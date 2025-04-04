@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -217,7 +217,7 @@ sub _PrepareData {
         my $ItemKey = $DefItem->{Key};
 
         # don't look at details if we don't have any value for this
-        next if ( !$Data->{ $ItemKey } );
+        next if ( !defined( $Data->{ $ItemKey } ) );
 
         # ignore attribute if user is logged in as Customer and attribute should not be visible
         next if (

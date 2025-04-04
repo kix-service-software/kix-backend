@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -370,7 +370,18 @@ our %FieldTypeMigration = (
             ]
         }
     },
-    'Table' => {}, # no changes needed for Table
+    'Table' => {
+        ConfigChange => {
+            Add => {
+                RowsInit => 1,
+                RowsMin  => 1,
+                RowsMax  => 1,
+            },
+            Remove => [
+                'Rows',
+            ]
+        }
+    },
     'Text' => {
         Type         => 'Text',
         ConfigChange => {
@@ -748,6 +759,18 @@ sub Run {
                     # init regular expression list, if missing
                     if ( !defined( $Config->{RegExList} ) ) {
                         $Config->{RegExList} = [];
+                    }
+                }
+
+                # special handling for Table
+                if ( $FieldTypeSrc eq 'Table' ) {
+                    # migrate Rows
+                    if ( ref( $Config->{Rows} ) eq 'HASH' ) {
+                        for my $Attribute ( qw(Init Min Max) ) {
+                            if ( defined( $Config->{Rows}->{ $Attribute } ) ) {
+                                $Config->{ 'Rows' . $Attribute } = $Config->{Rows}->{ $Attribute };
+                            }
+                        }
                     }
                 }
 

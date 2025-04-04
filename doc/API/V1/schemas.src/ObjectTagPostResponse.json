@@ -1,0 +1,14 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "ObjectTagPostResponse.json",
+    "type": "object",
+    "description": "The ID of the created objecttag.",
+    "properties": {
+        "ObjectTagID": {
+            "type": "integer"
+        }
+    },
+    "required": [
+        "ObjectTagID"
+    ]
+}

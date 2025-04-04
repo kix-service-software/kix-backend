@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -194,7 +194,7 @@ sub ValidateConfig {
             $SQL = MIME::Base64::decode_base64($1);
         }
 
-        if ( $SQL !~ /^SELECT\s+/i ) {
+        if ( $SQL !~ /^(SELECT|WITH)\s+/i ) {
             if ( !$Param{Silent} ) {
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',

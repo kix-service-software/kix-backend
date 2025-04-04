@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -1107,7 +1107,7 @@ sub ImportPO {
                     %Param,
                     Items => $Items
                 },
-                MaximumParallelInstances => 1,
+                MaximumParallelInstances => 0,
             );
             if ( !$TaskID ) {
                 $Kernel::OM->Get('Log')->Log(

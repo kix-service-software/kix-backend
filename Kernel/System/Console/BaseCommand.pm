@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -386,9 +386,8 @@ sub Execute {
     # Don't allow to run these scripts as root.
     if ( !$ParsedGlobalOptions->{'allow-root'} && $> == 0 && !$ENV{UnitTest} ) {    # $EFFECTIVE_USER_ID
         $Self->PrintError(
-            "You cannot run kix.Console.pl as root. Please run it as the apache user or with the help of su:"
+            "You cannot run this command as root. If you really want to do this and you know what you are doing, please use the option --allow-root."
         );
-        $Self->Print("  <yellow>su -c \"bin/kix.Console.pl MyCommand\" -s /bin/bash <apache user> </yellow>\n");
         return $Self->ExitCodeError();
     }
 
@@ -603,6 +602,14 @@ sub PrintError {
     my ( $Self, $Text ) = @_;
 
     chomp $Text;
+
+    # store error message in log object
+    $Kernel::OM->Get('Log')->Log(
+        Priority => 'error',
+        Message  => $Text,
+        Silent   => 1,
+    );
+
     print STDERR $Self->_Color( 'red', "Error: $Text\n" );
     return;
 }

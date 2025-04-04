@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -178,6 +178,97 @@ sub Exists {
     return $Exists;
 }
 
+=item OptionLookup()
+
+sysconfig name or id lookup
+
+    my $Name = $SysConfigObject->OptionLookup(
+        ID     => 1,
+        Silent => 1, # optional, don't generate log entry if sysconfig was not found
+    );
+
+    my $ID = $SysConfigObject->OptionLookup(
+        Name   => 'some sysconfig option name',
+        Silent => 1, # optional, don't generate log entry if sysconfig was not found
+    );
+
+=cut
+
+sub OptionLookup {
+    my ( $Self, %Param ) = @_;
+
+    if (
+        !$Param{ID}
+        && !$Param{Name}
+     ) {
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need ID or Name!"
+            );
+        }
+        return;
+    }
+
+    # check cache
+    my $CacheKey = 'OptionLookup::'
+        . ( $Param{ID} ? "ID::$Param{ID}" : q{} )
+        . ( $Param{Name} ? "Name::$Param{Name}" : q{} );
+
+    my $Cache = $Kernel::OM->Get('Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return $Cache if $Cache;
+
+    my $SQLSelect;
+    my $SQLWhere;
+    my @Bind;
+    if ( $Param{ID} ) {
+        $SQLSelect = 'name';
+        $SQLWhere  = 'id';
+        push( @Bind, \$Param{ID} );
+    }
+    else {
+        $SQLSelect = 'id';
+        $SQLWhere  = 'name';
+        push( @Bind, \$Param{Name} );
+    }
+
+    return if !$Kernel::OM->Get('DB')->Prepare(
+        SQL   => "SELECT $SQLSelect FROM sysconfig WHERE $SQLWhere = ?",
+        Bind  => \@Bind,
+        Limit => 1,
+    );
+
+    # fetch the result
+    my $Result;
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
+        $Result = $Row[0];
+    }
+
+    if ( !defined $Result ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => 'No config found for ' . ($Param{ID} ? "ID: $Param{ID}" : "Name: $Param{Name}"),
+            Silent   => $Param{Silent}
+        );
+        return;
+    }
+
+    # set cache
+    if ( $Result ) {
+        $Kernel::OM->Get('Cache')->Set(
+            Type  => $Self->{CacheType},
+            TTL   => $Self->{CacheTTL},
+            Key   => $CacheKey,
+            Value => $Result,
+        );
+    }
+
+    return $Result;
+}
+
 =item OptionGet()
 
 Get a SysConfig option.
@@ -215,39 +306,36 @@ sub OptionGet {
     return %{$Cache} if $Cache;
 
     return if !$Kernel::OM->Get('DB')->Prepare(
-        SQL   => "SELECT name, context, context_metadata, description, access_level, experience_level,
-                  type, group_name, setting, is_required, is_modified, default_value, value, comments,
-                  default_valid_id, valid_id, create_time, create_by, change_time, change_by
-                  FROM sysconfig WHERE name = ?",
+        SQL   => "SELECT * FROM sysconfig WHERE name = ?",
         Bind => [ \$Param{Name} ],
     );
 
     my %Data;
+    my @Columns = $Kernel::OM->Get('DB')->GetColumnNames();
+    for my $Column ( @Columns ) {
+        # special handling: use attribute name 'Default' for column 'default_value'
+        if ( $Column eq 'default_value' ) {
+            $Column = 'Default';
+
+            next;
+        }
+
+        my @Names = split(/_/sm, $Column);
+        for my $Name ( @Names) {
+            $Name = ( $Name eq 'id' ) ? uc($Name) : ucfirst($Name);
+        }
+
+        $Column = join( q{}, @Names);
+    }
 
     # fetch the result
     while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
-        %Data = (
-            Name            => $Row[0],
-            Context         => $Row[1],
-            ContextMetadata => $Row[2],
-            Description     => $Row[3],
-            AccessLevel     => $Row[4],
-            ExperienceLevel => $Row[5],
-            Type            => $Row[6],
-            Group           => $Row[7],
-            Setting         => $Row[8],
-            IsRequired      => $Row[9],
-            IsModified      => $Row[10],
-            Default         => $Row[11],
-            Value           => $Row[12],
-            Comment         => $Row[13],
-            DefaultValidID  => $Row[14],
-            ValidID         => $Row[15],
-            CreateTime      => $Row[16],
-            CreateBy        => $Row[17],
-            ChangeTime      => $Row[18],
-            ChangeBy        => $Row[19],
-        );
+        my $Index = 0;
+        COLUMN:
+        for my $Column ( @Columns ) {
+            $Data{ $Column } = $Row[$Index];
+            $Index++;
+        }
     }
 
     # no data found...
@@ -1179,7 +1267,7 @@ sub _RebuildFromFile {
 
                 if ( IsHashRef($Option{$Key}) || IsArrayRef($Option{$Key}) ) {
                     my $Result = Compare(
-                        $AllOptions{ $Option{Name} }->{$Key}, 
+                        $AllOptions{ $Option{Name} }->{$Key},
                         $Option{$Key}
                     );
                     if ( !$Result ) {

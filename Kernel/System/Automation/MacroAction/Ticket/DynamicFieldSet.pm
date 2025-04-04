@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -54,7 +54,11 @@ sub Describe {
         Label        => Kernel::Language::Translatable('Object ID'),
         Description  => Kernel::Language::Translatable('The ID of the object to which the value of the dynamic field should be set. If omitted, "${ObjectID}" is used'),
         Required     => 0,
-        DefaultValue => '${ObjectID}'
+        DefaultValue => '${ObjectID}',
+        Placeholder => {
+            Richtext  => 0,
+            Translate => 0,
+        },
     );
     $Self->AddOption(
         Name        => 'DynamicFieldName',
@@ -67,6 +71,10 @@ sub Describe {
         Label       => Kernel::Language::Translatable('Dynamic Field Value'),
         Description => Kernel::Language::Translatable('The value for the dynamic field to be set. Leave empty and uncheck "Append" to clear relevant dynamic field value of ticket.'),
         Required    => 0,
+        Placeholder => {
+            Richtext  => 0,
+            Translate => 1,
+        },
     );
     $Self->AddOption(
         Name        => 'DynamicFieldAppend',
@@ -115,13 +123,7 @@ sub Run {
         return;
     }
 
-    my $ObjectID = $Self->_ReplaceValuePlaceholder(
-        %Param,
-        Value => $Param{Config}->{ObjectID}
-    );
-
-    # use fallback if not set
-    $ObjectID ||= $Param{ObjectID} || $Self->{RootObjectID};
+    my $ObjectID = $Param{Config}->{ObjectID} || $Param{ObjectID} || $Self->{RootObjectID};
 
     if (!$ObjectID) {
         $Kernel::OM->Get('Automation')->LogError(
@@ -184,24 +186,22 @@ sub _PrepareValue {
     my ( $Self, %Param ) = @_;
 
     my @NewValue;
-    if (defined $Param{Config}->{DynamicFieldValue}) {
-        my $Value = $Self->_ReplaceValuePlaceholder(
-            %Param,
-            Translate => 1,
-            Value     => $Param{Config}->{DynamicFieldValue}
-        );
-        if (IsArrayRefWithData($Value)) {
-            @NewValue = @{$Value};
-        } elsif (defined $Value) {
-            @NewValue = ($Value);
+    if ( defined( $Param{Config}->{DynamicFieldValue} ) ) {
+        if ( IsArrayRefWithData( $Param{Config}->{DynamicFieldValue} ) ) {
+            @NewValue = @{ $Param{Config}->{DynamicFieldValue} };
+        } elsif ( defined( $Param{Config}->{DynamicFieldValue} ) ) {
+            @NewValue = ( $Param{Config}->{DynamicFieldValue} );
         }
     }
 
-    if ($Param{Config}->{DynamicFieldAppend} && $Param{Object}->{ "DynamicField_". $Param{Config}->{DynamicFieldName} }) {
-        if (IsArrayRefWithData($Param{Object}->{ "DynamicField_". $Param{Config}->{DynamicFieldName} })) {
-            unshift(@NewValue, @{ $Param{Object}->{ "DynamicField_". $Param{Config}->{DynamicFieldName} } });
+    if (
+        $Param{Config}->{DynamicFieldAppend}
+        && $Param{Object}->{ 'DynamicField_'. $Param{Config}->{DynamicFieldName} }
+    ) {
+        if ( IsArrayRefWithData( $Param{Object}->{ 'DynamicField_' . $Param{Config}->{DynamicFieldName} } ) ) {
+            unshift( @NewValue, @{ $Param{Object}->{ 'DynamicField_' . $Param{Config}->{DynamicFieldName} } } );
         } else {
-            unshift(@NewValue, $Param{Object}->{ "DynamicField_". $Param{Config}->{DynamicFieldName} });
+            unshift( @NewValue, $Param{Object}->{ 'DynamicField_' . $Param{Config}->{DynamicFieldName} } );
         }
     }
 

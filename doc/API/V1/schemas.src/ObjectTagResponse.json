@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "ObjectTagResponse.json",
+  "type": "object",
+  "description": "A response for a objecttag GET request.",
+  "properties": {
+    "ObjectTag": {
+      "$ref": "ObjectTagLink.json"
+    }
+  },
+  "required": [
+    "ObjectTag"
+  ]
+}

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -129,15 +129,6 @@ sub Search {
             Value    => $JoinRestrictionValue
         );
 
-        my $BigIntCast  = 'BIGINT';
-        my $CastMapping = $Kernel::OM->Get('DB')->GetDatabaseFunction('CastMapping');
-        if (
-            ref( $CastMapping ) eq 'HASH'
-            && $CastMapping->{BIGINT}
-        ) {
-            $BigIntCast = $CastMapping->{BIGINT};
-        }
-
         my $SupportedAttributes = $Self->GetSupportedAttributes();
         my @XMLType     = map{"ITSM::ConfigItem::$_"} @{$SupportedAttributes->{$Param{Search}->{Field}}->{ClassID}};
 
@@ -155,7 +146,7 @@ sub Search {
         # add join for xml storage
         push(
             @SQLJoin,
-            "LEFT OUTER JOIN xml_storage $TableAlias ON CAST($TableAlias.xml_key AS $BigIntCast) = $XMLStorageJoinColumn AND $JoinRestriction AND $JoinXMLType"
+            "LEFT OUTER JOIN xml_storage $TableAlias ON $TableAlias.xml_key = $XMLStorageJoinColumn AND $JoinRestriction AND $JoinXMLType"
         );
 
         $Param{Flags}->{JoinMap}->{ $Param{Search}->{Field} } = $Count;

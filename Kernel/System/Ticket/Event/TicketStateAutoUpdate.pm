@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -55,6 +55,9 @@ sub Run {
         return;
     }
 
+    # handle only events with given TicketID
+    return 1 if ( !$Param{Data}->{TicketID} );
+
     my $TicketStateAutoUpdate = $Self->{ConfigObject}->Get('TicketStateAutoUpdate');
     my $TicketStateAutoUpdateExtended = $Self->{ConfigObject}->Get('TicketStateAutoUpdateExtension');
 
@@ -69,9 +72,6 @@ sub Run {
     }
 
     if ( $Param{Event} eq 'TicketLockUpdate' ) {
-
-        #check required param...
-        return 1 if !$Param{Data}->{TicketID};
 
         # get defaultticketstate...
         if ( $Self->{TicketObject}->TicketLockGet( TicketID => $Param{Data}->{TicketID} ) ) {

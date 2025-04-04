@@ -1,4 +1,11 @@
 #!perl
+# --
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
+# --
+# This software comes with ABSOLUTELY NO WARRANTY. For details, see
+# the enclosed file LICENSE-AGPL for license information (AGPL). If you
+# did not receive this file, see https://www.gnu.org/licenses/agpl.txt.
+# --
 
 sub _Get { 
     my (%Param) = @_;
@@ -37,19 +44,24 @@ sub _Post {
     }
 
     my $Response = $ua->request($req);
-    my $DecRes = decode_json($Response->decoded_content);
+
+       if ( !$Response->decoded_content ){ 
+            return ($Response);
+       }
+       else {   
+            my $DecRes = decode_json($Response->decoded_content);
     
-    foreach my $Key (keys %{$DecRes}){
-        if ($Key ne "Systeminfo") {        
+            foreach my $Key (keys %{$DecRes}){
+                if ($Key ne "Systeminfo") {        
 
-            push (@{S->{$Key."Array"}}, $DecRes->{$Key});
-        }
-        if ($DecRes->{$Key}) {
-            S->{$Key} = $DecRes->{$Key}; 
-        }
-    }
-
-    return ($Response, decode_json($Response->decoded_content));        
+                    push (@{S->{$Key."Array"}}, $DecRes->{$Key});
+                }
+                if ($DecRes->{$Key}) {
+                    S->{$Key} = $DecRes->{$Key}; 
+                }
+            }
+            return ($Response, decode_json($Response->decoded_content));
+       }       
 }
 
 sub _Patch {

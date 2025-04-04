@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -777,7 +777,7 @@ sub ConvertDataToExternal {
                 delete $ArrayItem->{TagKey};
 
                 # get content from entry
-                my $Content = delete $ArrayItem->{Content} || '';
+                my $Content = delete $ArrayItem->{Content} // '';
 
                 # check if we have a special handling method to prepare the value
                 if ( $Self->{AttributeTypeModules}->{ $AttrDef{Input}->{Type} }->can('ExternalValuePrepare') ) {

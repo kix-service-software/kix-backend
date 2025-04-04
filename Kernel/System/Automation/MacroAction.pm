@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -742,9 +742,10 @@ sub MacroActionExecute {
 
     # fallback if not already known
     $Self->{MacroVariables} //= {
-        RootObjectID => $Self->{RootObjectID},
-        ObjectID     => $Param{ObjectID},
-        EventData    => $Self->{EventData}
+        RootObjectID  => $Self->{RootObjectID},
+        RootMacroType => $Self->{RootMacroType},
+        ObjectID      => $Param{ObjectID},
+        EventData     => $Self->{EventData}
     };
 
     # we need the result variables and macro results for the assignments
@@ -752,11 +753,18 @@ sub MacroActionExecute {
     $BackendObject->{ResultVariables} = $MacroAction{ResultVariables} || {};
     $BackendObject->{MacroResults}    = $Self->{MacroResults};
 
-    # add root object id
-    $BackendObject->{RootObjectID} = $Self->{RootObjectID};
+    # add root object id and type
+    $BackendObject->{RootObjectID}  = $Self->{RootObjectID};
+    $BackendObject->{RootMacroType} = $Self->{RootMacroType};
 
     # add event data
     $BackendObject->{EventData} = $Self->{EventData};
+
+    # add debug flag
+    $BackendObject->{Debug} = $MacroAction{Parameters}->{Debug};
+
+    # get macro action defintion
+    my %Definition = $BackendObject->DefinitionGet();
 
     do {
         # unset RepeatExecution of backend
@@ -770,11 +778,41 @@ sub MacroActionExecute {
         );
 
         # replace variables
-        if (IsHashRefWithData($Self->{MacroVariables})) {
+        if ( IsHashRefWithData( $Self->{MacroVariables} ) ) {
             $Kernel::OM->Get('Main')->ReplaceVariables(
                 Data      => \%Parameters,
                 Variables => $Self->{MacroVariables},
                 UserID    => $Param{UserID}
+            );
+        }
+
+        OPTION:
+        for my $Option ( values( %{ $Definition{Options} } ) ) {
+            next OPTION if ( !IsHashRef( $Option->{Placeholder} ) );
+
+            # special handling. When root macro type is current macro type, use root object id
+            my $ObjectID = $Param{ObjectID};
+            if ( $Self->{RootMacroType} eq $Macro{Type} ) {
+                $ObjectID = $Self->{RootObjectID};
+            }
+
+            $Parameters{ $Option->{Name} } = $Self->_ReplaceValuePlaceholder(
+                Value     => $Parameters{ $Option->{Name} },
+                ValueType => $Option->{Placeholder}->{ValueType} || '',
+                Richtext  => $Option->{Placeholder}->{Richtext},
+                Translate => $Option->{Placeholder}->{Translate},
+                MacroType => $Macro{Type},
+                ObjectID  => $ObjectID,
+                UserID    => $Param{UserID},
+                Data      => IsHashRefWithData( $Param{AdditionalData} ) ? $Param{AdditionalData} : {},
+            );
+        }
+
+        if ( $BackendObject->{Debug} ) {
+            $Kernel::OM->Get('Automation')->LogDebug(
+                Referrer => $Self,
+                Message  => 'Running macro action with config: ' . $Kernel::OM->Get('Main')->Dump( \%Parameters ),
+                UserID   => $Param{UserID},
             );
         }
 
@@ -1098,6 +1136,177 @@ sub _LoadMacroActionTypeBackend {
     }
 
     return $Self->{MacroActionTypeModules}->{$Param{MacroType}}->{$Param{Name}};
+}
+
+=item _ReplaceValuePlaceholder()
+
+replaces palceholders
+
+Example:
+    my $Value = $Self->_ReplaceValuePlaceholder(
+        Value     => $SomeValue,
+        Richtext  => 0,                  # optional: 0 will be used if omitted
+        Translate => 0,                  # optional: 0 will be used if omitted
+        UserID    => 1,                  # optional: 1 will be used if omitted
+        Data      => {},                 # optional: {} will be used
+    );
+
+=cut
+
+sub _ReplaceValuePlaceholder {
+    my ( $Self, %Param ) = @_;
+
+    return $Param{Value} if ( !$Param{Value} );
+
+    my $Data = $Self->{EventData} || {};
+    if ( IsHashRefWithData( $Param{Data} ) ) {
+        $Data = {
+            %{ $Data },
+            %{ $Param{Data} }
+        };
+    }
+
+    if ( $Param{ValueType} eq 'JSON' ) {
+        my $JSONData = $Kernel::OM->Get('JSON')->Decode(
+            Data => $Param{Value},
+        );
+        
+        if ( IsArrayRef( $JSONData ) ) {
+            $JSONData = $Self->_ReplacePlaceholderArrayRef(
+                %Param,
+                Data  => $Data,
+                Value => $JSONData,
+            );
+        }
+        elsif ( IsHashRef( $JSONData ) ) {
+            $JSONData = $Self->_ReplacePlaceholderHashRef(
+                %Param,
+                Data  => $Data,
+                Value => $JSONData,
+            );
+        }
+        elsif ( IsString( $JSONData ) ) {
+            $JSONData = $Self->_ReplacePlaceholderString(
+                %Param,
+                Data  => $Data,
+                Value => $JSONData,
+            );
+        }
+
+        $Param{Value} = $Kernel::OM->Get('JSON')->Encode(
+            Data => $JSONData,
+        );
+    }
+    elsif ( $Param{ValueType} eq 'KeyValueListValues' ) {
+        if ( IsArrayRef( $Param{Value} ) ) {
+            ENTRY:
+            for my $Entry ( @{ $Param{Value} } ) {
+                next ENTRY if ( !IsArrayRefWithData( $Entry ) );
+
+                $Entry->[1] = $Self->_ReplacePlaceholderString(
+                    %Param,
+                    Data  => $Data,
+                    Value => $Entry->[1],
+                );
+            }
+        }
+    }
+    elsif ( IsArrayRef( $Param{Value} ) ) {
+        $Param{Value} = $Self->_ReplacePlaceholderArrayRef(
+            %Param,
+            Data => $Data,
+        );
+    }
+    elsif ( IsHashRef( $Param{Value} ) ) {
+        $Param{Value} = $Self->_ReplacePlaceholderHashRef(
+            %Param,
+            Data => $Data,
+        );
+    }
+    elsif ( IsString( $Param{Value} ) ) {
+        $Param{Value} = $Self->_ReplacePlaceholderString(
+            %Param,
+            Data => $Data,
+        );
+    }
+
+    return $Param{Value};
+}
+
+sub _ReplacePlaceholderArrayRef {
+    my ( $Self, %Param ) = @_;
+
+    for my $Value ( @{ $Param{Value} } ) {
+        if ( IsArrayRef( $Value ) ) {
+            $Value = $Self->_ReplacePlaceholderArrayRef(
+                %Param,
+                Value => $Value,
+            );
+        }
+        elsif ( IsHashRef( $Value ) ) {
+            $Value = $Self->_ReplacePlaceholderHashRef(
+                %Param,
+                Value => $Value,
+            );
+        }
+        elsif ( IsString( $Value ) ) {
+            $Value = $Self->_ReplacePlaceholderString(
+                %Param,
+                Value => $Value,
+            );
+        }
+    }
+
+    return $Param{Value};
+}
+
+sub _ReplacePlaceholderHashRef {
+    my ( $Self, %Param ) = @_;
+
+    for my $Value ( values( %{ $Param{Value} } ) ) {
+        if ( IsArrayRef( $Value ) ) {
+            $Value = $Self->_ReplacePlaceholderArrayRef(
+                %Param,
+                Value => $Value,
+            );
+        }
+        elsif ( IsHashRef( $Value ) ) {
+            $Value = $Self->_ReplacePlaceholderHashRef(
+                %Param,
+                Value => $Value,
+            );
+        }
+        elsif ( IsString( $Value ) ) {
+            $Value = $Self->_ReplacePlaceholderString(
+                %Param,
+                Value => $Value,
+            );
+        }
+    }
+
+    return $Param{Value};
+}
+
+sub _ReplacePlaceholderString {
+    my ( $Self, %Param ) = @_;
+
+    return $Param{Value} if (
+        !$Param{Value}
+        || $Param{Value} !~ m/(<|&lt;)KIX_/
+    );
+
+    $Param{Value} = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
+        Text            => $Param{Value},
+        RichText        => $Param{Richtext} || 0,
+        Translate       => $Param{Translate} || 0,
+        UserID          => $Param{UserID} || 1,
+        Data            => $Param{Data},
+        ReplaceNotFound => $Param{ReplaceNotFound},
+        ObjectType      => $Param{MacroType},
+        ObjectID        => $Param{ObjectID},
+    );
+
+    return $Param{Value};
 }
 
 1;

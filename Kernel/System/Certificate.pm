@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
@@ -134,6 +134,9 @@ sub CertificateCreate {
         $Preferences{$Key} = $Attributes->{$Key};
     }
 
+    # add content type to the preferences for serialization
+    $Preferences{ContentType} = $Param{File}->{ContentType};
+
     my $Content = $Param{File}->{Content};
 
     my $FileID = $Kernel::OM->Get('VirtualFS')->Write(
@@ -145,12 +148,11 @@ sub CertificateCreate {
     );
 
     if ( !$FileID ) {
-        if ( !$Param{Silent} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => 'Certificate could not be create!'
-            );
-        }
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => 'Certificate could not be create!',
+            Silent   => $Param{Silent}
+        );
         return;
     }
 
@@ -189,6 +191,7 @@ get a local certificate
         Email           => "selfsigned@example.de",
         FileID          => "4",
         Filename        => "KIX_Cert_4",
+        Filepath        => "/path/to/certificate",
         Fingerprint     => "8F:9A:BB:D5:92:2F:54:CB:D6:61:96:A6:67:35:81:64:2A:EC:3F:94",
         Hash            => "791510e5",
         Issuer          => "C =  DE, ST =  Saxony, L =  Example, O =  Example GmbH, CN =  selfsigned, emailAddress =  selfsigned@example.de",
@@ -207,12 +210,11 @@ sub CertificateGet {
     my ( $Self, %Param ) = @_;
 
     if ( !$Param{ID} ) {
-        if ( !$Param{Silent} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => 'Need ID!'
-            );
-        }
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => 'Need ID!',
+            Silent   => $Param{Silent}
+        );
         return;
     }
 
@@ -246,27 +248,24 @@ sub CertificateGet {
     );
 
     if ( !%File ) {
-        if ( !$Param{Silent} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => 'Certificate could not be found!'
-            );
-        }
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => 'Certificate could not be found!',
+            Silent   => $Param{Silent}
+        );
         return;
     }
-
 
     if (
         !$File{Preferences}->{Type}
         || !$Self->{$File{Preferences}->{Type}}
         || !$Self->{$File{Preferences}->{Type}}->{Path}
     ) {
-        if ( !$Param{Silent} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "The file found is not a supported certificate!"
-            );
-        }
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "The file found is not a supported certificate!",
+            Silent   => $Param{Silent}
+        );
         return;
     }
 
@@ -278,27 +277,31 @@ sub CertificateGet {
     my $Certificate = $File{Preferences};
     $Certificate->{FileID}   = $Param{ID};
     $Certificate->{Filename} = $Filename;
-
-    # remove unnessary datas
-    for my $Key ( qw(Filesize FilesizeRaw Passphrase) ) {
-        next if ( $Key eq 'Passphrase' && $Param{Passphrase} );
-        delete $Certificate->{$Key};
-    }
+    $Certificate->{Filepath} = $Self->{ $File{Preferences}->{Type} }->{Path} . '/' . $Filename;
 
     if (
         defined $Param{Include}
         && $Param{Include} eq 'Content'
     ) {
         if ( !$File{Content} ) {
-            if ( !$Param{Silent} ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => 'Certificate could load content!'
-                );
-            }
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Certificate could load content!',
+                Silent   => $Param{Silent}
+            );
             return;
         }
         $Certificate->{Content} = ${$File{Content}};
+    }
+    else {
+        # remove unnessary datas
+        for my $Key ( qw(Filesize FilesizeRaw) ) {
+            delete $Certificate->{$Key};
+        }
+    }
+
+    if ( !$Param{Passphrase} ) {
+        delete $Certificate->{Passphrase};
     }
 
     # set cache
@@ -328,12 +331,11 @@ sub CertificateDelete {
     my ( $Self, %Param ) = @_;
 
     if ( !$Param{ID} ) {
-        if ( !$Param{Silent} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need ID!"
-            );
-        }
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Need ID!",
+            Silent   => $Param{Silent}
+        );
         return;
     }
 
@@ -344,12 +346,11 @@ sub CertificateDelete {
     );
 
     if ( !%File ) {
-        if ( !$Param{Silent} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "No certificate found!"
-            );
-        }
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "No certificate found!",
+            Silent   => $Param{Silent}
+        );
         return;
     }
 
@@ -358,12 +359,11 @@ sub CertificateDelete {
         || !$Self->{$File{Preferences}->{Type}}
         || !$Self->{$File{Preferences}->{Type}}->{Path}
     ) {
-        if ( !$Param{Silent} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "The file found is not a supported certificate!"
-            );
-        }
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "The file found is not a supported certificate!",
+            Silent   => $Param{Silent}
+        );
         return;
     }
 
@@ -383,12 +383,11 @@ sub CertificateDelete {
         );
 
         if ( !$Success ) {
-            if ( !$Param{Silent} ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Couldn't delete certificate!"
-                );
-            }
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Couldn't delete certificate!",
+                Silent   => $Param{Silent}
+            );
             return;
         }
     }
@@ -399,12 +398,11 @@ sub CertificateDelete {
     );
 
     if ( !$Success ) {
-        if ( !$Param{Silent} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Couldn't delete certificate!"
-            );
-        }
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Couldn't delete certificate!",
+            Silent   => $Param{Silent}
+        );
         return;
     }
 
@@ -452,24 +450,22 @@ sub CertificateExists {
 
     if ( $Param{HasCertificate} ) {
         if ( !$Param{Type} ) {
-            if ( !$Param{Silent} ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Needed Type!",
-                );
-            }
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Needed Type!",
+                Silent   => $Param{Silent}
+            );
             return;
         }
 
         return 1 if $Param{Type} ne 'Private';
 
         if ( !$Param{Modulus} ) {
-            if ( !$Param{Silent} ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Needed Modulus!",
-                );
-            }
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Needed Modulus!",
+                Silent   => $Param{Silent}
+            );
             return;
         }
 
@@ -495,24 +491,22 @@ sub CertificateExists {
         );
 
         if ( !@CertID ) {
-            if ( !$Param{Silent} ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Need Certificate of Private Key first -$Param{Modulus})!",
-                );
-            }
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need Certificate of Private Key first -$Param{Modulus})!",
+                Silent   => $Param{Silent}
+            );
             return;
         }
         return $CertID[0];
     }
     else {
         if ( !$Param{Filename} ) {
-            if ( !$Param{Silent} ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Needed Filename!",
-                );
-            }
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Needed Filename!",
+                Silent   => $Param{Silent}
+            );
             return;
         }
 
@@ -533,12 +527,11 @@ sub CertificateExists {
         );
 
         if ( $Exists ) {
-            if ( !$Param{Silent} ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => 'Certificate already exists!'
-                );
-            }
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Certificate already exists!',
+                Silent   => $Param{Silent}
+            );
             return 1;
         }
     }
@@ -612,12 +605,11 @@ sub Decrypt {
 
     for my $Needed ( qw(Content Type) ) {
         if ( !$Param{$Needed} ) {
-            if ( !$Param{Silent} ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Needed $Needed!"
-                );
-            }
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Needed $Needed!",
+                Silent   => $Param{Silent}
+            );
             return;
         }
     }
@@ -805,12 +797,11 @@ sub Decrypt {
         }
     }
     else {
-        if ( !$Param{Silent} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Not supported Type $Param{Type}!"
-            );
-        }
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Not supported Type $Param{Type}!",
+            Silent   => $Param{Silent}
+        );
         return;
     }
 
@@ -822,12 +813,11 @@ sub Encrypt {
 
     for my $Needed ( qw(Entity To) ) {
         if ( !$Param{$Needed} ) {
-            if ( !$Param{Silent} ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Need $Needed!"
-                );
-            }
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!",
+                Silent   => $Param{Silent}
+            );
             return;
         }
     }
@@ -1096,12 +1086,11 @@ sub Verify {
 
     for my $Needed ( qw(Content Type) ) {
         if ( !$Param{$Needed} ) {
-            if ( !$Param{Silent} ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Needed $Needed!"
-                );
-            }
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Needed $Needed!",
+                Silent   => $Param{Silent}
+            );
             return;
         }
     }
@@ -1114,7 +1103,7 @@ sub Verify {
         return if !$ContentType;
 
         if (
-            $ContentType =~ /application\/(x-pkcs7|pkcs7)/i
+            $ContentType =~ /application\/(?:x-pkcs7|pkcs7)(?:-mime|)/i
             && $ContentType =~ /signed/i
         ) {
             # require EmailParser
@@ -1240,12 +1229,11 @@ sub Verify {
                     . "\")"
                     . ", but sender address \"$OrigSender\": does not match certificate address!";
 
-                if ( !$Param{Silent} ) {
-                    $Kernel::OM->Get('Log')->Log(
-                        Priority => 'error',
-                        Message  => $Message
-                    );
-                }
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => $Message,
+                    Silent   => $Param{Silent}
+                );
 
                 return {
                     Flags   => [
@@ -1259,6 +1247,50 @@ sub Verify {
                         }
                     ],
                     Content => $Content
+                }
+            }
+            elsif (
+                $Verified{Type} eq 'Unverified'
+                && $SignerSenderMatch
+            ) {
+                # create email entity with old content
+                my $Mail = Mail::Internet->new( $Content );
+
+                # get headers
+                my $Head = $Mail->head();
+                $Head->modify(1);
+
+                # removed old sign headers
+                $Head->delete('Content-Type');
+                $Head->delete('Content-Disposition');
+                $Head->delete('Content-Transfer-Encoding');
+
+                # create tempoary email entity with new content
+                my $EMail = Mail::Internet->new( $Verified{Content} );
+                my $EHead = $EMail->head();
+
+                # extract headers and add to orignal header
+                for my $Key ( keys %{$EHead->{mail_hdr_hash}} ) {
+                    next if !defined $EHead->get($Key);
+                    $Head->add($Key,$EHead->get($Key));
+                }
+
+                # replace old body with new body
+                $Mail->body($EMail->body());
+                my @NewContent = map { "$_\n" } split( /\n/, $Mail->as_string() );
+
+                return {
+                    Flags   => [
+                        {
+                            Key   => 'SMIMESigned',
+                            Value => 1
+                        },
+                        {
+                            Key   => 'SMIMESignedError',
+                            Value => $Verified{Error}
+                        }
+                    ],
+                    Content => \@NewContent
                 }
             }
             else{
@@ -1275,12 +1307,11 @@ sub Verify {
         }
     }
     else {
-        if ( !$Param{Silent} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Not supported Type $Param{Type}!"
-            );
-        }
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Not supported Type $Param{Type}!",
+            Silent   => $Param{Silent}
+        );
         return;
     }
 
@@ -1292,12 +1323,11 @@ sub Sign {
 
     for my $Needed ( qw(Entity From) ) {
         if ( !$Param{$Needed} ) {
-            if ( !$Param{Silent} ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Need $Needed!"
-                );
-            }
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!",
+                Silent   => $Param{Silent}
+            );
             return;
         }
     }
@@ -1491,12 +1521,11 @@ sub _WriteCertificate {
 
     for my $Needed ( qw(ID Type Content) ) {
         if ( !$Param{$Needed} ) {
-            if ( !$Param{Silent} ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Needed $Needed!"
-                );
-            }
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Needed $Needed!",
+                Silent   => $Param{Silent}
+            );
             return;
         }
     }
@@ -1519,12 +1548,11 @@ sub _WriteCertificate {
     );
 
     if ( !$Success ) {
-        if ( !$Param{Silent} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => 'Certificate could not be create!'
-            );
-        }
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => 'Certificate could not be create!',
+            Silent   => $Param{Silent}
+        );
         if ( !$Param{NoDelete} ) {
             $Self->CertificateDelete(
                 ID     => $Param{ID},
@@ -1547,49 +1575,45 @@ sub _CheckCertificate {
 
     for my $Needed ( qw(File Type CType) ) {
         if ( !$Param{$Needed} ) {
-            if ( !$Param{Silent} ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Need $Needed!"
-                );
-            }
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!",
+                Silent   => $Param{Silent}
+            );
             return;
         }
     }
 
     for my $Needed ( qw(Content ContentType Filename) ) {
         if ( !$Param{File}->{$Needed} ) {
-            if ( !$Param{Silent} ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Need $Needed in File!"
-                );
-            }
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed in File!",
+                Silent   => $Param{Silent}
+            );
             return;
         }
     }
 
     my $ContentTypes = $Self->{$Param{Type}}->{ContentTypes};
     if ( !$ContentTypes->{$Param{File}->{ContentType}} ) {
-        if ( !$Param{Silent} ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Invalid content type $Param{File}->{ContentType}"
-                );
-            }
-            return;
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Invalid content type $Param{File}->{ContentType}",
+            Silent   => $Param{Silent}
+        );
+        return;
     }
 
     if (
         $Param{Type} eq 'Private'
         && !$Param{Passphrase}
     ) {
-        if ( !$Param{Silent} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need Passphrase!"
-            );
-        }
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Need Passphrase!",
+            Silent   => $Param{Silent}
+        );
         return;
     }
 
@@ -1713,19 +1737,17 @@ sub _FetchAttributes {
         my $Output = qx{$Self->{Cmd} $OptionStrg 2>&1};
 
         if ( $Output =~ /error:/sm ) {
-            if ( !$Param{Silent} ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => $Output
-                );
-            }
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => $Output,
+                Silent   => $Param{Silent}
+            );
             return;
         }
 
         $Result .= "\n" if $Result;
         $Result .= $Output;
     }
-
 
     # filters
     my %Filters = (
@@ -1974,12 +1996,11 @@ sub _Decrypt {
     # check needed stuff
     for my $Needed (qw(Content ID)) {
         if ( !$Param{$Needed} ) {
-            if ( !$Param{Silent} ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Need $Needed!"
-                );
-            }
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!",
+                Silent   => $Param{Silent}
+            );
             return;
         }
     }
@@ -2093,12 +2114,11 @@ sub _Verify {
 
     # check needed stuff
     if ( !$Param{Content} ) {
-        if ( !$Param{Silent} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need Content!"
-            );
-        }
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Need Content!",
+            Silent   => $Param{Silent}
+        );
         return;
     }
 
@@ -2201,7 +2221,7 @@ sub _Verify {
         );
     }
 
-    # digest failure means that the content of the email does not match witht he signature
+    # digest failure means that the content of the email does not match with the signature
     elsif ( $Message =~ m{digest failure}i ) {
         if ( $Self->{Debug} ) {
             $Kernel::OM->Get('Log')->Log(
@@ -2214,6 +2234,28 @@ sub _Verify {
             Type      => 'Unverified',
             Error     => 'OpenSSL: The signature does not match the message content : ' . $Message,
             Content   => \@NewContent
+        );
+    }
+
+    # certificate has expired
+    elsif ( $Message =~ m{certificate has expired}i ) {
+        if ( $Self->{Debug} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'debug',
+                Message  => 'OpenSSL: The signature does not match the message content : ' . $MessageLong,
+            );
+        }
+
+        # repeat verifcation, but with option -noverify to get the content.
+        my %Result = $Self->_Verify(
+            %Param,
+            NoVerify => 1
+        );
+
+        return (
+            %Result,
+            Type    => 'Unverified',
+            Error   => 'OpenSSL: The signature does not match the message content : ' . $Message,
         );
     }
 
@@ -2236,12 +2278,11 @@ sub _Sign {
     # check needed stuff
     for (qw(Content ID)) {
         if ( !$Param{$_} ) {
-            if ( !$Param{Silent} ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Need $_!"
-                );
-            }
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!",
+                Silent   => $Param{Silent}
+            );
             return;
         }
     }

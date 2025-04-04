@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -50,6 +50,9 @@ Run - contains the actions performed by this event handler.
 sub Run {
     my ( $Self, %Param ) = @_;
 
+    # handle only events with given TicketID
+    return 1 if ( !$Param{Data}->{TicketID} );
+
     # check if manual state change is activated in CustomerTicketZoom
     my $CustomerTicketZoomConfig
         = $Self->{ConfigObject}->Get("Ticket::Frontend::CustomerTicketZoom");
@@ -68,11 +71,6 @@ sub Run {
     );
 
     return 1 if ( $ThisArticle{Channel} ne 'note' && $ThisArticle{SenderType} ne 'external');
-
-    if ( !$Param{Data}->{TicketID} ) {
-        $Self->{LogObject}->Log( Priority => 'error', Message => "Need TicketID!" );
-        return;
-    }
 
     # get ticket data and check ticket state
     my %Ticket = $Self->{TicketObject}->TicketGet( TicketID => $Param{Data}->{TicketID} );

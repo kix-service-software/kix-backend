@@ -28,6 +28,11 @@
             "type": "object",
             "description": "contains object type specific paramters",
             "readOnly": true
+        },
+        "Requires": {
+            "type": "array",
+            "description": "required search attributes in AND part to use this attribute",
+            "readOnly": true
         }
     },
     "required": [

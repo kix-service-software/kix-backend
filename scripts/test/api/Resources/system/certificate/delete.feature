@@ -1,4 +1,4 @@
-Feature: DELETE request to the /system/certificate/:CertificateID resource
+Feature: DELETE request to the /system/certificates/:CertificateID resource
 
   Background: 
     Given the API URL is __BACKEND_API_URL__

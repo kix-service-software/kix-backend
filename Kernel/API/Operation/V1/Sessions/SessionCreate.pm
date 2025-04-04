@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -49,12 +49,16 @@ define parameter preparation and check for this operation
 sub ParameterDefinition {
     my ( $Self, %Param ) = @_;
 
-    my $PreAuthTypes = $Kernel::OM->Get('Auth')->GetPreAuthTypes(
-        UsageContext => $Param{Data}->{UserType}
-    );
-    my $MFAuthTypes  = $Kernel::OM->Get('Auth')->GetMFAuthTypes(
-        UsageContext => $Param{Data}->{UserType}
-    );
+    my $PreAuthTypes = [];
+    my $MFAuthTypes  = [];
+    if ( $Param{Data}->{UserType} ) {
+        $PreAuthTypes = $Kernel::OM->Get('Auth')->GetPreAuthTypes(
+            UsageContext => $Param{Data}->{UserType}
+        );
+        $MFAuthTypes  = $Kernel::OM->Get('Auth')->GetMFAuthTypes(
+            UsageContext => $Param{Data}->{UserType}
+        );
+    }
 
     return {
         'UserLogin' => {

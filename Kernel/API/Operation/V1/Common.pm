@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -1490,7 +1490,7 @@ sub _Success {
         if ( IsHashRefWithData($Self->{PermissionFieldSelector}) ) {
             my $StartTime;
             if ( $Self->{Debug} ) {
-               my $StartTime = Time::HiRes::time();
+               $StartTime = Time::HiRes::time();
                $Self->_Debug($Self->{LevelIndent}, "applying permission field selector");
             }
 
@@ -2005,7 +2005,7 @@ sub _ApplyFilter {
                 # if not, the item cannot be read
                 $Param{Data}->{$Object} = $FilteredResult[0];
                 $Result{$Object} = scalar @FilteredResult;
-                
+
                 if ( $Self->{Debug} ) {
                     $Self->_Debug($Self->{LevelIndent}, sprintf("filtered result contains %i objects", $Result{$Object}));
                 }
@@ -2877,7 +2877,7 @@ sub _ApplyObjectPermissions {
             # replace the item list in the response
             if ( IsArrayRefWithData($Param{Data}->{$Object}) ) {
                 $Param{Data}->{$Object} = \@NewItemList;
-                
+
                 if ( $Self->{PermissionDebug} ) {
                     $Self->_PermissionDebug($Self->{LevelIndent},  sprintf("permission filtered result contains %i objects", scalar @NewItemList) );
                 }
@@ -4347,6 +4347,14 @@ sub _GetCustomerUserVisibleObjectIds {
                     UserType   => $Self->{Authorization}->{UserType}
                 );
                 return scalar(@IDs) ? \@IDs : [];
+            } elsif ($Param{ObjectType} eq 'Contact') {
+                return $Kernel::OM->Get('Contact')->GetAssignedContactsForObject(
+                    %Param,
+                    ObjectType => 'Contact',
+                    Object     => \%ContactData,
+                    UserID     => $Self->{Authorization}->{UserID},
+                    UserType   => $Self->{Authorization}->{UserType},
+                );
             }
         }
     }
@@ -4529,7 +4537,7 @@ sub _ValidateDynamicFieldValue {
         my $ValueTypeResult = $Kernel::OM->Get('DynamicField::Backend')->ValueValidate(
             DynamicFieldConfig => $DynamicFieldConfig,
             Value              => $Value,
-            UserID             => 1,
+            UserID             => $Self->{Authorization}->{UserID},
         );
         return if (!$ValueTypeResult);
     }

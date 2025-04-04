@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -843,32 +843,34 @@ sub QueueUpdate {
         Type => $Self->{CacheType},
     );
 
-    # updated all sub queue names
-    my @ParentQueue = split( /::/, $OldQueue{Name} );
+    # updated all sub queue names if queue name changed
+    if ( $OldQueue{Name} ne $Param{Name} ) {
+        my @ParentQueue = split( /::/, $OldQueue{Name} );
 
-    for my $QueueID ( sort keys %AllQueue ) {
+        for my $QueueID ( sort keys %AllQueue ) {
 
-        my @SubQueue = split( /::/, $AllQueue{$QueueID} );
+            my @SubQueue = split( /::/, $AllQueue{$QueueID} );
 
-        if ( $#SubQueue > $#ParentQueue ) {
+            if ( $#SubQueue > $#ParentQueue ) {
 
-            if ( $AllQueue{$QueueID} =~ /^\Q$OldQueue{Name}::\E/i ) {
+                if ( $AllQueue{$QueueID} =~ /^\Q$OldQueue{Name}::\E/i ) {
 
-                my $NewQueueName = $AllQueue{$QueueID};
-                $NewQueueName =~ s/\Q$OldQueue{Name}\E/$Param{Name}/;
+                    my $NewQueueName = $AllQueue{$QueueID};
+                    $NewQueueName =~ s/\Q$OldQueue{Name}\E/$Param{Name}/;
 
-                return if !$DBObject->Do(
-                    SQL => '
-                        UPDATE queue
-                        SET name = ?, change_time = current_timestamp, change_by = ?
-                        WHERE id = ?',
-                    Bind => [ \$NewQueueName, \$Param{UserID}, \$QueueID ],
-                );
+                    return if !$DBObject->Do(
+                        SQL => '
+                            UPDATE queue
+                            SET name = ?, change_time = current_timestamp, change_by = ?
+                            WHERE id = ?',
+                        Bind => [ \$NewQueueName, \$Param{UserID}, \$QueueID ],
+                    );
 
-                # reset cache
-                $Kernel::OM->Get('Cache')->CleanUp(
-                    Type => $Self->{CacheType},
-                );
+                    # reset cache
+                    $Kernel::OM->Get('Cache')->CleanUp(
+                        Type => $Self->{CacheType},
+                    );
+                }
             }
         }
     }

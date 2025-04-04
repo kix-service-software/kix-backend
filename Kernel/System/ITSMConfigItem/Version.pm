@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -1857,8 +1857,8 @@ sub _FindChangedXMLValues {
     # do the check
     my %UpdateValues;
     for my $TagKey ( sort keys %UniqueTagKeys ) {
-        my $NewContent = eval '$NewXMLData' . $TagKey . '->{Content}' || '';      ## no critic
-        my $OldContent = eval '$OldXMLData->' . $TagKey . '->{Content}' || '';    ## no critic
+        my $NewContent = eval '$NewXMLData' . $TagKey . '->{Content}' // '';      ## no critic
+        my $OldContent = eval '$OldXMLData->' . $TagKey . '->{Content}' // '';    ## no critic
 
         if ( $NewContent ne $OldContent ) {
 

@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -237,6 +237,17 @@ for my $Test (@Tests) {
         $Flag{ $Test->{Key} },
         $Test->{Value},
         'ArticleFlagGet() article 1',
+    );
+    # test duplicate set
+    $Set = $Kernel::OM->Get('Ticket')->ArticleFlagSet(
+        ArticleID => $ArticleIDs[0],
+        Key       => $Test->{Key},
+        Value     => $Test->{Value},
+        UserID    => 1,
+    );
+    $Self->True(
+        $Set,
+        'ArticleFlagSet() article 1 (duplicate)',
     );
     $Delete = $Kernel::OM->Get('Ticket')->ArticleFlagDelete(
         ArticleID => $ArticleIDs[0],

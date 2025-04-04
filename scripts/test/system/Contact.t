@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -516,142 +516,6 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
         }
     }
 
-    # check token support
-    my $Token = $ContactObject->TokenGenerate(
-        ContactID => $ContactID,
-    );
-    $Self->True(
-        $Token,
-        "TokenGenerate() - $ContactID - $Token",
-    );
-
-    my $TokenValid = $ContactObject->TokenCheck(
-        Token     => $Token,
-        ContactID => $ContactID,
-    );
-
-    $Self->True(
-        $TokenValid,
-        "TokenCheck() - $ContactID - $Token",
-    );
-
-    $TokenValid = $ContactObject->TokenCheck(
-        Token     => $Token,
-        ContactID => $ContactID,
-    );
-
-    $Self->True(
-        !$TokenValid,
-        "TokenCheck() - $ContactID - $Token",
-    );
-
-    $TokenValid = $ContactObject->TokenCheck(
-        Token     => $Token . '123',
-        ContactID => $ContactID,
-    );
-
-    $Self->True(
-        !$TokenValid,
-        "TokenCheck() - $ContactID - $Token" . "123",
-    );
-
-    # testing preferences
-
-    my $SetPreferences = $ContactObject->SetPreferences(
-        Key       => 'UserLanguage',
-        Value     => 'fr',
-        ContactID => $ContactID,
-    );
-
-    $Self->True(
-        $SetPreferences,
-        "SetPreferences - $ContactID",
-    );
-
-    my %Preferences = $ContactObject->GetPreferences(
-        ContactID => $ContactID,
-    );
-
-    $Self->True(
-        %Preferences || '',
-        "GetPreferences - $ContactID",
-    );
-
-    $Self->Is(
-        $Preferences{UserLanguage},
-        "fr",
-        "GetPreferences $ContactID - fr",
-    );
-
-    my %ContactList = $ContactObject->SearchPreferences(
-        Key   => 'UserLanguage',
-        Value => 'fr',
-    );
-
-    $Self->True(
-        %ContactList || '',
-        "SearchPreferences - $ContactID",
-    );
-
-    $Self->Is(
-        $ContactList{$ContactID},
-        'fr',
-        "SearchPreferences() - $ContactID",
-    );
-
-    %ContactList = $ContactObject->SearchPreferences(
-        Key   => 'UserLanguage',
-        Value => 'de',
-    );
-
-    $Self->False(
-        $ContactList{$ContactID},
-        "SearchPreferences() - $ContactID",
-    );
-
-    # search for any value
-    %ContactList = $ContactObject->SearchPreferences(
-        Key => 'UserLanguage',
-    );
-
-    $Self->True(
-        %ContactList || '',
-        "SearchPreferences - $ContactID",
-    );
-
-    $Self->Is(
-        $ContactList{$ContactID},
-        'fr',
-        "SearchPreferences() - $ContactID",
-    );
-
-    #update existing prefs
-    my $UpdatePreferences = $ContactObject->SetPreferences(
-        Key       => 'UserLanguage',
-        Value     => 'da',
-        ContactID => $ContactID,
-    );
-
-    $Self->True(
-        $UpdatePreferences,
-        "UpdatePreferences - $ContactID",
-    );
-
-    %Preferences = $ContactObject->GetPreferences(
-        ContactID => $ContactID,
-    );
-
-    $Self->True(
-        %Preferences || '',
-        "GetPreferences - $ContactID",
-    );
-
-    $Self->Is(
-        $Preferences{UserLanguage},
-        "da",
-        "UpdatePreferences $ContactID - da",
-    );
-
     #update customer user
     $Update = $ContactObject->ContactUpdate(
         ID                    => $ContactID,
@@ -669,21 +533,6 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
     $Self->True(
         $Update,
         "ContactUpdate - $ContactID",
-    );
-
-    %Preferences = $ContactObject->GetPreferences(
-        ContactID => $ContactID,
-    );
-
-    $Self->True(
-        %Preferences || '',
-        "GetPreferences for updated user - Updated NewLogin$ContactID",
-    );
-
-    $Self->Is(
-        $Preferences{UserLanguage},
-        "da",
-        "GetPreferences for updated user $ContactID - da",
     );
 
     if ( $Key eq '1' ) {

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -693,6 +693,12 @@ sub MacroExecute {
         Message  => "executing macro \"$Macro{Name}\" with ".(scalar(@{$Macro{ExecOrder}})).' macro actions on ObjectID "'.$ObjectIDString.'".',
         UserID   => $Param{UserID},
     );
+    
+    # add root macro type to macro variables
+    if ( !$Self->{MacroID} ) {
+        $Self->{MacroVariables}->{RootMacroType} = $Param{RootMacroType} || $Macro{Type};
+    }
+    $Self->{RootMacroType} = $Param{RootMacroType} || $Macro{Type};
 
     # load type backend module
     my $BackendObject = $Self->_LoadMacroTypeBackend(
@@ -701,10 +707,11 @@ sub MacroExecute {
     return if !$BackendObject;
 
     # add variable referrer data
-    $BackendObject->{MacroID}      = $Param{ID};
-    $BackendObject->{ObjectID}     = $Param{ObjectID};
-    $BackendObject->{RootObjectID} = $Self->{RootObjectID};
-    $BackendObject->{EventData}    = $Self->{EventData};
+    $BackendObject->{MacroID}       = $Param{ID};
+    $BackendObject->{ObjectID}      = $Param{ObjectID};
+    $BackendObject->{RootObjectID}  = $Self->{RootObjectID};
+    $BackendObject->{RootMacroType} = $Self->{RootMacroType};
+    $BackendObject->{EventData}     = $Self->{EventData};
 
     my $CacheType = Digest::MD5::md5_hex(
         ($Self->{JobID} ? $Self->{JobID} : '') . '::' .

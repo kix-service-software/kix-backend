@@ -37,7 +37,7 @@
      When I query the collection of config "Ticket::StateAfterPending"
      Then the response code is 200
      Then the response contains the following items type of SysConfigOption
-       | Name                | AccessLevel |
+       | Name                      | AccessLevel |
        | Ticket::StateAfterPending | internal    |
 
    Scenario: get the list of existing config (Ticket::StateAfterPending_value)
@@ -58,8 +58,30 @@
      When I get the attribute in config "TicketStateWorkflow::PostmasterFollowUpState"
      Then the response code is 200
      Then the response contains the following "TicketStateWorkflow::PostmasterFollowUpState" Values
-       | closed |  pending auto close | pending reminder |
-       | open   |  open               | open             |
+       | closed | pending auto close | pending reminder |
+       | open   | open               | open             |
 
+  Scenario: get the list of existing config ForceOwnerAndResponsibleResetOnMissingPermission
+    When I query the collection of sysconfig "Ticket::EventModulePost###100-ForceOwnerAndResponsibleResetOnMissingPermission"
+    Then the response code is 200
+    Then the response contains the following sysconfig entrys of "SysConfigOption"
+      | Context | ContextMetadata | AccessLevel | ReadOnly | Name                    |
+      |         |                 |             | 0        | Ticket::EventModulePost |
 
+   Scenario: SysConfigOption ITSM::Core::IncidentLinkTypeDirection
+     When I query this SysConfigOption "ITSM::Core::IncidentLinkTypeDirection"
+     Then the response code is 200
+     Then the response contains the following items type of SysConfigOption
+       | Name                                  | AccessLevel |
+       | ITSM::Core::IncidentLinkTypeDirection | internal    |
+
+   Scenario: SysConfigOption ITSM::Core::IncidentLinkTypeDirection Value
+     When I query this SysConfigOption "ITSM::Core::IncidentLinkTypeDirection"
+     Then the response code is 200
+     Then response contains the following items type of Value
+       | ConnectedTo | DependsOn |
+       | Both        | Source    |
+      
+      
+      
 

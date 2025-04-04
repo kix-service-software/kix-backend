@@ -1,0 +1,12 @@
+{
+  "ObjectTag": {
+    "ID": 1,
+    "Name": "internal",
+    "ObjectType": "Queue",
+    "ObjectID": 1,
+    "ChangeBy": 1,
+    "ChangeTime": "2019-03-12 18:24:18",
+    "CreateBy": 1,
+    "CreateTime": "2018-11-01 14:21:35"
+  }
+}

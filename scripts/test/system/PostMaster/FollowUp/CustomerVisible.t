@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -129,6 +129,151 @@ Some Content in Body
 END
         CustomerVisible       => 1,
     },
+    {
+        Name            => 'Ticket contact, CheckReferences inactive (add visible article with reference)',
+        CheckReferences => '0',
+        Email           => <<"END",
+From: Foreign Contact <$Contact1{Email}>
+To: System <test\@localhost>
+Message-ID: <UnitTest\@kixdesk.com>
+Subject: FollowUp Ticket#$Ticket{TicketNumber}
+
+Some Content in Body
+END
+        CustomerVisible => 1,
+    },
+    {
+        Name            => 'Foreign contact, CheckReferences active, matching In-Reply-To',
+        CheckReferences => '0',
+        Email           => <<"END",
+From: Foreign Contact <foreign\@contact>
+To: System <test\@localhost>
+In-Reply-To: <UnitTest\@kixdesk.com>
+Subject: FollowUp Ticket#$Ticket{TicketNumber}
+
+Some Content in Body
+END
+        CustomerVisible => 0,
+    },
+    {
+        Name            => 'Foreign contact, CheckReferences active, matching References',
+        CheckReferences => '0',
+        Email           => <<"END",
+From: Foreign Contact <foreign\@contact>
+To: System <test\@localhost>
+References: <UnitTest\@kixdesk.com>
+Subject: FollowUp Ticket#$Ticket{TicketNumber}
+
+Some Content in Body
+END
+        CustomerVisible => 0,
+    },
+    {
+        Name            => 'Foreign contact, CheckReferences active, matching In-Reply-To and References',
+        CheckReferences => '0',
+        Email           => <<"END",
+From: Foreign Contact <foreign\@contact>
+To: System <test\@localhost>
+In-Reply-To: <UnitTest\@kixdesk.com>
+References: <UnitTest\@kixdesk.com>
+Subject: FollowUp Ticket#$Ticket{TicketNumber}
+
+Some Content in Body
+END
+        CustomerVisible => 0,
+    },
+    {
+        Name            => 'Foreign contact, CheckReferences active, no reference',
+        CheckReferences => '1',
+        Email           => <<"END",
+From: Foreign Contact <foreign\@contact>
+To: System <test\@localhost>
+Subject: FollowUp Ticket#$Ticket{TicketNumber}
+
+Some Content in Body
+END
+        CustomerVisible => 0,
+    },
+    {
+        Name            => 'Foreign contact, CheckReferences active, mismatching In-Reply-To',
+        CheckReferences => '1',
+        Email           => <<"END",
+From: Foreign Contact <foreign\@contact>
+To: System <test\@localhost>
+In-Reply-To: <UnitTest-Mismatch\@kixdesk.com>
+Subject: FollowUp Ticket#$Ticket{TicketNumber}
+
+Some Content in Body
+END
+        CustomerVisible => 0,
+    },
+    {
+        Name            => 'Foreign contact, CheckReferences active, matching In-Reply-To',
+        CheckReferences => '1',
+        Email           => <<"END",
+From: Foreign Contact <foreign\@contact>
+To: System <test\@localhost>
+In-Reply-To: <UnitTest\@kixdesk.com>
+Subject: FollowUp Ticket#$Ticket{TicketNumber}
+
+Some Content in Body
+END
+        CustomerVisible => 1,
+    },
+    {
+        Name            => 'Foreign contact, CheckReferences active, mismatching In-Reply-To',
+        CheckReferences => '1',
+        Email           => <<"END",
+From: Foreign Contact <foreign\@contact>
+To: System <test\@localhost>
+References: <UnitTest-Mismatch\@kixdesk.com>
+Subject: FollowUp Ticket#$Ticket{TicketNumber}
+
+Some Content in Body
+END
+        CustomerVisible => 0,
+    },
+    {
+        Name            => 'Foreign contact, CheckReferences active, matching In-Reply-To',
+        CheckReferences => '1',
+        Email           => <<"END",
+From: Foreign Contact <foreign\@contact>
+To: System <test\@localhost>
+References: <UnitTest\@kixdesk.com>
+Subject: FollowUp Ticket#$Ticket{TicketNumber}
+
+Some Content in Body
+END
+        CustomerVisible => 1,
+    },
+    {
+        Name            => 'Foreign contact, CheckReferences active, matching In-Reply-To and mismatching References',
+        CheckReferences => '1',
+        Email           => <<"END",
+From: Foreign Contact <foreign\@contact>
+To: System <test\@localhost>
+In-Reply-To: <UnitTest\@kixdesk.com>
+References: <UnitTest-Mismatch\@kixdesk.com>
+Subject: FollowUp Ticket#$Ticket{TicketNumber}
+
+Some Content in Body
+END
+        CustomerVisible => 1,
+    },
+    {
+        Name            => 'Foreign contact, CheckReferences active, mismatching In-Reply-To and matching References',
+        CheckReferences => '1',
+        Email           => <<"END",
+From: Foreign Contact <foreign\@contact>
+To: System <test\@localhost>
+In-Reply-To: <UnitTest-Mismatch\@kixdesk.com>
+References: <UnitTest\@kixdesk.com>
+Subject: FollowUp Ticket#$Ticket{TicketNumber}
+
+Some Content in Body
+END
+        CustomerVisible => 1,
+    },
 );
 
 for my $Test (@Tests) {
@@ -136,6 +281,10 @@ for my $Test (@Tests) {
     $Kernel::OM->Get('Config')->Set(
         Key   => 'PostMaster::FollowUp::CheckFromOrganisation',
         Value => $Test->{CheckFromOrganisation} || 0,
+    );
+    $Kernel::OM->Get('Config')->Set(
+        Key   => 'PostMaster::FollowUp::CheckReferences',
+        Value => $Test->{CheckReferences} || 0,
     );
 
     # process email

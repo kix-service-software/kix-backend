@@ -31,11 +31,12 @@
                 "SenderTypeID": 1,
                 "Subject": "The printer does not work!",
                 "TicketID": 49,
-                "TimeUnits": 0,
+                "TimeUnit": 0,
                 "To": "\"Some one\" <someone@somecorp.com>",
                 "ToRealname": "Some one"
             }
         ],
+        "AttachmentCount": 2,
         "ChangeBy": 1,
         "Changed": "2020-04-24 13:23:20",
         "ContactID": "1",

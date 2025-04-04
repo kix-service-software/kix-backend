@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<database Name="kix">
+
+    <TableDrop Name="acl_sync"/>
+    <TableDrop Name="acl"/>
+    <TableDrop Name="search_profile_preferences"/>
+    <TableDrop Name="search_profile_category"/>
+    <TableDrop Name="search_profile"/>
+    <TableDrop Name="kix_article_flag"/>
+    <TableDrop Name="contact_preferences"/>
+    <TableDrop Name="organisation_prefs"/>
+        
+    <TableAlter Name="attachment_dir_preferences">
+        <ColumnAdd Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
+    </TableAlter>
+
+    <TableAlter Name="job_exec_plan">
+        <UniqueDrop Name="job_exec_plan_pkey"/>
+        <UniqueCreate Name="job_exec_plan_unique">
+            <UniqueColumn Name="job_id"/>
+            <UniqueColumn Name="exec_plan_id"/>
+        </UniqueCreate>
+        <ColumnAdd Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
+    </TableAlter>
+
+    <TableAlter Name="job_macro">
+        <UniqueDrop Name="job_macro_pkey"/>
+        <UniqueCreate Name="job_macro_unique">
+            <UniqueColumn Name="job_id"/>
+            <UniqueColumn Name="macro_id"/>
+        </UniqueCreate>
+        <ColumnAdd Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
+    </TableAlter>
+
+    <TableAlter Name="role_user">
+        <UniqueDrop Name="role_user_pkey"/>
+        <UniqueCreate Name="role_user_unique">
+            <UniqueColumn Name="user_id"/>
+            <UniqueColumn Name="role_id"/>
+        </UniqueCreate>
+        <ColumnAdd Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
+    </TableAlter>
+
+    <TableAlter Name="translation_language">
+        <ColumnAdd Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
+    </TableAlter>
+
+</database>

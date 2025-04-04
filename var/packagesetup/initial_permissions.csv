@@ -149,6 +149,8 @@
 "Asset Reader";"Resource";"/cmdb/*";;;;;
 "Asset Reader";"Resource";"/cmdb/configitems";;"x";;;
 "Asset Reader";"Resource";"/links";;"x";;;
+"Asset Reader";"Resource";"/system/htmltopdf";;"x";;;
+"Asset Reader";"Resource";"/system/htmltopdf/convert";;"x";;;
 "Asset Maintainer";"Resource";"/system/cmdb";;"x";;;
 "Asset Maintainer";"Resource";"/system/cmdb/*";;;;;
 "Asset Maintainer";"Resource";"/system/cmdb/classes";;"x";;;
@@ -156,6 +158,8 @@
 "Asset Maintainer";"Resource";"/cmdb/*";;;;;
 "Asset Maintainer";"Resource";"/cmdb/configitems";"x";"x";"x";"x";
 "Asset Maintainer";"Resource";"/links";"x";"x";"x";"x";
+"Asset Maintainer";"Resource";"/system/htmltopdf";;"x";;;
+"Asset Maintainer";"Resource";"/system/htmltopdf/convert";;"x";;;
 "Customer Reader";"Resource";"/organisations";;"x";;;
 "Customer Reader";"Resource";"/contacts";;"x";;;
 "Customer Manager";"Resource";"/organisations";"x";"x";"x";"x";
@@ -169,6 +173,7 @@
 "System Admin";"Resource";"/contacts";"x";"x";"x";"x";
 "System Admin";"Resource";"/organisations";;"x";"x";;
 "System Admin";"Resource";"/certificates";"x";"x";;"x";
+"System Admin";"Resource";"/objecttags";"x";"x";;"x";
 "System Admin";"Object";"/*{}";"x";"x";"x";"x";
 "System Admin";"Property";"/*{}";"x";"x";"x";"x";
 "Superuser";"Resource";"/*";"x";"x";"x";"x";

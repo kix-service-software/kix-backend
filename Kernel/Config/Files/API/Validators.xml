@@ -289,7 +289,7 @@
                 <Item Key="Module">Kernel::API::Validator::StateValidator</Item>
                 <Item Key="Validates">State,StateID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
-                <Item Key="IgnoreOperationRegEx">(TicketStateGet|NotificationCreate|NotificationUpdate|AuthCodeProcess)</Item>
+                <Item Key="IgnoreOperationRegEx">(TicketStateGet|NotificationCreate|NotificationUpdate|AuthCodeProcess|JobCreate|JobUpdate|JobGet|MacroCreate|MacroUpdate|MacroGet|MacroActionCreate|MacroActionUpdate|MacroActionGet)</Item>
             </Hash>
         </Setting>
     </ConfigItem>

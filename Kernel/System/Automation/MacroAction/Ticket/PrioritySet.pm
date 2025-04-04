@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -52,7 +52,11 @@ sub Describe {
         Name        => 'Priority',
         Label       => Kernel::Language::Translatable('Priority'),
         Description => Kernel::Language::Translatable('The name of the priority to be set.'),
-        Required    => 1
+        Required    => 1,
+        Placeholder => {
+            Richtext  => 0,
+            Translate => 0,
+        },
     );
 
     return;
@@ -79,9 +83,7 @@ sub Run {
     # check incoming parameters
     return if !$Self->_CheckParams(%Param);
 
-    my $TicketObject = $Kernel::OM->Get('Ticket');
-
-    my %Ticket = $TicketObject->TicketGet(
+    my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
         TicketID => $Param{TicketID},
     );
 
@@ -89,14 +91,9 @@ sub Run {
         return;
     }
 
-    my $Priority = $Self->_ReplaceValuePlaceholder(
-        %Param,
-        Value => $Param{Config}->{Priority}
-    );
-
     # set the new priority
     my $PriorityID = $Kernel::OM->Get('Priority')->PriorityLookup(
-        Priority => $Priority
+        Priority => $Param{Config}->{Priority}
     );
 
     if ( !$PriorityID ) {
@@ -113,7 +110,7 @@ sub Run {
         return 1;
     }
 
-    my $Success = $TicketObject->TicketPrioritySet(
+    my $Success = $Kernel::OM->Get('Ticket')->TicketPrioritySet(
         TicketID   => $Param{TicketID},
         PriorityID => $PriorityID,
         Priority   => $Param{Config}->{Priority},

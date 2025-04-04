@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -18,8 +18,20 @@ my $ConfigObject = $Kernel::OM->Get('Config');
 # get helper object
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
+# set fixed time for test
+$Helper->FixedTimeSet(
+    $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
+        String => '2014-01-01 14:00:00',
+    ),
+);
+
 # begin transaction on database
 $Helper->BeginWork();
+
+my $YesNoList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
+    Class => 'ITSM::ConfigItem::YesNo',
+);
+my %YesNoListReverse = reverse %{$YesNoList};
 
 # given object tests
 my @Tests = (
@@ -174,20 +186,113 @@ my @Tests = (
         Text   => 'RootValue: <KIX_ASSET_SomeAttribute> ## <KIX_ASSET_SomeAttribute_1_SubAttribute_1> ## <KIX_ASSET_SomeAttribute_1_OtherSubAttribute_0>',
         Result => 'RootValue: SomeValue1, SomeValue2 ## SomeValue2-2 ## OtherValue2-1',
     },
+    {
+        Name => 'KIX_ASSET_ RootElement GeneralCatalog ObjectValue',
+        Data => {
+            Version => {
+                XMLData => [
+                    undef,
+                    {
+                        TagKey  => '[1]',
+                        Version => [
+                            undef,
+                            {
+                                YesNo => [
+                                    undef,
+                                    {
+                                        Content => $YesNoListReverse{Yes},
+                                        TagKey  => '[1]{\'Version\'}[1]{\'YesNo\'}[1]'
+                                    },
+                                    {
+                                        Content => $YesNoListReverse{No},
+                                        TagKey  => '[1]{\'Version\'}[1]{\'YesNo\'}[2]'
+                                    }
+                                ],
+                                TagKey => '[1]{\'Version\'}[1]'
+                            }
+                        ]
+                    }
+                ],
+                XMLDefinition => [
+                    {
+                        CountMax => 2,
+                        Key      => 'YesNo',
+                        Name     => 'YesNo',
+                        Input    => {
+                            Type        => 'GeneralCatalog',
+                            Class       => 'ITSM::ConfigItem::YesNo',
+                            Translation => 1,
+                        }
+                    }
+                ]
+            }
+        },
+        Texts   => [
+            '<KIX_ASSET_YesNo>',
+            '<KIX_ASSET_YesNo_Values>',
+            '<KIX_ASSET_YesNo_Values!>',
+            '<KIX_ASSET_YesNo_0>',
+            '<KIX_ASSET_YesNo_0!>',
+            '<KIX_ASSET_YesNo_0_Value>',
+            '<KIX_ASSET_YesNo_0_Value!>',
+            '<KIX_ASSET_YesNo_Keys>',
+            '<KIX_ASSET_YesNo_Keys!>',
+            '<KIX_ASSET_YesNo_0_Key>',
+            '<KIX_ASSET_YesNo_0_Key!>',
+            '<KIX_ASSET_YesNo_ObjectValue>',
+            '<KIX_ASSET_YesNo!>',
+            '<KIX_ASSET_YesNo_ObjectValue> with text',
+            '<KIX_ASSET_YesNo!> with text'
+        ],
+        Results => [
+            'Ja, Nein',
+            'Ja, Nein',
+            'Yes, No',
+            'Ja',
+            "Yes",
+            'Ja',
+            'Yes',
+            "$YesNoListReverse{Yes}, $YesNoListReverse{No}",
+            "-",
+            "$YesNoListReverse{Yes}",
+            "-",
+            [$YesNoListReverse{Yes},$YesNoListReverse{No}],
+            [$YesNoListReverse{Yes},$YesNoListReverse{No}],
+            "$YesNoListReverse{Yes},$YesNoListReverse{No} with text",
+            "$YesNoListReverse{Yes},$YesNoListReverse{No} with text"
+        ],
+        Translate => 1
+    },
 );
 
 for my $Test (@Tests) {
-    my $Result = $Kernel::OM->Get('TemplateGenerator')->_Replace(
-        Text        => $Test->{Text},
-        Data        => $Test->{Data},
-        UserID      => 1,
-        Translate   => 0
-    );
-    $Self->Is(
-        $Result,
-        $Test->{Result},
-        "$Test->{Name} - _Replace()",
-    );
+    my $Texts = $Test->{Texts} || [$Test->{Text}];
+    my $Results = $Test->{Results} || [$Test->{Result}];
+
+    for (my $Index = 0; $Index < @{$Texts}; $Index++) {
+        my $Result = $Kernel::OM->Get('TemplateGenerator')->_Replace(
+            Text        => $Texts->[$Index],
+            Data        => $Test->{Data},
+            UserID      => 1,
+            Translate   => $Test->{Translate} || 0,
+            Language    => $Test->{Translate} ? 'de' : 'en'
+        );
+
+        if ( IsStringWithData($Results->[$Index]) ) {
+            $Self->Is(
+                $Result,
+                $Results->[$Index],
+                "$Test->{Name} - _Replace($Texts->[$Index])",
+            );
+        }
+        else {
+            $Self->IsDeeply(
+                $Result,
+                $Results->[$Index],
+                "$Test->{Name} - _Replace($Texts->[$Index])",
+            );
+        }
+    }
 }
 
 # test by id (config item data from database)

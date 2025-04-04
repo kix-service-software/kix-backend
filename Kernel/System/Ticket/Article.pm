@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -294,16 +294,16 @@ sub ArticleCreate {
         $Param{Body} = 'No body';
     }
 
+    # get From by agent preference
+    if (!$Param{From} && $Param{SenderType} eq 'agent') {
+        $Param{From} = $Self->_GetFromByUser(
+            %Param,
+            Ticket => \%OldTicketData
+        )
+    }
+
     # handle some special things for channel "email"
     if ( $Param{Channel} eq 'email' ) {
-
-        # get From by agent preference
-        if (!$Param{From} && $Param{SenderType} eq 'agent') {
-            $Param{From} = $Self->_GetFromByUser(
-                %Param,
-                Ticket => \%OldTicketData
-            )
-        }
 
         # get From by ticket queue
         if (!$Param{From} && $Param{SenderType} eq 'system') {
@@ -337,14 +337,8 @@ sub ArticleCreate {
         $Param{Body} =~ s/\r/\n/g;
 
         # create MessageID
-        if (!$Param{MessageID}) {
-            my $Time      = $Kernel::OM->Get('Time')->SystemTime();
-            my $Random    = rand 999999;
-            my $FQDN      = $Kernel::OM->Get('Config')->Get('FQDN');
-            if (IsHashRefWithData($FQDN)) {
-                $FQDN = $FQDN->{Backend}
-            }
-            $Param{MessageID} = "<$Time.$Random\@$FQDN>";
+        if ( !$Param{MessageID} ) {
+            $Param{MessageID} = $Kernel::OM->Get('Email')->GenerateMessageID();
         }
     }
 
@@ -493,7 +487,10 @@ sub ArticleCreate {
         );
     }
 
-    $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
+    # clear ticket cache
+    $Self->_TicketCacheClear(
+        TicketID => $Param{TicketID},
+    );
 
     # add history row
     $Self->HistoryAdd(
@@ -911,13 +908,12 @@ sub ArticleGetContentPath {
         $Param{TicketID} = $TicketID;
     }
 
-    # check key
+    # prepare cache key
     my $CacheKey = 'ArticleGetContentPath::' . $Param{ArticleID};
 
     # check cache
     my $Cache = $Self->_TicketCacheGet(
         TicketID => $Param{TicketID},
-        Type     => $Self->{CacheType},
         Key      => $CacheKey,
     );
     return $Cache if $Cache;
@@ -939,8 +935,6 @@ sub ArticleGetContentPath {
     # set cache
     $Self->_TicketCacheSet(
         TicketID => $Param{TicketID},
-        Type     => $Self->{CacheType},
-        TTL      => $Self->{CacheTTL},
         Key      => $CacheKey,
         Value    => $Result,
     );
@@ -971,13 +965,12 @@ sub ArticleGetTicketID {
         return;
     }
 
-    # check key
+    # prepare cache key
     my $CacheKey = 'ArticleGetTicketID::' . $Param{ArticleID};
 
     # check cache
     my $Cache = $Self->_TicketCacheGet(
-        Type => $Self->{CacheType},
-        Key  => $CacheKey,
+        Key => $CacheKey,
     );
     return $Cache if $Cache;
 
@@ -994,11 +987,8 @@ sub ArticleGetTicketID {
 
     # set cache
     $Self->_TicketCacheSet(
-        TicketID => $TicketID,
-        Type     => $Self->{CacheType},
-        TTL      => $Self->{CacheTTL},
-        Key      => $CacheKey,
-        Value    => $TicketID,
+        Key   => $CacheKey,
+        Value => $TicketID,
     );
 
     # return
@@ -1307,12 +1297,13 @@ sub ArticleIndex {
 
     my $UseCache = $CacheableSenderTypes{ $Param{SenderType} || 'ALL' };
 
-    my $CacheKey = 'ArticleIndex::' . $Param{TicketID} . '::' . ( $Param{SenderType} || 'ALL' ) . ($Param{CustomerVisible} ? '::CustomerVisible' : '');
+    # prepare cache key
+    my $CacheKey = 'ArticleIndex::' . ( $Param{SenderType} || 'ALL' ) . ($Param{CustomerVisible} ? '::CustomerVisible' : '');
 
+    # check cache
     if ($UseCache) {
         my $Cached = $Self->_TicketCacheGet(
             TicketID => $Param{TicketID},
-            Type     => $Self->{CacheType},
             Key      => $CacheKey,
         );
 
@@ -1354,11 +1345,10 @@ sub ArticleIndex {
         push @Index, $Row[0];
     }
 
+    # set cache
     if ($UseCache) {
         $Self->_TicketCacheSet(
             TicketID => $Param{TicketID},
-            Type     => $Self->{CacheType},
-            TTL      => $Self->{CacheTTL},
             Key      => $CacheKey,
             Value    => \@Index,
         );
@@ -2229,7 +2219,10 @@ sub ArticleUpdate {
         ],
     );
 
-    $Self->_TicketCacheClear( TicketID => $Article{TicketID} );
+    # clear ticket cache
+    $Self->_TicketCacheClear(
+        TicketID => $Article{TicketID},
+    );
 
     # event
     $Self->EventHandler(
@@ -2284,13 +2277,7 @@ sub ArticleBounce {
     }
 
     # create message id
-    my $Time         = $Kernel::OM->Get('Time')->SystemTime();
-    my $Random       = rand 999999;
-    my $FQDN         = $Kernel::OM->Get('Config')->Get('FQDN');
-    if (IsHashRefWithData($FQDN)) {
-        $FQDN = $FQDN->{Backend}
-    }
-    my $NewMessageID = "<$Time.$Random.0\@$FQDN>";
+    my $NewMessageID = $Kernel::OM->Get('Email')->GenerateMessageID();
     my $Email        = $Self->ArticlePlain( ArticleID => $Param{ArticleID} );
 
     # check if plain email exists
@@ -2402,22 +2389,25 @@ sub ArticleFlagSet {
         $UserID = 1;
     }
 
-    # set flag
-    return if !$Kernel::OM->Get('DB')->Do(
-        SQL => '
-            DELETE FROM article_flag
-            WHERE article_id = ?
-                AND article_key = ?
-                AND create_by = ?',
-        Bind => [ \$Param{ArticleID}, \$Param{Key}, \$UserID ],
-    );
+    my $DBObject = $Kernel::OM->Get('DB');
 
-    return if !$Kernel::OM->Get('DB')->Do(
-        SQL => 'INSERT INTO article_flag
-            (article_id, article_key, article_value, create_time, create_by)
-            VALUES (?, ?, ?, current_timestamp, ?)',
-        Bind => [ \$Param{ArticleID}, \$Param{Key}, \$Param{Value}, \$UserID ],
-    );
+    # insert flag if not exists
+    if ( !defined $Flag{$Param{Key}} ) {
+        return if !$DBObject->Do(
+            SQL => '
+                INSERT INTO article_flag
+                (article_id, article_key, article_value, create_time, create_by)
+                VALUES (?, ?, ?, current_timestamp, ?)',
+            Bind => [ \$Param{ArticleID}, \$Param{Key}, \$Param{Value}, \$Param{UserID} ],
+        );
+    }
+    else {
+        return if !$DBObject->Do(
+            SQL => 'UPDATE article_flag SET article_value = ?, create_time = current_timestamp
+                    WHERE article_id = ? AND article_key = ? AND create_by = ?',
+            Bind => [ \$Param{Value}, \$Param{ArticleID}, \$Param{Key}, \$Param{UserID} ],
+        );
+    }
 
     # check if we have to set the ticket Seen flag as well
     if ( $Param{Key} eq 'Seen' ) {
@@ -2425,15 +2415,15 @@ sub ArticleFlagSet {
             TicketID => $Param{TicketID},
         );
 
-        $Kernel::OM->Get('DB')->Prepare(
-            SQL   => 'SELECT count(*) FROM article a, article_flag af WHERE a.ticket_id = ? AND 
+        $DBObject->Prepare(
+            SQL   => 'SELECT count(*) FROM article a, article_flag af WHERE a.ticket_id = ? AND
                 af.article_id = a.id AND article_key = ? AND af.create_by = ?',
             Bind  => [ \$Param{TicketID}, \$Param{Key}, \$Param{UserID} ],
             Limit => 1,
         );
 
         my $SeenCount;
-        while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
+        while ( my @Row = $DBObject->FetchrowArray() ) {
             $SeenCount = $Row[0];
         }
         if ( $SeenCount == $ArticleCount ) {
@@ -2452,7 +2442,43 @@ sub ArticleFlagSet {
         }
     }
 
-    $Self->_TicketCacheClear( TicketID => $Param{TicketID} );
+    # check if we have to set the ticket Seen flag as well
+    if ( $Param{Key} eq 'Seen' ) {
+        my $ArticleCount = $Self->ArticleCount(
+            TicketID => $Param{TicketID},
+        );
+
+        $DBObject->Prepare(
+            SQL   => 'SELECT count(*) FROM article a, article_flag af WHERE a.ticket_id = ? AND
+                af.article_id = a.id AND article_key = ? AND af.create_by = ?',
+            Bind  => [ \$Param{TicketID}, \$Param{Key}, \$Param{UserID} ],
+            Limit => 1,
+        );
+
+        my $SeenCount;
+        while ( my @Row = $DBObject->FetchrowArray() ) {
+            $SeenCount = $Row[0];
+        }
+        if ( $SeenCount == $ArticleCount ) {
+            my $Result = $Self->TicketFlagSet(
+                TicketID => $Param{TicketID},
+                Key      => 'Seen',
+                Value    => 1,
+                UserID   => $Param{UserID}
+            );
+            if ( !$Result ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Unable to set Seen flag for TicketID $Param{TicketID}!"
+                );
+            }
+        }
+    }
+
+    # clear ticket cache
+    $Self->_TicketCacheClear(
+        TicketID => $Param{TicketID}
+    );
 
     if ( !$Param{NoEvents} ) {
         $Self->EventHandler(
@@ -2565,7 +2591,10 @@ sub ArticleFlagDelete {
         );
     }
 
-    $Self->_TicketCacheClear( TicketID => $TicketID );
+    # clear ticket cache
+    $Self->_TicketCacheClear(
+        TicketID => $TicketID
+    );
 
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
@@ -2604,11 +2633,12 @@ sub ArticleFlagGet {
         }
     }
 
-    my $CacheKey = 'ArticleFlagGet::' . $Param{TicketID} . '::' . $Param{ArticleID} . '::' . $Param{UserID};
+    # prepare cache key
+    my $CacheKey = 'ArticleFlagGet::' . $Param{ArticleID} . '::' . $Param{UserID};
 
+    # check cache
     my $Cached = $Self->_TicketCacheGet(
         TicketID => $Param{TicketID},
-        Type     => $Self->{CacheType},
         Key      => $CacheKey,
     );
     return %{$Cached} if ref $Cached eq 'HASH';
@@ -2651,10 +2681,9 @@ sub ArticleFlagGet {
         }
     }
 
+    # set cache
     $Self->_TicketCacheSet(
         TicketID => $Param{TicketID},
-        Type     => $Self->{CacheType},
-        TTL      => $Self->{CacheTTL},
         Key      => $CacheKey,
         Value    => \%Flag,
     );
@@ -2770,11 +2799,12 @@ sub ArticleFlagsOfTicketGet {
         }
     }
 
-    my $CacheKey = 'ArticleFlagsOfTicketGet::' . $Param{TicketID} . '::' . $Param{UserID};
+    # prepare cache key
+    my $CacheKey = 'ArticleFlagsOfTicketGet::' . $Param{UserID};
 
+    # check cache
     my $Cached = $Self->_TicketCacheGet(
         TicketID => $Param{TicketID},
-        Type     => $Self->{CacheType},
         Key      => $CacheKey,
     );
     return %{$Cached} if ref $Cached eq 'HASH';
@@ -2798,10 +2828,9 @@ sub ArticleFlagsOfTicketGet {
         $Flag{ $Row[0] }->{ $Row[1] } = $Row[2];
     }
 
+    # set cache
     $Self->_TicketCacheSet(
         TicketID => $Param{TicketID},
-        Type     => $Self->{CacheType},
-        TTL      => $Self->{CacheTTL},
         Key      => $CacheKey,
         Value    => \%Flag,
     );
@@ -2934,11 +2963,11 @@ delete a plain article
         UserID    => 123,
     );
 
-=item ArticleDeleteAttachment()
+=item ArticleDeleteAttachments()
 
 delete all attachments of an article
 
-    my $Success = $TicketObject->ArticleDeleteAttachment(
+    my $Success = $TicketObject->ArticleDeleteAttachments(
         ArticleID => 123,
         UserID    => 123,
     );
@@ -3249,7 +3278,8 @@ return all assigned article IDs
         TicketID   => 123,
         ObjectType => 'Contact',
         Object     => $ContactHashRef,      # (optional)
-        UserID     => 1
+        UserID     => 1,
+        UserType   => 'Customer'            # 'Agent' | 'Customer'
     );
 
 =cut
@@ -3272,7 +3302,7 @@ sub GetAssignedArticlesForObject {
             scalar(@{$AssignedTicketIDList}) == 1 &&
             $AssignedTicketIDList->[0] == $TicketID
         ) {
-            my %SearchData = $Self->_GetAssignedSearchParams(
+            my %SearchData = $Kernel::OM->Get('Main')->GetAssignedSearchParams(
                 %Param,
                 AssignedObjectType => 'TicketArticle'
             );
@@ -3302,131 +3332,6 @@ sub GetAssignedArticlesForObject {
     }
 
     return \@AssignedArticleIDs;
-}
-
-# TODO: move to a "common" module (used in other modules too)
-=item _GetAssignedSearchParams()
-
-prepares and transform config from AssignedObjectsMapping to a simple hash
-
-    my %SearchData = $Self->_GetAssignedSearchParams(
-        ObjectType         => 'Contact',
-        Object             => $ContactHash,         # (optional)
-        AssignedObjectType => 'Ticket'
-    );
-
-    e.g. if AssignedObjectType is 'Ticket'
-
-    %SearchData = (
-        ContactID      => 1,
-        OrganisationID => 2,
-        ...
-    );
-
-=cut
-
-sub _GetAssignedSearchParams {
-    my ( $Self, %Param ) = @_;
-
-    for my $Needed ( qw(AssignedObjectType ObjectType) ) {
-        if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $Needed!"
-            );
-            return;
-        }
-    }
-
-    my $MappingString = $Kernel::OM->Get('Config')->Get('AssignedObjectsMapping') || '';
-
-    my %SearchData;
-    if ( IsStringWithData($MappingString) ) {
-
-        my $Mapping = $Kernel::OM->Get('JSON')->Decode(
-            Data   => $MappingString,
-            Silent => $Param{Silent} || 0
-        );
-
-        if ( !IsHashRefWithData($Mapping) ) {
-            if (
-                !defined $Param{Silent}
-                || !$Param{Silent}
-            ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Invalid JSON for sysconfig option 'AssignedObjectsMapping'."
-                );
-            }
-        } elsif (
-            IsHashRefWithData( $Mapping->{ $Param{ObjectType} } ) &&
-            IsHashRefWithData( $Mapping->{ $Param{ObjectType} }->{ $Param{AssignedObjectType} } )
-        ) {
-            my %SearchAttributes = %{ $Mapping->{ $Param{ObjectType} }->{ $Param{AssignedObjectType} } };
-
-            # prepare search data
-            for my $SearchAttribute ( keys %SearchAttributes ) {
-                next if (!$SearchAttribute);
-
-                next if ( !IsHashRefWithData( $SearchAttributes{$SearchAttribute} ) );
-                my $ObjectSearchAttributes = $SearchAttributes{$SearchAttribute}->{SearchAttributes};
-                my $SearchStatics          = $SearchAttributes{$SearchAttribute}->{SearchStatic};
-                next if ( !IsArrayRefWithData( $ObjectSearchAttributes ) && !IsArrayRefWithData($SearchStatics) );
-
-                $SearchAttribute =~ s/^\s+//g;
-                $SearchAttribute =~ s/\s+$//g;
-
-                next if (!$SearchAttribute);
-
-                $SearchData{$SearchAttribute} = [];
-
-                # get attributes search data
-                if (IsHashRefWithData( $Param{Object} )) {
-                    for my $ObjectSearchAttribute ( @{$ObjectSearchAttributes} ) {
-                        my $Value;
-
-                        # check if value from sub-object (e.g. User of Contact)
-                        if ( $ObjectSearchAttribute =~ /.+\..+/ ) {
-                            my @AttributStructure = split(/\./, $ObjectSearchAttribute);
-                            next if ( !$AttributStructure[0] || !$AttributStructure[1] || !IsHashRefWithData( $Param{Object}->{$AttributStructure[0]} ) );
-                            $Value = $Param{Object}->{$AttributStructure[0]}->{$AttributStructure[1]}
-                        } else {
-                            $Value = $Param{Object}->{$ObjectSearchAttribute};
-                        }
-
-                        next if ( !defined $Value );
-
-                        push (
-                            @{ $SearchData{$SearchAttribute} },
-                            IsArrayRefWithData($Value) ? @{$Value} : $Value
-                        );
-                    }
-                }
-
-                # get static search data
-                for my $SearchStatic ( @{$SearchStatics} ) {
-                    next if ( !defined $SearchStatic );
-                    push ( @{ $SearchData{$SearchAttribute} }, $SearchStatic );
-                }
-
-                if (!scalar(@{ $SearchData{$SearchAttribute} })) {
-                    delete $SearchData{$SearchAttribute};
-                }
-            }
-        } else {
-            if (
-                !defined $Param{Silent}
-                || !$Param{Silent}
-            ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'info',
-                    Message  => "type '$Param{ObjectType}' or sub-type '$Param{AssignedObjectType}' not contained in 'AssignedObjectsMapping'."
-                );
-            }
-        }
-    }
-
-    return %SearchData;
 }
 
 sub PrepareArticle {
@@ -3696,6 +3601,20 @@ sub _GetFromByQueue {
     }
 
     return "\"$Realname\" <$Address{Email}>";
+}
+
+sub _ConvertScalar2ArrayRef {
+    my ( $Self, %Param ) = @_;
+
+    my @Data = split( /,/, $Param{Data} );
+
+    # remove any possible heading and tailing white spaces
+    for my $Item (@Data) {
+        $Item =~ s{\A\s+}{};
+        $Item =~ s{\s+\z}{};
+    }
+
+    return \@Data;
 }
 
 1;

@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -198,6 +198,7 @@ sub ApplyContactMappingToLDAPResult {
 
             ATTRIBUTE_ENTRY:
             for my $AttributeEntry ( @{ $AttributeEntries } ) {
+                # reset attribute value array
                 my @AttributeValues = ();
 
                 # set a fixed value...
@@ -214,7 +215,7 @@ sub ApplyContactMappingToLDAPResult {
                     while ( $Value =~ /\{(.+?)\}/ ) {
                         my $Attribute = $1;
 
-                        my $ValuePart = $Entry->get_value( $Attribute ) || '';
+                        my $ValuePart = $Entry->get_value( $Attribute ) // '';
                         $ValuePart    =~ s/^\s+|\s+$//g;
 
                         $Value =~s/\{\Q$Attribute\E\}/$ValuePart/g;
@@ -232,11 +233,21 @@ sub ApplyContactMappingToLDAPResult {
                         my $Attribute = $1;
 
                         my @ValuePartArray = $Entry->get_value( $Attribute );
-                        my $ValuePart      = join( $SepStrg, @ValuePartArray ) || '';
+                        my $ValuePart      = join( $SepStrg, @ValuePartArray ) // '';
                         $ValuePart         =~ s/^\s+|\s+$//g;
 
                         $Value =~s/\{\Q$Attribute\E\}/$ValuePart/g;
                     }
+                }
+                # get a single value of an array attribute on a specified index
+                # index starting with 0 is written in square brackets after ARRAYINDEX
+                elsif ( $AttributeEntry =~ /^ARRAYINDEX\[(.+)\]\:(.+)$/i ) {
+                    my $Index     = $1;
+                    my $Attribute = $2;
+
+                    my @AttributeArray = $Entry->get_value( $Attribute );
+
+                    $Value = $AttributeArray[ $Index ] // '';
                 }
                 # handle binary attributes (make it b64...)
                 elsif ( $AttributeEntry =~ /^TOBASE64:/i) {
@@ -244,7 +255,7 @@ sub ApplyContactMappingToLDAPResult {
                     $Attribute    =~ s/^\s+|\s+$//g;
 
                     my $LDAPValue = $Entry->get_value( $Attribute );
-                    if ( $LDAPValue ) {
+                    if ( defined( $LDAPValue ) ) {
                         $Value = encode_base64( $LDAPValue );
                     }
                     else {
@@ -259,7 +270,87 @@ sub ApplyContactMappingToLDAPResult {
                 }
                 # set empty if no value can be retrieved or the attribute is not available..
                 else {
-                    $Value = "";
+                    $Value = '';
+                }
+
+                # handle array values for specific attributes
+                if (
+                    scalar( @AttributeValues ) > 1
+                    && (
+                        $Key eq 'Email'
+                        || $Key eq 'OrganisationIDs'
+                    )
+                ) {
+                    # prepare values
+                    for my $AttributeValue ( @AttributeValues ) {
+                        $AttributeValue =~ s/^\s+|\s+$//g;
+                        $AttributeValue = $Self->Convert(
+                            Text => $AttributeValue,
+                            From => $Param{LDAPCharset},
+                            To   => 'utf-8',
+                        );
+                    }
+
+                    # handle Email
+                    if ( $Key eq 'Email' ) {
+                        EMAIL:
+                        for my $Email ( @AttributeValues ) {
+                            # skip empty entries
+                            next EMAIL if ( !$Email );
+
+                            # cleanup SMTP prefix ('SMTP:' and 'smtp:')
+                            $Email =~ s/^SMTP://i;
+
+                            # add email to list
+                            push( @KeyValues, $Email );
+                        }
+
+                        # skip further default handling
+                        next ATTRIBUTE_ENTRY;
+                    }
+
+                    # handle OrganisationIDs
+                    if ( $Key eq 'OrganisationIDs' ) {
+                        ORG:
+                        for my $CurrOrg ( @AttributeValues ) {
+                            # lookup value as organisation number
+                            my $FoundOrgID = $Kernel::OM->Get('Organisation')->OrganisationLookup(
+                                Number => $CurrOrg,
+                                Silent => 1,
+                            );
+
+                            if ( !$FoundOrgID ) {
+                                # lookup value as organisation name
+                                $FoundOrgID = $Kernel::OM->Get('Organisation')->OrganisationLookup(
+                                    Name   => $CurrOrg,
+                                    Silent => 1,
+                                );
+                            }
+
+                            if ( !$FoundOrgID ) {
+                                # lookup value as organsation id
+                                my $FoundOrgNumber = $Kernel::OM->Get('Organisation')->OrganisationLookup(
+                                    ID     => $CurrOrg,
+                                    Silent => 1,
+                                );
+                                if ( $FoundOrgNumber ) {
+                                    $FoundOrgID = $CurrOrg;
+                                }
+                                # unknown organisation id, use configured fallback id
+                                else {
+                                    $FoundOrgID = $Param{FallbackUnknownOrgID};
+                                }
+                            }
+
+                            # add found id to list
+                            if ( $FoundOrgID ) {
+                                push( @KeyValues, $FoundOrgID );
+                            }
+                        }
+
+                        # skip further default handling
+                        next ATTRIBUTE_ENTRY;
+                    }
                 }
 
                 # ensure proper encoding, i.e. utf-8
@@ -269,60 +360,46 @@ sub ApplyContactMappingToLDAPResult {
                     To   => 'utf-8',
                 );
 
-                # "special treatment"
-                # if there's multiple mail values, automatically set Email, Email1..x
+                # specific handling for PrimaryOrganisationID and OrganisationIDs
+                # lookup organisation id
                 if (
-                    $Key eq 'Email'
-                    && scalar( @AttributeValues ) > 1
+                    $Key eq 'PrimaryOrganisationID'
+                    || $Key eq 'OrganisationIDs'
                 ) {
-                    # init counter
-                    my $Counter = 0;
-                    EMAIL:
-                    for my $CurrEmail ( @AttributeValues ) {
-                        # prepare value
-                        $CurrEmail =~ s/^\s+|\s+$//g;
-                        $CurrEmail = $Self->Convert(
-                            Text => $CurrEmail,
-                            From => $Param{LDAPCharset},
-                            To   => 'utf-8',
-                        );
-
-                        # skip empty entries
-                        next EMAIL if ( !$CurrEmail );
-
-                        if ( $Counter == 0 ) {
-                            $MappedData{'Email'} = $CurrEmail;
-                        } 
-                        else {
-                            $MappedData{ 'Email' . $Counter } = $CurrEmail;
-                        } 
-
-                        # increment counter
-                        $Counter += 1;
-                    }
-                    last ATTRIBUTE_ENTRY;
-                }
-
-                # "special treatment"
-                # do we have to look up organisation id?
-                if ( $Key eq "PrimaryOrganisationID" || $Key eq "OrganisationIDs" ) {
-                    my $FoundOrgID;
                     if ( $Value ) {
+                        my $FoundOrgID;
+
+                        # check if fixed value (organisation id) was given
                         if ( $AttributeEntry !~ /^SET:/i ) {
+                            # lookup value as organisation number
                             $FoundOrgID = $Kernel::OM->Get('Organisation')->OrganisationLookup(
                                 Number => $Value,
                                 Silent => 1,
                             );
+
+                            if (!$FoundOrgID ) {
+                                # lookup value as organisation name
+                                $FoundOrgID = $Kernel::OM->Get('Organisation')->OrganisationLookup(
+                                    Name   => $Value,
+                                    Silent => 1,
+                                );
+                            }
+
+                            # use found id as value
                             if ( $FoundOrgID ) {
                                 $Value = $FoundOrgID;
                             }
                         }
+
                         if ( !$FoundOrgID ) {
-                            $FoundOrgID = $Kernel::OM->Get('Organisation')->OrganisationLookup(
+                            # lookup value as organsation id
+                            my $FoundOrgNumber = $Kernel::OM->Get('Organisation')->OrganisationLookup(
                                 ID     => $Value,
                                 Silent => 1,
                             );
-                            if ( !$FoundOrgID ) {
+
+                            # unknown organisation id, use configured fallback id
+                            if ( !$FoundOrgNumber ) {
                                 $Value = $Param{FallbackUnknownOrgID};
                             }
                         }
@@ -331,11 +408,19 @@ sub ApplyContactMappingToLDAPResult {
                         $Value = $Param{FallbackUnknownOrgID};
                     }
                 }
+                # special handling for Email attributes
+                elsif ( $Key =~ m/^Email/ ) {
+                    if ( $Value ) {
+                        # cleanup SMTP prefix ('SMTP:' and 'smtp:')
+                        $Value =~ s/^SMTP://i;
+                    }
+                }
 
                 # accept multiple values when mapping has an array ref
-                # enforce array structure for attribute OrganisationIDs
+                # enforce array structure for attribute Email and OrganisationIDs
                 if (
-                    $Key eq 'OrganisationIDs'
+                    $Key eq 'Email'
+                    || $Key eq 'OrganisationIDs'
                     || IsArrayRef( $Param{Mapping}->{ $Key } )
                 ) {
                     push( @KeyValues, $Value );
@@ -347,11 +432,36 @@ sub ApplyContactMappingToLDAPResult {
 
             # when key is not set by single value, use value array
             if ( !defined( $MappedData{ $Key } ) ) {
-                # make sure entries of OrganisationIDs are unique
-                if ( $Key eq 'OrganisationIDs' ) {
+                # make sure entries of Email and OrganisationIDs are unique
+                if (
+                    $Key eq 'Email'
+                    || $Key eq 'OrganisationIDs'
+                ) {
                     @KeyValues = $Kernel::OM->Get('Main')->GetUnique(@KeyValues);
                 }
-                $MappedData{ $Key } = \@KeyValues;
+                
+                # special handling fpr attribute Email
+                if ( $Key eq 'Email' ) {
+                    my $EmailIndex = 0;
+                    EMAIL:
+                    for my $Email ( @KeyValues ) {
+                        # skip empty entires
+                        next EMAIL if ( !$Email );
+
+                        if ( !$EmailIndex ) {
+                            $MappedData{'Email'} = $Email;
+                        }
+                        else {
+                            $MappedData{ 'Email' . $EmailIndex } = $Email;
+                        }
+
+                        $EmailIndex += 1;
+                    }
+                }
+                # default handling
+                else {
+                    $MappedData{ $Key } = \@KeyValues;
+                }
             }
 
         }

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -86,6 +86,16 @@ my @ConfigTests = (
         },
         Expect => undef,
         Silent => 1,
+    },
+    {
+        Test         => 'valid SQL (SELECT using WITH)',
+        Config       => {
+            SQL => {
+                any => 'WITH valid_select AS ( SELECT * FROM valid ) SELECT v.* FROM valid v, valid_select vs WHERE v.id = vs.id'
+            }
+        },
+        Expect       => ['id','name', 'create_time', 'create_by', 'change_time', 'change_by'],
+        SkipForMySQL => 1,
     },
     {
         Test   => 'valid SQL with wildcard column list',
@@ -225,6 +235,12 @@ my @ConfigTests = (
 );
 
 foreach my $Test ( @ConfigTests ) {
+    # skip specific tests for mysql dbms
+    next if (
+        $Test->{SkipForMySQL}
+        && $Kernel::OM->Get('DB')->{'DB::Type'} eq 'mysql'
+    );
+
     # wrong config
     my $Result = $ReportingObject->DataSourceGetProperties(
         Source => 'GenericSQL',

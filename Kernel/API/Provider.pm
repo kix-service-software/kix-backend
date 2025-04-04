@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -79,6 +79,24 @@ web service.
 
 sub Run {
     my ( $Self, %Param ) = @_;
+
+    # handle healthcheck requests on top of everything to prevent useless overhead
+    if ( $ENV{REQUEST_URI} eq '/healthcheck' ) {
+        # check the connection to the DB
+        if ( !$Kernel::OM->Get('DB')->Ping() ) {
+            print STDOUT "Status: 503 Service Unavailable\r\n";
+            return;
+        }
+
+        # check the connection to redis (we don't use the registered config here to keep the overhead as low as possible)
+        if ( !$Kernel::OM->CreateOnce('Kernel::System::Cache::Redis')->Ping() ) {
+            print STDOUT "Status: 503 Service Unavailable\r\n";
+            return;
+        }
+
+        print STDOUT "Status: 200 OK\r\n";
+        return;
+    }
 
     $Self->{Metric} = $Kernel::OM->Get('Metric')->MetricInit(
         Type => 'API',

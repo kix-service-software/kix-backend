@@ -8,5 +8,9 @@
   Scenario: get an existing config
     When I get the config with Option "WebUserAgent::Timeout"
     Then the response code is 200
-#    And the attribute "SysConfigItem.Data" is "15"
+    And the attribute "SysConfigOption.Value" is "15"
 
+  Scenario: get an existing config
+    When I get the config with Option "SendmailNotificationEnvelopeFrom::FallbackToEmailFrom"
+    Then the response code is 200
+    And the attribute "SysConfigOption.Value" is "1"
