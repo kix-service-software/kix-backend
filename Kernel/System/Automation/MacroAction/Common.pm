@@ -67,6 +67,9 @@ sub new {
         );
     }
 
+    # move Debug to the top
+    $Self->{Definition}->{Options}->{ 'Debug' }->{Order} = 0;
+
     return $Self;
 }
 
