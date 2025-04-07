@@ -21,13 +21,14 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
     When I query the collection of permissions with roleid 2
     Then the response code is 200
 #    And the response object is PermissionCollectionResponse
-    And the response contains 9 items of type "Permission"
+    And the response contains 10 items of type "Permission"
     And the response contains the following items of type Permission
       | Target         | Value | TypeID |
       | /auth          | 1     | 1      |
       | /certificates  | 11    | 1      |
       | /cmdb          | 15    | 1      |
       | /contacts      | 15    | 1      |
+      | /objecttags    | 11    | 1      |
       | /organisations | 6     | 1      |
       | /session       | 15    | 1      |
       | /system        | 15    | 1      |
@@ -191,7 +192,6 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
     When I query the collection of permissions with roleid 9
     Then the response code is 200
 #    And the response object is PermissionCollectionResponse
-    Then the response content is
     And the response contains 9 items of type "Permission"
     And the response contains the following items of type Permission
       | Target                    | Value | TypeID |
@@ -210,7 +210,6 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
     When I query the collection of permissions with roleid 10
     Then the response code is 200
 #    And the response object is PermissionCollectionResponse
-    Then the response content is
     And the response contains 9 items of type "Permission"
     And the response contains the following items of type Permission
       | Target                    | Value | TypeID |
