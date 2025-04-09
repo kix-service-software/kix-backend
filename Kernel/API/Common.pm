@@ -110,8 +110,11 @@ sub _MetricAdd {
 
     return if !$Self->{Metric};
 
+    $Self->{Metric}->{RequestID}     = $Self->{ProcessedRequest}->{Headers}->{'Kix-request-id'};
     $Self->{Metric}->{RequestMethod} = $Self->{ProcessedRequest}->{RequestMethod};
     $Self->{Metric}->{Resource}      = $Self->{ProcessedRequest}->{RequestURI};
+    $Self->{Metric}->{UserID}        = $Self->{Authorization}->{UserID};
+    $Self->{Metric}->{UserType}      = $Self->{Authorization}->{UserType};
 
     if ( $Param{Response} && $Param{Response}->{ContentLength} ) {
         $Self->{Metric}->{OutBytes} = $Param{Response}->{ContentLength};
