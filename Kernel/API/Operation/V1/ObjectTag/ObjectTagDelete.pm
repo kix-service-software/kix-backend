@@ -88,11 +88,11 @@ sub Run {
     if ( IsArrayRefWithData( $Data->{ObjectTagID} ) ) {
         foreach my $ObjectTagID ( @{$Data->{ObjectTagID}} ) {
             # get the Organisation data
-            my %ObjectTag = $Kernel::OM->Get('ObjectTag')->ObjectTagGet(
+            my $ObjectTag = $Kernel::OM->Get('ObjectTag')->ObjectTagGet(
                 ID => $ObjectTagID,
             );
 
-            if ( !IsHashRefWithData( \%ObjectTag ) ) {
+            if ( !IsHashRefWithData( $ObjectTag ) ) {
 
                 return $Self->_Error(
                     Code => 'Object.NotFound',

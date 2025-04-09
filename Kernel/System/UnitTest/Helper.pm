@@ -291,6 +291,16 @@ sub TestContactCreate {
                 ChangeUserID => 1,
                 IsCustomer   => 1,
             );
+
+            # set customer user language
+            my $UserLanguage = $Param{Language} || 'en';
+            $Kernel::OM->Get('User')->SetPreferences(
+                ContactID => $TestContactUserID,
+                Key       => 'UserLanguage',
+                Value     => $UserLanguage,
+            );
+            # rkaiser - T#2017020290001194 - changed customer user to contact
+            $Self->{UnitTestObject}->True( 1, "Set user UserLanguage to $UserLanguage" );
         }
 
         $OrgID = $Kernel::OM->Get('Organisation')->OrganisationAdd(
@@ -353,16 +363,6 @@ sub TestContactCreate {
             $Self->{UnitTestObject}->True( 1, "Added test contact $TestContactLogin to role $RoleName" );
         }
     }
-
-    # set customer user language
-    my $UserLanguage = $Param{Language} || 'en';
-    $Kernel::OM->Get('Contact')->SetPreferences(
-        ContactID => $TestContactID,
-        Key       => 'UserLanguage',
-        Value     => $UserLanguage,
-    );
-    # rkaiser - T#2017020290001194 - changed customer user to contact
-    $Self->{UnitTestObject}->True( 1, "Set contact UserLanguage to $UserLanguage" );
 
     return $TestContactID;
 }

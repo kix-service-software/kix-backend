@@ -157,7 +157,6 @@
 /system/roles/:RoleID/userids                                                              | POST             | V1::Role::RoleUserIDCreate                       |
 /system/roles/:RoleID/userids/:UserID                                                      | DELETE           | V1::Role::RoleUserIDDelete                       |
 /system/roles/permissiontypes                                                              | GET              | V1::Role::PermissionTypeSearch                   |
-/system/sessions                                                                           | GET              | V1::Sessions::SessionSearch                      |
 /system/sessions/:Token                                                                    | DELETE           | V1::Sessions::SessionDelete                      |
 /system/sessions/:Token                                                                    | GET              | V1::Sessions::SessionGet                         |
 /system/textmodules                                                                        | GET              | V1::TextModule::TextModuleSearch                 |

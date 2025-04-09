@@ -5540,7 +5540,7 @@ DefaultValue:
     <Data Key="object" Type="Quote">Ticket</Data>
     <Data Key="description" Type="Quote"></Data>
     <Data Key="valid_id">1</Data>
-    <Data Key="definition" Type="Quote"><![CDATA[{"Expands":["DynamicField","Article","LinkObject","Organisation","Contact"],"Page":{"Top":"15","Left":"20","Right":"15","Bottom":"15","SpacingHeader":"12","SpacingFooter":"5"},"Header":[{"ID":"PageLogo","Type":"Image","Value":"agent-portal-logo","TypeOf":"DB","Style":{"Width":"2.5rem","Height":"2.5rem","Float":"left"}},{"ID":"PageTitle","Type":"Text","Value":"<KIX_CONFIG_Ticket::Hook>Ticket.TicketNumber.Value","Style":{"Size":"0.9rem","Float":"right"}}],"Content":[{"ID":"Title","Type":"Text","Value":"Ticket.Title.Value","Style":{"Size":"1.1rem"}},{"ID":"PrintedBy","Type":"Text","Value":["printed by","<Current_User>","<Current_Time>"],"Join":" ","Translate":true},{"Blocks":[{"ID":"InfoTableLeft","Type":"Table","Include":"DynamicField","SubType":"KeyValue","Columns":["<Class_Key><Font_Bold>Key","<Class_Value>Value"],"Allow":{"State":"KEY","Queue":"KEY","Lock":"KEY","CustomerID":"KEY","Owner":"KEY","Responsoble":"KEY","Type":"KEY","Priority":"KEY"},"Translate":true,"Style":{"Width":"48%","Float":"left","Class":[{"Selector":" .Key","CSS":"width: 40%;"},{"Selector":" .Value","CSS":"min-width: 40%; max-width: 60%;"}]}},{"ID":"InfoTableRight","Type":"Table","Include":"DynamicField","SubType":"KeyValue","Columns":["<Class_Key><Font_Bold>Key","<Class_Value>Value"],"Allow":{"Age":"KEY","Created":"KEY","CreatedBy":"KEY","CustomerID":"KEY","AccountedTime":"KEY","PendingTime":"KEY"},"Translate":true,"Style":{"Width":"50%","Float":"right","Class":[{"Selector":" .Key","CSS":"width: 40%;"},{"Selector":" .Value","CSS":"min-width: 40%; max-width: 60%;"}]}}]},{"Blocks":[{"ID":"CustomerInformation","Type":"Text","Value":["<Font_Bold>Customer Information"],"Join":" ","Break":true,"Translate":true,"Style":{"Size":"1.1em","Color":"gray"}},{"Type":"List","Object":"Organisation","Data":"Organisation","Expand":"DynamicField","Blocks":[{"ID":"Organisation","Type":"Table","SubType":"Custom","Include":"DynamicField","Columns":["<Class_Col1><Font_Bold>","<Class_Col2>","<Class_Col1><Font_Bold>","<Class_Col2>"],"Rows":[["Organisation","Organisation.Name.Value","Customer No. / Type","Organisation.Number.Value / Organisation.DynamicField_Type.Value.0"],["Street","Organisation.Street.Value","ZIP, City, Country","Organisation.Zip.Value, Organisation.City.Value, Organisation.Country.Value"],["","","URL","Organisation.Url.Value"]],"Translate":true,"Style":{"Class":[{"Selector":" .Col1","CSS":"width: 20%;"},{"Selector":" .Col2","CSS":"width: 30%;"}]}}]},{"Type":"List","Object":"Contact","Data":"Contact","Expand":"DynamicField","Blocks":[{"ID":"Contact","Type":"Table","SubType":"Custom","Include":"DynamicField","Columns":["<Class_Col1><Font_Bold>","<Class_Col2>","<Class_Col1><Font_Bold>","<Class_Col2>"],"Rows":[["Title","Contact.Title.Value","Phone","Contact.Phone.Value"],["Contact","Contact.Fullname.Value","Mobile","Contact.Mobile.Value"],["Street","Contact.Street.Value","Email","Contact.Email.Value"],["ZIP, City, Country","Contact.Zip.Value, Contact.City.Value, Contact.Country.Value","",""]],"Translate":true,"Style":{"Class":[{"Selector":" .Col1","CSS":"width: 20%;"},{"Selector":" .Col2","CSS":"width: 30%;"}]}}]}]},{"Data":"LinkObject","Blocks":[{"ID":"LinkedHeader","Type":"Text","Value":"<Font_Bold>Linked Objects","Translate":true,"Break":true,"Style":{"Size":"1.1em","Color":"gray"}},{"ID":"LinkedTable","Type":"Table","SubType":"KeyValue","Columns":["<Class_Key><Font_Bold>Key","Value"],"Translate":true,"Join":"<br>","Style":{"Class":[{"Selector":" .Key","CSS":"width: 20%;"}]}}]},{"Type":"List","Object":"Article","Expand":"DynamicField","Data":"Article","Blocks":[{"ID":"ArticleHeader","Type":"Text","Value":["<Font_Bold>Article","#<Count>"],"Join":" ","Break":true,"Translate":true,"Style":{"Size":"1.1em","Color":"gray"}},{"ID":"ArticleMeta","Type":"Table","SubType":"KeyValue","Columns":["<Class_Key><Font_Bold>Key","<Class_Value>Value"],"Allow":{"From":"KEY","Subject":"KEY","CreateTime":"KEY","Channel":"KEY"},"Style":{"Class":[{"Selector":" .Key","CSS":"width: 20%;"},{"Selector":" .Value","CSS":"min-width: 20%; max-width: 50%;"}]},"Translate":true},{"ID":"ArticleBody","Type":"Richtext","Value":"Article.Body.Value"}]}],"Footer":[{"ID":"Paging","Type":"Page","PageOf":false,"Translate":true,"Style":{"Float":"right"}}]}]]></Data>
+    <Data Key="definition" Type="Quote"><![CDATA[{"Expands":["DynamicField","Article","LinkObject","Organisation","Contact"],"Page":{"Top":"15","Left":"20","Right":"15","Bottom":"15","SpacingHeader":"12","SpacingFooter":"5"},"Header":[{"ID":"PageLogo","Type":"Image","Value":"agent-portal-logo","TypeOf":"DB","Style":{"Width":"2.5rem","Height":"2.5rem","Float":"left"}},{"ID":"PageTitle","Type":"Text","Value":"<KIX_CONFIG_Ticket::Hook>Ticket.TicketNumber.Value","Style":{"Size":"0.9rem","Float":"right"}}],"Content":[{"ID":"Title","Type":"Text","Value":"Ticket.Title.Value","Style":{"Size":"1.1rem"}},{"ID":"PrintedBy","Type":"Text","Value":["printed by","<Current_User>","<Current_Time>"],"Join":" ","Translate":true},{"Blocks":[{"ID":"InfoTableLeft","Type":"Table","Include":"DynamicField","SubType":"KeyValue","Columns":["<Class_Key><Font_Bold>Key","<Class_Value>Value"],"Allow":{"State":"KEY","Queue":"KEY","Lock":"KEY","CustomerID":"KEY","Owner":"KEY","Responsible":"KEY","Type":"KEY","Priority":"KEY"},"Translate":true,"Style":{"Width":"48%","Float":"left","Class":[{"Selector":" .Key","CSS":"width: 40%;"},{"Selector":" .Value","CSS":"min-width: 40%; max-width: 60%;"}]}},{"ID":"InfoTableRight","Type":"Table","Include":"DynamicField","SubType":"KeyValue","Columns":["<Class_Key><Font_Bold>Key","<Class_Value>Value"],"Allow":{"Age":"KEY","Created":"KEY","CreatedBy":"KEY","CustomerID":"KEY","AccountedTime":"KEY","PendingTime":"KEY"},"Translate":true,"Style":{"Width":"50%","Float":"right","Class":[{"Selector":" .Key","CSS":"width: 40%;"},{"Selector":" .Value","CSS":"min-width: 40%; max-width: 60%;"}]}}]},{"Blocks":[{"ID":"CustomerInformation","Type":"Text","Value":["<Font_Bold>Customer Information"],"Join":" ","Break":true,"Translate":true,"Style":{"Size":"1.1em","Color":"gray"}},{"Type":"List","Object":"Organisation","Data":"Organisation","Expand":"DynamicField","Blocks":[{"ID":"Organisation","Type":"Table","SubType":"Custom","Include":"DynamicField","Columns":["<Class_Col1><Font_Bold>","<Class_Col2>","<Class_Col1><Font_Bold>","<Class_Col2>"],"Rows":[["Organisation","Organisation.Name.Value","Customer No. / Type","Organisation.Number.Value / Organisation.DynamicField_Type.Value.0"],["Street","Organisation.Street.Value","ZIP, City, Country","Organisation.Zip.Value, Organisation.City.Value, Organisation.Country.Value"],["","","URL","Organisation.Url.Value"]],"Translate":true,"Style":{"Class":[{"Selector":" .Col1","CSS":"width: 20%;"},{"Selector":" .Col2","CSS":"width: 30%;"}]}}]},{"Type":"List","Object":"Contact","Data":"Contact","Expand":"DynamicField","Blocks":[{"ID":"Contact","Type":"Table","SubType":"Custom","Include":"DynamicField","Columns":["<Class_Col1><Font_Bold>","<Class_Col2>","<Class_Col1><Font_Bold>","<Class_Col2>"],"Rows":[["Title","Contact.Title.Value","Phone","Contact.Phone.Value"],["Contact","Contact.Fullname.Value","Mobile","Contact.Mobile.Value"],["Street","Contact.Street.Value","Email","Contact.Email.Value"],["ZIP, City, Country","Contact.Zip.Value, Contact.City.Value, Contact.Country.Value","",""]],"Translate":true,"Style":{"Class":[{"Selector":" .Col1","CSS":"width: 20%;"},{"Selector":" .Col2","CSS":"width: 30%;"}]}}]}]},{"Data":"LinkObject","Blocks":[{"ID":"LinkedHeader","Type":"Text","Value":"<Font_Bold>Linked Objects","Translate":true,"Break":true,"Style":{"Size":"1.1em","Color":"gray"}},{"ID":"LinkedTable","Type":"Table","SubType":"KeyValue","Columns":["<Class_Key><Font_Bold>Key","Value"],"Translate":true,"Join":"<br>","Style":{"Class":[{"Selector":" .Key","CSS":"width: 20%;"}]}}]},{"Type":"List","Object":"Article","Expand":"DynamicField","Data":"Article","Blocks":[{"ID":"ArticleHeader","Type":"Text","Value":["<Font_Bold>Article","#<Count>"],"Join":" ","Break":true,"Translate":true,"Style":{"Size":"1.1em","Color":"gray"}},{"ID":"ArticleMeta","Type":"Table","SubType":"KeyValue","Columns":["<Class_Key><Font_Bold>Key","<Class_Value>Value"],"Allow":{"From":"KEY","Subject":"KEY","CreateTime":"KEY","Channel":"KEY"},"Style":{"Class":[{"Selector":" .Key","CSS":"width: 20%;"},{"Selector":" .Value","CSS":"min-width: 20%; max-width: 50%;"}]},"Translate":true},{"ID":"ArticleBody","Type":"Richtext","Value":"Article.Body.Value"}]}],"Footer":[{"ID":"Paging","Type":"Page","PageOf":false,"Translate":true,"Style":{"Float":"right"}}]}]]></Data>
     <Data Key="created_by">1</Data>
     <Data Key="created">current_timestamp</Data>
     <Data Key="changed_by">1</Data>
@@ -7071,6 +7071,26 @@ DefaultValue:
     <Data Key="change_time">current_timestamp</Data>
 </Insert>
 <Insert Table="role_permission">
+    <Data Key="role_id">9</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/system/htmltopdf]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">9</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/system/htmltopdf/convert]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
     <Data Key="role_id">10</Data>
     <Data Key="type_id">1</Data>
     <Data Key="target" Type="Quote"><![CDATA[/system/cmdb]]></Data>
@@ -7135,6 +7155,26 @@ DefaultValue:
     <Data Key="type_id">1</Data>
     <Data Key="target" Type="Quote"><![CDATA[/links]]></Data>
     <Data Key="value">15</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">10</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/system/htmltopdf]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">10</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/system/htmltopdf/convert]]></Data>
+    <Data Key="value">2</Data>
     <Data Key="create_by">1</Data>
     <Data Key="create_time">current_timestamp</Data>
     <Data Key="change_by">1</Data>
@@ -7264,6 +7304,16 @@ DefaultValue:
     <Data Key="role_id">2</Data>
     <Data Key="type_id">1</Data>
     <Data Key="target" Type="Quote"><![CDATA[/certificates]]></Data>
+    <Data Key="value">11</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">2</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/objecttags]]></Data>
     <Data Key="value">11</Data>
     <Data Key="create_by">1</Data>
     <Data Key="create_time">current_timestamp</Data>

@@ -1107,7 +1107,7 @@ sub ImportPO {
                     %Param,
                     Items => $Items
                 },
-                MaximumParallelInstances => 1,
+                MaximumParallelInstances => 0,
             );
             if ( !$TaskID ) {
                 $Kernel::OM->Get('Log')->Log(

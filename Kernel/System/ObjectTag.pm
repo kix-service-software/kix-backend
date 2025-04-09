@@ -63,7 +63,7 @@ sub new {
 
 Returns data of one ObjectTag
 
-    my %ObjectTag = $ObjectTagObject->ObjectTagGet(
+    my $ObjectTag = $ObjectTagObject->ObjectTagGet(
         ID => 1
     );
 
@@ -73,15 +73,13 @@ sub ObjectTagGet {
     my ($Self, %Param) = @_;
 
     # check needed stuff
-    for ( qw(ID) ) {
-        if (!$Param{$_}) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!",
-                Silent   => $Param{Silent}
-            );
-            return;
-        }
+    if (!$Param{ID}) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Need ID!",
+            Silent   => $Param{Silent}
+        );
+        return;
     }
 
     # check cache
@@ -90,7 +88,7 @@ sub ObjectTagGet {
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
-    return %{$Cache} if $Cache;
+    return $Cache if $Cache;
 
     return if !$Kernel::OM->Get('DB')->Prepare(
         SQL => <<'END',
@@ -134,7 +132,7 @@ END
         Value => \%ObjectTag,
     );
 
-    return %ObjectTag
+    return \%ObjectTag
 }
 
 =item ObjectTagAdd()
@@ -288,7 +286,19 @@ sub ObjectTagDelete {
         return;
     }
 
-    my $SQL = 'DELETE FROM object_tags WHERE ';
+    if (
+        $Param{ObjectID}
+        && !$Param{ObjectType}
+    ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Need ObjectType if ObjectID is used!",
+            Silent   => $Param{Silent}
+        );
+        return;
+    }
+
+    my $SQL = 'DELETE FROM object_tags ';
     my @SQLWhere;
     my @Bind;
 
@@ -314,7 +324,7 @@ sub ObjectTagDelete {
         }
     }
 
-    $SQL .= (@SQLWhere ? join( ' AND ', @SQLWhere) : q{} );
+    $SQL .= (@SQLWhere ? 'WHERE ' . join( ' AND ', @SQLWhere) : q{} );
 
     return if !$Kernel::OM->Get('DB')->Prepare(
         SQL  => $SQL,

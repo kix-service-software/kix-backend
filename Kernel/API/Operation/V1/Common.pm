@@ -1490,7 +1490,7 @@ sub _Success {
         if ( IsHashRefWithData($Self->{PermissionFieldSelector}) ) {
             my $StartTime;
             if ( $Self->{Debug} ) {
-               my $StartTime = Time::HiRes::time();
+               $StartTime = Time::HiRes::time();
                $Self->_Debug($Self->{LevelIndent}, "applying permission field selector");
             }
 
