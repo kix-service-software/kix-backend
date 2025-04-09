@@ -111,18 +111,25 @@ sub Run {
         # include CurrentDefinition if requested
         if ( $Param{Data}->{include}->{CurrentDefinition} ) {
 
-            # get already prepared data of current definition from ClassDefinitionSearch operation
-            my $Result = $Self->ExecOperation(
-                OperationType => 'V1::CMDB::ClassDefinitionSearch',
-                Data          => {
-                    ClassID => $ClassID,
-                    sort    => 'ConfigItemClassDefinition.-Version:numeric',
-                    limit   => 1,
-                }
+            $Class{CurrentDefinition} = undef;
+
+            my $Definition = $Kernel::OM->Get('ITSMConfigItem')->DefinitionGet(
+                ClassID => $ClassID,
             );
 
-            if ( IsHashRefWithData($Result) && $Result->{Success} ) {
-                $Class{CurrentDefinition} = IsArrayRefWithData( $Result->{Data}->{ConfigItemClassDefinition} ) ? $Result->{Data}->{ConfigItemClassDefinition}->[0] : undef;
+            if ( IsHashRefWithData($Definition) ) {
+                # get already prepared data of current definition from ClassDefinitionSearch operation
+                my $Result = $Self->ExecOperation(
+                    OperationType => 'V1::CMDB::ClassDefinitionGet',
+                    Data          => {
+                        ClassID      => $ClassID,
+                        DefinitionID => $Definition->{DefinitionID},
+                    }
+                );
+
+                if ( IsHashRefWithData($Result) && $Result->{Success} ) {
+                    $Class{CurrentDefinition} = IsHashRefWithData( $Result->{Data}->{ConfigItemClassDefinition} ) ? $Result->{Data}->{ConfigItemClassDefinition} : undef;
+                }
             }
         }
 

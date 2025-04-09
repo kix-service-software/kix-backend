@@ -132,12 +132,13 @@ sub Run {
         }
 
         my $ID = $Kernel::OM->Get('SysConfig')->OptionLookup(
-            Name => $OrgOption
+            Name   => $OrgOption,
+            Silent => 1,
         );
 
         # add
         push(@SysConfigList, {
-            ID              => $ID,
+            ID              => $ID || '',
             Name            => $OrgOption,
             Value           => $Value,
             AccessLevel     => $AllOptions{$OrgOption}->{AccessLevel},

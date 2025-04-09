@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -62,8 +62,8 @@ sub Run {
         my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::TicketType::TicketTypeGet',
             SuppressPermissionErrors => 1,
-            Data      => {
-                TypeID => join(',', sort keys %TicketTypeList),
+            Data                     => {
+                TypeID => join( q{,}, sort { $a <=> $b } keys %TicketTypeList ),
             }
         );
         if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {

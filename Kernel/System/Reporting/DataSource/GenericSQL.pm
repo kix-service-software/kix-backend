@@ -194,7 +194,7 @@ sub ValidateConfig {
             $SQL = MIME::Base64::decode_base64($1);
         }
 
-        if ( $SQL !~ /^SELECT\s+/i ) {
+        if ( $SQL !~ /^(SELECT|WITH)\s+/i ) {
             if ( !$Param{Silent} ) {
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',

@@ -49,6 +49,15 @@ sub new {
     my $ValidatorList = $Kernel::OM->Get('Config')->Get('API::Validator::Module');
 
     foreach my $Validator (sort keys %{$ValidatorList}) {
+        if ( !defined( $ValidatorList->{ $Validator }->{Module} ) ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Invalid validator entry "' . $Validator . '"!',
+            );
+
+            next;
+        }
+
         if ( !$Kernel::OM->Get('Main')->Require($ValidatorList->{$Validator}->{Module}) ) {
             return $Self->_Error(
                 Code    => 'Validator.InternalError',

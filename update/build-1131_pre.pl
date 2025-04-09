@@ -81,11 +81,6 @@ sub _FreeOrgIDOneAndAddMyOrga {
             $NewOrgID = $Row[0];
         }
         return if !$DBObject->Do(
-            SQL  => 'UPDATE organisation_prefs SET org_id = ? WHERE org_id = 1',
-            Bind => [ \$NewOrgID ],
-        );
-
-        return if !$DBObject->Do(
             SQL  => 'UPDATE ticket SET organisation_id = ? WHERE organisation_id = \'1\' ',
             Bind => [ \$NewOrgID ],
         );

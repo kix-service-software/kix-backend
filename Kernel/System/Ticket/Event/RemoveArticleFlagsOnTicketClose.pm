@@ -100,13 +100,6 @@ sub Run {
                     Key       => $Flag,
                     AllUsers  => 1,
                 );
-
-                # delete article flag data
-                $Self->{TicketObject}->ArticleFlagDataDelete(
-                    ArticleID => $ArticleID,
-                    Key       => $Flag,
-                    AllUsers  => 1,
-                );
             }
 
             # nothing to do with this flag any more
@@ -188,14 +181,6 @@ sub Run {
                         Key       => $Flag,
                         UserID    => $UserID,
                     );
-
-                    # delete article flag data
-                    $Self->{TicketObject}->ArticleFlagDataDelete(
-                        ArticleID => $ArticleID,
-                        Key       => $Flag,
-                        UserID    => $UserID,
-                    );
-
                 }
             }
 

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -61,9 +61,9 @@ sub Run {
         my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::MailFilter::MailFilterGet',
             SuppressPermissionErrors => 1,
-            Data          => {
-                MailFilterID => join( ',', sort keys %MailFilterList )
-                }
+            Data                     => {
+                MailFilterID => join( q{,}, sort { $a <=> $b } keys %MailFilterList )
+            }
         );
         if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
             return $GetResult;

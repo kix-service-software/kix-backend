@@ -303,6 +303,12 @@ sub ClearSemaphore {
     return $Self->_RedisCall('del', $PreparedKey);
 }
 
+sub Ping {
+    my ( $Self, %Param ) = @_;
+
+    return $Self->_RedisCall('ping');
+}
+
 =item _InitRedis()
 
 initialize connection to Redis

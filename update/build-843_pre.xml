@@ -13,12 +13,6 @@
             <UniqueColumn Name="name"/>
         </UniqueCreate>
     </TableAlter>
-    <TableAlter NameOld="kix_customer_company_prefs" NameNew="organisation_prefs">
-        <ColumnChange NameOld="user_id" NameNew="org_id" Required="true" Type="INTEGER"/>
-        <ForeignKeyCreate ForeignTable="organisation">
-            <Reference Local="org_id" Foreign="id"/>
-        </ForeignKeyCreate>
-    </TableAlter>
     <TableAlter NameOld="customer_user" NameNew="contact">
         <ColumnChange NameOld="customer_id" NameNew="primary_org_id" Required="true" Type="INTEGER"/>
         <ColumnChange NameOld="customer_ids" NameNew="org_ids" Required="false" Size="10000" Type="VARCHAR"/>
@@ -29,16 +23,6 @@
         <UniqueCreate Name="contact_login">
             <UniqueColumn Name="login"/>
         </UniqueCreate>
-    </TableAlter>
-    <TableAlter NameOld="customer_preferences" NameNew="contact_preferences">
-        <ColumnChange NameOld="user_id" NameNew="contact_id" Required="true" Type="INTEGER"/>
-        <IndexDrop Name="customer_preferences_user_id"/>
-        <IndexCreate Name="contact_preferences_contact_id">
-            <IndexColumn Name="contact_id"/>
-        </IndexCreate>
-        <ForeignKeyCreate ForeignTable="contact">
-            <Reference Local="contact_id" Foreign="id"/>
-        </ForeignKeyCreate>
     </TableAlter>
     <TableAlter Name="ticket">
         <ColumnChange NameOld="customer_id" NameNew="organisation_id" Required="false" Size="150" Type="VARCHAR"/>

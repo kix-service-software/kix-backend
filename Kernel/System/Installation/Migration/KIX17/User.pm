@@ -101,6 +101,7 @@ sub Run {
             Table        => 'users',
             PrimaryKey   => 'id',
             Item         => $Item,
+            IgnoreCase   => 1,
             RelevantAttr => [
                 'login'
             ],
