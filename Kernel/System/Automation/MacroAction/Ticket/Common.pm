@@ -74,10 +74,24 @@ sub _PrepareEventData {
 
     $Param{EventData} ||= IsHashRefWithData($Self->{EventData}) ? $Self->{EventData} : {};
     if ( !$Param{EventData}->{TicketID} ) {
-        $Param{EventData}->{TicketID}  = $Self->{RootObjectID} || $Param{TicketID};
+        if (
+            $Self->{RootMacroType} eq 'Ticket'
+            && $Self->{RootObjectID}
+        ) {
+            $Param{EventData}->{TicketID} = $Self->{RootObjectID};
+        }
+        elsif ( $Param{TicketID} ) {
+            $Param{EventData}->{TicketID} = $Param{TicketID};
+        }
     }
     if ( !$Param{EventData}->{ArticleID} ) {
         $Param{EventData}->{ArticleID} = $Param{AdditionalData}->{ArticleID} ? $Param{AdditionalData}->{ArticleID}->[0] : q{};
+    }
+    if (
+        $Self->{RootMacroType} eq 'ITSMConfigItem'
+        && $Self->{RootObjectID}
+    ) {
+        $Param{EventData}->{ConfigItemID} = $Self->{RootObjectID};
     }
 
     return %Param;
