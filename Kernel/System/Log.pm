@@ -94,6 +94,11 @@ sub new {
         %Param,
     );
 
+    # init log stack
+    for my $PriorityNum ( values( %LogLevel ) ) {
+        $Self->{LogStack}->{ $PriorityNum } = [{}];
+    }
+
     return $Self;
 }
 
@@ -140,13 +145,18 @@ sub Log {
 
     my $Message = $Param{MSG} || $Param{Message} || '???';
 
-    # remember message
-    $Self->{ $Priority }->{Message} //= [];
-    push( @{ $Self->{ $Priority }->{Message} }, $Message );
+    # add message to log stack
+    push(
+        @{ $Self->{LogStack}->{ $PriorityNum } },
+        {
+            Code    => $Param{Code},
+            Message => $Message
+        }
+    );
 
     # truncate to 100 entries
-    if ( @{ $Self->{ $Priority }->{Message} } > 100 ) {
-        shift( @{ $Self->{ $Priority }->{Message} } );
+    if ( @{ $Self->{LogStack}->{ $PriorityNum } } > 100 ) {
+        shift( @{ $Self->{LogStack}->{ $PriorityNum } } );
     }
 
     return 1 if ( $Param{Silent} );
@@ -220,15 +230,6 @@ sub Log {
 
         $Error .= "\n";
         print STDERR $Error;
-
-        # store data for reference
-        $Self->{error}->{Traceback} //= [];
-        push @{$Self->{error}->{Traceback}}, $Error;
-
-        # truncate to 100 entries
-        if ( @{$Self->{error}->{Traceback}} > 100 ) {
-            shift @{$Self->{error}->{Traceback}};
-        }
     }
 
     return 1;
@@ -239,8 +240,8 @@ sub Log {
 to get the last log info back
 
     my $Message = $LogObject->GetLogEntry(
-        Type  => 'error',   # error|info|notice
-        What  => 'Message', # Message|Traceback,
+        Type  => 'error',   # error|info|notice|debug
+        What  => 'Message', # optional: Code|Message,
         Index => 1,         # optional: index in the list (max. 100 entries). Use negative values to access items at the end of the list (-1 is the last element). If not given, the last entry will be returned.
     );
 
@@ -249,9 +250,16 @@ to get the last log info back
 sub GetLogEntry {
     my ( $Self, %Param ) = @_;
 
+    my $PriorityNum = $LogLevel{ lc( $Param{Type} ) };
+    return if ( !$PriorityNum );
+
     my $Index = $Param{Index} // -1;
 
-    return $Self->{ lc $Param{Type} }->{ $Param{What} }[$Index] || '';
+    if ( $Param{What} ) {
+        return $Self->{LogStack}->{ $PriorityNum }->[$Index]->{ $Param{What} } || '';
+    }
+
+    return $Self->{LogStack}->{ $PriorityNum }->[$Index];
 }
 
 =item GetNumericLogLevel()
