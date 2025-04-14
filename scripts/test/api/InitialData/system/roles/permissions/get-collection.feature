@@ -237,7 +237,6 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
   Scenario: get the list of existing permissions of Customer Manager
     When I query the collection of permissions with roleid 12
     Then the response code is 200
- #   And the response object is PermissionCollectionResponse
     And the response contains 4 items of type "Permission"
     And the response contains the following items of type Permission
       | Target              | Value | TypeID |
