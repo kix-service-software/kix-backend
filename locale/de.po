@@ -5410,7 +5410,7 @@ msgstr "Artikel Löschen"
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Delete Attachments from Articles"
-msgstr ""
+msgstr "Anhänge aus Artikeln löschen"
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Delete Ticket"
