@@ -18,8 +18,6 @@ use Time::HiRes;
 use Kernel::System::VariableCheck qw(:all);
 use vars qw(@ISA);
 
-use base qw(Kernel::System::AsynchronousExecutor);
-
 our @ObjectDependencies = (
     'Config',
     'Cache',
