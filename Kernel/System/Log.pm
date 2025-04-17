@@ -96,7 +96,7 @@ sub new {
 
     # init log stack
     for my $PriorityNum ( values( %LogLevel ) ) {
-        $Self->{LogStack}->{ $PriorityNum } = [{}];
+        $Self->{LogStack}->{ $PriorityNum } = [];
     }
 
     return $Self;
@@ -254,6 +254,8 @@ sub GetLogEntry {
     return if ( !$PriorityNum );
 
     my $Index = $Param{Index} // -1;
+
+    return if ( !defined( $Self->{LogStack}->{ $PriorityNum }->[$Index] ) );
 
     if ( $Param{What} ) {
         return $Self->{LogStack}->{ $PriorityNum }->[$Index]->{ $Param{What} } || '';
