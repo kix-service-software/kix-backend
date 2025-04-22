@@ -178,7 +178,7 @@
             "type": "integer",
             "readOnly": true
         },
-        "TimeUnits": {
+        "TimeUnit": {
             "type": "integer",
             "readOnly": true
         },
@@ -231,7 +231,7 @@
         "SMIMESignedError",
         "Subject",
         "TicketID",
-        "TimeUnits",
+        "TimeUnit",
         "To",
         "ToRealname",
         "Unseen"

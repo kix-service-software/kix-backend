@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
@@ -131,7 +131,7 @@ my @SearchTests = (
                 'AND vfsp0.preferences_key IN (\'Subject\',\'Email\')'
             ],
             'Where' => [
-                $CaseSensitive ? '(LOWER(vfsp0.preferences_value) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\') ' : '(vfsp0.preferences_value LIKE \'%Test%\' ESCAPE \'' . $Escape . '\') '
+                $CaseSensitive ? '(LOWER(vfsp0.preferences_value) LIKE \'%test%\' ESCAPE \'' . $Escape . '\') ' : '(vfsp0.preferences_value LIKE \'%test%\' ESCAPE \'' . $Escape . '\') '
             ]
         }
     }

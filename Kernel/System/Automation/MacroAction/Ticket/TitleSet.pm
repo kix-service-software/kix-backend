@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -52,6 +52,10 @@ sub Describe {
         Label       => Kernel::Language::Translatable('Title'),
         Description => Kernel::Language::Translatable('The new title of a ticket to be set.'),
         Required    => 1,
+        Placeholder => {
+            Richtext  => 0,
+            Translate => 0,
+        },
     );
 
     return;
@@ -78,9 +82,7 @@ sub Run {
     # check incoming parameters
     return if !$Self->_CheckParams(%Param);
 
-    my $TicketObject = $Kernel::OM->Get('Ticket');
-
-    my %Ticket = $TicketObject->TicketGet(
+    my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
         TicketID => $Param{TicketID},
     );
 
@@ -88,20 +90,14 @@ sub Run {
         return;
     }
 
-    my $Title = $Self->_ReplaceValuePlaceholder(
-        %Param,
-        Value     => $Param{Config}->{Title},
-        Translate => 1
-    );
-
     # do nothing if the desired title is already set
-    if ( $Title && $Title eq $Ticket{Title} ) {
+    if ( $Param{Config}->{Title} && $Param{Config}->{Title} eq $Ticket{Title} ) {
         return 1;
     }
 
-    my $Success = $TicketObject->TicketTitleUpdate(
+    my $Success = $Kernel::OM->Get('Ticket')->TicketTitleUpdate(
         TicketID => $Param{TicketID},
-        Title    => $Title,
+        Title    => $Param{Config}->{Title},
         UserID   => $Param{UserID},
     );
 

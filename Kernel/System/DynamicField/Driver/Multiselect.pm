@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -125,10 +125,13 @@ sub DisplayValueRender {
     }
 
     # set Value and Title variables
-    my $Value         = q{};
-    my $Title         = q{};
-    my $ValueMaxChars = $Param{ValueMaxChars} || q{};
-    my $TitleMaxChars = $Param{TitleMaxChars} || q{};
+    my $Value           = q{};
+    my $Title           = q{};
+    my $ValueMaxChars   = $Param{ValueMaxChars} || q{};
+    my $TitleMaxChars   = $Param{TitleMaxChars} || q{};
+
+    my $NotTranslatedValue = q{};
+    my $NotTranslatedValueMaxChars = $Param{ValueMaxChars} || q{};
 
     # check value
     my @Values;
@@ -144,19 +147,23 @@ sub DisplayValueRender {
     my $TranslatableValues = $Param{DynamicFieldConfig}->{Config}->{TranslatableValues};
 
     my @ReadableValues;
+    my @NotTranslatedValues;
     my @ReadableTitles;
 
     my $ShowValueEllipsis;
+    my $ShowNotTranslatedValueEllipsis;
     my $ShowTitleEllipsis;
 
     VALUEITEM:
     for my $Item (@Values) {
-        next VALUEITEM if !$Item && $Item != 0;
+        next VALUEITEM if ( !defined( $Item ) || $Item eq '' );
 
         my $ReadableValue = $Item;
+        my $NotTranslatedReadableValue = $Item;
 
         if ( $PossibleValues->{$Item} ) {
             $ReadableValue = $PossibleValues->{$Item};
+            $NotTranslatedReadableValue = $PossibleValues->{$Item};
 
             if ($TranslatableValues) {
                 $ReadableValue = $Param{LayoutObject}->{LanguageObject}->Translate($ReadableValue);
@@ -183,9 +190,26 @@ sub DisplayValueRender {
             }
         }
 
+        my $NotTranslatedLength = length $NotTranslatedReadableValue;
+
+        # cut strings if needed
+        if ( $NotTranslatedValueMaxChars ne q{} ) {
+
+            if ( length $NotTranslatedReadableValue > $NotTranslatedValueMaxChars ) {
+                $ShowNotTranslatedValueEllipsis = 1;
+            }
+            $NotTranslatedReadableValue = substr $NotTranslatedReadableValue, 0, $NotTranslatedValueMaxChars;
+
+            # decrease the max parameter
+            $NotTranslatedValueMaxChars = $NotTranslatedValueMaxChars - $NotTranslatedLength;
+            if ( $NotTranslatedValueMaxChars < 0 ) {
+                $NotTranslatedValueMaxChars = 0;
+            }
+        }
+
         if ( $TitleMaxChars ne q{} ) {
 
-            if ( length $ReadableTitle > $ValueMaxChars ) {
+            if ( length $ReadableTitle > $TitleMaxChars ) {
                 $ShowTitleEllipsis = 1;
             }
             $ReadableTitle = substr $ReadableTitle, 0, $TitleMaxChars;
@@ -204,6 +228,10 @@ sub DisplayValueRender {
                 Text => $ReadableValue,
             );
 
+            $NotTranslatedReadableValue = $Param{LayoutObject}->Ascii2Html(
+                Text => $NotTranslatedReadableValue,
+            );
+
             $ReadableTitle = $Param{LayoutObject}->Ascii2Html(
                 Text => $ReadableTitle,
             );
@@ -211,6 +239,9 @@ sub DisplayValueRender {
 
         if ( length $ReadableValue ) {
             push @ReadableValues, $ReadableValue;
+        }
+        if ( length $NotTranslatedReadableValue ) {
+            push @NotTranslatedValues, $NotTranslatedReadableValue;
         }
         if ( length $ReadableTitle ) {
             push @ReadableTitles, $ReadableTitle;
@@ -235,9 +266,13 @@ sub DisplayValueRender {
 
     $Value = join( $Separator, @ReadableValues );
     $Title = join( $Separator, @ReadableTitles );
+    $NotTranslatedValue = join( $Separator, @NotTranslatedValues );
 
     if ($ShowValueEllipsis) {
         $Value .= '...';
+    }
+    if ($ShowNotTranslatedValueEllipsis) {
+        $NotTranslatedValue .= '...';
     }
     if ($ShowTitleEllipsis) {
         $Title .= '...';
@@ -251,6 +286,7 @@ sub DisplayValueRender {
         Value => $Value,
         Title => $Title,
         Link  => $Link,
+        NotTranslatedValue => $NotTranslatedValue
     };
 
     return $Data;

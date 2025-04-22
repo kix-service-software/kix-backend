@@ -157,7 +157,6 @@
 /system/roles/:RoleID/userids                                                              | POST             | V1::Role::RoleUserIDCreate                       |
 /system/roles/:RoleID/userids/:UserID                                                      | DELETE           | V1::Role::RoleUserIDDelete                       |
 /system/roles/permissiontypes                                                              | GET              | V1::Role::PermissionTypeSearch                   |
-/system/sessions                                                                           | GET              | V1::Sessions::SessionSearch                      |
 /system/sessions/:Token                                                                    | DELETE           | V1::Sessions::SessionDelete                      |
 /system/sessions/:Token                                                                    | GET              | V1::Sessions::SessionGet                         |
 /system/textmodules                                                                        | GET              | V1::TextModule::TextModuleSearch                 |
@@ -258,6 +257,11 @@
 /links/:LinkID                                                                             | GET              | V1::Link::LinkGet                                |
 /links/types                                                                               | GET              | V1::Link::LinkTypeSearch                         |
 /objectsearch/:ObjectType                                                                  | GET              | V1::ObjectSearch::SupportedAttributesGet         |
+/objecttags                                                                                | GET              | V1::ObjectTag::ObjectTagSearch                   |
+/objecttags                                                                                | POST             | V1::ObjectTag::ObjectTagCreate                   |
+/objecttags/:ObjectTagID                                                                   | GET              | V1::ObjectTag::ObjectTagGet                      |
+/objecttags/:ObjectTagID                                                                   | DELETE           | V1::ObjectTag::ObjectTagDelete                   |
+/objecttags/taglinks                                                                       | GET              | V1::ObjectTag::ObjectTagLinkSearch                   |
 /organisations                                                                             | GET              | V1::Organisation::OrganisationSearch             |
 /organisations                                                                             | POST             | V1::Organisation::OrganisationCreate             |
 /organisations/:OrganisationID                                                             | DELETE           | V1::Organisation::OrganisationDelete             |

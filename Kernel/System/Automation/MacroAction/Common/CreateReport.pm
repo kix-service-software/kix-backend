@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -57,6 +57,10 @@ sub Describe {
         Label       => Kernel::Language::Translatable('Parameters'),
         Description => Kernel::Language::Translatable('The parameters of the report as a HashRef.'),
         Required    => 0,
+        Placeholder => {
+            Richtext  => 0,
+            Translate => 0,
+        },
     );
     $Self->AddOption(
         Name        => 'OutputFormats',
@@ -112,22 +116,6 @@ sub Run {
         return;
     }
 
-    # replace placeholders - atm only for ticket
-    if ( IsHashRefWithData($Param{Config}->{Parameters}) ) {
-        foreach my $Parameter ( sort keys %{$Param{Config}->{Parameters} ||{}} ) {
-            $Param{Config}->{Parameters}->{$Parameter} = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
-                RichText  => 0,
-                Text      => $Param{Config}->{Parameters}->{$Parameter},
-                Data      => {},
-                UserID    => $Param{UserID},
-                Translate => 0,
-
-                # FIXME: as common action, object id could be not a ticket!
-                TicketID  => $Self->{RootObjectID} || $Param{ObjectID}
-            );
-        }
-    }
-
     # create Report
     my $ReportID = $Kernel::OM->Get('Reporting')->ReportCreate(
         DefinitionID => $Param{Config}->{DefinitionID},
@@ -175,7 +163,11 @@ sub Run {
     }
 
     # return the report
-    $Self->SetResult(Name => 'Report', Value => \%Report);
+    $Self->SetResult(
+        Name   => 'Report',
+        Value  => \%Report,
+        UserID => $Param{UserID}
+    );
 
     return 1;
 }

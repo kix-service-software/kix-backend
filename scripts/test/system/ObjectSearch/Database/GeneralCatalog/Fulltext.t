@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
@@ -127,7 +127,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                $CaseSensitive ? '(LOWER(gc.name) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\' OR LOWER(gc.general_catalog_class) LIKE LOWER(\'%Test%\') ESCAPE \'' . $Escape . '\') ' : '(gc.name LIKE \'%Test%\' ESCAPE \'' . $Escape . '\' OR gc.general_catalog_class LIKE \'%Test%\' ESCAPE \'' . $Escape . '\') '
+                $CaseSensitive ? '(LOWER(gc.name) LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR LOWER(gc.general_catalog_class) LIKE \'%test%\' ESCAPE \'' . $Escape . '\') ' : '(gc.name LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR gc.general_catalog_class LIKE \'%test%\' ESCAPE \'' . $Escape . '\') '
             ]
         }
     }

@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -291,7 +291,7 @@ sub _ReplaceBodyRichtext {
 
                     if (!$Param{WithInline}) {
                         # remove inline images
-                        $BodyRichtext =~ s/<img.+?src="cid:.+?>//g;
+                        $BodyRichtext =~ s/<img.+?src=["']?cid:.+?>//gs;
                     }
                 }
             } elsif ($AttachmentIndex{$AttachmentID}->{ContentID} && $Param{WithInline}) {
@@ -310,6 +310,7 @@ sub _ReplaceBodyRichtext {
     if ($BodyRichtext) {
         my %PreparedInline;
         if (scalar @InlineAttachments) {
+            $BodyRichtext =~ s/src=(?!["\'])(cid:[^\s\/\>\"\']+)/src="$1"/g;
             for my $Attachment ( @InlineAttachments ) {
                 my $Content = MIME::Base64::encode_base64( $Attachment->{Content}, '' );
 
@@ -374,7 +375,7 @@ sub _GetPreparedBody {
     }
 
     # add images if needed and given
-    if ($PreparedBody =~ /<img.+?src="cid:.+?>/ && IsHashRefWithData($Param{Inline})) {
+    if ($PreparedBody =~ /<img.+?src="cid:.+?>/s && IsHashRefWithData($Param{Inline})) {
         for my $ContentID ( keys %{$Param{Inline}} ) {
             $PreparedBody =~ s/cid:$ContentID/$Param{Inline}->{$ContentID}/g;
         }
@@ -388,7 +389,7 @@ sub _CloseTags {
 
     # get all opening and closing tags but not self closing ones and ignore some specific
     # e.g. <div>, <p class...> but not <br /> or <img src... />
-    my @StartTags = grep {defined && $_ !~ /^(area|base|br|col|command|embed|hr|img|input|keygen|link|meta|param|source|track|wbr)$/} $Param{Body} =~ /(?:<([^!\s\/]+?)>|<([^!\s\/]+)\s+.+?\s*[^\/]>)/g;
+    my @StartTags = grep {defined && $_ !~ /^(area|base|br|col|command|embed|hr|img|input|keygen|link|meta|param|source|track|wbr)$/} $Param{Body} =~ /(?:<([^!\s\/>]+)(?:\s+[^\/>]+)?>)/gs;
     my @EndTags   = grep {defined && $_ !~ /^(area|base|br|col|command|embed|hr|img|input|keygen|link|meta|param|source|track|wbr)$/} $Param{Body} =~ /<\/(.+?)>/g;
 
     my @ReversedStartTags = reverse @StartTags;

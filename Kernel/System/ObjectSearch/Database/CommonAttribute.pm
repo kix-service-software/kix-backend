@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -941,6 +941,11 @@ sub _CheckSearchParams {
         }
     }
 
+    # check for required attributes
+    if ( defined( $AttributeList->{ $Param{Search}->{Field} }->{Requires} ) ) {
+        $Param{Search}->{Requires} = $AttributeList->{ $Param{Search}->{Field} }->{Requires};
+    }
+
     return 1;
 }
 
@@ -1422,7 +1427,7 @@ sub _FulltextColumnSQL {
     my $SQL           = q{};
     my $CaseSensitive = $Param{CaseSensitive} || 0;
 
-    $Word = q{'} . $Word . q{'};
+    $Word = lc( q{'} . $Word . q{'} );
 
     # check if database supports LIKE in large text types
     # the first condition is a little bit opaque
@@ -1439,18 +1444,18 @@ sub _FulltextColumnSQL {
     elsif ( $Kernel::OM->Get('DB')->GetDatabaseFunction('LcaseLikeInLargeText') ) {
 
         if ( $Param{IsStaticSearch} ) {
-            $SQL .= "$Column $Type LCASE($Word)";
+            $SQL .= "$Column $Type $Word";
         }
         else {
-            $SQL .= "LCASE($Column) $Type LCASE($Word)";
+            $SQL .= "LCASE($Column) $Type $Word";
         }
     }
     else {
         if ( $Param{IsStaticSearch} ) {
-            $SQL .= "$Column $Type LOWER($Word)";
+            $SQL .= "$Column $Type $Word";
         }
         else {
-            $SQL .= "LOWER($Column) $Type LOWER($Word)";
+            $SQL .= "LOWER($Column) $Type $Word";
         }
     }
 

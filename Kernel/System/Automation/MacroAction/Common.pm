@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
@@ -57,6 +57,18 @@ sub new {
     bless( $Self, $Type );
 
     $Self->Describe();
+
+    if ( !defined( $Self->{Definition}->{Options}->{ 'Debug' } ) ) {
+        $Self->AddOption(
+            Name           => 'Debug',
+            Label          => Kernel::Language::Translatable('Debug'),
+            Description    => Kernel::Language::Translatable('Output debug data.'),
+            Required       => 0,
+        );
+    }
+
+    # move Debug to the top
+    $Self->{Definition}->{Options}->{ 'Debug' }->{Order} = 0;
 
     return $Self;
 }
@@ -211,6 +223,14 @@ sub SetResult {
 
     $Self->{MacroVariables}->{$VariableName} = $Param{Value};
 
+    if ( $Self->{Debug} ) {
+        $Kernel::OM->Get('Automation')->LogDebug(
+            Referrer => $Self,
+            Message  => 'Set macro variable "' . $Param{Name} . '": ' . $Kernel::OM->Get('Main')->Dump( $Param{Value} ),
+            UserID   => $Param{UserID},
+        );
+    }
+
     return 1;
 }
 
@@ -240,6 +260,14 @@ sub SetMacroResult {
 
     $Self->{MacroResults} //= {};
     $Self->{MacroResults}->{$Param{Name}} = $Param{Value};
+
+    if ( $Self->{Debug} ) {
+        $Kernel::OM->Get('Automation')->LogDebug(
+            Referrer => $Self,
+            Message  => 'Set macro result "' . $Param{Name} . '": ' . $Kernel::OM->Get('Main')->Dump( $Param{Value} ),
+            UserID   => $Param{UserID},
+        );
+    }
 
     return 1;
 }
@@ -409,7 +437,7 @@ sub _CheckParams {
 
     # check needed stuff
     for my $Needed (qw(Config UserID)) {
-        if ( !$Param{$Needed} ) {
+        if ( !$Param{ $Needed } ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
@@ -418,7 +446,7 @@ sub _CheckParams {
         }
     }
 
-    if (ref $Param{Config} ne 'HASH') {
+    if ( !IsHashRef( $Param{Config} ) ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Config is no object!",
@@ -426,13 +454,14 @@ sub _CheckParams {
         return;
     }
 
-    my %Definition = $Self->DefinitionGet();
-
-    if (IsHashRefWithData(\%Definition) && IsHashRefWithData($Definition{Options})) {
-        for my $Option ( values %{$Definition{Options}}) {
+    if ( IsHashRefWithData( $Self->{Definition}->{Options} ) ) {
+        for my $Option ( values %{ $Self->{Definition}->{Options} } ) {
 
             # check if the value is given, if required
-            if ($Option->{Required} && !defined $Param{Config}->{$Option->{Name}}) {
+            if (
+                $Option->{Required}
+                && !defined( $Param{Config}->{ $Option->{Name} } )
+            ) {
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Need $Option->{Name} in Config!",
@@ -443,69 +472,6 @@ sub _CheckParams {
     }
 
     return 1;
-}
-
-=item _ReplaceValuePlaceholder()
-
-replaces palceholders
-
-Example:
-    my $Value = $Self->_ReplaceValuePlaceholder(
-        Value     => $SomeValue,
-        Richtext  => 0,                  # optional: 0 will be used if omitted
-        Translate => 0,                  # optional: 0 will be used if omitted
-        UserID    => 1,                  # optional: 1 will be used if omitted
-        Data      => {},                 # optional: {} will be used
-    );
-
-=cut
-
-sub _ReplaceValuePlaceholder {
-    my ( $Self, %Param ) = @_;
-
-    return $Param{Value} if (!$Param{Value} || $Param{Value} !~ m/(<|&lt;)KIX_/);
-
-    my $Data = $Param{EventData} || $Self->{EventData} || {};
-    if(IsHashRefWithData($Param{Data})) {
-        $Data = {
-            %{$Data},
-            %{$Param{Data}}
-        }
-    };
-    if(IsHashRefWithData($Param{AdditionalData})) {
-        $Data = {
-            %{$Data},
-            %{$Param{AdditionalData}}
-        }
-    };
-
-    return $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
-        Text            => $Param{Value},
-        RichText        => $Param{Richtext} || 0,
-        Translate       => $Param{Translate} || 0,
-        UserID          => $Param{UserID} || 1,
-        Data            => $Data,
-        ReplaceNotFound => $Param{ReplaceNotFound},
-
-        # FIXME: use correct object id for typ (could be a sub macro of other type)
-        # or get and use job type by JobID in $Self
-        ObjectType => $Param{MacroType},
-        ObjectID   => $Self->{RootObjectID} || $Param{ObjectID}
-    );
-}
-
-sub _ConvertScalar2ArrayRef {
-    my ( $Self, %Param ) = @_;
-
-    my @Data = split( /,/, $Param{Data} );
-
-    # remove any possible heading and tailing white spaces
-    for my $Item (@Data) {
-        $Item =~ s{\A\s+}{};
-        $Item =~ s{\s+\z}{};
-    }
-
-    return \@Data;
 }
 
 1;

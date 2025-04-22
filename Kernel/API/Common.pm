@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -110,8 +110,11 @@ sub _MetricAdd {
 
     return if !$Self->{Metric};
 
+    $Self->{Metric}->{RequestID}     = $Self->{ProcessedRequest}->{Headers}->{'Kix-request-id'};
     $Self->{Metric}->{RequestMethod} = $Self->{ProcessedRequest}->{RequestMethod};
     $Self->{Metric}->{Resource}      = $Self->{ProcessedRequest}->{RequestURI};
+    $Self->{Metric}->{UserID}        = $Self->{Authorization}->{UserID};
+    $Self->{Metric}->{UserType}      = $Self->{Authorization}->{UserType};
 
     if ( $Param{Response} && $Param{Response}->{ContentLength} ) {
         $Self->{Metric}->{OutBytes} = $Param{Response}->{ContentLength};

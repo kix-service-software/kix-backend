@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -449,7 +449,10 @@ sub _MigrateArticles {
 
             # fix faulty email adresses - remove trailing comma
             foreach my $Attr ( qw(a_from a_to a_cc a_bcc) ) {
-                if ( $Item->{$Attr} =~ /^(.*?),$/gmx ) {
+                if (
+                    $Item->{$Attr}
+                    && $Item->{$Attr} =~ /^(.*?),$/gmx
+                ) {
                     $Item->{$Attr} = $1;
                 }
             }

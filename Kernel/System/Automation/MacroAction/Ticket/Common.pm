@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
@@ -69,23 +69,29 @@ sub _CheckParams {
     return 1;
 }
 
-sub _ReplaceValuePlaceholder {
-    my ( $Self, %Param ) = @_;
-
-    %Param = $Self->_PrepareEventData(%Param);
-
-    return $Self->SUPER::_ReplaceValuePlaceholder(%Param);
-}
-
 sub _PrepareEventData {
     my ( $Self, %Param ) = @_;
 
     $Param{EventData} ||= IsHashRefWithData($Self->{EventData}) ? $Self->{EventData} : {};
     if ( !$Param{EventData}->{TicketID} ) {
-        $Param{EventData}->{TicketID}  = $Self->{RootObjectID} || $Param{TicketID};
+        if (
+            $Self->{RootMacroType} eq 'Ticket'
+            && $Self->{RootObjectID}
+        ) {
+            $Param{EventData}->{TicketID} = $Self->{RootObjectID};
+        }
+        elsif ( $Param{TicketID} ) {
+            $Param{EventData}->{TicketID} = $Param{TicketID};
+        }
     }
     if ( !$Param{EventData}->{ArticleID} ) {
         $Param{EventData}->{ArticleID} = $Param{AdditionalData}->{ArticleID} ? $Param{AdditionalData}->{ArticleID}->[0] : q{};
+    }
+    if (
+        $Self->{RootMacroType} eq 'ITSMConfigItem'
+        && $Self->{RootObjectID}
+    ) {
+        $Param{EventData}->{ConfigItemID} = $Self->{RootObjectID};
     }
 
     return %Param;

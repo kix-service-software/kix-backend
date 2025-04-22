@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -338,15 +338,28 @@ sub _PrepareSQLDef {
 
     # add base def to sql def
     my $BaseOrderBy;
+    my $Success = 1;
     for my $Key ( keys %{ $BaseDef } ) {
         # remember OrderBy of base in separate variable
         if ( $Key eq 'OrderBy' ) {
             $BaseOrderBy = $BaseDef->{ $Key };
         }
+        # special handling for attributes that should be extracted to flags
+        elsif (
+            $Key eq 'Extract'
+            && ref( $BaseDef->{ $Key } ) eq 'HASH'
+        ) {
+            $Success = $Self->_ProcessExtractAttribute(
+                %Param,
+                Extract => $BaseDef->{ $Key },
+                Flags   => \%Flags
+            );
+        }
         else {
             push( @{ $SQLDef{ $Key } }, @{ $BaseDef->{ $Key } } );
         }
     }
+    return if ( !$Success );
 
     # check permission if UserID given and prepare relevant part of SQL statement (not needed for user with id 1)
     if ( $Param{UserID} != 1 ) {
@@ -527,6 +540,65 @@ sub _PrepareSQLStatement {
     }
 
     return $SQL;
+}
+
+=item _ProcessExtractAttribute()
+
+### TODO ###
+
+=cut
+
+sub _ProcessExtractAttribute {
+    my ( $Self, %Param ) = @_;
+
+    for my $Type ( keys %{ $Param{Search} } ) {
+        if ( ref( $Param{Search}->{ $Type } ) ne 'ARRAY' ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Invalid Search! Search type has to provide an array.",
+                Silent   => $Param{Silent}
+            );
+
+            return;
+        }
+
+        my @Items;
+        for my $SearchItem ( @{ $Param{Search}->{ $Type } } ) {
+            if (
+                ref( $SearchItem ) ne 'HASH'
+                || !defined( $SearchItem->{Field} )
+                || !defined( $SearchItem->{Value} )
+            ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Invalid Search! Entry has to be a hash with Field and Value.",
+                    Silent   => $Param{Silent}
+                );
+
+                return;
+            }
+
+            if ( defined( $Param{Extract}->{ $SearchItem->{Field} } ) ) {
+                $Param{Flags}->{ $SearchItem->{Field} } = $SearchItem->{Value};
+
+                if ( $Param{Extract}->{ $SearchItem->{Field} } ) {
+                    push( @Items, $SearchItem );
+                }
+            }
+            else {
+                push( @Items, $SearchItem );
+            }
+        }
+
+        if ( scalar(@Items) ) {
+            $Param{Search}->{ $Type } = \@Items;
+        }
+        else {
+            delete $Param{Search}->{ $Type };
+        }
+    }
+
+    return 1;
 }
 
 1;

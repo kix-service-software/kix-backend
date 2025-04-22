@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -164,6 +164,12 @@ sub Request {
         $UserAgent->ssl_opts(
             verify_hostname => 0,
             SSL_verify_mode => SSL_VERIFY_NONE,
+        );
+    }
+
+    if ( IsHashRefWithData( $Param{SSLOptions} ) ) {
+        $UserAgent->ssl_opts(
+            %{ $Param{SSLOptions} }
         );
     }
 

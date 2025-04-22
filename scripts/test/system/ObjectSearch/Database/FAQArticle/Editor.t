@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
@@ -378,13 +378,18 @@ my @SortTests = (
         Attribute => 'CreateBy',
         Expected  => {
             'Join'    => [
-                'INNER JOIN contact c0 ON c0.user_id = f.created_by'
+                'INNER JOIN users fcru ON fcru.id = f.created_by',
+                'LEFT OUTER JOIN contact fcruc ON fcruc.user_id = fcru.id'
             ],
             'OrderBy' => [
-                'c0.lastname', 'c0.firstname'
+                'LOWER(fcruc.lastname)',
+                'LOWER(fcruc.firstname)',
+                'LOWER(fcru.login)'
             ],
             'Select'  => [
-                'c0.lastname', 'c0.firstname'
+                'fcruc.lastname',
+                'fcruc.firstname',
+                'fcru.login'
             ]
         }
     },
@@ -393,28 +398,38 @@ my @SortTests = (
         Attribute => 'CreatedUserIDs',
         Expected  => {
             'Join'    => [
-                'INNER JOIN contact c0 ON c0.user_id = f.created_by'
+                'INNER JOIN users fcru ON fcru.id = f.created_by',
+                'LEFT OUTER JOIN contact fcruc ON fcruc.user_id = fcru.id'
             ],
             'OrderBy' => [
-                'c0.lastname', 'c0.firstname'
+                'LOWER(fcruc.lastname)',
+                'LOWER(fcruc.firstname)',
+                'LOWER(fcru.login)'
             ],
             'Select'  => [
-                'c0.lastname', 'c0.firstname'
+                'fcruc.lastname',
+                'fcruc.firstname',
+                'fcru.login'
             ]
         }
     },
     {
-        Name      => 'Sort: Attribute "CreateBy"',
+        Name      => 'Sort: Attribute "ChangeBy"',
         Attribute => 'ChangeBy',
         Expected  => {
             'Join'    => [
-                'INNER JOIN contact c0 ON c0.user_id = f.changed_by'
+                'INNER JOIN users fchu ON fchu.id = f.changed_by',
+                'LEFT OUTER JOIN contact fchuc ON fchuc.user_id = fchu.id'
             ],
             'OrderBy' => [
-                'c0.lastname', 'c0.firstname'
+                'LOWER(fchuc.lastname)',
+                'LOWER(fchuc.firstname)',
+                'LOWER(fchu.login)'
             ],
             'Select'  => [
-                'c0.lastname', 'c0.firstname'
+                'fchuc.lastname',
+                'fchuc.firstname',
+                'fchu.login'
             ]
         }
     },
@@ -423,13 +438,18 @@ my @SortTests = (
         Attribute => 'LastChangedUserIDs',
         Expected  => {
             'Join'    => [
-                'INNER JOIN contact c0 ON c0.user_id = f.changed_by'
+                'INNER JOIN users fchu ON fchu.id = f.changed_by',
+                'LEFT OUTER JOIN contact fchuc ON fchuc.user_id = fchu.id'
             ],
             'OrderBy' => [
-                'c0.lastname', 'c0.firstname'
+                'LOWER(fchuc.lastname)',
+                'LOWER(fchuc.firstname)',
+                'LOWER(fchu.login)'
             ],
             'Select'  => [
-                'c0.lastname', 'c0.firstname'
+                'fchuc.lastname',
+                'fchuc.firstname',
+                'fchu.login'
             ]
         }
     }
@@ -466,9 +486,95 @@ my $ObjectSearch = $Kernel::OM->Get('ObjectSearch');
 
 # begin transaction on database
 $Helper->BeginWork();
-my $UserID1 = 1;
-my $UserID2 = $Helper->TestUserCreate( Result => 'ID' );
-my $UserID3 = $Helper->TestUserCreate( Result => 'ID' );
+
+## prepare user mapping
+my $RoleID = $Kernel::OM->Get('Role')->RoleLookup(
+    Role => 'FAQ Admin'
+);
+my $UserLogin1 = 'Test001';
+my $UserLogin2 = 'test002';
+my $UserLogin3 = 'Test003';
+my $ContactFirstName1 = 'Alf';
+my $ContactFirstName2 = 'Bert';
+my $ContactLastName1  = 'test';
+my $ContactLastName2  = 'Test';
+my $UserID1 = $Kernel::OM->Get('User')->UserAdd(
+    UserLogin     => $UserLogin1,
+    ValidID       => 1,
+    ChangeUserID  => 1,
+    IsAgent       => 1
+);
+$Kernel::OM->Get('Role')->RoleUserAdd(
+    AssignUserID => $UserID1,
+    RoleID       => $RoleID,
+    UserID       => 1,
+);
+$Self->True(
+    $UserID1,
+    'First user created'
+);
+my $ContactID1 = $Kernel::OM->Get('Contact')->ContactAdd(
+    Firstname             => $ContactFirstName1,
+    Lastname              => $ContactLastName1,
+    AssignedUserID        => $UserID1,
+    ValidID               => 1,
+    UserID                => 1,
+);
+$Self->True(
+    $ContactID1,
+    'Contact for first user created'
+);
+my $UserID2 = $Kernel::OM->Get('User')->UserAdd(
+    UserLogin     => $UserLogin2,
+    ValidID       => 1,
+    ChangeUserID  => 1,
+    IsAgent       => 1
+);
+$Kernel::OM->Get('Role')->RoleUserAdd(
+    AssignUserID => $UserID2,
+    RoleID       => $RoleID,
+    UserID       => 1,
+);
+$Self->True(
+    $UserID2,
+    'Second user created'
+);
+my $ContactID2 = $Kernel::OM->Get('Contact')->ContactAdd(
+    Firstname             => $ContactFirstName2,
+    Lastname              => $ContactLastName2,
+    AssignedUserID        => $UserID2,
+    ValidID               => 1,
+    UserID                => 1,
+);
+$Self->True(
+    $ContactID2,
+    'Contact for second user created'
+);
+my $UserID3 = $Kernel::OM->Get('User')->UserAdd(
+    UserLogin     => $UserLogin3,
+    ValidID       => 1,
+    ChangeUserID  => 1,
+    IsAgent       => 1
+);
+$Kernel::OM->Get('Role')->RoleUserAdd(
+    AssignUserID => $UserID3,
+    RoleID       => $RoleID,
+    UserID       => 1,
+);
+$Self->True(
+    $UserID3,
+    'Third user created'
+);
+
+# discard contact object to process events
+$Kernel::OM->ObjectsDiscard(
+    Objects => ['Contact'],
+);
+
+# discard user object to process events
+$Kernel::OM->ObjectsDiscard(
+    Objects => ['User'],
+);
 
 ## prepare test faq articles ##
 # first faq article
@@ -743,14 +849,42 @@ for my $Test ( @IntegrationSearchTests ) {
 # test Sort
 my @IntegrationSortTests = (
     {
+        Name     => 'Sort: Field CreatedUserIDs',
+        Sort     => [
+            {
+                Field => 'CreatedUserIDs'
+            }
+        ],
+        Expected => $OrderByNull eq 'LAST' ? [$FAQArticleID1,$FAQArticleID2,$FAQArticleID3] : [$FAQArticleID3,$FAQArticleID1,$FAQArticleID2]
+    },
+    {
+        Name     => 'Sort: Field CreatedUserIDs / Direction ascending',
+        Sort     => [
+            {
+                Field     => 'CreatedUserIDs',
+                Direction => 'ascending'
+            }
+        ],
+        Expected => $OrderByNull eq 'LAST' ? [$FAQArticleID1,$FAQArticleID2,$FAQArticleID3] : [$FAQArticleID3,$FAQArticleID1,$FAQArticleID2]
+    },
+    {
+        Name     => 'Sort: Field CreatedUserIDs / Direction descending',
+        Sort     => [
+            {
+                Field     => 'CreatedUserIDs',
+                Direction => 'descending'
+            }
+        ],
+        Expected => $OrderByNull eq 'LAST' ? [$FAQArticleID3,$FAQArticleID2,$FAQArticleID1] : [$FAQArticleID2,$FAQArticleID1,$FAQArticleID3]
+    },
+    {
         Name     => 'Sort: Field CreateBy',
         Sort     => [
             {
                 Field => 'CreateBy'
             }
         ],
-        Language => 'en',
-        Expected => $OrderByNull eq 'LAST' ? [$FAQArticleID1, $FAQArticleID3, $FAQArticleID2] : [$FAQArticleID1, $FAQArticleID2, $FAQArticleID3]
+        Expected => $OrderByNull eq 'LAST' ? [$FAQArticleID1,$FAQArticleID2,$FAQArticleID3] : [$FAQArticleID3,$FAQArticleID1,$FAQArticleID2]
     },
     {
         Name     => 'Sort: Field CreateBy / Direction ascending',
@@ -760,8 +894,7 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Language => 'en',
-        Expected => $OrderByNull eq 'LAST' ? [$FAQArticleID1, $FAQArticleID3, $FAQArticleID2] : [$FAQArticleID1, $FAQArticleID2, $FAQArticleID3]
+        Expected => $OrderByNull eq 'LAST' ? [$FAQArticleID1,$FAQArticleID2,$FAQArticleID3] : [$FAQArticleID3,$FAQArticleID1,$FAQArticleID2]
     },
     {
         Name     => 'Sort: Field CreateBy / Direction descending',
@@ -771,8 +904,65 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Language => 'en',
-        Expected => $OrderByNull eq 'LAST' ? [$FAQArticleID2, $FAQArticleID3, $FAQArticleID1] : [$FAQArticleID3, $FAQArticleID2, $FAQArticleID1]
+        Expected => $OrderByNull eq 'LAST' ? [$FAQArticleID3,$FAQArticleID2,$FAQArticleID1] : [$FAQArticleID2,$FAQArticleID1,$FAQArticleID3]
+    },
+    {
+        Name     => 'Sort: Field LastChangedUserIDs',
+        Sort     => [
+            {
+                Field => 'LastChangedUserIDs'
+            }
+        ],
+        Expected => $OrderByNull eq 'LAST' ? [$FAQArticleID1,$FAQArticleID2,$FAQArticleID3] : [$FAQArticleID3,$FAQArticleID1,$FAQArticleID2]
+    },
+    {
+        Name     => 'Sort: Field LastChangedUserIDs / Direction ascending',
+        Sort     => [
+            {
+                Field     => 'LastChangedUserIDs',
+                Direction => 'ascending'
+            }
+        ],
+        Expected => $OrderByNull eq 'LAST' ? [$FAQArticleID1,$FAQArticleID2,$FAQArticleID3] : [$FAQArticleID3,$FAQArticleID1,$FAQArticleID2]
+    },
+    {
+        Name     => 'Sort: Field LastChangedUserIDs / Direction descending',
+        Sort     => [
+            {
+                Field     => 'LastChangedUserIDs',
+                Direction => 'descending'
+            }
+        ],
+        Expected => $OrderByNull eq 'LAST' ? [$FAQArticleID3,$FAQArticleID2,$FAQArticleID1] : [$FAQArticleID2,$FAQArticleID1,$FAQArticleID3]
+    },
+    {
+        Name     => 'Sort: Field ChangeBy',
+        Sort     => [
+            {
+                Field => 'ChangeBy'
+            }
+        ],
+        Expected => $OrderByNull eq 'LAST' ? [$FAQArticleID1,$FAQArticleID2,$FAQArticleID3] : [$FAQArticleID3,$FAQArticleID1,$FAQArticleID2]
+    },
+    {
+        Name     => 'Sort: Field ChangeBy / Direction ascending',
+        Sort     => [
+            {
+                Field     => 'ChangeBy',
+                Direction => 'ascending'
+            }
+        ],
+        Expected => $OrderByNull eq 'LAST' ? [$FAQArticleID1,$FAQArticleID2,$FAQArticleID3] : [$FAQArticleID3,$FAQArticleID1,$FAQArticleID2]
+    },
+    {
+        Name     => 'Sort: Field ChangeBy / Direction descending',
+        Sort     => [
+            {
+                Field     => 'ChangeBy',
+                Direction => 'descending'
+            }
+        ],
+        Expected => $OrderByNull eq 'LAST' ? [$FAQArticleID3,$FAQArticleID2,$FAQArticleID1] : [$FAQArticleID2,$FAQArticleID1,$FAQArticleID3]
     }
 );
 for my $Test ( @IntegrationSortTests ) {

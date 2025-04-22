@@ -122,12 +122,6 @@
         </ForeignKeyCreate>
     </TableAlter>
 
-    <TableAlter Name="kix_article_flag">
-        <ForeignKeyCreate ForeignTable="users">
-            <Reference Local="create_by" Foreign="id"/>
-        </ForeignKeyCreate>
-    </TableAlter>
-
     <TableAlter Name="text_module">
         <ForeignKeyCreate ForeignTable="users">
             <Reference Local="create_by" Foreign="id"/>

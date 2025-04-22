@@ -1,6 +1,6 @@
 <!DOCTYPE HTML><html><head><title>KIX REST API documentation</title><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="generator" content="https://github.com/raml2html/raml2html 7.6.0"><link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"><script type="text/javascript" src="https://code.jquery.com/jquery-1.11.0.min.js"></script><script type="text/javascript" src="https://netdna.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script><script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script><script type="text/javascript">
-      // --
-// Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+// --
+// Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
 // --
 // This software comes with ABSOLUTELY NO WARRANTY. For details, see
 // the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -93,13 +93,6 @@ $(document).ready(function() {
   });
 });
 
-      // --
-// Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
-// --
-// This software comes with ABSOLUTELY NO WARRANTY. For details, see
-// the enclosed file LICENSE-GPL3 for license information (GPL3). If you
-// did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
-// --
 /**
  * jQuery json-viewer
  * @author: Kevin Olson <acidjazz@gmail.com>
@@ -4615,6 +4608,10 @@ pre code {
                },
                "readOnly" : true
             },
+            "AttachmentCount" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
             "ChangeBy" : {
                "type" : "integer",
                "readOnly" : true
@@ -4783,6 +4780,7 @@ pre code {
          },
          "required" : [
             "Age",
+            "AttachmentCount",
             "ChangeBy",
             "Changed",
             "ContactID",
@@ -5848,6 +5846,10 @@ pre code {
                },
                "readOnly" : true
             },
+            "AttachmentCount" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
             "ChangeBy" : {
                "type" : "integer",
                "readOnly" : true
@@ -6016,6 +6018,7 @@ pre code {
          },
          "required" : [
             "Age",
+            "AttachmentCount",
             "ChangeBy",
             "Changed",
             "ContactID",
@@ -6918,6 +6921,10 @@ pre code {
                },
                "readOnly" : true
             },
+            "AttachmentCount" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
             "ChangeBy" : {
                "type" : "integer",
                "readOnly" : true
@@ -7086,6 +7093,7 @@ pre code {
          },
          "required" : [
             "Age",
+            "AttachmentCount",
             "ChangeBy",
             "Changed",
             "ContactID",
@@ -7167,6 +7175,7 @@ pre code {
     "Ticket": [
         {
             "Age": 1316865,
+            "AttachmentCount": 0,
             "ChangeBy": 1,
             "Changed": "2020-04-24 13:23:20",
             "ContactID": "1",
@@ -7221,6 +7230,7 @@ pre code {
         },
         {
             "Age": 1316731,
+            "AttachmentCount": 1,
             "ChangeBy": 1,
             "Changed": "2020-04-24 13:24:20",
             "ContactID": "1",
@@ -11199,6 +11209,10 @@ pre code {
                },
                "readOnly" : true
             },
+            "AttachmentCount" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
             "ChangeBy" : {
                "type" : "integer",
                "readOnly" : true
@@ -11367,6 +11381,7 @@ pre code {
          },
          "required" : [
             "Age",
+            "AttachmentCount",
             "ChangeBy",
             "Changed",
             "ContactID",
@@ -12508,6 +12523,10 @@ pre code {
                },
                "readOnly" : true
             },
+            "AttachmentCount" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
             "ChangeBy" : {
                "type" : "integer",
                "readOnly" : true
@@ -12676,6 +12695,7 @@ pre code {
          },
          "required" : [
             "Age",
+            "AttachmentCount",
             "ChangeBy",
             "Changed",
             "ContactID",
@@ -13761,6 +13781,10 @@ pre code {
                },
                "readOnly" : true
             },
+            "AttachmentCount" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
             "ChangeBy" : {
                "type" : "integer",
                "readOnly" : true
@@ -13929,6 +13953,7 @@ pre code {
          },
          "required" : [
             "Age",
+            "AttachmentCount",
             "ChangeBy",
             "Changed",
             "ContactID",
@@ -14559,6 +14584,10 @@ pre code {
                },
                "readOnly" : true
             },
+            "AttachmentCount" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
             "ChangeBy" : {
                "type" : "integer",
                "readOnly" : true
@@ -14727,6 +14756,7 @@ pre code {
          },
          "required" : [
             "Age",
+            "AttachmentCount",
             "ChangeBy",
             "Changed",
             "ContactID",
@@ -14808,6 +14838,7 @@ pre code {
     "Ticket": [
         {
             "Age": 1316865,
+            "AttachmentCount": 0,
             "ChangeBy": 1,
             "Changed": "2020-04-24 13:23:20",
             "ContactID": "1",
@@ -14862,6 +14893,7 @@ pre code {
         },
         {
             "Age": 1316731,
+            "AttachmentCount": 1,
             "ChangeBy": 1,
             "Changed": "2020-04-24 13:24:20",
             "ContactID": "1",
@@ -17888,6 +17920,10 @@ pre code {
                },
                "readOnly" : true
             },
+            "AttachmentCount" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
             "ChangeBy" : {
                "type" : "integer",
                "readOnly" : true
@@ -18056,6 +18092,7 @@ pre code {
          },
          "required" : [
             "Age",
+            "AttachmentCount",
             "ChangeBy",
             "Changed",
             "ContactID",
@@ -19016,6 +19053,10 @@ pre code {
                },
                "readOnly" : true
             },
+            "AttachmentCount" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
             "ChangeBy" : {
                "type" : "integer",
                "readOnly" : true
@@ -19184,6 +19225,7 @@ pre code {
          },
          "required" : [
             "Age",
+            "AttachmentCount",
             "ChangeBy",
             "Changed",
             "ContactID",
@@ -19265,6 +19307,7 @@ pre code {
     "Ticket": [
         {
             "Age": 1316865,
+            "AttachmentCount": 0,
             "ChangeBy": 1,
             "Changed": "2020-04-24 13:23:20",
             "ContactID": "1",
@@ -19319,6 +19362,7 @@ pre code {
         },
         {
             "Age": 1316731,
+            "AttachmentCount": 1,
             "ChangeBy": 1,
             "Changed": "2020-04-24 13:24:20",
             "ContactID": "1",
@@ -20475,6 +20519,10 @@ pre code {
                },
                "readOnly" : true
             },
+            "AttachmentCount" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
             "ChangeBy" : {
                "type" : "integer",
                "readOnly" : true
@@ -20643,6 +20691,7 @@ pre code {
          },
          "required" : [
             "Age",
+            "AttachmentCount",
             "ChangeBy",
             "Changed",
             "ContactID",
@@ -20724,6 +20773,7 @@ pre code {
     "Ticket": [
         {
             "Age": 1316865,
+            "AttachmentCount": 0,
             "ChangeBy": 1,
             "Changed": "2020-04-24 13:23:20",
             "ContactID": "1",
@@ -20778,6 +20828,7 @@ pre code {
         },
         {
             "Age": 1316731,
+            "AttachmentCount": 1,
             "ChangeBy": 1,
             "Changed": "2020-04-24 13:24:20",
             "ContactID": "1",
@@ -21681,6 +21732,10 @@ pre code {
                },
                "readOnly" : true
             },
+            "AttachmentCount" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
             "ChangeBy" : {
                "type" : "integer",
                "readOnly" : true
@@ -21849,6 +21904,7 @@ pre code {
          },
          "required" : [
             "Age",
+            "AttachmentCount",
             "ChangeBy",
             "Changed",
             "ContactID",
@@ -21964,6 +22020,7 @@ pre code {
                 "ToRealname": "Some one"
             }
         ],
+        "AttachmentCount": 2,
         "ChangeBy": 1,
         "Changed": "2020-04-24 13:23:20",
         "ContactID": "1",
@@ -31005,6 +31062,10 @@ pre code {
                "type" : "string",
                "readOnly" : true
             },
+            "ContentType" : {
+               "type" : "string",
+               "readOnly" : true
+            },
             "Email" : {
                "type" : "string",
                "readOnly" : true
@@ -31258,6 +31319,10 @@ pre code {
                "readOnly" : true
             },
             "Content" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "ContentType" : {
                "type" : "string",
                "readOnly" : true
             },
@@ -47607,6 +47672,10 @@ pre code {
                },
                "readOnly" : true
             },
+            "AttachmentCount" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
             "ChangeBy" : {
                "type" : "integer",
                "readOnly" : true
@@ -47775,6 +47844,7 @@ pre code {
          },
          "required" : [
             "Age",
+            "AttachmentCount",
             "ChangeBy",
             "Changed",
             "ContactID",
@@ -48904,6 +48974,10 @@ pre code {
                },
                "readOnly" : true
             },
+            "AttachmentCount" : {
+               "type" : "integer",
+               "readOnly" : true
+            },
             "ChangeBy" : {
                "type" : "integer",
                "readOnly" : true
@@ -49072,6 +49146,7 @@ pre code {
          },
          "required" : [
             "Age",
+            "AttachmentCount",
             "ChangeBy",
             "Changed",
             "ContactID",

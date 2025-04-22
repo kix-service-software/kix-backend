@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -816,7 +816,7 @@ sub TranslationLanguageUpdate {
         if ( !$Param{Silent} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "Translation language $Param{Language} doesn't exist for given pattern!"
+                Message  => "Translation language \"$Param{Language}\" doesn't exist for given pattern!"
             );
         }
         return;
@@ -1008,6 +1008,86 @@ sub CleanUp {
     return 1;
 }
 
+=item ImportPOMultiAsync()
+
+Import multiple PO content (will always be executed asynchronously)
+
+    my $Result = $TranslationObject->ImportPOMultiAsync(
+        Data   => [],           # required, multiple objects of ImportPO parameters
+        UserID => 123,          # required
+    );
+
+=cut
+
+sub ImportPOMultiAsync {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    if ( !IsArrayRefWithData($Param{Data}) ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Missing Data or Data is not an ArrayRef!"
+        );
+        return;
+    }
+
+    my @PreparedData;
+    my $TotalItemCount = 0;
+
+    DATA:
+    foreach my $PO ( @{$Param{Data}} ) {
+        if ( !IsHashRefWithData($PO) ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "PO in Data array is not a HashRef!"
+            );
+            next DATA;
+        }
+    
+        my $Items = $Self->_ImportPOPrepareItems(%{$PO});
+        next DATA if !IsHashRefWithData($Items);
+
+        push @PreparedData, {
+            Language => $PO->{Language},
+            Items    => $Items,
+        };
+
+        $TotalItemCount += scalar(keys %{$Items});
+    }
+
+    if ( @PreparedData ) {
+
+        if ( !$ENV{UnitTest} ) {
+            my $TaskID = $Self->AsyncCall(
+                ObjectName     => $Kernel::OM->GetModuleFor('Translation'),
+                FunctionName   => '_ImportPOItems',
+                FunctionParams => {
+                    UserID => $Param{UserID},
+                    Data   => \@PreparedData
+                },
+                MaximumParallelInstances => 1,
+            );
+            if ( !$TaskID ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Could not schedule asynchronous task for PO import!",
+                );
+                return;
+            }
+        }
+        else {
+            my @Result = $Self->_ImportPOItems(
+                UserID => $Param{UserID},
+                Data   => \@PreparedData
+            );
+        }
+
+        return ( $TotalItemCount, $TotalItemCount );
+    }
+
+    return;
+}
+
 =item ImportPO()
 
 Import a PO content
@@ -1017,7 +1097,6 @@ Import a PO content
         File     => '...',        # required if Content is not given
         Content  => '...',        # required if File is not given
         UserID   => 123,          # required
-        Async    => 1,            # optional, start import as a background process
     );
 
 =cut
@@ -1025,6 +1104,31 @@ Import a PO content
 sub ImportPO {
     my ( $Self, %Param ) = @_;
     my @Result;
+
+    my $Items = $Self->_ImportPOPrepareItems(%Param);
+
+    if ( IsHashRefWithData($Items) ) {
+
+        my %ImportParameters = (
+            UserID => $Param{UserID},
+            Data   => [
+                {
+                    Language => $Param{Language},
+                    Items    => $Items
+                }
+            ]
+        );
+
+        @Result = $Self->_ImportPOItems(
+            %ImportParameters
+        );
+    }
+
+    return @Result;
+}
+
+sub _ImportPOPrepareItems {
+    my ( $Self, %Param ) = @_;
 
     # check needed stuff
     for (qw(Language)) {
@@ -1096,102 +1200,97 @@ sub ImportPO {
         $DisableWarnings = 0;
     }
 
-    if ( IsHashRefWithData($Items) ) {
-
-        if ( $Param{Async} ) {
-
-            my $TaskID = $Self->AsyncCall(
-                ObjectName     => $Kernel::OM->GetModuleFor('Translation'),
-                FunctionName   => '_ImportPO',
-                FunctionParams => {
-                    %Param,
-                    Items => $Items
-                },
-                MaximumParallelInstances => 1,
-            );
-            if ( !$TaskID ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Could not schedule asynchronous task for PO import!",
-                );
-                return;
-            }
-
-            return ( scalar(keys %{$Items}), scalar(keys %{$Items}) );
-        }
-
-        @Result = $Self->_ImportPO(
-            %Param,
-            Items => $Items
-        );
-    }
-
-    # reset cache
-    $Kernel::OM->Get('Cache')->CleanUp(
-        Type => $Self->{CacheType},
-    );
-
-    return @Result;
+    return $Items;
 }
 
-sub _ImportPO {
+sub _ImportPOItems {
     my ( $Self, %Param ) = @_;
     my $CountTotal = 0;
     my $CountOK = 0;
 
     my $EncodeObject = $Kernel::OM->Get('Encode');
 
-    foreach my $MsgId ( sort keys %{$Param{Items}} ) {
-        $CountTotal++;
-
-        # the pattern is obsolete, go to the next one
-        next if $Param{Items}->{$MsgId}->obsolete;
-
-        my $MsgStr = $EncodeObject->EncodeInput($Param{Items}->{$MsgId}->msgstr);
-        $MsgId =~ s/(?<!\\)"//g;
-        $MsgId =~ s/\\"/"/g;
-        if ($MsgStr) {
-            $MsgStr =~ s/(?<!\\)"//g;
-            $MsgStr =~ s/\\"/"/g;
-        }
-
-        # the pattern is empty, go to the next one
-        next if !$MsgId;
-
-        my $PatternID = $Self->PatternExistsCheck(
-            Value => $MsgId,
+    # check needed stuff
+    if ( !IsArrayRefWithData($Param{Data}) ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Data is not given or not an ArrayRef!"
         );
+        return;
+    }
 
-        if ( !$PatternID ) {
-            # create new pattern entry
-            $PatternID = $Self->PatternAdd(
-                Value  => $MsgId,
-                UserID => $Param{UserID},
-            );
-            if ( !$PatternID ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Unable to add translation pattern for $MsgId!"
-                );
-                next;
+    PO:
+    foreach my $PO ( @{$Param{Data}} ) {
+        
+        MSGID:
+        foreach my $MsgId ( sort keys %{$PO->{Items}} ) {
+            $CountTotal++;
+
+            # the pattern is obsolete, go to the next one
+            next MSGID if $PO->{Items}->{$MsgId}->obsolete;
+
+            my $MsgStr = $EncodeObject->EncodeInput($PO->{Items}->{$MsgId}->msgstr);
+            $MsgId =~ s/(?<!\\)"//g;
+            $MsgId =~ s/\\"/"/g;
+            if ($MsgStr) {
+                $MsgStr =~ s/(?<!\\)"//g;
+                $MsgStr =~ s/\\"/"/g;
             }
-        }
 
-        # we don't have a translation for this language so go to the next pattern
-        next if !$MsgStr;
+            # the pattern is empty, go to the next one
+            next MSGID if !$MsgId;
 
-        # create or update language translation
-        my %Translation = $Self->TranslationLanguageGet(
-            PatternID => $PatternID,
-            Language  => $Param{Language},
-        );
+            my $PatternID = $Self->PatternExistsCheck(
+                Value => $MsgId,
+            );
 
-        if ( %Translation ) {
-            # update existing translation but only if it is still the default
-            if ( $Translation{IsDefault} ) {
-                my $Result = $Self->TranslationLanguageUpdate(
+            if ( !$PatternID ) {
+                # create new pattern entry
+                $PatternID = $Self->PatternAdd(
+                    Value  => $MsgId,
+                    UserID => $Param{UserID},
+                );
+                if ( !$PatternID ) {
+                    $Kernel::OM->Get('Log')->Log(
+                        Priority => 'error',
+                        Message  => "Unable to add translation pattern for $MsgId!"
+                    );
+                    next;
+                }
+            }
+
+            # we don't have a translation for this language so go to the next pattern
+            next if !$MsgStr;
+
+            # create or update language translation
+            my %Translation = $Self->TranslationLanguageGet(
+                PatternID => $PatternID,
+                Language  => $PO->{Language},
+            );
+
+            if ( %Translation ) {
+                # update existing translation but only if it is still the default
+                if ( $Translation{IsDefault} ) {
+                    my $Result = $Self->TranslationLanguageUpdate(
+                        PatternID => $PatternID,
+                        Language  => $PO->{Language},
+                        Value     => $MsgStr,
+                        IsDefault => 1,
+                        UserID    => $Param{UserID},
+                    );
+                    if ( !$Result ) {
+                        $Kernel::OM->Get('Log')->Log(
+                            Priority => 'error',
+                            Message  => "Unable to update translation language \"$PO->{Language}\" for PatternID $PatternID!"
+                        );
+                    }
+                }
+            }
+            else {
+                # create a new one
+                my $Result = $Self->TranslationLanguageAdd(
                     PatternID => $PatternID,
-                    Language  => $Param{Language},
+                    Language  => $PO->{Language},
                     Value     => $MsgStr,
                     IsDefault => 1,
                     UserID    => $Param{UserID},
@@ -1199,30 +1298,19 @@ sub _ImportPO {
                 if ( !$Result ) {
                     $Kernel::OM->Get('Log')->Log(
                         Priority => 'error',
-                        Message  => "Unable to update translation language '$Param{Language}' for PatternID $PatternID!"
+                        Message  => "Unable to create translation language \"$PO->{Language}\" for PatternID $PatternID!"
                     );
                 }
             }
-        }
-        else {
-            # create a new one
-            my $Result = $Self->TranslationLanguageAdd(
-                PatternID => $PatternID,
-                Language  => $Param{Language},
-                Value     => $MsgStr,
-                IsDefault => 1,
-                UserID    => $Param{UserID},
-            );
-            if ( !$Result ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Unable to create translation language '$Param{Language}' for PatternID $PatternID!"
-                );
-            }
-        }
 
-        $CountOK++;
+            $CountOK++;
+        }
     }
+
+    # reset cache
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
 
     return ( $CountTotal, $CountOK );
 }

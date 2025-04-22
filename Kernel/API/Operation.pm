@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -247,7 +247,7 @@ sub Run {
         }
     }
 
-    if ( $Self->{AlteredRequestURI} && $Self->{CurrentRoute} =~ /:(.+?)$/ ) {
+    if ( $Self->{AlteredRequestURI} && $Self->{CurrentRoute} =~ /:(\w+)$/ ) {
         # the RequestURI has been altered by the permission check
         # this can happen in case of multiple IDs with different permissions (the user has no permission to some of the items)
         $Param{Data}->{$1} = (split(/\//, $Self->{AlteredRequestURI}))[-1];
@@ -421,8 +421,8 @@ sub _CheckPermission {
     }
 
     $Self->{LevelIndent} = $OldLevelIndent;
-    if ( $Self->{PermissionDebug} ) {
-       $Self->_PermissionDebug($Self->{LevelIndent}, sprintf("permission check (Resource) for %s took %i ms", $Self->{RequestURI}, TimeDiff($StartTime)));
+    if ( $Self->{Debug} ) {
+       $Self->_Debug($Self->{LevelIndent}, sprintf("permission check (Resource) for %s took %i ms", $Self->{RequestURI}, TimeDiff($StartTime)));
     }
 
     # OPTIONS requests are always possible

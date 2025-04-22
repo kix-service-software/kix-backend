@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -138,13 +138,13 @@ for my $File (
                 $MD5New  || '2',
                 "MD5 - $FileNew",
             );
-            my $Delete = $Kernel::OM->Get('Ticket')->ArticleDeleteAttachment(
+            my $Delete = $Kernel::OM->Get('Ticket')->ArticleDeleteAttachments(
                 ArticleID => $ArticleID,
                 UserID    => 1,
             );
             $Self->True(
                 $Delete,
-                "ArticleDeleteAttachment() - $FileNew",
+                "ArticleDeleteAttachments() - $FileNew",
             );
 
             %AttachmentIndex = $Kernel::OM->Get('Ticket')->ArticleAttachmentIndex(
@@ -243,14 +243,14 @@ $Self->IsDeeply(
     "ArticleAttachmentIndex - collision check entry 2",
 );
 
-my $Delete = $Kernel::OM->Get('Ticket')->ArticleDeleteAttachment(
+my $Delete = $Kernel::OM->Get('Ticket')->ArticleDeleteAttachments(
     ArticleID => $ArticleID,
     UserID    => 1,
 );
 
 $Self->True(
     $Delete,
-    "ArticleDeleteAttachment()",
+    "ArticleDeleteAttachments()",
 );
 
 %AttachmentIndex = $Kernel::OM->Get('Ticket')->ArticleAttachmentIndex(

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -67,8 +67,8 @@ sub Run {
         my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::Priority::PriorityGet',
             SuppressPermissionErrors => 1,
-            Data      => {
-                PriorityID => join(',', sort keys %PriorityList),
+            Data                     => {
+                PriorityID => join( q{,}, sort { $a <=> $b } keys %PriorityList),
             }
         );
         if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {

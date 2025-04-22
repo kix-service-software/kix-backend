@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -301,6 +301,12 @@ sub ClearSemaphore {
     return if ( $Value != $Param{Value} );
 
     return $Self->_RedisCall('del', $PreparedKey);
+}
+
+sub Ping {
+    my ( $Self, %Param ) = @_;
+
+    return $Self->_RedisCall('ping');
 }
 
 =item _InitRedis()

@@ -1,0 +1,12 @@
+  displayName: ObjectTags
+  description: !include ../descriptions/resources/objecttags.md
+  type: { collection: { typeName: ObjectTag } }
+  /{objecttagId}:
+    type: { item-nopatch: { typeName: ObjectTag } }
+    uriParameters:
+      objecttagId:
+        displayName: ObjectTagID
+        type: integer
+  /taglinks:
+    description: !include ../descriptions/resources/objecttags/taglinks.md
+    type: { item-readonly: { typeName: ObjectTagLink } }

@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -261,6 +261,7 @@ the login name of the new customer user, the password is the same.
 
     my $TestContactID = $Helper->TestContactCreate(
         Language => 'de',   # optional, defaults to 'en' if not set
+        NoUser   => 1,      # optional, create contact without user, defaults to 0
     );
 
 =cut
@@ -282,13 +283,25 @@ sub TestContactCreate {
 
         $TestContactLogin = $Self->GetRandomID();
 
-        $TestContactUserID = $Kernel::OM->Get('User')->UserAdd(
-            UserLogin    => $TestContactLogin,
-            UserPw       => $TestContactLogin,
-            ValidID      => 1,
-            ChangeUserID => 1,
-            IsCustomer   => 1,
-        );
+        if ( !$Param{NoUser} ) {
+            $TestContactUserID = $Kernel::OM->Get('User')->UserAdd(
+                UserLogin    => $TestContactLogin,
+                UserPw       => $TestContactLogin,
+                ValidID      => 1,
+                ChangeUserID => 1,
+                IsCustomer   => 1,
+            );
+
+            # set customer user language
+            my $UserLanguage = $Param{Language} || 'en';
+            $Kernel::OM->Get('User')->SetPreferences(
+                ContactID => $TestContactUserID,
+                Key       => 'UserLanguage',
+                Value     => $UserLanguage,
+            );
+            # rkaiser - T#2017020290001194 - changed customer user to contact
+            $Self->{UnitTestObject}->True( 1, "Set user UserLanguage to $UserLanguage" );
+        }
 
         $OrgID = $Kernel::OM->Get('Organisation')->OrganisationAdd(
             Number  => $TestContactLogin,
@@ -316,44 +329,40 @@ sub TestContactCreate {
 
     die 'Could not create test user contact' if !$TestContactID;
     die 'Could not create test user organisation' if !$OrgID;
-    die 'Could not create test user login' if !$TestContactUserID;
+    die 'Could not create test user login' if ( !$TestContactUserID && !$Param{NoUser} );
 
     # Remember IDs of the test user and organisation to later set it to invalid
     #   in the destructor.
     $Self->{TestContacts} ||= [];
     push( @{ $Self->{TestContacts} }, $TestContactID );
 
-    # rkaiser - T#2017020290001194 - changed customer user to contact
-    $Self->{UnitTestObject}->True(1, "Created test contact $TestContactLogin (ContactID $TestContactID, UserID $TestContactUserID)");
-
-    # Add user to roles
-    ROLE_NAME:
-    for my $RoleName ( @{ $Param{Roles} || [] } ) {
-
-        # get role object
-        my $RoleObject = $Kernel::OM->Get('Role');
-
-        my $RoleID = $RoleObject->RoleLookup( Role => $RoleName );
-        die "Cannot find role $RoleName" if ( !$RoleID );
-
-        $RoleObject->RoleUserAdd(
-            AssignUserID => $TestContactUserID,
-            RoleID       => $RoleID,
-            UserID       => 1,
-        ) || die "Could not add test contact $TestContactLogin to role $RoleName";
-
-        $Self->{UnitTestObject}->True( 1, "Added test contact $TestContactLogin to role $RoleName" );
+    if ( $Param{NoUser} ) {
+        $Self->{UnitTestObject}->True(1, "Created test contact $TestContactLogin (ContactID $TestContactID, OrgID $OrgID)");
+    }
+    else {
+        $Self->{UnitTestObject}->True(1, "Created test contact $TestContactLogin (ContactID $TestContactID, OrgID $OrgID, UserID $TestContactUserID)");
     }
 
-    # set customer user language
-    my $UserLanguage = $Param{Language} || 'en';
-    $Kernel::OM->Get('Contact')->SetPreferences(
-        ContactID => $TestContactID,
-        Key       => 'UserLanguage',
-        Value     => $UserLanguage,
-    );
-    # rkaiser - T#2017020290001194 - changed customer user to contact
-    $Self->{UnitTestObject}->True( 1, "Set contact UserLanguage to $UserLanguage" );
+    if ( !$Param{NoUser} ) {
+        # Add user to roles
+        ROLE_NAME:
+        for my $RoleName ( @{ $Param{Roles} || [] } ) {
+
+            # get role object
+            my $RoleObject = $Kernel::OM->Get('Role');
+
+            my $RoleID = $RoleObject->RoleLookup( Role => $RoleName );
+            die "Cannot find role $RoleName" if ( !$RoleID );
+
+            $RoleObject->RoleUserAdd(
+                AssignUserID => $TestContactUserID,
+                RoleID       => $RoleID,
+                UserID       => 1,
+            ) || die "Could not add test contact $TestContactLogin to role $RoleName";
+
+            $Self->{UnitTestObject}->True( 1, "Added test contact $TestContactLogin to role $RoleName" );
+        }
+    }
 
     return $TestContactID;
 }
@@ -490,6 +499,9 @@ sub Rollback {
     # reset time freeze
     $Self->FixedTimeUnset();
 
+    # reset lwp useragent overwirte
+    $Self->HTTPRequestOverwriteUnset();
+
     $Kernel::OM->Get('Cache')->CleanUp();
 
     if ( $Self->{SysConfigChanged} ) {
@@ -611,6 +623,23 @@ sub FixedTimeAddSeconds {
     return;
 }
 
+my $HTTPRequestOverwrite;
+sub HTTPRequestOverwriteSet {
+    my ( $Self, $CodeRef ) = @_;
+
+    $HTTPRequestOverwrite = $CodeRef;
+
+    return;
+}
+
+sub HTTPRequestOverwriteUnset {
+    my ( $Self ) = @_;
+
+    $HTTPRequestOverwrite = undef;
+
+    return;
+}
+
 # See http://perldoc.perl.org/5.10.0/perlsub.html#Overriding-Built-in-Functions
 BEGIN {
     *CORE::GLOBAL::time = sub {
@@ -646,6 +675,29 @@ BEGIN {
             no warnings 'redefine';
             delete $INC{$FilePath};
             $Kernel::OM->Get('Main')->Require($Object);
+        }
+    }
+
+    no strict "refs";
+    no warnings 'redefine';
+
+    use HTTP::Date;
+    use LWP::Protocol::http;
+    my $HTTPRequest = \&LWP::Protocol::http::request;
+
+    *LWP::Protocol::http::request = sub {
+        if ( defined( $HTTPRequestOverwrite ) ) {
+            my ( $Self, $Request, $Proxy, $Arguments, $Size, $Timeout ) = @_;
+
+            my $Response = $HTTPRequestOverwrite->( $Self, $Request, $Proxy, $Arguments, $Size, $Timeout );
+
+            $Response->header("Client-Date" => HTTP::Date::time2str(time));
+            $Response->request($Request);
+
+            return $Response;
+        }
+        else {
+            return $HTTPRequest->( @_ );
         }
     }
 }

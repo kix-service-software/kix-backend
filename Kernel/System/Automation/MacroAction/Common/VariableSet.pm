@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -51,6 +51,10 @@ sub Describe {
         Label       => Kernel::Language::Translatable('Value'),
         Description => Kernel::Language::Translatable('The value to assign.'),
         Required    => 0,
+        Placeholder => {
+            Richtext  => 0,
+            Translate => 0,
+        },
     );
 
     $Self->AddResult(
@@ -83,15 +87,12 @@ sub Run {
     # check incoming parameters
     return if !$Self->_CheckParams(%Param);
 
-    foreach my $Key (keys %{$Param{Config}}) {
-        $Param{Config}->{$Key} = $Self->_ReplaceValuePlaceholder(
-            %Param,
-            Value => $Param{Config}->{$Key}
-        );
-    }
-
     # set the variable
-    $Self->SetResult(Name => 'Variable', Value => $Param{Config}->{Value});
+    $Self->SetResult(
+        Name   => 'Variable',
+        Value  => $Param{Config}->{Value},
+        UserID => $Param{UserID}
+    );
 
     return 1;
 }

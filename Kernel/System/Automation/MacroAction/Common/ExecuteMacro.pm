@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -51,6 +51,10 @@ sub Describe {
         Label       => Kernel::Language::Translatable('ObjectID'),
         Description => Kernel::Language::Translatable('The ID of the object to run the macro for.'),
         Required    => 0,
+        Placeholder => {
+            Richtext  => 0,
+            Translate => 0,
+        },
     );
     $Self->AddOption(
         Name        => 'MacroID',
@@ -84,13 +88,6 @@ sub Run {
     # check incoming parameters
     return if !$Self->_CheckParams(%Param);
 
-    if ( $Param{Config}->{ObjectID} ) {
-        $Param{Config}->{ObjectID} = $Self->_ReplaceValuePlaceholder(
-            %Param,
-            Value => $Param{Config}->{ObjectID} || ''
-        );
-    }
-
     # FIXME: use given instance
     my $AutomationObject = $Param{AutomationInstance} || $Kernel::OM->Get('Automation');
 
@@ -105,8 +102,9 @@ sub Run {
         # keep additional data
         AdditionalData => $Param{AdditionalData},
 
-        # keep root object id
-        RootObjectID => $Self->{RootObjectID} || $Param{ObjectID},
+        # keep root object id and type
+        RootObjectID  => $Self->{RootObjectID} || $Param{ObjectID},
+        RootMacroType => $Self->{RootMacroType} || $Param{MacroType},
     );
 
     return 1;

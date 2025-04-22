@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -26,14 +26,45 @@ local *STDERR;
 open STDOUT, '>>', "/dev/null";
 open STDERR, '>>', "/dev/null";
 
+# begin transaction on database
+$Helper->BeginWork();
+
+# deactivate all mail accounts for this test
+my %MailAccountList = $Kernel::OM->Get('MailAccount')->MailAccountList(
+    Valid => 1,
+);
+for my $MailAccountID ( keys( %MailAccountList ) ) {
+    my %MailAccount = $Kernel::OM->Get('MailAccount')->MailAccountGet(
+        ID => $MailAccountID,
+    );
+    $Kernel::OM->Get('MailAccount')->MailAccountUpdate(
+        %MailAccount,
+        ID      => $MailAccountID,
+        ValidID => 2,
+        UserID  => 1,
+    );
+}
+
 my $ExitCode = $CommandObject->Execute();
 
 # just check exit code; should be 0 also if no accounts are configured
-$Self->Is(
-    $ExitCode,
-    0,
-    "Maint::PostMaster::MailAccountFetch exit code",
-);
+if ( !$ExitCode ) {
+    $Self->Is(
+        $ExitCode,
+        0,
+        "Maint::PostMaster::MailAccountFetch exit code",
+    );
+}
+else {
+    my $LogMessage = $Kernel::OM->Get('Log')->GetLogEntry(
+        Type => 'error',
+        What => 'Message',
+    );
+    $Self->True(
+        0,
+        "Maint::PostMaster::MailAccountFetch unexpected exit code (error: $LogMessage)"
+    );
+}
 
 $ExitCode = $CommandObject->Execute( '--mail-account-id', 99999 );
 
@@ -43,6 +74,9 @@ $Self->Is(
     1,
     "Maint::PostMaster::MailAccountFetch exit code for nonexisting mail account",
 );
+
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
 

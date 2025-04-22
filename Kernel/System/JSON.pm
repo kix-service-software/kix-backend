@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -67,17 +67,6 @@ Encode a perl data structure to a JSON string.
 
 sub Encode {
     my ( $Self, %Param ) = @_;
-
-    # check for needed data
-    if ( !defined $Param{Data} ) {
-        if ( !$Param{Silent} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => 'Need Data!',
-            );
-        }
-        return;
-    }
 
     # create json object
     my $JSONObject = JSON::MaybeXS->new();
@@ -219,9 +208,11 @@ sub Jq {
         Suffix => '.filter'
     );
 
+    binmode($DataFH, ':encoding(UTF-8)');
     print {$DataFH} $Param{Data};
     close $DataFH;
 
+    binmode($FilterFH, ':encoding(UTF-8)');
     print {$FilterFH} $Param{Filter};
     close $FilterFH;
 

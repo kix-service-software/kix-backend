@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -311,6 +311,192 @@ $Self->False(
     exists $TranslationLanguageList{$TranslationLanguage{Value}},
     'TranslationLanguageList() does not contain the deleted TranslationLanguage',
 );
+
+########################################################################################################################################
+# Import handling
+########################################################################################################################################
+
+my $HomeDir = $Kernel::OM->Get('Config')->Get('Home');
+
+my $POContent = $Kernel::OM->Get('Main')->FileRead(
+    Location => $HomeDir . '/scripts/test/system/sample/Translation/de.po',
+    Mode     => 'binmode'
+);
+
+my @Tests = (
+    {
+        Name => 'Import PO file de',
+        Parameters => {
+            Language => 'de',
+            File     => $HomeDir . '/scripts/test/system/sample/Translation/de.po',
+        },
+        Expect => {
+            CountTotal => 4,
+            CountOK    => 3,
+            Tests => [
+                {
+                    Language => 'de',
+                    Pattern  => 'testitem 2',
+                    Value    => 'TestItem Zwei'
+                }
+            ]
+        }
+    },
+    {
+        Name => 'Import PO file de (2nd time)',
+        Parameters => {
+            Language => 'de',
+            File     => $HomeDir . '/scripts/test/system/sample/Translation/de.po',
+        },
+        Expect => {
+            CountTotal => 4,
+            CountOK    => 3,
+            Tests => [
+                {
+                    Language => 'de',
+                    Pattern  => 'testitem 2',
+                    Value    => 'TestItem Zwei'
+                }
+            ]
+        }
+    },
+    {
+        Name => 'Import PO file en',
+        Parameters => {
+            Language => 'en',
+            File     => $HomeDir . '/scripts/test/system/sample/Translation/en.po',
+        },
+        Expect => {
+            CountTotal => 4,
+            CountOK    => 3,
+            Tests => [
+                {
+                    Language => 'en',
+                    Pattern  => 'testitem 2',
+                    Value    => 'TestItem Two'
+                }
+            ]
+        }
+    },
+    {
+        Name => 'Import PO file en (2nd time)',
+        Parameters => {
+            Language => 'en',
+            File     => $HomeDir . '/scripts/test/system/sample/Translation/en.po',
+        },
+        Expect => {
+            CountTotal => 4,
+            CountOK    => 3,
+            Tests => [
+                {
+                    Language => 'en',
+                    Pattern  => 'testitem 2',
+                    Value    => 'TestItem Two'
+                }
+            ]
+        }
+    },
+    {
+        Name => 'Import PO content de',
+        Parameters => {
+            Language => 'de',
+            Content  => $$POContent,
+        },
+        Expect => {
+            CountTotal => 4,
+            CountOK    => 3,
+            Tests => [
+                {
+                    Language => 'de',
+                    Pattern  => 'testitem 2',
+                    Value    => 'TestItem Zwei'
+                }
+            ]
+        }
+    },
+    {
+        Name => 'Multi Import PO file de and en',
+        Parameters => {
+            Data => [
+                {
+                    Language => 'de',
+                    File     => $HomeDir . '/scripts/test/system/sample/Translation/de.po',
+                },
+                {
+                    Language => 'en',
+                    File     => $HomeDir . '/scripts/test/system/sample/Translation/en.po',
+                },
+            ]
+        },
+        Expect => {
+            CountTotal => 8,
+            CountOK    => 8,
+            Test => [
+                {
+                    Language => 'de',
+                    Pattern  => 'testitem 2',
+                    Value    => 'TestItem Zwei'
+                },
+                {
+                    Language => 'en',
+                    Pattern  => 'testitem 3',
+                    Value    => 'TestItem Three'
+                }
+            ]
+        }
+    },
+);
+
+foreach my $Test ( @Tests ) {
+
+    my $CountTotal;
+    my $CountOK;
+
+    if ( IsArrayRefWithData($Test->{Parameters}->{Data}) ) {
+        # multi import 
+        ($CountTotal, $CountOK) = $TranslationObject->ImportPOMultiAsync(
+            %{$Test->{Parameters}},
+            UserID => 1,
+        );
+    } 
+    else {
+        # single import 
+        ($CountTotal, $CountOK) = $TranslationObject->ImportPO(
+            %{$Test->{Parameters}},
+            UserID => 1,
+        );
+    }
+
+    $Self->Is(
+        $CountTotal,
+        $Test->{Expect}->{CountTotal},
+        $Test->{Name}." - CountTotal",
+    );
+    $Self->Is(
+        $CountOK,
+        $Test->{Expect}->{CountOK},
+        $Test->{Name}." - CountOK",
+    );
+
+    foreach my $PatternTest ( @{$Test->{Expect}->{Tests}} ) {
+        my $PatternID = $TranslationObject->PatternExistsCheck( 
+            Value => ${PatternTest}->{Pattern}
+        );
+        $Self->True(
+            $PatternID,
+            $Test->{Name}." - pattern \"$PatternTest->{Pattern}\" exists (ID: $PatternID)",
+        );
+        my %Translation = $TranslationObject->TranslationLanguageGet(
+            PatternID => $PatternID,
+            Language  => $PatternTest->{Language}
+        );
+        $Self->Is(
+            $Translation{Value},
+            $PatternTest->{Value},
+            $Test->{Name}." - pattern \"$PatternTest->{Pattern}\" translation",
+        );
+    }
+}
 
 # rollback transaction on database
 $Helper->Rollback();

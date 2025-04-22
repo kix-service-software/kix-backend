@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -4374,6 +4374,101 @@ my @ImportDataTests = (
                     'Main1 (2) Main1Sub1 (5) Main1Sub1SubSub1 (3)',
                 # value of position 2 should be in position 1
                 'Main2::1'               => 'Main2 (2)',
+            },
+        },
+    },
+
+    # 48 import a new value for Text1 and clear GeneralCatalog1, with EmptyFieldsLeaveTheOldValues turned off
+    # to prepare config item for next test case
+    {
+        SourceImportData => {
+            ObjectData => {
+                ClassID                      => $ConfigItemClassIDs[0],
+            },
+            MappingObjectData => [
+                {
+                    Key        => 'Name',
+                    Identifier => 1,
+                },
+                {
+                    Key => 'DeplState',
+                },
+                {
+                    Key => 'InciState',
+                },
+                {
+                    Key => 'Text1::1',
+                },
+                {
+                    Key => 'GeneralCatalog1::1',
+                },
+            ],
+            ImportDataSave => {
+                TemplateID    => $TemplateIDs[25],
+                ImportDataRow => [
+                    'UnitTest - Importtest 5',
+                    'Production',
+                    'Operational',
+                    'UnitTest',
+                    '',
+                ],
+                UserID        => 1,
+                UsageContext  => 'Agent',
+            },
+        },
+        ReferenceImportData => {
+            VersionNumber => 5,
+            LastVersion   => {
+                Name                 => 'UnitTest - Importtest 5',
+                DeplState            => 'Production',
+                InciState            => 'Operational',
+                'Text1::1'           => 'UnitTest',
+            },
+        },
+    },
+
+    # 49 import a zero value for Text1, with EmptyFieldsLeaveTheOldValues turned on
+    # zero should be used as new value for Text1
+    {
+        SourceImportData => {
+            ObjectData => {
+                ClassID                      => $ConfigItemClassIDs[0],
+                EmptyFieldsLeaveTheOldValues => '1',
+            },
+            MappingObjectData => [
+                {
+                    Key        => 'Name',
+                    Identifier => 1,
+                },
+                {
+                    Key => 'DeplState',
+                },
+                {
+                    Key => 'InciState',
+                },
+                {
+                    Key => 'Text1::1',
+                },
+            ],
+            ImportDataSave => {
+                TemplateID    => $TemplateIDs[25],
+                ImportDataRow => [
+                    'UnitTest - Importtest 5',
+                    'Production',
+                    'Operational',
+                    '0',
+                ],
+                UserID        => 1,
+                UsageContext  => 'Agent',
+            },
+        },
+        ReferenceImportData => {
+            VersionNumber => 6,
+            LastVersion   => {
+                Name                 => 'UnitTest - Importtest 5',
+                DeplState            => 'Production',
+                InciState            => 'Operational',
+                'Text1::1'           => '0',
             },
         },
     },

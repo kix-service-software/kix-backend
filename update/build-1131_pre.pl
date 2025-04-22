@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE for license information (AGPL). If you
@@ -80,11 +80,6 @@ sub _FreeOrgIDOneAndAddMyOrga {
         while (my @Row = $DBObject->FetchrowArray()) {
             $NewOrgID = $Row[0];
         }
-        return if !$DBObject->Do(
-            SQL  => 'UPDATE organisation_prefs SET org_id = ? WHERE org_id = 1',
-            Bind => [ \$NewOrgID ],
-        );
-
         return if !$DBObject->Do(
             SQL  => 'UPDATE ticket SET organisation_id = ? WHERE organisation_id = \'1\' ',
             Bind => [ \$NewOrgID ],

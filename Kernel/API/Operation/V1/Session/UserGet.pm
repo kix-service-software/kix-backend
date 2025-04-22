@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -187,11 +187,12 @@ sub Run {
                     my $DynamicFieldConfig = $Kernel::OM->Get('DynamicField')->DynamicFieldGet(
                         Name => $1,
                     );
-                    if ( IsHashRefWithData($DynamicFieldConfig) ) {
 
-                        # ignore DFs which are not visible for the customer, if the user session is a Customer session
-                        next ATTRIBUTE if $Self->{Authorization}->{UserType} eq 'Customer' && !$DynamicFieldConfig->{CustomerVisible};
-
+                    # ignore DFs which are not visible for the customer, if the user session is a Customer session
+                    if (
+                        IsHashRefWithData($DynamicFieldConfig) &&
+                        ($Self->{Authorization}->{UserType} ne 'Customer' || $DynamicFieldConfig->{CustomerVisible})
+                    ) {
                         my $PreparedValue = $Self->_GetPrepareDynamicFieldValue(
                             Config          => $DynamicFieldConfig,
                             Value           => $ContactData{$Attribute},
@@ -202,17 +203,15 @@ sub Run {
                             push(@DynamicFields, $PreparedValue);
                         }
                     }
-                    delete $ContactData{$Attribute};
                 }
-                next ATTRIBUTE;
+                delete $ContactData{$Attribute};
             }
         }
 
         # add dynamic fields array into 'DynamicFields' hash key if any
         if (@DynamicFields) {
             $ContactData{DynamicFields} = \@DynamicFields;
-        }
-        else {
+        } else {
             $ContactData{DynamicFields} = [];
         }
     }

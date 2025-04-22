@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -49,6 +49,15 @@ sub new {
     my $ValidatorList = $Kernel::OM->Get('Config')->Get('API::Validator::Module');
 
     foreach my $Validator (sort keys %{$ValidatorList}) {
+        if ( !defined( $ValidatorList->{ $Validator }->{Module} ) ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Invalid validator entry "' . $Validator . '"!',
+            );
+
+            next;
+        }
+
         if ( !$Kernel::OM->Get('Main')->Require($ValidatorList->{$Validator}->{Module}) ) {
             return $Self->_Error(
                 Code    => 'Validator.InternalError',

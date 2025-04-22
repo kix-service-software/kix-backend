@@ -29,12 +29,22 @@
             "Filename" : {
                "type" : "string",
                "readOnly" : true
+            },
+            "Filesize" : {
+               "type" : "string",
+               "readOnly" : true
+            },
+            "FilesizeRaw" : {
+               "type" : "integer",
+               "readOnly" : true
             }
          },
          "required" : [
             "Content",
             "ContentType",
-            "Filename"
+            "Filename",
+            "Filesize",
+            "FilesizeRaw"
          ]
       }
    }

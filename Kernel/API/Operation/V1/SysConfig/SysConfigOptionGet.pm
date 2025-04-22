@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -131,8 +131,14 @@ sub Run {
             $Value  = $Value->{$SubOption};
         }
 
+        my $ID = $Kernel::OM->Get('SysConfig')->OptionLookup(
+            Name   => $OrgOption,
+            Silent => 1,
+        );
+
         # add
         push(@SysConfigList, {
+            ID              => $ID || '',
             Name            => $OrgOption,
             Value           => $Value,
             AccessLevel     => $AllOptions{$OrgOption}->{AccessLevel},

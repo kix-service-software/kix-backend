@@ -13,8 +13,8 @@
         <SubGroup>Core</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="de">https://kixdesk.com/impressum.html</Item>
-                <Item Key="en">https://kixdesk.com/impressum.html</Item>
+                <Item Key="de">https://www.kixdesk.com/impressum</Item>
+                <Item Key="en">https://www.kixdesk.com/en/legal-notice</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -1100,6 +1100,7 @@
         <Setting>
             <Hash>
                 <Item Key="closed">open</Item>
+                <Item Key="new">new</Item>
                 <Item Key="pending auto close">open</Item>
                 <Item Key="pending reminder">open</Item>
             </Hash>
@@ -2030,7 +2031,7 @@
             <String Regex="^[1-9][\d]?$">1</String>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="HttpType" Required="1" Valid="1" ConfigLevel="200">
+    <ConfigItem AccessLevel="external" Name="HttpType" Required="1" Valid="1" ConfigLevel="200">
         <Description Translatable="1">Defines the type of protocol, used by the web server, to serve the application. If https protocol will be used instead of plain http, it must be specified here. Since this has no affect on the web server's settings or behavior, it will not change the method of access to the application and, if it is wrong, it will not prevent you from logging into the application. This setting is only used as a variable, KIX_CONFIG_HttpType which is found in all forms of messaging used by the application, to build links to the tickets within your system.</Description>
         <Group>Framework</Group>
         <SubGroup>Core</SubGroup>
@@ -7868,7 +7869,7 @@ Notes:
                     "Config": {}
                 }
             ]
-            
+
             </Object>
         </Setting>
     </ConfigItem>
@@ -7893,7 +7894,7 @@ Notes:
                     }
                 }
             ]
-            
+
             </Object>
         </Setting>
     </ConfigItem>
@@ -8051,40 +8052,6 @@ Notes:
                 <Item Key="0">No</Item>
                 <Item Key="1">Yes</Item>
             </Option>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="ContactPreferences" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">Defines the parameters for the contact preferences table.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Contact::Preferences::DB</Item>
-                <Item Key="Params">
-                    <Hash>
-                        <Item Key="Table">contact_preferences</Item>
-                        <Item Key="TableKey">preferences_key</Item>
-                        <Item Key="TableValue">preferences_value</Item>
-                        <Item Key="TableUserID">contact_id</Item>
-                    </Hash>
-                </Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="ContactPreferencesGroups###TimeZone" Required="0" Valid="1">
-        <Description Translatable="1">Defines all the parameters for this item in the customer preferences.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::TimeZone</Item>
-                <Item Key="Column">User Profile</Item>
-                <Item Key="Label" Translatable="1">Time Zone</Item>
-                <Item Key="Key" Translatable="1">Time Zone</Item>
-                <Item Key="PrefKey">UserTimeZone</Item>
-                <Item Key="Prio">5000</Item>
-                <Item Key="Active">1</Item>
-            </Hash>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Stats::StatsHook" Required="1" Valid="1">
@@ -8559,54 +8526,6 @@ Notes:
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="ContactPreferencesGroups###DefaultTicketType" Required="0" Valid="1">
-        <Description Translatable="1">Defines all the parameters for this item in the customer preferences.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::DefaultTicketType</Item>
-                <Item Key="Column">User Profile</Item>
-                <Item Key="Label" Translatable="1">Default ticket type</Item>
-                <Item Key="Key" Translatable="1">Your default ticket type</Item>
-                <Item Key="PrefKey">UserDefaultTicketType</Item>
-                <Item Key="Prio">2600</Item>
-                <Item Key="Active">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="ContactPreferencesGroups###DefaultTicketQueue" Required="0" Valid="1">
-        <Description Translatable="1">Defines all the parameters for this item in the customer preferences.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::DefaultTicketQueue</Item>
-                <Item Key="Column">User Profile</Item>
-                <Item Key="Label" Translatable="1">Default ticket queue</Item>
-                <Item Key="Key" Translatable="1">Your default ticket queue</Item>
-                <Item Key="PrefKey">UserDefaultTicketQueue</Item>
-                <Item Key="Prio">2601</Item>
-                <Item Key="Active">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="ContactPreferencesGroups###DefaultService" Required="0" Valid="1">
-        <Description Translatable="1">Defines all the parameters for this item in the customer preferences.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::DefaultService</Item>
-                <Item Key="Column">User Profile</Item>
-                <Item Key="Label" Translatable="1">Default service</Item>
-                <Item Key="Key" Translatable="1">Your default service</Item>
-                <Item Key="PrefKey">UserDefaultService</Item>
-                <Item Key="Prio">2602</Item>
-                <Item Key="Active">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="PreferencesGroups###MultipleSelection" Required="0" Valid="0">
         <Description Translatable="1">Defines the config parameters of this item, to allow multiple selected options and be shown in the preferences view.</Description>
         <Group>Framework</Group>
@@ -8728,24 +8647,6 @@ Notes:
                 <Item Key="PrefKey">UserDisplayPendingTime</Item>
                 <Item Key="Prio">1310</Item>
                 <Item Key="Active">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="OrganisationPreferences" Required="1" Valid="1" ConfigLevel="200">
-        <Description Translatable="1">Defines the parameters for the customer company preferences table.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Customer::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::System::Organisation::Preferences::DB</Item>
-                <Item Key="Params">
-                    <Hash>
-                        <Item Key="Table">kix_customer_company_prefs</Item>
-                        <Item Key="TableKey">preferences_key</Item>
-                        <Item Key="TableValue">preferences_value</Item>
-                        <Item Key="TableUserID">user_id</Item>
-                    </Hash>
-                </Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -9047,8 +8948,6 @@ Notes:
 
     <ConfigItem AccessLevel="internal" Name="AssignedObjectsMapping" Required="1" Valid="1">
         <Description Translatable="1">Defines which dependend object (e.g. "Ticket") is assigned by which attributes to a relevant object (e.g. "Contact") - e.g. "Tickets of Contact". Structure is "{ "RelevantObject": { "DependendObject": { "DependendObjectAttribut": { "SearchAttribut OR SearchStatic": [ "RelevantObjectAttribut OR StaticValue" ] } } } }. All attributes will be OR combined."</Description>
-        <Group>ITSM</Group>
-        <SubGroup>Core::ITSMConfigItem</SubGroup>
         <Setting>
             <String Regex="">
 {
@@ -9071,6 +8970,13 @@ Notes:
             "CustomerVisible": {
                 "SearchStatic": [
                     1
+                ]
+            }
+        },
+        "Contact": {
+            "OrganisationIDs": {
+                "SearchAttributes": [
+                    "RelevantOrganisationID"
                 ]
             }
         }

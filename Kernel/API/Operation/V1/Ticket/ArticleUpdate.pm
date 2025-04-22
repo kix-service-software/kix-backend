@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -379,7 +379,7 @@ sub _ArticleUpdate {
     # update attachment list
     if ( defined( $Article->{Attachments} ) ) {
         # delete all (old) attachments
-        my $DeleteSuccessful = $Kernel::OM->Get('Ticket')->ArticleDeleteAttachment(
+        my $DeleteSuccessful = $Kernel::OM->Get('Ticket')->ArticleDeleteAttachments(
             ArticleID => $Param{ArticleID},
             UserID    => $Param{UserID},
         );
@@ -395,6 +395,7 @@ sub _ArticleUpdate {
             # decode attachment content from base64
             if ($Attachment->{Filename} !~ m/^(?:file-[12]|pasted[-]\d+[-]\d+[.].*)$/smx) {
                 $Attachment->{Content} = MIME::Base64::decode_base64($Attachment->{Content});
+                $Attachment->{Disposition} //= 'attachment';
             }
             # extract embedded images from file-2
             elsif (

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -93,44 +93,64 @@ sub Sort {
     # check params
     return if ( !$Self->_CheckSortParams( %Param ) );
 
-    my %Join;
-    my $TableAlias = $Param{Flags}->{FlagMap}->{ContactJoin} // 'c';
+    # check for needed joins
+    my @SQLJoin = ();
     if (
-        $Param{Attribute} =~ m/^Create(?:By|dUserIDs)$/sm
-        && !$Param{Flags}->{FlagMap}->{ContactJoin}
+        $Param{Attribute} eq 'CreateBy'
+        || $Param{Attribute} eq 'CreatedUserIDs'
     ) {
-        my $Count = $Param{Flags}->{ContactJoinCounter}++;
-        $TableAlias .= $Count;
+        if ( !$Param{Flags}->{JoinMap}->{FAQArticleCreateBy} ) {
+            push( @SQLJoin, 'INNER JOIN users fcru ON fcru.id = f.created_by' );
 
-        $Join{Join} = [
-            "INNER JOIN contact $TableAlias ON $TableAlias.user_id = f.created_by"
-        ];
-        $Param{Flags}->{FlagMap}->{ContactJoin} = $TableAlias;
+            $Param{Flags}->{JoinMap}->{FAQArticleCreateBy} = 1;
+        }
+        if ( !$Param{Flags}->{JoinMap}->{FAQArticleCreateByContact} ) {
+            push( @SQLJoin, 'LEFT OUTER JOIN contact fcruc ON fcruc.user_id = fcru.id' );
+
+            $Param{Flags}->{JoinMap}->{FAQArticleCreateByContact} = 1;
+        }
     }
-    elsif (
-        $Param{Attribute} =~ m/^(?:Last|)Change(?:By|dUserIDs)$/sm
-        && !$Param{Flags}->{FlagMap}->{ContactJoin}
+    if (
+        $Param{Attribute} eq 'ChangeBy'
+        || $Param{Attribute} eq 'LastChangedUserIDs'
     ) {
-        my $Count = $Param{Flags}->{ContactJoinCounter}++;
-        $TableAlias .= $Count;
+        if ( !$Param{Flags}->{JoinMap}->{FAQArticleChangeBy} ) {
+            push( @SQLJoin, 'INNER JOIN users fchu ON fchu.id = f.changed_by' );
 
-        $Join{Join} = [
-            "INNER JOIN contact $TableAlias ON $TableAlias.user_id = f.changed_by"
-        ];
-        $Param{Flags}->{FlagMap}->{ContactJoin} = $TableAlias;
+            $Param{Flags}->{JoinMap}->{FAQArticleChangeBy} = 1;
+        }
+        if ( !$Param{Flags}->{JoinMap}->{FAQArticleChangeByContact} ) {
+            push( @SQLJoin, 'LEFT OUTER JOIN contact fchuc ON fchuc.user_id = fchu.id' );
+
+            $Param{Flags}->{JoinMap}->{FAQArticleChangeByContact} = 1;
+        }
     }
 
+    # init mapping
     my %AttributeMapping = (
-        CreateBy           => ["$TableAlias.lastname", "$TableAlias.firstname"],
-        CreatedUserIDs     => ["$TableAlias.lastname", "$TableAlias.firstname"],
-        ChangeBy           => ["$TableAlias.lastname", "$TableAlias.firstname"],
-        LastChangedUserIDs => ["$TableAlias.lastname", "$TableAlias.firstname"],
+        CreatedUserIDs => {
+            Select  => ['fcruc.lastname','fcruc.firstname','fcru.login'],
+            OrderBy => ['LOWER(fcruc.lastname)','LOWER(fcruc.firstname)','LOWER(fcru.login)']
+        },
+        CreateBy   => {
+            Select  => ['fcruc.lastname','fcruc.firstname','fcru.login'],
+            OrderBy => ['LOWER(fcruc.lastname)','LOWER(fcruc.firstname)','LOWER(fcru.login)']
+        },
+        LastChangedUserIDs => {
+            Select  => ['fchuc.lastname','fchuc.firstname','fchu.login'],
+            OrderBy => ['LOWER(fchuc.lastname)','LOWER(fchuc.firstname)','LOWER(fchu.login)']
+        },
+        ChangeBy   => {
+            Select  => ['fchuc.lastname','fchuc.firstname','fchu.login'],
+            OrderBy => ['LOWER(fchuc.lastname)','LOWER(fchuc.firstname)','LOWER(fchu.login)']
+        }
     );
 
+    # return sort def
     return {
-        Select   => $AttributeMapping{$Param{Attribute}},
-        OrderBy  => $AttributeMapping{$Param{Attribute}},
-        %Join
+        Join    => \@SQLJoin,
+        Select  => $AttributeMapping{ $Param{Attribute} }->{Select},
+        OrderBy => $AttributeMapping{ $Param{Attribute} }->{OrderBy}
     };
 }
 

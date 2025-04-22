@@ -107,6 +107,16 @@
             </Option>
         </Setting>
     </ConfigItem>
+
+    <ConfigItem AccessLevel="internal" Name="Ticket::Title::Default" Required="1" Valid="1">
+        <Description Translatable="1">Defines the default ticket title, e.g. if an email without subject is received.</Description>
+        <Group>Ticket</Group>
+        <SubGroup>Core::Ticket</SubGroup>
+        <Setting>
+            <String Regex="" Translatable="1">No Title &lt;KIX_NOW&gt;</String>
+        </Setting>
+    </ConfigItem>
+
     <ConfigItem AccessLevel="internal" Name="Ticket::Type::Default" Required="1" Valid="1">
         <Description Translatable="1">Defines the default ticket type.</Description>
         <Group>Ticket</Group>
@@ -2850,6 +2860,18 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###500-TicketAttachmentCountUpdate" Required="0" Valid="1">
+        <Description Translatable="1">Counts all ticket attachments (all article attachments).</Description>
+        <Group>Ticket</Group>
+        <SubGroup>TicketAttachmentCountUpdate</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Ticket::Event::TicketAttachmentCountUpdate</Item>
+                <Item Key="Event">(ArticleAttachmentAdd|ArticleAttachmentsDelete|ArticleAttachmentDelete|ArticleMove)</Item>
+                <Item Key="Transaction">1</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
 
     <ConfigItem AccessLevel="internal" Name="Automation::JobType###Ticket" Required="0" Valid="1">
         <Description Translatable="1">Registration of a job type for automation.</Description>
@@ -2873,6 +2895,16 @@ Thanks for your help!
         </Setting>
     </ConfigItem>
 
+    <ConfigItem AccessLevel="internal" Name="Automation::MacroActionType::Ticket###ArticleAttachmentsDelete" Required="0" Valid="1">
+        <Description Translatable="1">Registration of a macro action type for automation.</Description>
+        <Group>Automation</Group>
+        <Setting>
+            <Hash>
+                <Item Key="DisplayName" Translatable="1">Delete Attachments from Articles</Item>
+                <Item Key="Module">Kernel::System::Automation::MacroAction::Ticket::ArticleAttachmentsDelete</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Automation::MacroActionType::Ticket###ArticleCreate" Required="0" Valid="1">
         <Description Translatable="1">Registration of a macro action type for automation.</Description>
         <Group>Automation</Group>
@@ -2983,7 +3015,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Automation::MacroActionType::Ticket###TicketCreate" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="Automation::MacroActionType::Common###TicketCreate" Required="0" Valid="1">
         <Description Translatable="1">Registration of a macro action type for automation.</Description>
         <Group>Automation</Group>
         <Setting>

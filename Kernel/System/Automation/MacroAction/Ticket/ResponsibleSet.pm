@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -53,6 +53,10 @@ sub Describe {
         Label       => Kernel::Language::Translatable('Responsible'),
         Description => Kernel::Language::Translatable('The ID or login of the agent to be set.'),
         Required    => 1,
+        Placeholder => {
+            Richtext  => 0,
+            Translate => 0,
+        },
     );
 
     return;
@@ -79,9 +83,7 @@ sub Run {
     # check incoming parameters
     return if !$Self->_CheckParams(%Param);
 
-    my $TicketObject = $Kernel::OM->Get('Ticket');
-
-    my %Ticket = $TicketObject->TicketGet(
+    my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
         TicketID => $Param{TicketID},
     );
 
@@ -89,22 +91,17 @@ sub Run {
         return;
     }
 
-    my $Responsible = $Self->_ReplaceValuePlaceholder(
-        %Param,
-        Value => $Param{Config}->{ResponsibleLoginOrID}
-    );
-
     my $UserID = $Kernel::OM->Get('User')->UserLookup(
-        UserLogin => $Responsible,
+        UserLogin => $Param{Config}->{ResponsibleLoginOrID},
         Silent    => 1
     );
-    if ( !$UserID && $Responsible =~ m/^\d+$/ ) {
+    if ( !$UserID && $Param{Config}->{ResponsibleLoginOrID} =~ m/^\d+$/ ) {
         my $ResponsibleLogin = $Kernel::OM->Get('User')->UserLookup(
-            UserID => $Responsible,
+            UserID => $Param{Config}->{ResponsibleLoginOrID},
             Silent => 1
         );
         if ($ResponsibleLogin) {
-            $UserID = $Responsible;
+            $UserID = $Param{Config}->{ResponsibleLoginOrID};
         }
     }
 
@@ -122,7 +119,7 @@ sub Run {
         return 1;
     }
 
-    my $Success = $TicketObject->TicketResponsibleSet(
+    my $Success = $Kernel::OM->Get('Ticket')->TicketResponsibleSet(
         TicketID  => $Param{TicketID},
         NewUserID => $UserID,
         UserID    => $Param{UserID},

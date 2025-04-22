@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com 
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -41,6 +41,7 @@ sub Describe {
             'configitem_definition',
             'customer_user',
             'customer_company',
+            'queue',
         ],
         Depends => {
             'configitem_id' => 'configitem',
@@ -289,6 +290,7 @@ sub _MapAttributeValue {
         'Organisation'        => 'organisation',
         'Contact'             => 'contact',
         'GeneralCatalog'      => 'general_catalog',
+        'TeamReference'       => 'queue',
     );
 
     # check needed params
@@ -380,30 +382,6 @@ sub _MapAttributeValue {
         );
         if ( $MappedID ) {
             $Param{Item}->{xml_content_value} = $MappedID;
-        }
-        elsif ( $TypeMapping eq 'configitem' ) {
-            # we are referencing another configitem which isn't migrated yet -> indicate that we didn't succeed
-            my $RepeatXMLAttributeMigration = $Kernel::OM->Get('Cache')->Get(
-                Type => 'ConfigItemMigration',
-                Key  => 'RepeatXMLAttributeMigration'.$$,
-            );
-
-            $RepeatXMLAttributeMigration = [] if !IsArrayRef($RepeatXMLAttributeMigration);
-            push @{$RepeatXMLAttributeMigration}, { Item => $Param{Item}, DefinitionID => $Param{DefinitionID} };
-
-            my $Success = $Kernel::OM->Get('Cache')->Set(
-                Type  => 'ConfigItemMigration',
-                Key   => 'RepeatXMLAttributeMigration'.$$,
-                Value => $RepeatXMLAttributeMigration,
-            );
-            if ( !$Success ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Unable to store repetition information (PID: $$)!"
-                );
-            }
-
-            return 0;
         }
     }
     elsif ( $Self->{DefinitionFlatHash}->{$Param{DefinitionID}}->{$PreparedKey} eq 'Attachment' ) {

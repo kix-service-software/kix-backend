@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -17,6 +17,7 @@ use Crypt::PasswdMD5 qw(unix_md5_crypt apache_md5_crypt);
 use Digest::SHA;
 use Kernel::System::VariableCheck qw( IsArrayRefWithData );
 use Data::UUID;
+use Kernel::System::EmailParser;
 
 use Kernel::System::VariableCheck qw(:all);
 
@@ -65,18 +66,6 @@ sub new {
     # allocate new hash for object
     my $Self = {};
     bless( $Self, $Type );
-
-    # get needed objects
-    my $ConfigObject = $Kernel::OM->Get('Config');
-    my $MainObject   = $Kernel::OM->Get('Main');
-
-    # load generator contact preferences module
-    my $GeneratorModule = $ConfigObject->Get('ContactPreferences')->{Module}
-        || 'Contact::Preferences::DB';
-
-    if ( $MainObject->Require($GeneratorModule) ) {
-        $Self->{PreferencesObject} = $GeneratorModule->new();
-    }
 
     $Self->{CacheType}   = 'Contact';
     $Self->{OSCacheType} = 'ObjectSearch_Contact';
@@ -964,9 +953,25 @@ sub ContactUpdate {
             Comment ValidID AssignedUserID
         )
     ) {
-        next KEY if defined $Contact{$Key} && $Contact{$Key} eq $Param{$Key};
+        next KEY if (
+            (
+                !defined( $Contact{ $Key } )
+                && !defined( $Param{ $Key } )
+            )
+            || (
+                defined( $Contact{ $Key } )
+                && defined( $Param{ $Key } )
+                && $Contact{ $Key } eq $Param{ $Key }
+            )
+        );
+
         $ChangeRequired = 1;
         last KEY;
+    }
+
+    my $OldAssignedUserID;
+    if ($Contact{AssignedUserID} && $Contact{AssignedUserID} != $Param{AssignedUserID}) {
+        $OldAssignedUserID = $Contact{AssignedUserID};
     }
 
     my @DeleteOrgIDs;
@@ -1069,6 +1074,22 @@ sub ContactUpdate {
         ObjectID  => $Param{ID},
     );
 
+    # push client callback event for assigned user (contact include)
+    if ($Param{AssignedUserID}) {
+        $Kernel::OM->Get('ClientNotification')->NotifyClients(
+            Event     => 'UPDATE',
+            Namespace => 'User',
+            ObjectID  => $Param{AssignedUserID}
+        );
+    }
+    if ($OldAssignedUserID) {
+        $Kernel::OM->Get('ClientNotification')->NotifyClients(
+            Event     => 'UPDATE',
+            Namespace => 'User',
+            ObjectID  => $OldAssignedUserID
+        );
+    }
+
     return 1;
 }
 
@@ -1095,11 +1116,6 @@ sub ContactDelete {
             return;
         }
     }
-
-    # delete preferences (foreign key)
-    $Self->{PreferencesObject}->DeleteAllPreferencesForContact(
-        ContactID => $Param{ID}
-    );
 
     # get dynamic field objects
     my $DynamicFieldObject        = $Kernel::OM->Get('DynamicField');
@@ -1159,196 +1175,6 @@ sub ContactDelete {
         Event     => 'DELETE',
         Namespace => 'Contact',
         ObjectID  => $Param{ID},
-    );
-
-    return 1;
-}
-
-
-=item SetPreferences()
-
-set contact preferences
-
-    $ContactObject->SetPreferences(
-        ContactID => 123,
-        Key       => 'UserComment',
-        Value     => 'some comment',
-    );
-
-=cut
-
-sub SetPreferences {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    if ( !$Param{ContactID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Need ContactID!'
-        );
-        return;
-    }
-
-    # check if contact exists
-    my %Contact = $Self->ContactGet( ID => $Param{ContactID} );
-    if ( !%Contact ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "No such contact '$Param{ContactID}'!",
-        );
-        return;
-    }
-
-    my $Result = $Self->{PreferencesObject}->SetPreferences(%Param);
-
-    # trigger event handler
-    if ($Result) {
-        $Self->EventHandler(
-            Event => 'ContactSetPreferences',
-            Data  => {
-                %Param,
-                ContactData => \%Contact,
-                Result   => $Result,
-            },
-            UserID => 1,
-        );
-    }
-
-    # push client callback event
-    $Kernel::OM->Get('ClientNotification')->NotifyClients(
-        Event     => 'UPDATE',
-        Namespace => 'Contact.Preference',
-        ObjectID  => $Param{ContactID}.'::'.$Param{Key},
-    );
-
-    return $Result;
-}
-
-=item GetPreferences()
-
-get customer user preferences
-
-    my %Preferences = $ContactObject->GetPreferences(
-        ContactID => 123,
-    );
-
-=cut
-
-sub GetPreferences {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    if ( !$Param{ContactID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Need ContactID!'
-        );
-        return;
-    }
-
-    # check if contact exists
-    my %Contact = $Self->ContactGet( ID => $Param{ContactID} );
-    if ( !%Contact ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "No such contact '$Param{ContactID}'!",
-        );
-        return;
-    }
-
-    return $Self->{PreferencesObject}->GetPreferences(%Param);
-}
-
-=item SearchPreferences()
-
-search in user preferences
-
-    my %UserList = $ContactObject->SearchPreferences(
-        Key   => 'UserSomeKey',
-        Value => 'SomeValue',   # optional, limit to a certain value/pattern
-    );
-
-=cut
-
-sub SearchPreferences {
-    my ( $Self, %Param ) = @_;
-
-    return $Self->{PreferencesObject}->SearchPreferences(%Param);
-}
-
-=item TokenGenerate()
-
-generate a random token
-
-    my $Token = $UserObject->TokenGenerate(
-        ContactID => 123,
-    );
-
-=cut
-
-sub TokenGenerate {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    if ( !$Param{ContactID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Need ContactID!"
-        );
-        return;
-    }
-
-    my $Token = $Kernel::OM->Get('Main')->GenerateRandomString(
-        Length => 14,
-    );
-
-    # save token in preferences
-    $Self->SetPreferences(
-        Key    => 'UserToken',
-        Value  => $Token,
-        ContactID => $Param{ContactID},
-    );
-
-    return $Token;
-}
-
-=item TokenCheck()
-
-check password token
-
-    my $Valid = $UserObject->TokenCheck(
-        Token  => $Token,
-        ContactID => 123,
-    );
-
-=cut
-
-sub TokenCheck {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    if ( !$Param{Token} || !$Param{ContactID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Need Token and ContactID!"
-        );
-        return;
-    }
-
-    # get preferences token
-    my %Preferences = $Self->GetPreferences(
-        ContactID => $Param{ContactID},
-    );
-
-    # check requested vs. stored token
-    return if !$Preferences{UserToken};
-    return if $Preferences{UserToken} ne $Param{Token};
-
-    # reset password token
-    $Self->SetPreferences(
-        Key    => 'UserToken',
-        Value  => '',
-        ContactID => $Param{ContactID},
     );
 
     return 1;
@@ -1415,6 +1241,171 @@ sub ContactList {
     );
 
     return %Contacts;
+}
+
+=item GetOrCreateID()
+
+return a contact id for a given email. If no matching contact exists, new contact is created
+
+    my $ContactID = $ContactObject->GetOrCreateID(
+        Email                 => "\"Mustermann, Max\" <max.mustermann@example.com>",    # single email to parse
+        UserID                => 1,
+        ParserObject          => $ParserObject,                                         # optional. Standalone instance of Kernel::System::EmailParser
+        PrimaryOrganisationID => 123,                                                   # optional. PrimaryOrganisationID to use when creating a new contact
+    );
+
+=cut
+sub GetOrCreateID {
+
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed (qw(Email UserID)) {
+        if ( !$Param{ $Needed } ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!"
+            );
+
+            return;
+        }
+    }
+
+    # get parser object
+    my $ParserObject;
+    if ( defined( $Param{ParserObject} ) ) {
+        $ParserObject = $Param{ParserObject};
+    }
+    else {
+        $ParserObject = Kernel::System::EmailParser->new(
+            Mode => 'Standalone',
+        );
+    }
+
+    # parse email
+    my $ContactEmail = $ParserObject->GetEmailAddress(
+        Email => $Param{Email},
+    );
+    if ( !$ContactEmail ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => 'Could not parse email from "' . $Param{Email} . '"!',
+        );
+
+        return;
+    }
+
+    # lookup existing valid contact
+    my $ContactID = $Self->ContactLookup(
+        Email  => $ContactEmail,
+        Silent => 1,
+        Valid  => 1
+    );
+    return $ContactID if ( $ContactID );
+
+    # lookup existing invalid contact
+    $ContactID = $Self->ContactLookup(
+        Email  => $ContactEmail,
+        Silent => 1
+    );
+    return $ContactID if ( $ContactID );
+
+    # set email as fallback for firstname and lastname
+    my $Firstname = $ContactEmail;
+    my $Lastname  = $ContactEmail;
+
+    # get and process realname part of given email
+    my $ContactEmailRealname = $ParserObject->GetRealname(
+        Email => $Param{Email},
+    );
+    if ( $ContactEmailRealname ) {
+        # remove quotes
+        $ContactEmailRealname =~ s/["']//g;
+
+        # remove leading/trailing whitespace
+        $ContactEmailRealname =~ s/^\s+|\s+$//g;
+
+        # realname contains comma, use part before comma as lastname, part after as firstname
+        if ( $ContactEmailRealname =~ m/^(.+)\s*,\s*(.+)$/ ) {
+            $Firstname = $2;
+            $Lastname  = $1;
+        }
+        # realname contains whitespace, use part before last whitespace as firstname, part after as lastname
+        elsif ( $ContactEmailRealname =~ m/^(.+)\s+(.+?)$/ ) {
+            $Firstname = $1;
+            $Lastname  = $2;
+        }
+        # fallback: use realname as firstname and set dash to lastname
+        else {
+            $Firstname = $ContactEmailRealname;
+            $Lastname  = '-';
+        }
+    }
+
+    # create contact
+    $ContactID = $Self->ContactAdd(
+        Firstname             => $Firstname,
+        Lastname              => $Lastname,
+        Email                 => $ContactEmail,
+        PrimaryOrganisationID => $Param{PrimaryOrganisationID},
+        ValidID               => 1,
+        UserID                => $Param{UserID},
+    );
+    if ( !$ContactID ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => 'Could not create contact for "' . $Param{Email} . '"!',
+        );
+
+        return;
+    }
+
+    return $ContactID;
+}
+
+=item GetAssignedContactsForObject()
+
+return all assigned contact IDs
+
+    my $ContactIDList = $ContactObject->GetAssignedContactsForObject(
+        ObjectType   => 'Contact',
+        Object       => $ContactHashRef,         # (optional)
+        UserID       => 1,
+        UserType     => 'Customer'               # 'Agent' | 'Customer'
+    );
+
+=cut
+
+sub GetAssignedContactsForObject {
+    my ( $Self, %Param ) = @_;
+
+    my @AssignedContactIDs = ();
+
+    my %SearchData = $Kernel::OM->Get('Main')->GetAssignedSearchParams(
+        %Param,
+        AssignedObjectType => 'Contact'
+    );
+
+    if (IsHashRefWithData(\%SearchData)) {
+        my @ORSearch = map { { Field => $_, Operator => $_ eq 'IsCustomer' || $_ eq 'IsAgent' ? 'EQ' : 'IN', Value => $SearchData{$_} } } keys %SearchData;
+
+        @AssignedContactIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+            ObjectType => 'Contact',
+            Result     => 'ARRAY',
+            Search     => {
+                OR => \@ORSearch
+            },
+            UserID   => $Param{UserID},
+            UserType => $Param{UserType},
+            Silent   => $Param{Silent}
+        );
+
+        if ( IsArrayRefWithData(\@AssignedContactIDs) ) {
+            @AssignedContactIDs = map { 0 + $_ } @AssignedContactIDs;
+        }
+    }
+
+    return \@AssignedContactIDs;
 }
 
 =begin Internal

@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "ObjectTag.json",
+  "type": "object",
+  "description": "The object tag object.",
+  "properties": {
+    "Name": {
+      "type": "string",
+      "readOnly": true
+    }
+  },
+  "required": [
+    "Name"
+  ]
+}

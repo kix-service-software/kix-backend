@@ -2,6 +2,7 @@
     "Ticket": [
         {
             "Age": 1316865,
+            "AttachmentCount": 0,
             "ChangeBy": 1,
             "Changed": "2020-04-24 13:23:20",
             "ContactID": "1",
@@ -56,6 +57,7 @@
         },
         {
             "Age": 1316731,
+            "AttachmentCount": 1,
             "ChangeBy": 1,
             "Changed": "2020-04-24 13:24:20",
             "ContactID": "1",

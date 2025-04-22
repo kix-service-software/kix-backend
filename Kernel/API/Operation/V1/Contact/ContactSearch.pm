@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2024 KIX Service Software GmbH, https://www.kixdesk.com
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -70,6 +70,34 @@ sub Run {
             { Field => 'Firstname' },
         ]
     );
+
+    # check for customer relevant ids if necessary
+    if ($Self->{Authorization}->{UserType} eq 'Customer') {
+        my $CustomerContactIDList = $Self->_GetCustomerUserVisibleObjectIds(
+            ObjectType             => 'Contact',
+            RelevantOrganisationID => $Param{Data}->{RelevantOrganisationID}
+        );
+
+        # return empty result if there are no assigned contacts for customer
+        return $Self->_Success(
+            Contact => [],
+        ) if (!IsArrayRefWithData($CustomerContactIDList));
+
+        # add contact ids of to search as AND condition
+        if ( !IsHashRefWithData($Self->{Search}->{Contact}) ) {
+            $Self->{Search}->{Contact} = {};
+        }
+        if ( !IsArrayRefWithData($Self->{Search}->{Contact}->{AND}) ) {
+            $Self->{Search}->{Contact}->{AND} = [
+                { Field => 'ContactID', Operator => 'IN', Value => $CustomerContactIDList }
+            ];
+        } else {
+            push(
+                @{$Self->{Search}->{Contact}->{AND}},
+                { Field => 'ContactID', Operator => 'IN', Value => $CustomerContactIDList }
+            );
+        }
+    }
 
     @ContactList = $Kernel::OM->Get('ObjectSearch')->Search(
         ObjectType => 'Contact',
