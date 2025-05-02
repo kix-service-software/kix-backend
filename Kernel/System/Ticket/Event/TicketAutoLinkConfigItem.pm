@@ -287,7 +287,7 @@ sub Run {
                 ) {
                     next ATTR if $AttributeValue ne $SearchAttributeKey;
 
-                    my $Operator = 'CONTAINS';
+                    my $Operator = 'EQ';
                     my $Type     = 'STRING';
                     my $Value    = \@SearchStrings;
                     if ( $AttributeValue !~ /^(?:Name|Number)$/sm ) {
