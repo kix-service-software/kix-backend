@@ -337,7 +337,7 @@ msgstr "Laptop"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Lists open tickets by statetype."
-msgstr ""
+msgstr "Listet offene Tickets nach Statustyp."
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Macro for Job \"Customer Response - reopen from pending\""
@@ -2208,27 +2208,27 @@ msgstr ""
 
 #. Perl Module: update/build-1586.pl
 msgid "Lists closed tickets within the last 7 days."
-msgstr ""
+msgstr "Listet geschlossene Tickets der letzten 7 Tage."
 
 #. Perl Module: update/build-1586.pl
 msgid "Lists open tickets by priority."
-msgstr ""
+msgstr "Listet offene Tickets nach Priorität."
 
 #. Perl Module: update/build-1586.pl
 msgid "Lists open tickets by state."
-msgstr ""
+msgstr "Listet offene Tickets nach Status."
 
 #. Perl Module: update/build-1586.pl
 msgid "Lists open tickets by team."
-msgstr ""
+msgstr "Listet offene Tickets nach Team."
 
 #. Perl Module: update/build-1586.pl
 msgid "Lists open tickets in teams by priority."
-msgstr ""
+msgstr "Listet offene Tickets in Teams nach Priorität."
 
 #. Perl Module: update/build-1586.pl
 msgid "Lists tickets created within the last 7 days."
-msgstr ""
+msgstr "Listet erstellte Tickets der letzten 7 Tage."
 
 #. Perl Module: update/build-1586.pl
 msgid "Number of open tickets by priority"
