@@ -722,6 +722,30 @@ my $TestPNGBinJSON = $Kernel::OM->Get('JSON')->Encode(
         }
     },
     {
+        Name => 'simple with whitespace before name',
+        Variables => {
+            Test1 => 'test1_value',
+        },
+        Data => {
+            Dummy => '${ Test1}',
+        },
+        Expected => {
+            Dummy => 'test1_value',
+        }
+    },
+    {
+        Name => 'simple with whitespace after name',
+        Variables => {
+            Test1 => 'test1_value',
+        },
+        Data => {
+            Dummy => '${Test1 }',
+        },
+        Expected => {
+            Dummy => 'test1_value',
+        }
+    },
+    {
         Name => 'simple with complex name',
         Variables => {
             'test_123-count' => '123',
@@ -930,6 +954,26 @@ my $TestPNGBinJSON = $Kernel::OM->Get('JSON')->Encode(
         }
     },
     {
+        Name => 'base64 filter with whitespaces ',
+        Variables => {
+            Variable1 => 'test123',
+        },
+        Data => {
+            Result => '
+1: ${Variable1 |base64}
+2: ${Variable1| ToBase64}
+3: ${Variable1 | ToBase64|FromBase64 }
+',
+        },
+        Expected => {
+            Result => '
+1: dGVzdDEyMw==
+2: dGVzdDEyMw==
+3: test123
+'
+        }
+    },
+    {
         Name => 'base64 filter with binary content containing pipe characters',
         Variables => {
             Variable1 => $TestPNGBase64,
@@ -1058,6 +1102,19 @@ END
         }
     },
     {
+        Name => 'Combine variables as array with whitespace after comma',
+        Variables => {
+            Test1 => 'Test1',
+            Test2 => 'Test2',
+        },
+        Data => {
+            Dummy => '${Test1, Test2}',
+        },
+        Expected => {
+            Dummy => ['Test1','Test2'],
+        }
+    },
+    {
         Name => 'Combine variables containing arrays as array',
         Variables => {
             Test1 => [
@@ -1071,6 +1128,25 @@ END
         },
         Data => {
             Dummy => '${Test1,Test2}',
+        },
+        Expected => {
+            Dummy => ['Test1.1','Test1.2','Test2.1','Test2.2'],
+        }
+    },
+    {
+        Name => 'Combine variables containing arrays as array with whitespace after comma',
+        Variables => {
+            Test1 => [
+                'Test1.1',
+                'Test1.2'
+            ],
+            Test2 => [
+                'Test2.1',
+                'Test2.2'
+            ],
+        },
+        Data => {
+            Dummy => '${Test1, Test2}',
         },
         Expected => {
             Dummy => ['Test1.1','Test1.2','Test2.1','Test2.2'],
