@@ -428,10 +428,10 @@ my @Tests = (
                 WatchedAndUnseen => undef,
             },
             $UserID2 => {
-                Owned => 1,
-                OwnedAndUnseen => 1,
-                OwnedAndLocked => 1,
-                OwnedAndLockedAndUnseen => 1,
+                Owned => undef,
+                OwnedAndUnseen => undef,
+                OwnedAndLocked => undef,
+                OwnedAndLockedAndUnseen => undef,
                 Watched => undef,
                 WatchedAndUnseen => undef,
             }
@@ -570,8 +570,8 @@ my @Tests = (
                 WatchedAndUnseen => undef,
             },
             $UserID2 => {
-                Owned => 2,
-                OwnedAndUnseen => 1,
+                Owned => 1,
+                OwnedAndUnseen => undef,
                 OwnedAndLocked => 1,
                 OwnedAndLockedAndUnseen => undef,
                 Watched => 1,
