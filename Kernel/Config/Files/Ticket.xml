@@ -2391,6 +2391,18 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="PostMaster::CheckFollowUpModule###0390-AttachmentsFilename" Required="0" Valid="0">
+        <Description Translatable="1">Executes follow-up checks on attachment filenames for mails that don't have a ticket number in the subject.</Description>
+        <Group>Ticket</Group>
+        <SubGroup>Core::PostMaster</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::PostMaster::FollowUpCheck::AttachmentsFilename</Item>
+                <Item Key="OnlyFirstMatch">1</Item>
+                <Item Key="StopAfterMatch">1</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="PostMaster::CheckFollowUpModule###0400-Attachments" Required="0" Valid="0">
         <Description Translatable="1">Executes follow-up checks on attachment contents for mails that don't have a ticket number in the subject.</Description>
         <Group>Ticket</Group>
