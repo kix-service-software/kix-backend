@@ -186,12 +186,28 @@ sub _ObjectPermissionCheck {
     my $Parameters = $Mapping->{$Param{ObjectType}}->{Parameters};
 
     my $Data = {};
-    for my $Key ( keys %{$Parameters} ) {
-
-        my $Value = $Param{$Parameters->{$Key}};
+    for my $Key ( sort( keys( %{ $Parameters } ) ) ) {
+        my $Value;
+        if (
+            IsHashRefWithData( $Parameters->{ $Key } )
+            && $Parameters->{ $Key }->{Object}
+            && $Parameters->{ $Key }->{Method}
+            && IsHashRefWithData( $Parameters->{ $Key }->{Parameters} )
+        ) {
+            my $LookupObject = $Kernel::OM->Get( $Parameters->{ $Key }->{Object} );
+            my $LookupMethod = $Parameters->{ $Key }->{Method};
+            my %LookupParameters = ();
+            for my $LookupKey ( keys( %{ $Parameters->{ $Key }->{Parameters} } ) ) {
+                $LookupParameters{ $LookupKey } = $Param{ $Parameters->{ $LookupKey } } // $Data->{ $LookupKey };
+            }
+            $Value = $LookupObject->$LookupMethod( %LookupParameters );
+        }
+        else {
+            $Value = $Param{ $Parameters->{ $Key } };
+        }
         return if !$Value;
 
-        $Data->{$Key} = $Value;
+        $Data->{ $Key } = $Value;
     }
 
     my $GetResult = $Self->ExecOperation(
