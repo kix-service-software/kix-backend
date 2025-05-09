@@ -226,7 +226,7 @@ sub SetResult {
     if ( $Self->{Debug} ) {
         $Kernel::OM->Get('Automation')->LogDebug(
             Referrer => $Self,
-            Message  => 'Set macro variable "' . $Param{Name} . '": ' . $Kernel::OM->Get('Main')->Dump( $Param{Value} ),
+            Message  => 'Set macro variable "' . $VariableName . '": ' . $Kernel::OM->Get('Main')->Dump( $Param{Value} ),
             UserID   => $Param{UserID},
         );
     }

@@ -811,7 +811,10 @@ sub MacroActionExecute {
         if ( $BackendObject->{Debug} ) {
             $Kernel::OM->Get('Automation')->LogDebug(
                 Referrer => $Self,
-                Message  => 'Running macro action with config: ' . $Kernel::OM->Get('Main')->Dump( \%Parameters ),
+                Message  => 'Running macro action "'.$MacroAction{Type}.'" with ' . $Kernel::OM->Get('Main')->Dump({
+                    ConfigRaw => \%{$MacroAction{Parameters} || {}},
+                    Config    => \%Parameters,
+                }),
                 UserID   => $Param{UserID},
             );
         }
