@@ -58,8 +58,8 @@ sub Describe {
     );
     $Self->AddOption(
         Name        => 'MacroID',
-        Label       => Kernel::Language::Translatable('MacroID'),
-        Description => Kernel::Language::Translatable('The ID of the macro to execute.'),
+        Label       => Kernel::Language::Translatable('Macro'),
+        Description => Kernel::Language::Translatable('The macro to execute.'),
         Required    => 1,
     );
 
