@@ -20,8 +20,10 @@ use base qw(
 );
 
 our @ObjectDependencies = (
-    'ITSMConfigItem',
     'Log',
+    'Ticket',
+    'User',
+    'Watcher',
 );
 
 =head1 NAME
@@ -97,6 +99,16 @@ sub Run {
         return if !%Ticket;
 
         $Param{Ticket} = \%Ticket;
+
+        if ( !defined( $Self->{ViewableStates} ) ) {
+            $Self->{ViewableStates} = {
+                reverse $Kernel::OM->Get('State')->StateGetStatesByType(
+                    Type   => 'Viewable',
+                    Result => 'HASH',
+                )
+            };
+        }
+
     }
 
     # handle ticket events to update ticket counters:
@@ -108,12 +120,18 @@ sub Run {
     # - WatchedAndUnseen
 
     my $Function = 'Handle'.$Param{Event};
-    return $Self->$Function(%Param);
+    if ( $Self->can( $Function ) ) {
+        return $Self->$Function(%Param);
+    }
+    
+    return 1;
 
 }
 
 sub HandleTicketCreate {
     my ($Self, %Param) = @_;
+
+    return 1 if ( !$Self->{ViewableStates}->{ $Param{Ticket}->{State} } );
 
     $Kernel::OM->Get('User')->AddUserCounterObject(
         Category => 'Ticket',
@@ -172,9 +190,20 @@ sub HandleTicketDelete {
 sub HandleTicketStateUpdate {
     my ($Self, %Param) = @_;
 
-    $Self->HandleTicketCreate(
-        %Param,
-    );
+    if ( $Self->{ViewableStates}->{ $Param{Ticket}->{State} } ) {
+        $Self->HandleTicketCreate(
+            %Param,
+        );
+    }
+    else {
+        # delete Owned* counter
+        $Kernel::OM->Get('User')->DeleteUserCounterObject(
+            Category => 'Ticket',
+            Counter  => 'Owned*',
+            ObjectID => $Param{Ticket}->{TicketID}
+        );
+    }
+
     $Self->HandleTicketSubscribe(
         %Param,
         Data => {
@@ -188,17 +217,19 @@ sub HandleTicketStateUpdate {
 sub HandleTicketFlagSet {
     my ($Self, %Param) = @_;
 
-    my ( $OwnerID, $Owner ) = $Kernel::OM->Get('Ticket')->OwnerCheck(
-        TicketID => $Param{Ticket}->{TicketID}
-    );
-
-    if ( $Param{Data}->{Key} eq 'Seen' && $OwnerID == $Param{UserID} ) {
-        $Kernel::OM->Get('User')->DeleteUserCounterObject(
-            Category => 'Ticket',
-            Counter  => '*AndUnseen',
-            ObjectID => $Param{Ticket}->{TicketID},
-            UserID   => $OwnerID
+    if ( $Self->{ViewableStates}->{ $Param{Ticket}->{State} } ) {
+        my ( $OwnerID, $Owner ) = $Kernel::OM->Get('Ticket')->OwnerCheck(
+            TicketID => $Param{Ticket}->{TicketID}
         );
+
+        if ( $Param{Data}->{Key} eq 'Seen' && $OwnerID == $Param{UserID} ) {
+            $Kernel::OM->Get('User')->DeleteUserCounterObject(
+                Category => 'Ticket',
+                Counter  => '*AndUnseen',
+                ObjectID => $Param{Ticket}->{TicketID},
+                UserID   => $OwnerID
+            );
+        }
     }
 
     my $IsWatched = $Kernel::OM->Get('Watcher')->WatcherLookup(
@@ -223,21 +254,23 @@ sub HandleTicketFlagDelete {
 
     return 1 if lc $Param{Data}->{Key} ne 'seen';
 
-    if ( $Param{Ticket}->{OwnerID} == $Param{Data}->{UserID} ) {
-        $Kernel::OM->Get('User')->AddUserCounterObject(
-            Category => 'Ticket',
-            Counter  => 'OwnedAndUnseen',
-            ObjectID => $Param{Ticket}->{TicketID},
-            UserID   => $Param{Ticket}->{OwnerID}
-        );
-
-        if ( $Param{Ticket}->{Lock} eq 'lock' ) {
+    if ( $Self->{ViewableStates}->{ $Param{Ticket}->{State} } ) {
+        if ( $Param{Ticket}->{OwnerID} == $Param{Data}->{UserID} ) {
             $Kernel::OM->Get('User')->AddUserCounterObject(
                 Category => 'Ticket',
-                Counter  => 'OwnedAndLockedAndUnseen',
+                Counter  => 'OwnedAndUnseen',
                 ObjectID => $Param{Ticket}->{TicketID},
                 UserID   => $Param{Ticket}->{OwnerID}
             );
+
+            if ( $Param{Ticket}->{Lock} eq 'lock' ) {
+                $Kernel::OM->Get('User')->AddUserCounterObject(
+                    Category => 'Ticket',
+                    Counter  => 'OwnedAndLockedAndUnseen',
+                    ObjectID => $Param{Ticket}->{TicketID},
+                    UserID   => $Param{Ticket}->{OwnerID}
+                );
+            }
         }
     }
 
@@ -260,6 +293,8 @@ sub HandleTicketFlagDelete {
 
 sub HandleTicketLockUpdate {
     my ($Self, %Param) = @_;
+
+    return 1 if ( !$Self->{ViewableStates}->{ $Param{Ticket}->{State} } );
 
     if ( $Param{Data}->{Lock} eq 'lock' ) {
         $Kernel::OM->Get('User')->AddUserCounterObject(
@@ -302,6 +337,8 @@ sub HandleTicketLockUpdate {
 
 sub HandleTicketOwnerUpdate {
     my ($Self, %Param) = @_;
+
+    return 1 if ( !$Self->{ViewableStates}->{ $Param{Ticket}->{State} } );
 
     # add for new owner
     $Kernel::OM->Get('User')->AddUserCounterObject(

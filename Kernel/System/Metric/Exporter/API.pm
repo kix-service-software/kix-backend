@@ -61,10 +61,14 @@ sub Export {
             );
         }
 
-        $Output .= sprintf "%s\t%i\tinfo\t%i\t%s\t%i\t%s\t%s\n", 
+        $Output .= sprintf "%s\t%i\t%s\t%s\t%s\t%i\t%i\t%s\t%i\t%s\t%s\n", 
             $DateTime, 
             $Metric->{ProcessID}, 
+            $Metric->{RequestID} || '-', 
+            $Metric->{UserID} || '-',
+            $Metric->{UserType} || '-',
             $Metric->{Duration}*1000, 
+            $Metric->{OutBytes} || 0, 
             $Metric->{RequestMethod}, 
             $Metric->{HTTPCode}, 
             $Metric->{Resource}, 

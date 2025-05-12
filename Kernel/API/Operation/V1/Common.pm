@@ -1223,7 +1223,7 @@ sub _HandlePermissions {
 
     if ( !$HandlerObject || !$HandlerObject->can('UpdateBasePermissions') ) {
         $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
+            Priority => 'info',
             Message  => "No base permission handler for \"$Param{Object}\"!",
         );
         return;

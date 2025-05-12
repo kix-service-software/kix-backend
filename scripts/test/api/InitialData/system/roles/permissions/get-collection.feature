@@ -21,13 +21,14 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
     When I query the collection of permissions with roleid 2
     Then the response code is 200
 #    And the response object is PermissionCollectionResponse
-    And the response contains 9 items of type "Permission"
+    And the response contains 10 items of type "Permission"
     And the response contains the following items of type Permission
       | Target         | Value | TypeID |
       | /auth          | 1     | 1      |
       | /certificates  | 11    | 1      |
       | /cmdb          | 15    | 1      |
       | /contacts      | 15    | 1      |
+      | /objecttags    | 11    | 1      |
       | /organisations | 6     | 1      |
       | /session       | 15    | 1      |
       | /system        | 15    | 1      |
@@ -191,34 +192,36 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
     When I query the collection of permissions with roleid 9
     Then the response code is 200
 #    And the response object is PermissionCollectionResponse
-    And the response contains 7 items of type "Permission"
+    And the response contains 9 items of type "Permission"
     And the response contains the following items of type Permission
-      | Target               | Value | TypeID |
-      | /cmdb                | 2     | 1      |
-      | /cmdb/*              | 0     | 1      |
-      | /cmdb/configitems    | 2     | 1      |
-      | /links               | 2     | 1      |
-      | /system/cmdb         | 2     | 1      |
-      | /system/cmdb/*       | 0     | 1      |
-      | /system/cmdb/classes | 2     | 1      |
-
+      | Target                    | Value | TypeID |
+      | /cmdb                     | 2     | 1      |
+      | /cmdb/*                   | 0     | 1      |
+      | /cmdb/configitems         | 2     | 1      |
+      | /links                    | 2     | 1      |
+      | /system/cmdb              | 2     | 1      |
+      | /system/cmdb/*            | 0     | 1      |
+      | /system/cmdb/classes      | 2     | 1      |
+      | /system/htmltopdf         | 2     | 1      |
+      | /system/htmltopdf/convert | 2     | 1      |
 
 
   Scenario: get the list of existing permissions of Asset Maintainer
     When I query the collection of permissions with roleid 10
     Then the response code is 200
 #    And the response object is PermissionCollectionResponse
-    And the response contains 7 items of type "Permission"
+    And the response contains 9 items of type "Permission"
     And the response contains the following items of type Permission
-      | Target               | Value | TypeID |
-      | /cmdb                | 15    | 1      |
-      | /cmdb/*              | 0     | 1      |
-      | /cmdb/configitems    | 15    | 1      |
-      | /links               | 15    | 1      |
-      | /system/cmdb         | 2     | 1      |
-      | /system/cmdb/*       | 0     | 1      |
-      | /system/cmdb/classes | 2     | 1      |
-
+      | Target                    | Value | TypeID |
+      | /cmdb                     | 15    | 1      |
+      | /cmdb/*                   | 0     | 1      |
+      | /cmdb/configitems         | 15    | 1      |
+      | /links                    | 15    | 1      |
+      | /system/cmdb              | 2     | 1      |
+      | /system/cmdb/*            | 0     | 1      |
+      | /system/cmdb/classes      | 2     | 1      |
+      | /system/htmltopdf         | 2     | 1      |
+      | /system/htmltopdf/convert | 2     | 1      |
 
   Scenario: get the list of existing permissions of Customer Reader
     When I query the collection of permissions with roleid 11
@@ -234,7 +237,6 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
   Scenario: get the list of existing permissions of Customer Manager
     When I query the collection of permissions with roleid 12
     Then the response code is 200
- #   And the response object is PermissionCollectionResponse
     And the response contains 4 items of type "Permission"
     And the response contains the following items of type Permission
       | Target              | Value | TypeID |

@@ -1187,6 +1187,9 @@ sub ResolveValueByKey {
 
     my $Data = $Param{Data};
 
+    # cleanup leading and trailing spaces
+    $Param{Key} =~ s/^\s+|\s+$//;
+
     # handle comma separated variables and merge to array
     my @Keys = split( /,/, $Param{Key} );
     if ( scalar( @Keys ) > 1 ) {

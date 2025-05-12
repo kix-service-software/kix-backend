@@ -27,3 +27,25 @@ Feature: POST request to the /auth resource
     And the error code is "SessionCreate.AuthFail"
     And the error message is "Authorization not possible, please contact the system administrator."
 
+  Scenario: authenticate with sensetive login
+    Given I am an agent user with login "Admin" and password "PasswOrd"
+    When I login
+    Then the response code is 401
+    And the response object is Error
+    And the error code is "SessionCreate.AuthFail"
+    And the error message is "Authorization not possible, please contact the system administrator."
+
+  Scenario: authenticate with sensetive password
+    Given I am an agent user with login "admin" and password "PaSswOrd"
+    When I login
+    Then the response code is 401
+    And the response object is Error
+    And the error code is "SessionCreate.AuthFail"
+    And the error message is "Authorization not possible, please contact the system administrator."
+
+
+
+
+
+
+

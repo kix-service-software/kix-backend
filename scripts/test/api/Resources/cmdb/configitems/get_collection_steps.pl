@@ -106,5 +106,12 @@ When qr/I query the cmdb collection of configitems with sorted by "(.*?)"$/, sub
    );
 };
    
-   
+When qr/I query the cmdb collection of configitems with limit (\d+) and offset (\d+)and limit (\d+) and offset (\d+)$/, sub {
+   ( S->{Response}, S->{ResponseContent} ) = _Get(
+      Token => S->{Token},
+      URL   => S->{API_URL}.'/cmdb/configitems',
+      Limit  => $1,
+      Offset => $2,
+   );
+};
 

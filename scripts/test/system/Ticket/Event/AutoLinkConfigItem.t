@@ -17,17 +17,6 @@ use Kernel::System::VariableCheck qw(:all);
 
 use Kernel::System::PostMaster;
 
-# get needed objects for rollback
-my $UserObject           = $Kernel::OM->Get('User'); # without, config changes are ignored!!
-
-# get needed objects
-my $ConfigObject         = $Kernel::OM->Get('Config');
-my $TicketObject         = $Kernel::OM->Get('Ticket');
-my $ConfigItemObject     = $Kernel::OM->Get('ITSMConfigItem');
-my $GeneralCatalogObject = $Kernel::OM->Get('GeneralCatalog');
-my $DynamicFieldObject   = $Kernel::OM->Get('DynamicField');
-my $DFBackendObject      = $Kernel::OM->Get('DynamicField::Backend');
-
 # get helper object
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
@@ -35,16 +24,16 @@ my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 $Helper->BeginWork();
 
 # get deployment state list
-my $DeplStateList = $GeneralCatalogObject->ItemList(
+my $DeplStateList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
     Class => 'ITSM::ConfigItem::DeploymentState',
 );
-my %DeplStateListReverse = reverse %{$DeplStateList};
+my %DeplStateListReverse = reverse( %{ $DeplStateList } );
 
 # get incident state list
-my $InciStateList = $GeneralCatalogObject->ItemList(
+my $InciStateList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
     Class => 'ITSM::Core::IncidentState',
 );
-my %InciStateListReverse = reverse %{$InciStateList};
+my %InciStateListReverse = reverse( %{ $InciStateList } );
 
 my $DefString = <<'END';
 [
@@ -86,19 +75,18 @@ my $DefString = <<'END';
 END
 
 my $ClassAName = 'AutoLink' . $Helper->GetRandomNumber();
-my $ClassAID = $GeneralCatalogObject->ItemAdd(
-    Class    => 'ITSM::ConfigItem::Class',
-    Name     => $ClassAName,
-    Comment  => q{},
-    ValidID  => 1,
-    UserID   => 1
+my $ClassAID   = $Kernel::OM->Get('GeneralCatalog')->ItemAdd(
+    Class   => 'ITSM::ConfigItem::Class',
+    Name    => $ClassAName,
+    Comment => q{},
+    ValidID => 1,
+    UserID  => 1
 );
 $Self->True(
     $ClassAID,
     'Create class ' . $ClassAName,
 );
-
-my $ClassADefID = $ConfigItemObject->DefinitionAdd(
+my $ClassADefID = $Kernel::OM->Get('ITSMConfigItem')->DefinitionAdd(
     ClassID    => $ClassAID,
     UserID     => 1,
     Definition => $DefString
@@ -107,7 +95,6 @@ $Self->True(
     $ClassADefID,
     'Create class definition of ' . $ClassAName,
 );
-
 $Kernel::OM->ObjectsDiscard(
     Objects => [
         'GeneralCatalog',
@@ -116,19 +103,18 @@ $Kernel::OM->ObjectsDiscard(
 );
 
 my $ClassBName = 'AutoLink' . $Helper->GetRandomNumber();
-my $ClassBID = $GeneralCatalogObject->ItemAdd(
-    Class    => 'ITSM::ConfigItem::Class',
-    Name     => $ClassBName,
-    Comment  => q{},
-    ValidID  => 1,
-    UserID   => 1
+my $ClassBID   = $Kernel::OM->Get('GeneralCatalog')->ItemAdd(
+    Class   => 'ITSM::ConfigItem::Class',
+    Name    => $ClassBName,
+    Comment => q{},
+    ValidID => 1,
+    UserID  => 1
 );
 $Self->True(
     $ClassBID,
     'Create class ' . $ClassBName,
 );
-
-my $ClassBDefID = $ConfigItemObject->DefinitionAdd(
+my $ClassBDefID = $Kernel::OM->Get('ITSMConfigItem')->DefinitionAdd(
     ClassID    => $ClassBID,
     UserID     => 1,
     Definition => $DefString
@@ -137,7 +123,6 @@ $Self->True(
     $ClassBDefID,
     'Create class definition of ' . $ClassBName,
 );
-
 $Kernel::OM->ObjectsDiscard(
     Objects => [
         'GeneralCatalog',
@@ -145,26 +130,30 @@ $Kernel::OM->ObjectsDiscard(
     ]
 );
 
-my $FQDNValue = 'some.fqdn.com';
-my $IPValue   = '1.2.3.4';
-my $IPValue2  = '5.6.7.8';
+my $CIName1    = 'Asset1';
+my $CIName2    = 'Asset10';             # contains value of $CIName1
+my $CINumber1  = '123';
+my $CINumber2  = '1234';                # contains value of $CINumber1
+my $FQDNValue1 = 'some.fqdn.com';
+my $FQDNValue2 = 'sub.some.fqdn.com';   # contains value of $FQDNValue1
+my $IPValue1   = '1.2.3.4';
+my $IPValue2   = '5.6.7.8';
+my $IPValue3   = '1.2.3.41';            # contains value of $IPValue1
 
 #####################
 # create config items
 # item for value from body - should be found
-my $ConfigItemAID = $ConfigItemObject->ConfigItemAdd(
+my $ConfigItemAID = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemAdd(
     Number  => $Helper->GetRandomNumber(),
     ClassID => $ClassAID,
     UserID  => 1,
 );
-
 $Self->True(
     $ConfigItemAID,
     'Create config item A',
 );
-
-if ($ConfigItemAID) {
-    my $ConfigItemAVersionID = $ConfigItemObject->VersionAdd(
+if ( $ConfigItemAID ) {
+    my $ConfigItemAVersionID = $Kernel::OM->Get('ITSMConfigItem')->VersionAdd(
         ConfigItemID => $ConfigItemAID,
         Name         => 'ConfigItem A - 1st version',
         DefinitionID => $ClassADefID,
@@ -186,7 +175,7 @@ if ($ConfigItemAID) {
                                         Content => 'some.otherfqdn.com',
                                     },
                                     {
-                                        Content => $FQDNValue,   # relevant value as second value
+                                        Content => $FQDNValue1,   # relevant value as second value
                                     }
                                 ]
                             }
@@ -201,7 +190,6 @@ if ($ConfigItemAID) {
         'Create version A',
     );
 }
-
 $Kernel::OM->ObjectsDiscard(
     Objects => [
         'ITSMConfigItem'
@@ -209,7 +197,7 @@ $Kernel::OM->ObjectsDiscard(
 );
 
 # item for value from DF - should be found
-my $ConfigItemBID = $ConfigItemObject->ConfigItemAdd(
+my $ConfigItemBID = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemAdd(
     Number  => $Helper->GetRandomNumber(),
     ClassID => $ClassAID,
     UserID  => 1,
@@ -218,8 +206,8 @@ $Self->True(
     $ConfigItemBID,
     'Create config item B',
 );
-if ($ConfigItemBID) {
-    my $ConfigItemBVersionID = $ConfigItemObject->VersionAdd(
+if ( $ConfigItemBID ) {
+    my $ConfigItemBVersionID = $Kernel::OM->Get('ITSMConfigItem')->VersionAdd(
         ConfigItemID => $ConfigItemBID,
         Name         => 'ConfigItem B - 1st version',
         DefinitionID => $ClassADefID,
@@ -238,7 +226,7 @@ if ($ConfigItemBID) {
                                 IP => [
                                     undef,
                                     {
-                                        Content => $IPValue,
+                                        Content => $IPValue1,
                                     }
                                 ]
                             }
@@ -253,7 +241,6 @@ if ($ConfigItemBID) {
         'Create version B',
     );
 }
-
 $Kernel::OM->ObjectsDiscard(
     Objects => [
         'ITSMConfigItem'
@@ -261,7 +248,7 @@ $Kernel::OM->ObjectsDiscard(
 );
 
 # item for value from DF but not matching value - should NOT be found
-my $ConfigItemCID = $ConfigItemObject->ConfigItemAdd(
+my $ConfigItemCID = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemAdd(
     Number  => $Helper->GetRandomNumber(),
     ClassID => $ClassAID,
     UserID  => 1,
@@ -270,8 +257,8 @@ $Self->True(
     $ConfigItemCID,
     'Create config item C',
 );
-if ($ConfigItemCID) {
-    my $ConfigItemCVersionID = $ConfigItemObject->VersionAdd(
+if ( $ConfigItemCID ) {
+    my $ConfigItemCVersionID = $Kernel::OM->Get('ITSMConfigItem')->VersionAdd(
         ConfigItemID => $ConfigItemCID,
         Name         => 'ConfigItem C - 1st version',
         DefinitionID => $ClassADefID,
@@ -305,7 +292,6 @@ if ($ConfigItemCID) {
         'Create version C',
     );
 }
-
 $Kernel::OM->ObjectsDiscard(
     Objects => [
         'ITSMConfigItem'
@@ -313,7 +299,7 @@ $Kernel::OM->ObjectsDiscard(
 );
 
 # item for value from DF with matching value but not used class - should NOT be found
-my $ConfigItemDID = $ConfigItemObject->ConfigItemAdd(
+my $ConfigItemDID = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemAdd(
     Number  => $Helper->GetRandomNumber(),
     ClassID => $ClassBID,
     UserID  => 1,
@@ -322,8 +308,8 @@ $Self->True(
     $ConfigItemDID,
     'Create config item D',
 );
-if ($ConfigItemDID) {
-    my $ConfigItemDVersionID = $ConfigItemObject->VersionAdd(
+if ( $ConfigItemDID ) {
+    my $ConfigItemDVersionID = $Kernel::OM->Get('ITSMConfigItem')->VersionAdd(
         ConfigItemID => $ConfigItemDID,
         Name         => 'ConfigItem D - 1st version',
         DefinitionID => $ClassBDefID,
@@ -342,7 +328,7 @@ if ($ConfigItemDID) {
                                 IP => [
                                     undef,
                                     {
-                                        Content => $IPValue,
+                                        Content => $IPValue1,
                                     }
                                 ]
                             }
@@ -357,7 +343,179 @@ if ($ConfigItemDID) {
         'Create version D',
     );
 }
+$Kernel::OM->ObjectsDiscard(
+    Objects => [
+        'ITSMConfigItem'
+    ]
+);
 
+# item for value not matching value but containing the matching value - should NOT be found
+my $ConfigItemEID = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemAdd(
+    Number  => $Helper->GetRandomNumber(),
+    ClassID => $ClassAID,
+    UserID  => 1,
+);
+$Self->True(
+    $ConfigItemEID,
+    'Create config item E',
+);
+if ( $ConfigItemEID ) {
+    my $ConfigItemEVersionID = $Kernel::OM->Get('ITSMConfigItem')->VersionAdd(
+        ConfigItemID => $ConfigItemEID,
+        Name         => 'ConfigItem E - 1st version',
+        DefinitionID => $ClassADefID,
+        DeplStateID  => $DeplStateListReverse{Production},
+        InciStateID  => $InciStateListReverse{Operational},
+        UserID       => 1,
+        XMLData      => [
+            undef,
+            {
+                Version => [
+                    undef,
+                    {
+                        SectionHost => [
+                            undef,
+                            {
+                                FQDN => [
+                                    undef,
+                                    {
+                                        Content => $FQDNValue2,
+                                    }
+                                ]
+                            },
+                            {
+                                IP => [
+                                    undef,
+                                    {
+                                        Content => $IPValue3,
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    );
+    $Self->True(
+        $ConfigItemEVersionID,
+        'Create version E',
+    );
+}
+$Kernel::OM->ObjectsDiscard(
+    Objects => [
+        'ITSMConfigItem'
+    ]
+);
+
+# item for matching number - should be found
+my $ConfigItemFID = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemAdd(
+    Number  => $CINumber1,
+    ClassID => $ClassAID,
+    UserID  => 1,
+);
+$Self->True(
+    $ConfigItemFID,
+    'Create config item F',
+);
+if ( $ConfigItemFID ) {
+    my $ConfigItemFVersionID = $Kernel::OM->Get('ITSMConfigItem')->VersionAdd(
+        ConfigItemID => $ConfigItemFID,
+        Name         => 'ConfigItem E - 1st version',
+        DefinitionID => $ClassADefID,
+        DeplStateID  => $DeplStateListReverse{Production},
+        InciStateID  => $InciStateListReverse{Operational},
+        UserID       => 1,
+        XMLData      => [
+            undef,
+            {
+                Version => [
+                    undef
+                ]
+            }
+        ]
+    );
+    $Self->True(
+        $ConfigItemFVersionID,
+        'Create version F',
+    );
+}
+$Kernel::OM->ObjectsDiscard(
+    Objects => [
+        'ITSMConfigItem'
+    ]
+);
+
+# item for matching name - should be found
+my $ConfigItemGID = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemAdd(
+    Number  => $Helper->GetRandomNumber(),
+    ClassID => $ClassAID,
+    UserID  => 1,
+);
+$Self->True(
+    $ConfigItemGID,
+    'Create config item G',
+);
+if ( $ConfigItemGID ) {
+    my $ConfigItemGVersionID = $Kernel::OM->Get('ITSMConfigItem')->VersionAdd(
+        ConfigItemID => $ConfigItemGID,
+        Name         => $CIName1,
+        DefinitionID => $ClassADefID,
+        DeplStateID  => $DeplStateListReverse{Production},
+        InciStateID  => $InciStateListReverse{Operational},
+        UserID       => 1,
+        XMLData      => [
+            undef,
+            {
+                Version => [
+                    undef
+                ]
+            }
+        ]
+    );
+    $Self->True(
+        $ConfigItemGVersionID,
+        'Create version G',
+    );
+}
+$Kernel::OM->ObjectsDiscard(
+    Objects => [
+        'ITSMConfigItem'
+    ]
+);
+
+# item for not matching name and number but containing values of F (number) and G (name) - should be found
+my $ConfigItemHID = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemAdd(
+    Number  => $CINumber2,
+    ClassID => $ClassAID,
+    UserID  => 1,
+);
+$Self->True(
+    $ConfigItemHID,
+    'Create config item H',
+);
+if ( $ConfigItemHID ) {
+    my $ConfigItemHVersionID = $Kernel::OM->Get('ITSMConfigItem')->VersionAdd(
+        ConfigItemID => $ConfigItemHID,
+        Name         => $CIName2,
+        DefinitionID => $ClassADefID,
+        DeplStateID  => $DeplStateListReverse{Production},
+        InciStateID  => $InciStateListReverse{Operational},
+        UserID       => 1,
+        XMLData      => [
+            undef,
+            {
+                Version => [
+                    undef
+                ]
+            }
+        ]
+    );
+    $Self->True(
+        $ConfigItemHVersionID,
+        'Create version H',
+    );
+}
 $Kernel::OM->ObjectsDiscard(
     Objects => [
         'ITSMConfigItem'
@@ -366,43 +524,43 @@ $Kernel::OM->ObjectsDiscard(
 
 #####################
 # set relevant configs
-$ConfigObject->Set(
+$Kernel::OM->Get('Config')->Set(
     Key   => 'TicketAutoLinkConfigItem::CISearchInClasses',
     Value => {
-        $ClassAName => 'SectionHost::FQDN,SectionHost::IP',
-        $ClassBName => 'SectionHost::FQDN,SectionHost::IP'
+        $ClassAName => 'Name,Number,SectionHost::FQDN,SectionHost::IP',
+        $ClassBName => 'Name,Number,SectionHost::FQDN,SectionHost::IP'
     }
 );
-my $SearchClasses = $ConfigObject->Get('TicketAutoLinkConfigItem::CISearchInClasses');
+my $SearchClasses = $Kernel::OM->Get('Config')->Get('TicketAutoLinkConfigItem::CISearchInClasses');
 $Self->True(
-    IsHashRefWithData($SearchClasses) || 0,
+    IsHashRefWithData( $SearchClasses ) || 0,
     "Config CISearchInClasses is a hash ref",
 );
-if (IsHashRefWithData($SearchClasses)) {
+if ( IsHashRefWithData( $SearchClasses ) ) {
     $Self->Is(
-        $SearchClasses->{$ClassAName},
-        'SectionHost::FQDN,SectionHost::IP',
+        $SearchClasses->{ $ClassAName },
+        'Name,Number,SectionHost::FQDN,SectionHost::IP',
         "Config CISearchInClasses has new value (A)",
     );
     $Self->Is(
-        $SearchClasses->{$ClassBName},
-        'SectionHost::FQDN,SectionHost::IP',
+        $SearchClasses->{ $ClassBName },
+        'Name,Number,SectionHost::FQDN,SectionHost::IP',
         "Config CISearchInClasses has new value (B)",
     );
 }
 # only accept class A
-$ConfigObject->Set(
+$Kernel::OM->Get('Config')->Set(
     Key   => 'TicketAutoLinkConfigItem::CISearchInClassesPerRecipient',
     Value => {
         'sysmon-' . $ClassAName . '-mailbox@example.com' => $ClassAName
     }
 );
-my $ClassesPerRecipient = $ConfigObject->Get('TicketAutoLinkConfigItem::CISearchInClassesPerRecipient');
+my $ClassesPerRecipient = $Kernel::OM->Get('Config')->Get('TicketAutoLinkConfigItem::CISearchInClassesPerRecipient');
 $Self->True(
-    IsHashRefWithData($ClassesPerRecipient) || 0,
+    IsHashRefWithData( $ClassesPerRecipient ) || 0,
     "Config CISearchInClassesPerRecipient is a hash ref",
 );
-if (IsHashRefWithData($ClassesPerRecipient)) {
+if ( IsHashRefWithData( $ClassesPerRecipient ) ) {
     $Self->Is(
         $ClassesPerRecipient->{'sysmon-' . $ClassAName . '-mailbox@example.com'},
         $ClassAName,
@@ -423,13 +581,13 @@ my @NewTicketMail = (
     "\n",
     'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.' . "\n",
     "\n",
-    'Host: ' . $FQDNValue . "\n",
+    'Host: ' . $FQDNValue1 . "\n",
     'Address: 192.168.10.9' . "\n",
     "\n",
     'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.' . "\n",
     "\n",
 );
-$ConfigObject->Set(
+$Kernel::OM->Get('Config')->Set(
     Key   => 'PostmasterDefaultState',
     Value => 'new'
 );
@@ -443,94 +601,66 @@ $Self->Is(
     1,
     'New ticket created',
 );
+$Kernel::OM->ObjectsDiscard(
+    Objects => [
+        'Ticket'
+    ]
+);
 if ($Return[0] == 1) {
-
-    my %Ticket = $TicketObject->TicketGet(
+    # check if asset A is set by body text ("Host:")
+    my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
         TicketID      => $Return[1],
         DynamicFields => 1,
     );
-
-    # check if asset A is set by body text ("Host:")
-    $Self->True(
-        IsArrayRefWithData($Ticket{DynamicField_AffectedAsset}) || 0,
-        "Ticket has affected assets",
+    $Self->IsDeeply(
+        $Ticket{DynamicField_AffectedAsset},
+        [ $ConfigItemAID ],
+        'Ticket has config item A in DF AffectedAsset',
+        1
     );
-    if ( IsArrayRefWithData($Ticket{DynamicField_AffectedAsset}) ) {
-        $Self->ContainedIn(
-            $ConfigItemAID,
-            $Ticket{DynamicField_AffectedAsset},
-            'Ticket has config item A',
-        );
-    }
 
     #####################
     # dynamic field test (use IPValue for SySMonXAddress)
-    my $AddressDynamicField = $DynamicFieldObject->DynamicFieldGet(
+    my $AddressDynamicField = $Kernel::OM->Get('DynamicField')->DynamicFieldGet(
         Name => 'SysMonXAddress',
     );
-
     $Self->True(
-        IsHashRefWithData($AddressDynamicField) || 0,
+        IsHashRefWithData( $AddressDynamicField ) || 0,
         'Get DF "SysMonXAddress"',
     );
-
-    if (IsHashRefWithData($AddressDynamicField)) {
-        my $Success = $DFBackendObject->ValueSet(
+    if ( IsHashRefWithData( $AddressDynamicField ) ) {
+        my $Success = $Kernel::OM->Get('DynamicField::Backend')->ValueSet(
             DynamicFieldConfig => $AddressDynamicField,
             ObjectID           => $Return[1],
-            Value              => [$IPValue],
+            Value              => [ $IPValue1 ],
             UserID             => 1,
         );
-
         $Self->True(
             $Success || 0,
             'Set DF "SysMonXAddress" value',
         );
-
-        if ($Success) {
-            %Ticket = $TicketObject->TicketGet(
+        $Kernel::OM->ObjectsDiscard(
+            Objects => [
+                'Ticket'
+            ]
+        );
+        if ( $Success ) {
+            # check if assets (A and B) are set
+            %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
                 TicketID      => $Return[1],
                 DynamicFields => 1,
             );
-
-            # check if assets (A and B) are set
-            $Self->True(
-                IsArrayRefWithData($Ticket{DynamicField_AffectedAsset}) || 0,
-                "Ticket has affected assets (2nd check)",
+            $Self->IsDeeply(
+                $Ticket{DynamicField_AffectedAsset},
+                [ $ConfigItemAID, $ConfigItemBID ],
+                'Ticket has config item A and B in DF AffectedAsset',
+                1
             );
-
-            if ( IsArrayRefWithData($Ticket{DynamicField_AffectedAsset}) ) {
-                $Self->Is(
-                    scalar @{ $Ticket{DynamicField_AffectedAsset} },
-                    2,
-                    'Ticket has 2 config items in "AffectedAsset"',
-                );
-                $Self->ContainedIn(
-                    $ConfigItemAID,
-                    $Ticket{DynamicField_AffectedAsset},
-                    'Ticket has config item A (2nd check)',
-                );
-                $Self->ContainedIn(
-                    $ConfigItemBID,
-                    $Ticket{DynamicField_AffectedAsset},
-                    'Ticket has config item B',
-                );
-                $Self->NotContainedIn(
-                    $ConfigItemCID,
-                    $Ticket{DynamicField_AffectedAsset},
-                    'Ticket has NOT config item C',
-                );
-                $Self->NotContainedIn(
-                    $ConfigItemDID,
-                    $Ticket{DynamicField_AffectedAsset},
-                    'Ticket has NOT config item D',
-                );
-            }
         }
     }
 
     # further article tests
-    my $ArticleID = $TicketObject->ArticleCreate(
+    my $ArticleID = $Kernel::OM->Get('Ticket')->ArticleCreate(
         TicketID         => $Return[1],
         Channel          => 'note',
         SenderType       => 'agent',
@@ -542,59 +672,46 @@ if ($Return[0] == 1) {
         HistoryComment   => 'Some comment!',
         UserID           => 1,
     );
-
-    %Ticket = $TicketObject->TicketGet(
-        TicketID      => $Return[1],
-        DynamicFields => 1,
-    );
-
-    # check if asset C is NOT set by body text ("Address:" - FirstArticleOnly is active)
     $Self->True(
-        IsArrayRefWithData($Ticket{DynamicField_AffectedAsset}) || 0,
-        "Ticket has affected assets (3rd check)",
+        $ArticleID,
+        'Article created with IPValue2',
     );
-
-    if ( IsArrayRefWithData($Ticket{DynamicField_AffectedAsset}) ) {
-        $Self->Is(
-            scalar @{ $Ticket{DynamicField_AffectedAsset} },
-            2,
-            'Ticket has 2 config items in "AffectedAsset"',
+    $Kernel::OM->ObjectsDiscard(
+        Objects => [
+            'Ticket'
+        ]
+    );
+    if ( $ArticleID ) {
+        # check if assets (A and B) are set
+        %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
+            TicketID      => $Return[1],
+            DynamicFields => 1,
         );
-        $Self->ContainedIn(
-            $ConfigItemAID,
+        $Self->IsDeeply(
             $Ticket{DynamicField_AffectedAsset},
-            'Ticket has config item A (3rd check)',
-        );
-        $Self->ContainedIn(
-            $ConfigItemBID,
-            $Ticket{DynamicField_AffectedAsset},
-            'Ticket has config item B (2nd check)',
-        );
-        $Self->NotContainedIn(
-            $ConfigItemCID,
-            $Ticket{DynamicField_AffectedAsset},
-            'Ticket has NOT config item C',
+            [ $ConfigItemAID, $ConfigItemBID ],
+            'Ticket has config item A and B in DF AffectedAsset',
+            1
         );
     }
 
     # repeat but with inactive FirstArticleOnly
-
-    my $EventConfig = $ConfigObject->Get('Ticket::EventModulePost')->{'500-TicketAutoLinkConfigItem'};
+    my $EventConfig = $Kernel::OM->Get('Config')->Get('Ticket::EventModulePost')->{'500-TicketAutoLinkConfigItem'};
     $Self->True(
-        IsHashRefWithData($EventConfig) || 0,
+        IsHashRefWithData( $EventConfig ) || 0,
         "Event-Config 500-TicketAutoLinkConfigItem is a hash ref",
     );
 
-    if ( IsHashRefWithData($EventConfig) ) {
-        $ConfigObject->Set(
+    if ( IsHashRefWithData( $EventConfig ) ) {
+        $Kernel::OM->Get('Config')->Set(
             Key   => 'Ticket::EventModulePost###500-TicketAutoLinkConfigItem',
             Value => {
-                %{$EventConfig},
+                %{ $EventConfig },
                 FirstArticleOnly => 0
             }
         );
 
-        $EventConfig = $ConfigObject->Get('Ticket::EventModulePost')->{'500-TicketAutoLinkConfigItem'};
+        $EventConfig = $Kernel::OM->Get('Config')->Get('Ticket::EventModulePost')->{'500-TicketAutoLinkConfigItem'};
         $Self->True(
             IsHashRefWithData($EventConfig) || 0,
             "Event-Config 500-TicketAutoLinkConfigItem is a hash ref (2nd)",
@@ -608,7 +725,7 @@ if ($Return[0] == 1) {
             );
         }
 
-        $ArticleID = $TicketObject->ArticleCreate(
+        $ArticleID = $Kernel::OM->Get('Ticket')->ArticleCreate(
             TicketID         => $Return[1],
             Channel          => 'note',
             SenderType       => 'agent',
@@ -620,38 +737,93 @@ if ($Return[0] == 1) {
             HistoryComment   => 'Some comment!',
             UserID           => 1,
         );
-
-        %Ticket = $TicketObject->TicketGet(
-            TicketID      => $Return[1],
-            DynamicFields => 1,
-        );
-
-        # check if asset C is NOT set by body text ("Address:" - FirstArticleOnly is active)
         $Self->True(
-            IsArrayRefWithData($Ticket{DynamicField_AffectedAsset}) || 0,
-            "Ticket has affected assets (4th check)",
+            $ArticleID,
+            'Article created with IPValue2',
         );
+        $Kernel::OM->ObjectsDiscard(
+            Objects => [
+                'Ticket'
+            ]
+        );
+        if ( $ArticleID ) {
+            %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
+                TicketID      => $Return[1],
+                DynamicFields => 1,
+            );
+            $Self->IsDeeply(
+                $Ticket{DynamicField_AffectedAsset},
+                [ $ConfigItemAID, $ConfigItemBID, $ConfigItemCID ],
+                'Ticket has config item A, B and C in DF AffectedAsset',
+                1
+            );
+        }
 
-        if ( IsArrayRefWithData($Ticket{DynamicField_AffectedAsset}) ) {
-            $Self->Is(
-                scalar @{ $Ticket{DynamicField_AffectedAsset} },
-                3,
-                'Ticket has 3 config items in "AffectedAsset"',
+        $ArticleID = $Kernel::OM->Get('Ticket')->ArticleCreate(
+            TicketID         => $Return[1],
+            Channel          => 'note',
+            SenderType       => 'agent',
+            Subject          => 'third article',
+            Body             => "Lorem ipsum dolor sit amet\nHost: $CINumber1\nLorem ipsum dolor sit amet",
+            Charset          => 'utf-8',
+            MimeType         => 'text/plain',
+            HistoryType      => 'AddNote',
+            HistoryComment   => 'Some comment!',
+            UserID           => 1,
+        );
+        $Self->True(
+            $ArticleID,
+            'Article created with CINumber1',
+        );
+        $Kernel::OM->ObjectsDiscard(
+            Objects => [
+                'Ticket'
+            ]
+        );
+        if ( $ArticleID ) {
+            %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
+                TicketID      => $Return[1],
+                DynamicFields => 1,
             );
-            $Self->ContainedIn(
-                $ConfigItemAID,
+            $Self->IsDeeply(
                 $Ticket{DynamicField_AffectedAsset},
-                'Ticket has config item A (4th check)',
+                [ $ConfigItemAID, $ConfigItemBID, $ConfigItemCID, $ConfigItemFID ],
+                'Ticket has config item A, B, C and F in DF AffectedAsset',
+                1
             );
-            $Self->ContainedIn(
-                $ConfigItemBID,
-                $Ticket{DynamicField_AffectedAsset},
-                'Ticket has config item B (3rd check)',
+        }
+
+        $ArticleID = $Kernel::OM->Get('Ticket')->ArticleCreate(
+            TicketID         => $Return[1],
+            Channel          => 'note',
+            SenderType       => 'agent',
+            Subject          => 'third article',
+            Body             => "Lorem ipsum dolor sit amet\nHost: $CIName1\nLorem ipsum dolor sit amet",
+            Charset          => 'utf-8',
+            MimeType         => 'text/plain',
+            HistoryType      => 'AddNote',
+            HistoryComment   => 'Some comment!',
+            UserID           => 1,
+        );
+        $Self->True(
+            $ArticleID,
+            'Article created with CIName1',
+        );
+        $Kernel::OM->ObjectsDiscard(
+            Objects => [
+                'Ticket'
+            ]
+        );
+        if ( $ArticleID ) {
+            %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
+                TicketID      => $Return[1],
+                DynamicFields => 1,
             );
-            $Self->ContainedIn(
-                $ConfigItemCID,
+            $Self->IsDeeply(
                 $Ticket{DynamicField_AffectedAsset},
-                'Ticket has config item C now',
+                [ $ConfigItemAID, $ConfigItemBID, $ConfigItemCID, $ConfigItemFID , $ConfigItemGID ],
+                'Ticket has config item A, B, C, F and G in DF AffectedAsset',
+                1
             );
         }
     }

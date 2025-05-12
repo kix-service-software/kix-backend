@@ -11,14 +11,14 @@ Feature: GET request to the /reporting/reportdefinitions resource
     Then the reportdefinitions output is "<Name>"
     
      Examples:
-       | Name                                            |
-       | Duration in State and Team                      |
-       | Number of open tickets by priority              |
-       | Number of open tickets by state                 |
-       | Number of open tickets by statetype            |
-       | Number of open tickets by team                 |
-       | Number of open tickets in teams by priority     |
-       | Number of tickets closed within the last 7 days                  |
+       | Name                                             |
+       | Duration in State and Team                       |
+       | Number of open tickets by priority               |
+       | Number of open tickets by state                  |
+       | Number of open tickets by statetype              |
+       | Number of open tickets by team                   |
+       | Number of open tickets in teams by priority      |
+       | Number of tickets closed within the last 7 days  |
        | Number of tickets created within the last 7 days |
        | Tickets Closed In Date Range                     |
        | Tickets Created In Date Range                    |

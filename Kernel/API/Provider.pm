@@ -210,7 +210,6 @@ sub Run {
     }
 
     # check authorization if needed
-    my $Authorization;
     my $AuthorizationResult = $Self->CheckAuthorization();
 
     if (
@@ -223,7 +222,7 @@ sub Run {
         );
     }
     else {
-        $Authorization = $AuthorizationResult->{Data}->{Authorization};
+        $Self->{Authorization} = $AuthorizationResult->{Data}->{Authorization};
     }
 
     # check if we have to respond to an OPTIONS request instead of executing the operation
@@ -257,7 +256,7 @@ sub Run {
                 RequestMethod           => $Method,
                 CurrentRoute            => $ProcessedRequest->{Route},
                 RequestURI              => $ProcessedRequest->{RequestURI},
-                Authorization           => $Authorization,
+                Authorization           => $Self->{Authorization},
             );
 
             # if operation init failed, bail out
@@ -338,7 +337,7 @@ sub Run {
     #
     # store user authorization info in object manager for usage in kernel packages
     #
-    $Kernel::OM->{Authorization} = $Authorization;
+    $Kernel::OM->{Authorization} = $Self->{Authorization};
 
     #
     # Execute actual operation.
@@ -366,7 +365,7 @@ sub Run {
         RequestMethod                => $ProcessedRequest->{RequestMethod},
         CurrentRoute                 => $ProcessedRequest->{Route},
         RequestURI                   => $ProcessedRequest->{RequestURI},
-        Authorization                => $Authorization,
+        Authorization                => $Self->{Authorization},
     );
 
     # if operation init failed, bail out

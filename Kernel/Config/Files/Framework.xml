@@ -9096,6 +9096,19 @@ Notes:
             "TicketID": "ObjectID"
         }
     },
+    "Article": {
+        "Operation": "V1::Ticket::ArticleGet",
+        "Parameters": {
+            "TicketID": {
+                "Object": "Ticket",
+                "Method": "ArticleGetTicketID",
+                "Parameters": {
+                    "ArticleID": "ObjectID"
+                }
+            },
+            "ArticleID": "ObjectID"
+        }
+    },
     "Contact": {
         "Operation": "V1::Contact::ContactGet",
         "Parameters": {
