@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
-"POT-Creation-Date: 2025-4-9 12:29+0000\n"
+"POT-Creation-Date: 2025-5-12 06:38+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -4388,6 +4388,10 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Executes follow-up checks on attachment contents for mails that don't have a ticket number in the subject."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid "Executes follow-up checks on attachment filenames for mails that don't have a ticket number in the subject."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
