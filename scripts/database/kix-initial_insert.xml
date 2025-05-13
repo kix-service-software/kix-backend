@@ -5391,7 +5391,7 @@ DefaultValue:
     <Insert Table="report_definition">
         <Data Key="id" Type="AutoIncrement">9</Data>
         <Data Key="name" Type="Quote" Translatable="1">Duration in State and Team</Data>
-        <Data Key="is_periodic">1</Data>
+        <Data Key="is_periodic">0</Data>
         <Data Key="max_reports">1</Data>
         <Data Key="comments" Type="Quote" Translatable="1">Lists of tickets with their durations in specified states and teams.</Data>
         <Data Key="datasource" Type="Quote">GenericSQL</Data>
