@@ -38,8 +38,6 @@ sub Describe {
         ],
         Depends => {
             'general_catalog_id' => 'general_catalog',
-            'created_by'         => 'users',
-            'changed_by'         => 'users',
         }
     }
 }
