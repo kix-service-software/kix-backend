@@ -492,8 +492,12 @@ returns 1 if data matches criteria or undef otherwise
 sub IsBase64 {
     my $TestData = $_[0];
 
+    return if !defined $TestData;
+
+    $TestData =~ s/[\n\r]+//g;
+
     return if $TestData !~ /^[A-Za-z0-9+\/=]+$/;
-    
+
     return if length($TestData) % 4 != 0;
 
     return 1;
