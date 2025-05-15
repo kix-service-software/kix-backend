@@ -223,7 +223,10 @@ sub SetResult {
 
     $Self->{MacroVariables}->{$VariableName} = $Param{Value};
 
-    if ( $Self->{Debug} ) {
+    if (
+        $Self->{Debug}
+        && !$Param{NoLog}
+    ) {
         $Kernel::OM->Get('Automation')->LogDebug(
             Referrer => $Self,
             Message  => 'Set macro variable "' . $VariableName . '": ' . $Kernel::OM->Get('Main')->Dump( $Param{Value} ),
