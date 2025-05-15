@@ -808,6 +808,19 @@ sub MacroActionExecute {
             );
         }
 
+        if ( IsHashRefWithData( $Definition{Results} ) ) {
+            # reset result variables
+            RESULT:
+            for my $Result ( values( %{ $Definition{Results} } ) ) {
+                $BackendObject->SetResult(
+                    Name   => $Result->{Name},
+                    Value  => undef,
+                    UserID => $Param{UserID},
+                    NoLog  => 1
+                );
+            }
+        }
+
         if ( $BackendObject->{Debug} ) {
             $Kernel::OM->Get('Automation')->LogDebug(
                 Referrer => $Self,
