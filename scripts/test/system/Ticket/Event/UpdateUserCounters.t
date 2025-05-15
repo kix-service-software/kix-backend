@@ -615,8 +615,8 @@ my @Tests = (
                 WatchedAndUnseen => 1,
             },
             $UserID2 => {
-                Owned => 3,
-                OwnedAndUnseen => 2,
+                Owned => 1,
+                OwnedAndUnseen => undef,
                 OwnedAndLocked => 1,
                 OwnedAndLockedAndUnseen => undef,
                 Watched => 1,
