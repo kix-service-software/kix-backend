@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -1158,6 +1158,13 @@ sub _ImportPO {
         # the pattern is empty, go to the next one
         next if !$MsgId;
 
+        # set semaphore
+        $Kernel::OM->Get('Cache')->SetSemaphore(
+            ID      => "Translation::Pattern::$MsgId",
+            Value   => $$,
+            Timeout => 100
+        );
+
         my $PatternID = $Self->PatternExistsCheck(
             Value => $MsgId,
         );
@@ -1168,6 +1175,13 @@ sub _ImportPO {
                 Value  => $MsgId,
                 UserID => $Param{UserID},
             );
+
+            # clear semaphore
+            $Kernel::OM->Get('Cache')->ClearSemaphore(
+                ID    => "Translation::Pattern::$MsgId",
+                Value => $$,
+            );
+
             if ( !$PatternID ) {
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
@@ -1175,6 +1189,13 @@ sub _ImportPO {
                 );
                 next;
             }
+        }
+        else {
+            # clear semaphore
+            $Kernel::OM->Get('Cache')->ClearSemaphore(
+                ID    => "Translation::Pattern::$MsgId",
+                Value => $$,
+            );
         }
 
         # we don't have a translation for this language so go to the next pattern
