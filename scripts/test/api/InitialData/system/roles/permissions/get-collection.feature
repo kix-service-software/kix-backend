@@ -313,7 +313,7 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
   Scenario: get the list of existing permissions of Report User
     When I query the collection of permissions with roleid 14
     Then the response code is 200
-    And the response contains 18 items of type "Permission"
+    And the response contains 19 items of type "Permission"
     And the response contains the following items of type Permission
       | Target                                                         | Value | TypeID |
       | /reporting                                                     | 3     | 1      |
@@ -329,6 +329,7 @@ Feature: GET request to the /system/roles/:RoleID/permissions resource
       | /reporting/reportdefinitions/6                                 | 2     | 1      |
       | /reporting/reportdefinitions/7                                 | 2     | 1      |
       | /reporting/reportdefinitions/8                                 | 2     | 1      |
+      | /reporting/reportdefinitions/9                                 | 2     | 1      |
       | /reporting/reports                                             | 3     | 1      |
       | /reporting/reports{}                                           | 0     | 2      |
       | /reporting/reports/*{Report.DefinitionID GT 0}                 | 0     | 2      |
