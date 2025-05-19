@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -106,7 +106,7 @@ sub Run {
             SuppressPermissionErrors => 1,
             Data      => {
                 MacroID       => $Param{Data}->{MacroID},
-                MacroActionID => join(',', sort keys %MacroActionList),
+                MacroActionID => join( q{,}, sort { $a <=> $b }keys %MacroActionList),
             }
         );
         if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -67,7 +67,7 @@ sub Run {
             OperationType            => 'V1::Automation::JobGet',
             SuppressPermissionErrors => 1,
             Data      => {
-                JobID => join(',', sort keys %JobList),
+                JobID => join( q{,}, sort { $a <=> $b } keys %JobList),
             }
         );
         if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {
