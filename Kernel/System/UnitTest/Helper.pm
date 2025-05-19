@@ -502,7 +502,9 @@ sub Rollback {
     # reset lwp useragent overwirte
     $Self->HTTPRequestOverwriteUnset();
 
-    $Kernel::OM->Get('Cache')->CleanUp();
+    $Kernel::OM->Get('Cache')->CleanUp(
+        KeepTypes => []
+    );
 
     if ( $Self->{SysConfigChanged} ) {
         $Kernel::OM->Get('SysConfig')->CleanUp();

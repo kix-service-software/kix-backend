@@ -658,6 +658,57 @@ sub MacroActionListDelete {
     return 1;
 }
 
+
+=item MacroActionDefinitionGet()
+
+get the definition of a macro action
+
+    my $Definition = $AutomationObject->MacroActionDefinitionGet(
+        MacroType       => 'Ticket',
+        MacroActionType => 'Calculation'
+    );
+
+=cut
+
+sub MacroActionDefinitionGet {
+    my ( $Self, %Param ) = @_;
+
+    for my $Needed (
+        qw(
+            MacroType MacroActionType
+        )
+    ) {
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!",
+                Silent   => $Param{Silent}
+            );
+            return;
+        }
+    }
+
+    # load type backend module
+    my $BackendObject = $Self->_LoadMacroActionTypeBackend(
+        MacroType => $Param{MacroType},
+        Name      => $Param{MacroActionType},
+    );
+    return if !$BackendObject;
+
+    # get macro action defintion
+    my %Definition = $BackendObject->DefinitionGet();
+    if ( !%Definition ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "No Definition (MacroType: $Param{MacroType} and MacroActionType $Param{MacroActionType}) found!",
+            Silent   => $Param{Silent}
+        );
+        return;
+    }
+
+    return \%Definition;
+}
+
 =item MacroActionExecute()
 
 executes a macro action
@@ -1186,7 +1237,7 @@ sub _ReplaceValuePlaceholder {
         my $JSONData = $Kernel::OM->Get('JSON')->Decode(
             Data => $Param{Value},
         );
-        
+
         if ( IsArrayRef( $JSONData ) ) {
             $JSONData = $Self->_ReplacePlaceholderArrayRef(
                 %Param,
