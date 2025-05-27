@@ -654,7 +654,7 @@ the result looks like
 sub PermissionList {
     my ( $Self, %Param ) = @_;
 
-    my @RoleIDs = $Param{RoleIDs} ? $Param{RoleIDs} : $Param{RoleID} ? ( $Param{RoleID} ) : ();
+    my @RoleIDs = $Param{RoleIDs} ? @{ $Param{RoleIDs} } : $Param{RoleID} ? ( $Param{RoleID} ) : ();
 
     # create cache key
     my $CacheKey = 'PermissionList::' . join(',', @RoleIDs) . '::' . join(',', @{$Param{Types}||[]}) . '::' . ($Param{Target}||'') . '::' . ($Param{UsageContext}||'');
