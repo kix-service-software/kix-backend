@@ -14,7 +14,6 @@ use warnings;
 our $ObjectManagerDisabled = 1;
 
 use Kernel::System::VariableCheck qw(:all);
-use MIME::Base64;
 
 sub Convert {
     my ($Self, %Param) = @_;
@@ -237,7 +236,7 @@ sub Convert {
     }
 
     return (
-        Content     => MIME::Base64::encode_base64($Output),
+        Content     => $Output,
         ContentType => $ContentType,
         Filename    => $Filename . $FileExtension,
         FilesizeRaw => $FilesizeRaw,
