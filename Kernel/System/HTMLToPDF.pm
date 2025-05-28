@@ -16,6 +16,7 @@ use vars qw(@ISA);
 use Kernel::System::HTMLToPDF::Convert;
 use Kernel::System::HTMLToPDF::Render;
 use IO::Compress::Zip qw(:all);
+use MIME::Base64;
 
 our @ObjectDependencies = (
     "Config",
@@ -155,14 +156,28 @@ sub Print {
             UserID               => $Param{UserID},
         );
 
-        return %File if ( !$Compress );
+        # error messages are set in the Convert
+        return if !%File;
 
         push ( @Files, \%File );
     }
 
-    return $Self->_Compress(
-        Files => \@Files
-    );
+    my %File;
+    if ( $Compress ) {
+       
+        %File = $Self->_Compress(
+            Files => \@Files
+        );
+        # error messages are set in the _Compress
+        return if !%File;
+
+    } else {
+        %File = %{$Files[0]};
+    }
+
+    $File{Content} = MIME::Base64::encode_base64($File{Content});
+
+    return %File;
 }
 
 sub PossibleExpandsGet {
