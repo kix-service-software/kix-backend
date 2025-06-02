@@ -1630,6 +1630,7 @@
                 <Item Key="Unsubscribe" Translatable="1">Removed subscription for user "%s".</Item>
                 <Item Key="ArticleDelete" Translatable="1">Article ID %s - %s deleted.</Item>
                 <Item Key="ArticleDynamicFieldUpdate" Translatable="1">Updated: %s=%s;%s=%s;%s=%s;</Item>
+                <Item Key="ArticleSend" Translatable="1">Article send. To: %s / Cc: %s / Bcc: %s</Item>
             </Hash>
         </Setting>
     </ConfigItem>
