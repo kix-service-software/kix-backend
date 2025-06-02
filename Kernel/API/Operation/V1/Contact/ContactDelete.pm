@@ -110,6 +110,30 @@ sub Run {
             );
         }
 
+        my $ResultTicketSearch = $Kernel::OM->Get('ObjectSearch')->Search(
+            ObjectType   => 'Ticket',
+            Result       => 'COUNT',
+            Limit        => 1,
+            Search       => {
+                AND => [
+                    {
+                        Field => 'ContactID',
+                        Value => $ContactID,
+                        Operator => 'EQ',
+                    },
+                ]
+            },
+            UserID   => 1,
+            UserType => 'Agent',
+        );
+
+        if ( $ResultTicketSearch ) {
+            return $Self->_Error(
+                Code    => 'Object.DependingObjectExists',
+                Message => 'Cannot delete contact. A ticket with this contact already exists.',
+            );
+        }
+
         # delete contact
         my $Success = $Kernel::OM->Get('Contact')->ContactDelete(
             ID     => $ContactID,
