@@ -9138,4 +9138,15 @@ Notes:
             <String Regex="^[0-9]{1,11}$">32768</String>
         </Setting>
     </ConfigItem>
+
+    <ConfigItem AccessLevel="internal" Name="User::EventModulePost###000-ResetUserLoginFailed" Required="1" Valid="1">
+        <Description Translatable="1">Event module registration.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::User::Event::ResetUserLoginFailed</Item>
+                <Item Key="Transaction">1</Item>
+                <Item Key="Event">UserUpdate</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
 </kix_config>
