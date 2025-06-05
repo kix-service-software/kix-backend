@@ -18,6 +18,8 @@ use Digest::SHA;
 use Data::Dumper;
 use Time::HiRes;
 
+use base qw(Kernel::System::EventHandler);
+
 use Kernel::System::Role;
 use Kernel::System::VariableCheck qw(:all);
 use Kernel::System::PerfLog qw(TimeDiff);
@@ -85,6 +87,11 @@ sub new {
     }
 
     $Self->{PermissionDebug} = $Kernel::OM->Get('Config')->Get('Permission::Debug');
+
+    # init of event handler
+    $Self->EventHandlerInit(
+        Config => 'User::EventModulePost',
+    );
 
     return $Self;
 }
@@ -411,6 +418,20 @@ sub UserAdd {
         UserID => $UserID
     );
 
+    # get user data for UserAdd event
+    my %User = $Self->GetUserData(
+        UserID => $UserID,
+    );
+
+    # trigger event
+    $Self->EventHandler(
+        Event  => 'UserAdd',
+        Data   => {
+            NewUser => \%User,
+        },
+        UserID => $Param{ChangeUserID},
+    );
+
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
@@ -454,8 +475,8 @@ sub UserUpdate {
         }
     }
 
-    # store old user login for later use
-    my $OldUserLogin = $Self->UserLookup(
+    # get old user data for UserUpdate event
+    my %OldUser = $Self->GetUserData(
         UserID => $Param{UserID},
     );
 
@@ -514,6 +535,21 @@ sub UserUpdate {
     # assign basic roles depending on context
     $Self->_AssignRolesByContext(
         UserID => $Param{UserID}
+    );
+
+    # get new user data for UserUpdate event
+    my %NewUser = $Self->GetUserData(
+        UserID => $Param{UserID},
+    );
+
+    # trigger event
+    $Self->EventHandler(
+        Event  => 'UserUpdate',
+        Data   => {
+            NewUser => \%NewUser,
+            OldUser => \%OldUser,
+        },
+        UserID => $Param{ChangeUserID},
     );
 
     # push client callback event
@@ -2394,6 +2430,15 @@ sub _PermissionDebug {
 =end Internal:
 
 =cut
+
+sub DESTROY {
+    my $Self = shift;
+
+    # execute all transaction events
+    $Self->EventHandlerTransaction();
+
+    return 1;
+}
 
 1;
 
