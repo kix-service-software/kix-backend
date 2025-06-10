@@ -753,6 +753,18 @@ sub ArticleCreate {
             Message  => "Sent email to '$Param{ToOrig}' from '$Param{From}'. HistoryType => $Param{HistoryType}, Subject => $Param{Subject};",
         );
 
+        my $HistoryTo  = $Param{To}  || '';
+        my $HistoryCc  = $Param{Cc}  || '';
+        my $HistoryBcc = $Param{Bcc} || '';
+        # add history row
+        $Self->HistoryAdd(
+            ArticleID    => $ArticleID,
+            TicketID     => $Param{TicketID},
+            CreateUserID => $Param{UserID},
+            HistoryType  => 'ArticleSend',
+            Name         => "\%\%$HistoryTo\%\%$HistoryCc\%\%$HistoryBcc",
+        );
+
         # event
         $Self->EventHandler(
             Event => 'ArticleSend',
