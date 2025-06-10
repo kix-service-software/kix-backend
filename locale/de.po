@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-6-4 09:47+0000\n"
-"PO-Revision-Date: 2025-04-09 12:27+0000\n"
-"Last-Translator: tto <Torsten.Thau@kixdesk.com>\n"
+"PO-Revision-Date: 2025-06-10 14:08+0000\n"
+"Last-Translator: jbrueckner <Joerg.Brueckner@kixdesk.com>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/de/>\n"
 "Language: de\n"
@@ -4398,7 +4398,7 @@ msgstr "Tabelle"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Textarea"
-msgstr "Textbereich"
+msgstr "Textfeld"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Textarea input"
