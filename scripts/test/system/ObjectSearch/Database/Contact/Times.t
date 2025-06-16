@@ -42,16 +42,18 @@ $Self->IsDeeply(
     $AttributeList,
     {
         CreateTime => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','LT','GT','LTE','GTE'],
-            ValueType    => 'DATETIME'
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','LT','GT','LTE','GTE'],
+            ValueType      => 'DATETIME'
         },
         ChangeTime => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','LT','GT','LTE','GTE'],
-            ValueType    => 'DATETIME'
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','LT','GT','LTE','GTE'],
+            ValueType      => 'DATETIME'
         }
     },
     'GetSupportedAttributes provides expected data'

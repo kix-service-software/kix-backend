@@ -42,16 +42,18 @@ $Self->IsDeeply(
     $AttributeList,
     {
         IsAgent => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE'],
-            ValueType    => 'NUMERIC'
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE'],
+            ValueType      => 'NUMERIC'
         },
         IsCustomer => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE'],
-            ValueType    => 'NUMERIC'
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE'],
+            ValueType      => 'NUMERIC'
         }
     },
     'GetSupportedAttributes provides expected data'

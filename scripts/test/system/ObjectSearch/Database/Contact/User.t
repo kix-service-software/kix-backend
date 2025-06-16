@@ -42,26 +42,30 @@ $Self->IsDeeply(
     $AttributeList,
     {
         UserID => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN'],
-            ValueType    => 'NUMERIC'
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN'],
+            ValueType      => 'NUMERIC'
         },
         AssignedUserID => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN'],
-            ValueType    => 'NUMERIC'
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN'],
+            ValueType      => 'NUMERIC'
         },
         Login => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         UserLogin => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         }
     },
     'GetSupportedAttributes provides expected data'
@@ -147,7 +151,6 @@ my @SearchTests = (
             Value    => '1'
         },
         Expected     => {
-            'Join' => [],
             'Where' => [
                 'c.user_id = 1'
             ]
@@ -161,7 +164,6 @@ my @SearchTests = (
             Value    => '1'
         },
         Expected     => {
-            'Join' => [],
             'Where' => [
                 '(c.user_id <> 1 OR c.user_id IS NULL)'
             ]
@@ -175,7 +177,6 @@ my @SearchTests = (
             Value    => ['1']
         },
         Expected     => {
-            'Join' => [],
             'Where' => [
                 'c.user_id IN (1)'
             ]
@@ -189,7 +190,6 @@ my @SearchTests = (
             Value    => ['1']
         },
         Expected     => {
-            'Join' => [],
             'Where' => [
                 'c.user_id NOT IN (1)'
             ]
@@ -203,7 +203,6 @@ my @SearchTests = (
             Value    => '1'
         },
         Expected     => {
-            'Join' => [],
             'Where' => [
                 'c.user_id = 1'
             ]
@@ -217,7 +216,6 @@ my @SearchTests = (
             Value    => '1'
         },
         Expected     => {
-            'Join' => [],
             'Where' => [
                 '(c.user_id <> 1 OR c.user_id IS NULL)'
             ]
@@ -231,7 +229,6 @@ my @SearchTests = (
             Value    => ['1']
         },
         Expected     => {
-            'Join' => [],
             'Where' => [
                 'c.user_id IN (1)'
             ]
@@ -245,7 +242,6 @@ my @SearchTests = (
             Value    => ['1']
         },
         Expected     => {
-            'Join' => [],
             'Where' => [
                 'c.user_id NOT IN (1)'
             ]
