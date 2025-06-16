@@ -52,73 +52,18 @@ sub GetSupportedAttributes {
 
     return {
         Valid => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN']
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN']
         },
         ValidID => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN'],
-            ValueType    => 'NUMERIC'
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN'],
+            ValueType      => 'NUMERIC'
         }
-    };
-}
-
-=item Search()
-
-run this module and return the SQL extensions
-
-    my $Result = $Object->Search(
-        Search => {}
-    );
-
-    $Result = {
-        Where   => [ ],
-    };
-
-=cut
-
-sub Search {
-    my ( $Self, %Param ) = @_;
-
-    my @SQLJoin;
-
-    # check params
-    return if !$Self->_CheckSearchParams(%Param);
-
-    # map search attributes to table attributes
-    my %AttributeMapping = (
-        ValidID => {
-            Column    => 'c.valid_id',
-            ValueType => 'NUMERIC'
-        },
-        Valid   => {
-            Column    => 'cv.name'
-        }
-    );
-
-    if (
-        $Param{Search}->{Field} eq 'Valid'
-        && !$Param{Flags}->{JoinMap}->{ContactValid}
-    ) {
-        push( @SQLJoin, 'INNER JOIN valid cv ON cv.id = c.valid_id' );
-        $Param{Flags}->{JoinMap}->{ContactValid} = 1;
-    }
-
-    my $Condition = $Self->_GetCondition(
-        Operator  => $Param{Search}->{Operator},
-        Column    => $AttributeMapping{$Param{Search}->{Field}}->{Column},
-        ValueType => $AttributeMapping{$Param{Search}->{Field}}->{ValueType},
-        Value     => $Param{Search}->{Value},
-        Silent    => $Param{Silent}
-    );
-
-    return if ( !$Condition );
-
-    return {
-        Join  => \@SQLJoin,
-        Where => [ $Condition ]
     };
 }
 
@@ -166,8 +111,8 @@ sub Sort {
         }
     }
 
-    # init mapping
-    my %AttributeMapping = (
+    # init Definition
+    my %AttributeDefinition = (
         ValidID => {
             Select  => ['c.valid_id'],
             OrderBy => ['c.valid_id']
@@ -181,13 +126,40 @@ sub Sort {
     # return sort def
     return {
         Join    => \@SQLJoin,
-        Select  => $AttributeMapping{ $Param{Attribute} }->{Select},
-        OrderBy => $AttributeMapping{ $Param{Attribute} }->{OrderBy}
+        Select  => $AttributeDefinition{ $Param{Attribute} }->{Select},
+        OrderBy => $AttributeDefinition{ $Param{Attribute} }->{OrderBy}
+    };
+}
+
+sub AttributePrepare {
+    my ( $Self, %Param ) = @_;
+
+    if ( $Param{Search}->{Field} eq 'Valid' ) {
+        my @Join;
+        if ( !$Param{Flags}->{JoinMap}->{ContactValid} ) {
+            push( @Join, 'INNER JOIN valid cv ON cv.id = c.valid_id' );
+            $Param{Flags}->{JoinMap}->{ContactValid} = 1;
+        }
+
+        return {
+            ConditionDef => {
+                Column => 'cv.name'
+            },
+            SQLDef      => {
+                Join => \@Join
+            }
+        };
+    }
+
+    return {
+        ConditionDef => {
+            Column    => 'c.valid_id',
+            ValueType => 'NUMERIC'
+        }
     };
 }
 
 1;
-
 
 =back
 

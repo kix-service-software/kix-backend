@@ -43,15 +43,17 @@ $Self->IsDeeply(
     $AttributeList,
     {
         Valid => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN']
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN']
         },
         ValidID => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN'],
-            ValueType    => 'NUMERIC'
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN'],
+            ValueType      => 'NUMERIC'
         }
     },
     'GetSupportedAttributes provides expected data'
@@ -127,7 +129,6 @@ my @SearchTests = (
             Value    => '1'
         },
         Expected     => {
-            'Join'  => [],
             'Where' => [
                 'c.valid_id = 1'
             ]
@@ -141,7 +142,6 @@ my @SearchTests = (
             Value    => '1'
         },
         Expected     => {
-            'Join'  => [],
             'Where' => [
                 'c.valid_id <> 1'
             ]
@@ -155,7 +155,6 @@ my @SearchTests = (
             Value    => ['1']
         },
         Expected     => {
-            'Join'  => [],
             'Where' => [
                 'c.valid_id IN (1)'
             ]
@@ -169,7 +168,6 @@ my @SearchTests = (
             Value    => ['1']
         },
         Expected     => {
-            'Join'  => [],
             'Where' => [
                 'c.valid_id NOT IN (1)'
             ]

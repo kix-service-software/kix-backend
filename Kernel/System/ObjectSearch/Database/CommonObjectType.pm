@@ -41,8 +41,9 @@ sub new {
 
     return if ( !$Param{ObjectType} );
 
-    # remember own object type
-    $Self->{ObjectType} = $Param{ObjectType};
+    # remember own object type and fulltext attributes
+    $Self->{ObjectType}         = $Param{ObjectType};
+    $Self->{FulltextAttributes} = $Param{FulltextAttributes} || [];
 
     # get registered object types
     my $RegisteredAttributeMapping = $Kernel::OM->Get('Config')->Get('ObjectSearch::Database::' . $Param{ObjectType} . '::Module') || {};
@@ -177,15 +178,46 @@ sub GetSearchDef {
             my $AttributeModule = $Self->{AttributeMapping}->{ $Attribute }->{Object};
 
             # get attribute def
-            my $AttributeDef = $AttributeModule->Search(
-                Search       => $SearchEntry,
-                WholeSearch  => $Param{Search}->{ $BoolOperator },   # forward "whole" search, e.g. if behavior depends on other attributes
-                BoolOperator => $BoolOperator,
-                Flags        => $Param{Flags},
-                UserType     => $Param{UserType},
-                UserID       => $Param{UserID},
-                Silent       => $Param{Silent}
-            );
+            my $AttributeDef;
+            if ( $AttributeModule->can('FulltextSearch') ) {
+
+                my $FulltextDef = $Self->GetFulltextDef(
+                    Search   => $SearchEntry,
+                    Flags    => $Param{Flags},
+                    UserType => $Param{UserType},
+                    UserID   => $Param{UserID},
+                    Silent   => $Param{Silent}
+                );
+
+                if ( !IsHashRef($FulltextDef) ) {
+                    $Kernel::OM->Get('Log')->Log(
+                        Priority => 'error',
+                        Message  => "Unable to prepare $Attribute for object type $Self->{ObjectType}!",
+                        Silent   => $Param{Silent}
+                    );
+
+                    return;
+                }
+
+                $AttributeDef = $AttributeModule->FulltextSearch(
+                    %{$FulltextDef},
+                    Search   => $SearchEntry,
+                    UserType => $Param{UserType},
+                    UserID   => $Param{UserID},
+                    Silent   => $Param{Silent}
+                );
+            }
+            else {
+                $AttributeDef = $AttributeModule->Search(
+                    Search       => $SearchEntry,
+                    WholeSearch  => $Param{Search}->{ $BoolOperator },   # forward "whole" search, e.g. if behavior depends on other attributes
+                    BoolOperator => $BoolOperator,
+                    Flags        => $Param{Flags},
+                    UserType     => $Param{UserType},
+                    UserID       => $Param{UserID},
+                    Silent       => $Param{Silent}
+                );
+            }
 
             if ( !IsHashRef($AttributeDef) ) {
                 $Kernel::OM->Get('Log')->Log(
@@ -286,6 +318,154 @@ sub GetSearchDef {
             );
 
             return;
+        }
+    }
+
+    return \%SQLDef;
+}
+
+=item GetFulltextDef()
+
+provides the fulltext definition
+
+    my $Result = $Object->GetFulltextDef(
+        Search => {                   # required
+            Field    => '...',        # required
+            Operator => '...',        # required
+            Value    => '...'         # required
+        },
+        UserID       => '...',        # required
+        UserType     => '...',
+        Flags        => []
+    );
+
+    $Result = {
+        Columns => [],
+        Join    => [],
+    };
+
+
+=cut
+
+sub GetFulltextDef {
+    my ( $Self, %Param ) = @_;
+
+    # init def hash
+    my %SQLDef = (
+        Columns => [],
+        Join    => []
+    );
+
+    # check required search parameter
+    if (
+        ref( $Param{Search} ) ne 'HASH'
+        || !defined( $Param{Search}->{Field} )
+        || !defined( $Param{Search}->{Operator} )
+        || !defined( $Param{Search}->{Value} )
+    ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => 'Invalid Search!',
+            Silent   => $Param{Silent}
+        );
+        return;
+    }
+
+    # check required parameter
+    if ( !$Param{UserID} ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => 'Invalid UserID!',
+            Silent   => $Param{Silent}
+        );
+        return;
+    }
+
+    if ( !IsArrayRefWithData( $Self->{FulltextAttributes} ) ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "No defined fulltext attributes for object type $Self->{ObjectType}!",
+            Silent   => $Param{Silent}
+        );
+    }
+
+    # process fulltext attributes
+    for my $Attribute ( @{ $Self->{FulltextAttributes} } ) {
+        # check for supported attribute
+        if (
+            ref( $Self->{AttributeMapping}->{ $Attribute } ) ne 'HASH'
+            || !$Self->{AttributeMapping}->{ $Attribute }->{IsFulltextable}
+        ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Attribute $Attribute is not available for fulltext!",
+                Silent   => $Param{Silent}
+            );
+
+            return;
+        }
+        elsif ( !$Self->{AttributeMapping}->{ $Attribute }->{IsSearchable} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Unable to search for attribute $Attribute!",
+                Silent   => $Param{Silent}
+            );
+
+            return;
+        }
+
+        # skip attribute if not searchable or fulltextable
+        next if ( !$Self->{AttributeMapping}->{ $Attribute }->{IsFulltextable} );
+        next if ( !$Self->{AttributeMapping}->{ $Attribute }->{IsSearchable} );
+
+        # get object for attribute
+        my $AttributeModule = $Self->{AttributeMapping}->{ $Attribute }->{Object};
+
+        my $AttributeDef = $AttributeModule->AttributePrepare(
+            Flags  => $Param{Flags},
+            Search => {
+                %{$Param{Search}},
+                Field => $Attribute
+            }
+        );
+
+        if (
+            !IsHashRefWithData( $AttributeDef )
+            || !IsHashRefWithData( $AttributeDef->{ConditionDef} )
+        ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Unable to preparing the attribute $Attribute!",
+                Silent   => $Param{Silent}
+            );
+
+            return;
+        }
+
+        if ( defined $AttributeDef->{ConditionDef}->{Column} ) {
+            if ( IsArrayRef( $AttributeDef->{ConditionDef}->{Column} ) ) {
+                push(
+                    @{ $SQLDef{Columns} },
+                    @{ $AttributeDef->{ConditionDef}->{Column} }
+                );
+            }
+            else {
+                push(
+                    @{ $SQLDef{Columns} },
+                    $AttributeDef->{ConditionDef}->{Column}
+                );
+            }
+        }
+
+        if (
+            defined $AttributeDef->{SQLDef}
+            && IsHashRef($AttributeDef->{SQLDef})
+            && IsArrayRefWithData( $AttributeDef->{SQLDef}->{Join} )
+        ) {
+            push(
+                @{ $SQLDef{Join} },
+                @{ $AttributeDef->{SQLDef}->{Join} }
+            );
         }
     }
 
@@ -409,10 +589,11 @@ sub GetSupportedAttributes {
                         ObjectType      => $Self->{ObjectType},
                         Property        => $Attribute,
                         ObjectSpecifics => $Entry,
-                        IsSearchable    => $AttributeRef->{IsSearchable} || 0,
-                        IsSortable      => $AttributeRef->{IsSortable}   || 0,
-                        Operators       => $AttributeRef->{Operators}    || [],
-                        ValueType       => $AttributeRef->{ValueType}    || 'TEXTUAL',
+                        IsSearchable    => $AttributeRef->{IsSearchable}   || 0,
+                        IsSortable      => $AttributeRef->{IsSortable}     || 0,
+                        IsFulltextable  => $AttributeRef->{IsFulltextable} || 0,
+                        Operators       => $AttributeRef->{Operators}      || [],
+                        ValueType       => $AttributeRef->{ValueType}      || 'TEXTUAL',
                         Requires        => $AttributeRef->{Requires}
                     }
                 );
@@ -425,10 +606,11 @@ sub GetSupportedAttributes {
                     ObjectType      => $Self->{ObjectType},
                     Property        => $Attribute,
                     ObjectSpecifics => $ObjectSpecifics,
-                    IsSearchable    => $AttributeRef->{IsSearchable} || 0,
-                    IsSortable      => $AttributeRef->{IsSortable}   || 0,
-                    Operators       => $AttributeRef->{Operators}    || [],
-                    ValueType       => $AttributeRef->{ValueType}    || 'TEXTUAL',
+                    IsSearchable    => $AttributeRef->{IsSearchable}   || 0,
+                    IsSortable      => $AttributeRef->{IsSortable}     || 0,
+                    IsFulltextable  => $AttributeRef->{IsFulltextable} || 0,
+                    Operators       => $AttributeRef->{Operators}      || [],
+                    ValueType       => $AttributeRef->{ValueType}      || 'TEXTUAL',
                     Requires        => $AttributeRef->{Requires}
                 }
             );

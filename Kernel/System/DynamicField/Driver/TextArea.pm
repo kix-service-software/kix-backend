@@ -60,6 +60,7 @@ sub new {
     $Self->{Properties} = {
         'IsSearchable'    => 1,
         'IsSortable'      => 1,
+        'IsFulltextable'  => 1,
         'SearchOperators' => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
     };
 

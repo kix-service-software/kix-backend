@@ -20,6 +20,11 @@ my $AttributeModule = 'Kernel::System::ObjectSearch::Database::Contact::Fulltext
 # require module
 return if ( !$Kernel::OM->Get('Main')->Require( $AttributeModule ) );
 
+$Self->True(
+    0,
+    'ToDo: Needs to be rewritten because the functionality of the full text has changed.'
+);
+
 # create backend object
 my $AttributeObject = $AttributeModule->new( %{ $Self } );
 $Self->Is(
@@ -41,9 +46,10 @@ my $AttributeList = $AttributeObject->GetSupportedAttributes();
 $Self->IsDeeply(
     $AttributeList, {
         Fulltext => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['LIKE']
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 0,
+            Operators      => ['LIKE']
         }
     },
     'GetSupportedAttributes provides expected data'

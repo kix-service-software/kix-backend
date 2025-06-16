@@ -36,22 +36,25 @@ sub GetSupportedAttributes {
 
     my %Supported = (
         Emails => {
-            IsSearchable => 1,
-            IsSortable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 0,
             Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         Email => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         }
     );
 
     for ( 1..5 ) {
         $Supported{"Email$_"} = {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         };
     }
 
@@ -60,7 +63,6 @@ sub GetSupportedAttributes {
 
 sub Search {
     my ( $Self, %Param ) = @_;
-    my @SQLWhere;
 
     # check params
     return if !$Self->_CheckSearchParams(%Param);
@@ -94,25 +96,19 @@ sub Search {
         };
     }
 
-    # map search attributes to table attributes
-    my %AttributeMapping = (
-        Email  => 'c.email',
-        Email1 => 'c.email1',
-        Email2 => 'c.email2',
-        Email3 => 'c.email3',
-        Email4 => 'c.email4',
-        Email5 => 'c.email5',
-    );
+    my $Definition = $Self->AttributePrepare(%Param);
+
+    return if !IsHashRefWithData($Definition);
 
     my $Condition = $Self->_GetCondition(
-        Operator        => $Param{Search}->{Operator},
-        Column          => $AttributeMapping{$Param{Search}->{Field}},
-        Value           => $Param{Search}->{Value},
-        CaseInsensitive => 1,
-        NULLValue       => 1
+        %{$Definition->{ConditionDef}},
+        Operator => $Param{Search}->{Operator},
+        Value    => $Param{Search}->{Value},
+        Silent   => $Param{Silent}
     );
 
     return {
+        %{$Definition->{SQLDef} || {}},
         Where => [ $Condition ]
     };
 }
@@ -124,7 +120,7 @@ sub Sort {
     return if !$Self->_CheckSortParams(%Param);
 
     # map search attributes to table attributes
-    my %AttributeMapping = (
+    my %AttributeDefinition = (
         Email  => 'c.email',
         Email1 => 'c.email1',
         Email2 => 'c.email2',
@@ -135,13 +131,34 @@ sub Sort {
 
     # c.email is set by GetBaseDef and does not have to be specified again in the select
     return {
-        Select  => $Param{Attribute} ne 'Email' ? [ $AttributeMapping{$Param{Attribute}} ] : [],
-        OrderBy => [$AttributeMapping{$Param{Attribute}}]
+        Select  => $Param{Attribute} ne 'Email' ? [ $AttributeDefinition{$Param{Attribute}} ] : [],
+        OrderBy => [$AttributeDefinition{$Param{Attribute}}]
+    };
+}
+
+sub AttributePrepare {
+    my ( $Self, %Param ) = @_;
+
+    # map search attributes to table attributes
+    my %AttributeDefinition = (
+        Email  => 'c.email',
+        Email1 => 'c.email1',
+        Email2 => 'c.email2',
+        Email3 => 'c.email3',
+        Email4 => 'c.email4',
+        Email5 => 'c.email5',
+    );
+
+    return {
+        ConditionDef => {
+            Column          => $AttributeDefinition{ $Param{Search}->{Field} },
+            CaseInsensitive => 1,
+            NULLValue       => 1
+        }
     };
 }
 
 1;
-
 
 =back
 

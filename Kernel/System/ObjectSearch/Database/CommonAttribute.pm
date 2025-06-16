@@ -50,10 +50,11 @@ defines the list of attributes this module is supporting
 
     $Result = {
         'Property' => {
-            IsSearchable => 0|1,
-            IsSortable   => 0|1,
-            Operators    => [...],
-            ValueType    => 'NUMERIC|TEXTUAL|DATE|DATETIME'
+            IsSearchable   => 0|1,
+            IsSortable     => 0|1,
+            IsFulltextable => 0|1,
+            Operators      => [...],
+            ValueType      => 'NUMERIC|TEXTUAL|DATE|DATETIME'
         }
     };
 
@@ -97,7 +98,30 @@ sub Search {
     # check params
     return if ( !$Self->_CheckSearchParams( %Param ) );
 
-    return;
+    my $Definition = $Self->AttributePrepare(%Param);
+
+    return if !IsHashRefWithData($Definition);
+
+    my $Value = $Self->ValuePrepare(
+        Search => $Param{Search}
+    );
+
+    return if !defined $Value;
+
+    my $Condition = $Self->_GetCondition(
+        %{$Definition->{ConditionDef}},
+        Operator => $Param{Search}->{Operator},
+        Value    => $Value,
+        Silent   => $Param{Silent}
+    );
+
+    return if ( !$Condition );
+
+    # return search def
+    return {
+        %{$Definition->{SQLDef} || {}},
+        Where => [ $Condition ]
+    };
 }
 
 =item Sort()
@@ -127,6 +151,68 @@ sub Sort {
     return if ( !$Self->_CheckSortParams( %Param ) );
 
     return;
+}
+
+=item AttributePrepare()
+
+Returns SQL of the requested attributes
+
+    my $Result = $Object->AttributePrepare(
+        Search => {
+            Field    => '...',
+            Operator => '...',
+            Value    => '...'
+        },
+        UserID       => '...',
+        Flags        => {}
+    );
+
+    $Result = {
+        ConditionDef => {
+            NULLValue       => 0|1,
+            CaseInsensitive => 0|1,
+            Column          => '...',
+            ValueType       => '...',
+            IsStaticSearch  => 0|1
+        },
+        SQLDef => {
+            Select     => [],
+            From       => [],
+            Join       => [],
+            Where      => [],
+            GroupBy    => [],
+            Having     => [],
+            OrderBy    => [],
+            IsRelative => 1|0
+        }
+    };
+
+=cut
+
+sub AttributePrepare {
+    my ( $Self, %Param ) = @_;
+
+    return {};
+}
+
+=item ValuePrepare()
+
+Returns prepared value
+
+    my $Value = $Object->ValuePrepare(
+        Search => {
+            Field    => '...',
+            Operator => '...',
+            Value    => '...'
+        }
+    );
+
+=cut
+
+sub ValuePrepare {
+    my ( $Self, %Param ) = @_;
+
+    return $Param{Search}->{Value};
 }
 
 =begin Internal:

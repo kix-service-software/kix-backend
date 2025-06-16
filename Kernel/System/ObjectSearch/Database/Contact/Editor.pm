@@ -34,103 +34,37 @@ sub GetSupportedAttributes {
 
     return {
         CreateByID => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
-            ValueType    => 'NUMERIC'
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
+            ValueType      => 'NUMERIC'
         },
         CreateBy => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
-            ValueType    => 'NUMERIC'
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
+            ValueType      => 'NUMERIC'
 ## TODO: login based search instead of id
 #            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
         ChangeByID => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
-            ValueType    => 'NUMERIC'
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
+            ValueType      => 'NUMERIC'
         },
         ChangeBy => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
-            ValueType    => 'NUMERIC'
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
+            ValueType      => 'NUMERIC'
 ## TODO: login based search instead of id
 #            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         }
-    };
-}
-
-sub Search {
-    my ( $Self, %Param ) = @_;
-
-    # check params
-    return if ( !$Self->_CheckSearchParams( %Param ) );
-
-    # init mapping
-    my %AttributeMapping = (
-        CreateByID => {
-            Column          => 'c.create_by',
-            ValueType       => 'NUMERIC'
-        },
-        CreateBy   => {
-            Column          => 'c.create_by',
-            ValueType       => 'NUMERIC'
-## TODO: login based search instead of id
-#            Column          => 'ccru.login',
-#            CaseInsensitive => 1
-        },
-        ChangeByID => {
-            Column          => 'c.change_by',
-            ValueType       => 'NUMERIC'
-        },
-        ChangeBy   => {
-            Column          => 'c.change_by',
-            ValueType       => 'NUMERIC'
-## TODO: login based search instead of id
-#            Column    => 'cchu.login',
-#            CaseInsensitive => 1
-        }
-    );
-
-## TODO: login based search instead of id
-#    # check for needed joins
-#    my @SQLJoin = ();
-#    if ( $Param{Search}->{Field} eq 'CreateBy' ) {
-#        if ( !$Param{Flags}->{JoinMap}->{ContactCreateBy} ) {
-#            push( @SQLJoin, 'INNER JOIN users ccru ON ccru.id = c.create_by' );
-#
-#            $Param{Flags}->{JoinMap}->{ContactCreateBy} = 1;
-#        }
-#    }
-#    elsif ( $Param{Search}->{Field} eq 'ChangeBy' ) {
-#        if ( !$Param{Flags}->{JoinMap}->{ContactChangeBy} ) {
-#            push( @SQLJoin, 'INNER JOIN users cchu ON cchu.id = c.change_by' );
-#
-#            $Param{Flags}->{JoinMap}->{ContactChangeBy} = 1;
-#        }
-#    }
-
-    # prepare condition
-    my $Condition = $Self->_GetCondition(
-        Operator        => $Param{Search}->{Operator},
-        Column          => $AttributeMapping{ $Param{Search}->{Field} }->{Column},
-        ValueType       => $AttributeMapping{ $Param{Search}->{Field} }->{ValueType},
-## TODO: login based search instead of id
-#        CaseInsensitive => $AttributeMapping{ $Param{Search}->{Field} }->{CaseInsensitive},
-        Value           => $Param{Search}->{Value},
-        Silent          => $Param{Silent}
-    );
-    return if ( !$Condition );
-
-    # return search def
-    return {
-## TODO: login based search instead of id
-#        Join  => \@SQLJoin,
-        Where => [ $Condition ]
     };
 }
 
@@ -167,8 +101,8 @@ sub Sort {
         }
     }
 
-    # init mapping
-    my %AttributeMapping = (
+    # init Definition
+    my %AttributeDefinition = (
         CreateByID => {
             Select  => ['c.create_by'],
             OrderBy => ['c.create_by']
@@ -190,8 +124,60 @@ sub Sort {
     # return sort def
     return {
         Join    => \@SQLJoin,
-        Select  => $AttributeMapping{ $Param{Attribute} }->{Select},
-        OrderBy => $AttributeMapping{ $Param{Attribute} }->{OrderBy}
+        Select  => $AttributeDefinition{ $Param{Attribute} }->{Select},
+        OrderBy => $AttributeDefinition{ $Param{Attribute} }->{OrderBy}
+    };
+}
+
+sub AttributePrepare {
+    my ( $Self, %Param ) = @_;
+
+    # init Definition
+    my %AttributeDefinition = (
+        CreateByID => {
+            Column          => 'c.create_by',
+            ValueType       => 'NUMERIC'
+        },
+        CreateBy   => {
+            Column          => 'c.create_by',
+            ValueType       => 'NUMERIC'
+## TODO: login based search instead of id
+#            Column          => 'ccru.login',
+#            CaseInsensitive => 1
+        },
+        ChangeByID => {
+            Column          => 'c.change_by',
+            ValueType       => 'NUMERIC'
+        },
+        ChangeBy   => {
+            Column          => 'c.change_by',
+            ValueType       => 'NUMERIC'
+## TODO: login based search instead of id
+#            Column          => 'cchu.login',
+#            CaseInsensitive => 1
+        }
+    );
+
+## TODO: login based search instead of id
+#    # check for needed joins
+#    my @SQLJoin = ();
+#    if ( $Param{Search}->{Field} eq 'CreateBy' ) {
+#        if ( !$Param{Flags}->{JoinMap}->{ContactCreateBy} ) {
+#            push( @SQLJoin, 'INNER JOIN users ccru ON ccru.id = c.create_by' );
+#
+#            $Param{Flags}->{JoinMap}->{ContactCreateBy} = 1;
+#        }
+#    }
+#    elsif ( $Param{Search}->{Field} eq 'ChangeBy' ) {
+#        if ( !$Param{Flags}->{JoinMap}->{ContactChangeBy} ) {
+#            push( @SQLJoin, 'INNER JOIN users cchu ON cchu.id = c.change_by' );
+#
+#            $Param{Flags}->{JoinMap}->{ContactChangeBy} = 1;
+#        }
+#    }
+
+    return {
+        ConditionDef => $AttributeDefinition{ $Param{Search}->{Field} }
     };
 }
 
