@@ -291,7 +291,8 @@ sub _GetObjectTypeBackend {
     # create backend object
     $Self->{ObjectTypeBackends}->{ $Param{ObjectType} } = $ObjectTypeModule->new(
         %{ $Self },
-        ObjectType => $Param{ObjectType}
+        ObjectType         => $Param{ObjectType},
+        FulltextAttributes => $Self->{ObjectTypeModules}->{ $Param{ObjectType} }->{FulltextAttributes} || []
     );
 
     # return object type backend

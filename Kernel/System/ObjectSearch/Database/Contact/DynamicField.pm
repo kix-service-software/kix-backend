@@ -67,69 +67,22 @@ sub GetSupportedAttributes {
                 Property           => 'IsSortable'
             );
 
+            my $IsFulltextable = $Kernel::OM->Get('DynamicField::Backend')->GetProperty(
+                DynamicFieldConfig => $DynamicFieldConfig,
+                Property           => 'IsFulltextable'
+            );
+
             $Supported{ $AttributeName } = {
-                Operators    => $Operators    || [],
-                IsSearchable => $IsSearchable || 0,
-                IsSortable   => $IsSortable   || 0,
-                ValueType    => $ValueType    || q{}
+                Operators      => $Operators      || [],
+                IsSearchable   => $IsSearchable   || 0,
+                IsSortable     => $IsSortable     || 0,
+                IsFulltextable => $IsFulltextable || 0,
+                ValueType      => $ValueType      || q{}
             };
         }
     }
 
     return \%Supported;
-}
-
-sub Search {
-    my ( $Self, %Param ) = @_;
-
-    # check params
-    return if ( !$Self->_CheckSearchParams( %Param ) );
-
-    # get dynamic field config
-    my $DFName = $Param{Search}->{Field};
-    $DFName =~ s/DynamicField_//g;
-    return if ( !$DFName );
-    my $DynamicFieldConfig = $Kernel::OM->Get('DynamicField')->DynamicFieldGet(
-        Name => $DFName,
-    );
-    return if ( !IsHashRefWithData( $DynamicFieldConfig ) );
-
-    # check for needed joins
-    my $TableAlias = 'dfv_left' . ( $Param{Flags}->{JoinMap}->{ 'DynamicField_' . $DFName } // '' );
-    my @SQLJoin = ();
-    if ( !defined( $Param{Flags}->{JoinMap}->{ 'DynamicField_' . $DFName } ) ) {
-        my $Count = $Param{Flags}->{DynamicFieldJoinCounter}++;
-        $TableAlias .= $Count;
-        push( @SQLJoin, "LEFT OUTER JOIN dynamic_field_value $TableAlias ON $TableAlias.object_id = c.id AND $TableAlias.field_id = $DynamicFieldConfig->{ID}" );
-
-        $Param{Flags}->{JoinMap}->{ 'DynamicField_' . $DFName } = $Count;
-    }
-
-    # get search def from dynamic field backend
-    my $SearchFieldRef = $Kernel::OM->Get('DynamicField::Backend')->SearchSQLSearchFieldGet(
-        DynamicFieldConfig => $DynamicFieldConfig,
-        TableAlias         => $TableAlias,
-    );
-    return if ( !IsHashRefWithData( $SearchFieldRef ) );
-
-    # prepare condition
-    my $Condition = $Self->_GetCondition(
-        Operator        => $Param{Search}->{Operator},
-        Column          => $SearchFieldRef->{Column},
-        Value           => $Param{Search}->{Value},
-        ValueType       => $SearchFieldRef->{ValueType},
-        CaseInsensitive => $SearchFieldRef->{CaseInsensitive},
-        NULLValue       => 1,
-        Silent          => $Param{Silent}
-    );
-    return if ( !$Condition );
-
-    # return search def
-    return {
-        Join       => \@SQLJoin,
-        Where      => [ $Condition ],
-        IsRelative => $Param{Search}->{IsRelative}
-    };
 }
 
 sub Sort {
@@ -168,6 +121,54 @@ sub Sort {
     return {
         %{ $SortFieldRef },
         Join => \@SQLJoin
+    };
+}
+
+sub AttributePrepare {
+    my ( $Self, %Param ) = @_;
+
+    # get dynamic field config
+    my $DFName = $Param{Search}->{Field};
+    $DFName =~ s/DynamicField_//g;
+
+    return if ( !$DFName );
+
+    my $DynamicFieldConfig = $Kernel::OM->Get('DynamicField')->DynamicFieldGet(
+        Name => $DFName,
+    );
+
+    return if ( !IsHashRefWithData( $DynamicFieldConfig ) );
+
+    # check for needed joins
+    my $TableAlias = 'dfv_left' . ( $Param{Flags}->{JoinMap}->{ 'DynamicField_' . $DFName } // '' );
+    my @SQLJoin = ();
+    if ( !defined( $Param{Flags}->{JoinMap}->{ 'DynamicField_' . $DFName } ) ) {
+        my $Count = $Param{Flags}->{DynamicFieldJoinCounter}++;
+        $TableAlias .= $Count;
+        push( @SQLJoin, "LEFT OUTER JOIN dynamic_field_value $TableAlias ON $TableAlias.object_id = c.id AND $TableAlias.field_id = $DynamicFieldConfig->{ID}" );
+
+        $Param{Flags}->{JoinMap}->{ 'DynamicField_' . $DFName } = $Count;
+    }
+
+    # get search def from dynamic field backend
+    my $SearchFieldRef = $Kernel::OM->Get('DynamicField::Backend')->SearchSQLSearchFieldGet(
+        DynamicFieldConfig => $DynamicFieldConfig,
+        TableAlias         => $TableAlias,
+    );
+
+    return if ( !IsHashRefWithData( $SearchFieldRef ) );
+
+    return {
+        ConditionDef => {
+            Column          => $SearchFieldRef->{Column},
+            ValueType       => $SearchFieldRef->{ValueType},
+            CaseInsensitive => $SearchFieldRef->{CaseInsensitive},
+            NULLValue       => 1
+        },
+        SQLDef => {
+            Join       => \@SQLJoin,
+            IsRelative => $Param{Search}->{IsRelative}
+        }
     };
 }
 

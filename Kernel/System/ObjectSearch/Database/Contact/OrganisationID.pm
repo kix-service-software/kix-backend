@@ -33,95 +33,95 @@ Kernel::System::ObjectSearch::Database::Contact::OrganisationID - attribute modu
 
 =cut
 
-=item GetSupportedAttributes()
-
-defines the list of attributes this module is supporting
-
-    my $AttributeList = $Object->GetSupportedAttributes();
-
-    $Result = {
-        Property => {
-            IsSortable     => 0|1,
-            IsSearchable => 0|1,
-            Operators     => []
-        },
-    };
-
-=cut
-
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
     return {
         OrganisationID => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN'],
-            ValueType    => 'NUMERIC'
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN'],
+            ValueType      => 'NUMERIC'
         },
         OrganisationIDs => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN'],
-            ValueType    => 'NUMERIC'
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN'],
+            ValueType      => 'NUMERIC'
         },
         Organisation => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         OrganisationNumber => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         PrimaryOrganisationID => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN'],
-            ValueType    => 'NUMERIC'
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN'],
+            ValueType      => 'NUMERIC'
         },
         PrimaryOrganisation => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         PrimaryOrganisationNumber => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         }
     };
 }
 
-
-=item Search()
-
-run this module and return the SQL extensions
-
-    my $Result = $Object->Search(
-        Search => {}
-    );
-
-    $Result = {
-        Where   => [ ],
-    };
-
-=cut
-
-sub Search {
+sub Sort {
     my ( $Self, %Param ) = @_;
-    my @SQLJoin;
 
     # check params
-    return if !$Self->_CheckSearchParams(%Param);
+    return if !$Self->_CheckSortParams( %Param );
 
     my %JoinData = $Self->_JoinGet(
         %Param
     );
 
     # map search attributes to table attributes
-    my %AttributeMapping = (
+    my %AttributeDefinition = (
+        OrganisationID            => "$JoinData{OCAlias}.org_id",
+        OrganisationIDs           => "$JoinData{OCAlias}.org_id",
+        Organisation              => "$JoinData{OAlias}.name",
+        OrganisationNumber        => "$JoinData{OAlias}.number",
+        PrimaryOrganisationID     => "$JoinData{POCAlias}.org_id",
+        PrimaryOrganisation       => "$JoinData{POAlias}.name",
+        PrimaryOrganisationNumber => "$JoinData{POAlias}.number",
+    );
+
+    return {
+        Select  => [ $AttributeDefinition{ $Param{Attribute} } ],
+        OrderBy => [ $AttributeDefinition{ $Param{Attribute} } ],
+        Join    => $JoinData{Join}
+    };
+}
+
+sub AttributePrepare {
+    my ( $Self, %Param ) = @_;
+
+    my %JoinData = $Self->_JoinGet(
+        %Param
+    );
+
+    # map search attributes to table attributes
+    my %Attributes = (
         OrganisationID => {
             Column    => "$JoinData{OCAlias}.org_id",
             ValueType => 'NUMERIC'
@@ -156,62 +156,11 @@ sub Search {
         }
     );
 
-    my $Condition = $Self->_GetCondition(
-        Operator        => $Param{Search}->{Operator},
-        Column          => $AttributeMapping{$Param{Search}->{Field}}->{Column},
-        Value           => $Param{Search}->{Value},
-        ValueType       => $AttributeMapping{$Param{Search}->{Field}}->{ValueType},
-        CaseInsensitive => $AttributeMapping{$Param{Search}->{Field}}->{CaseInsensitive}
-    );
-
-    return if !$Condition;
-
     return {
-        Join  => $JoinData{Join},
-        Where => [ $Condition ]
-    };
-}
-
-=item Sort()
-
-run this module and return the SQL extensions
-
-    my $Result = $Object->Sort(
-        Attribute => '...'      # required
-    );
-
-    $Result = {
-        Select  => [ ],         # optional
-        OrderBy => [ ]          # optional
-    };
-
-=cut
-
-sub Sort {
-    my ( $Self, %Param ) = @_;
-
-    # check params
-    return if !$Self->_CheckSortParams( %Param );
-
-    my %JoinData = $Self->_JoinGet(
-        %Param
-    );
-
-    # map search attributes to table attributes
-    my %AttributeMapping = (
-        OrganisationID            => "$JoinData{OCAlias}.org_id",
-        OrganisationIDs           => "$JoinData{OCAlias}.org_id",
-        Organisation              => "$JoinData{OAlias}.name",
-        OrganisationNumber        => "$JoinData{OAlias}.number",
-        PrimaryOrganisationID     => "$JoinData{POCAlias}.org_id",
-        PrimaryOrganisation       => "$JoinData{POAlias}.name",
-        PrimaryOrganisationNumber => "$JoinData{POAlias}.number",
-    );
-
-    return {
-        Select  => [ $AttributeMapping{ $Param{Attribute} } ],
-        OrderBy => [ $AttributeMapping{ $Param{Attribute} } ],
-        Join    => $JoinData{Join}
+        ConditionDef => $Attributes{ $Param{Search}->{Field} },
+        SQLDef       => {
+            Join => $JoinData{Join},
+        }
     };
 }
 

@@ -34,96 +34,71 @@ sub GetSupportedAttributes {
 
     return {
         Title => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         Firstname => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         Lastname => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         Phone => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         Fax => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         Mobile => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         Street => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         City => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         Zip => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         Country => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         Comment => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
-    };
-}
-
-sub Search {
-    my ( $Self, %Param ) = @_;
-
-    # check params
-    return if ( !$Self->_CheckSearchParams( %Param ) );
-
-    # map search attributes to table attributes
-    my %AttributeMapping = (
-        Title     => 'c.title',
-        Firstname => 'c.firstname',
-        Lastname  => 'c.lastname',
-        Mobile    => 'c.mobile',
-        Phone     => 'c.phone',
-        Fax       => 'c.fax',
-        Street    => 'c.street',
-        City      => 'c.city',
-        Zip       => 'c.zip',
-        Country   => 'c.country',
-        Comment   => 'c.comments',
-    );
-
-    my $Condition = $Self->_GetCondition(
-        Operator        => $Param{Search}->{Operator},
-        Column          => $AttributeMapping{$Param{Search}->{Field}},
-        Value           => $Param{Search}->{Value},
-        CaseInsensitive => 1,
-        NULLValue       => 1
-    );
-
-    return if ( !$Condition );
-
-    return {
-        Where => [ $Condition ]
     };
 }
 
@@ -134,7 +109,7 @@ sub Sort {
     return if ( !$Self->_CheckSortParams(%Param) );
 
     # map search attributes to table attributes
-    my %AttributeMapping = (
+    my %AttributeDefinition = (
         Title     => 'LOWER(c.title)',
         Firstname => 'LOWER(c.firstname)',
         Lastname  => 'LOWER(c.lastname)',
@@ -149,13 +124,39 @@ sub Sort {
     );
 
     return {
-        Select  => [ $AttributeMapping{ $Param{Attribute} } ],
-        OrderBy => [ $AttributeMapping{ $Param{Attribute} } ]
+        Select  => [ $AttributeDefinition{ $Param{Attribute} } ],
+        OrderBy => [ $AttributeDefinition{ $Param{Attribute} } ]
+    };
+}
+
+sub AttributePrepare {
+    my ( $Self, %Param ) = @_;
+
+    # map search attributes to table attributes
+    my %AttributeDefinition = (
+        Title     => 'c.title',
+        Firstname => 'c.firstname',
+        Lastname  => 'c.lastname',
+        Mobile    => 'c.mobile',
+        Phone     => 'c.phone',
+        Fax       => 'c.fax',
+        Street    => 'c.street',
+        City      => 'c.city',
+        Zip       => 'c.zip',
+        Country   => 'c.country',
+        Comment   => 'c.comments',
+    );
+
+    return {
+        ConditionDef => {
+            Column          => $AttributeDefinition{ $Param{Search}->{Field} },
+            CaseInsensitive => 1,
+            NULLValue       => 1
+        }
     };
 }
 
 1;
-
 
 =back
 

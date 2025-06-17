@@ -31,70 +31,69 @@ Kernel::System::ObjectSearch::Database::Contact::Times - attribute module for da
 
 =cut
 
-=item GetSupportedAttributes()
-
-defines the list of attributes this module is supporting
-
-    my $AttributeList = $Object->GetSupportedAttributes();
-
-    $Result = {
-        Property => {
-            IsSortable     => 0|1,
-            IsSearchable => 0|1,
-            Operators     => []
-        },
-    };
-
-=cut
-
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
     return {
         CreateTime => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','LT','GT','LTE','GTE'],
-            ValueType    => 'DATETIME'
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','LT','GT','LTE','GTE'],
+            ValueType      => 'DATETIME'
         },
         ChangeTime => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','LT','GT','LTE','GTE'],
-            ValueType    => 'DATETIME'
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','LT','GT','LTE','GTE'],
+            ValueType      => 'DATETIME'
         }
     };
 }
 
-=item Search()
-
-run this module and return the SQL extensions
-
-    my $Result = $Object->Search(
-        Search => {}
-    );
-
-    $Result = {
-        Where   => [ ],
-    };
-
-=cut
-
-sub Search {
+sub Sort {
     my ( $Self, %Param ) = @_;
-    my $Value;
-    my @SQLWhere;
 
     # check params
-    return if !$Self->_CheckSearchParams( %Param );
+    return if !$Self->_CheckSortParams(%Param);
 
     # map search attributes to table attributes
-    my %AttributeMapping = (
+    my %AttributeDefinition = (
         CreateTime => 'c.create_time',
         ChangeTime => 'c.change_time',
     );
 
-    return q{} if !$Param{Search}->{Value};
+    return {
+        Select  => [$AttributeDefinition{$Param{Attribute}}],
+        OrderBy => [$AttributeDefinition{$Param{Attribute}}],
+    };
+}
+
+sub AttributePrepare {
+    my ( $Self, %Param ) = @_;
+
+    # map search attributes to table attributes
+    my %Attributes = (
+        CreateTime => 'c.create_time',
+        ChangeTime => 'c.change_time',
+    );
+
+    return {
+        ConditionDef => {
+            Column    => $Attributes{$Param{Search}->{Field}},
+            ValueType => 'DATETIME'
+        },
+        SQLDef => {
+            IsRelative => $Param{Search}->{IsRelative}
+        }
+    };
+}
+
+sub ValuePrepare {
+    my ($Self, %Param) = @_;
+
+    return if !$Param{Search}->{Value};
 
     # calculate relative times
     my $SystemTime = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
@@ -109,64 +108,14 @@ sub Search {
         return;
     }
 
-    $Value = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
+    my $Value = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
         SystemTime => $SystemTime
     );
 
-    # quote
-    $Value = $Kernel::OM->Get('DB')->Quote( $Value );
-
-    my $Condition = $Self->_GetCondition(
-        Operator  => $Param{Search}->{Operator},
-        Column    => $AttributeMapping{$Param{Search}->{Field}},
-        Value     => $Value
-    );
-
-    return if ( !$Condition );
-
-
-
-    return {
-        Where      => [ $Condition ],
-        IsRelative => $Param{Search}->{IsRelative}
-    };
-}
-
-=item Sort()
-
-run this module and return the SQL extensions
-
-    my $Result = $Object->Sort(
-        Attribute => '...'      # required
-    );
-
-    $Result = {
-        Select   => [ ],          # optional
-        OrderBy => [ ]           # optional
-    };
-
-=cut
-
-sub Sort {
-    my ( $Self, %Param ) = @_;
-
-    # check params
-    return if !$Self->_CheckSortParams(%Param);
-
-    # map search attributes to table attributes
-    my %AttributeMapping = (
-        CreateTime => 'c.create_time',
-        ChangeTime => 'c.change_time',
-    );
-
-    return {
-        Select  => [$AttributeMapping{$Param{Attribute}}],
-        OrderBy => [$AttributeMapping{$Param{Attribute}}],
-    };
+    return $Kernel::OM->Get('DB')->Quote( $Value );
 }
 
 1;
-
 
 =back
 
