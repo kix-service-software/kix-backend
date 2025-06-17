@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -75,7 +75,7 @@ sub Run {
             OperationType            => 'V1::FAQ::FAQCategoryGet',
             SuppressPermissionErrors => 1,
             Data      => {
-                FAQCategoryID => join(',', sort keys %{$FAQCategories}),
+                FAQCategoryID => join( q{,}, sort { $a <=> $b } keys %{$FAQCategories}),
             }
         );
         if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {

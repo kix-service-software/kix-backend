@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-4-4 12:08+0000\n"
+"POT-Creation-Date: 2025-6-10 14:08+0000\n"
 "PO-Revision-Date: 2024-12-03 08:51+0000\n"
 "Last-Translator: mbauer <Mario.Bauer@kixdesk.com>\n"
 "Language-Team: English <http://weblate.vm.devel.cape-it.de/projects/kix18/"
@@ -5314,6 +5314,12 @@ msgstr ""
 msgid ""
 "Executes follow-up checks on attachment contents for mails that don't have a "
 "ticket number in the subject."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid ""
+"Executes follow-up checks on attachment filenames for mails that don't have "
+"a ticket number in the subject."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml

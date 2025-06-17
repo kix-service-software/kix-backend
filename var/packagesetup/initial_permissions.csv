@@ -36,7 +36,7 @@
 "Ticket Reader";"Resource";"/links";;"x";;;
 "Ticket Reader";"Resource";"/reporting";;"x";;;
 "Ticket Reader";"Resource";"/reporting/reports";;"x";;;
-"Ticket Reader";"Object";"/reporting/reports/*{Report.DefinitionID !IN [3,4,5,6,7,8]}";;;;;
+"Ticket Reader";"Object";"/reporting/reports/*{Report.DefinitionID !IN [3,4,5,6,7,8,10]}";;;;;
 "Ticket Reader";"Resource";"/reporting/reportdefinitions";;"x";;;
 "Ticket Reader";"Resource";"/reporting/reportdefinitions/*";;;;;
 "Ticket Reader";"Resource";"/reporting/reportdefinitions/3";;"x";;;
@@ -45,6 +45,7 @@
 "Ticket Reader";"Resource";"/reporting/reportdefinitions/6";;"x";;;
 "Ticket Reader";"Resource";"/reporting/reportdefinitions/7";;"x";;;
 "Ticket Reader";"Resource";"/reporting/reportdefinitions/8";;"x";;;
+"Ticket Reader";"Resource";"/reporting/reportdefinitions/10";;"x";;;
 "Ticket Reader";"Resource";"/system/htmltopdf";;"x";;;
 "Ticket Reader";"Resource";"/system/htmltopdf/convert";;"x";;;
 "Ticket Reader";"Base::Ticket";"*";;"x";;;
@@ -67,7 +68,7 @@
 "Ticket Agent";"Resource";"/system/textmodules";;"x";;;
 "Ticket Agent";"Resource";"/reporting";;"x";;;
 "Ticket Agent";"Resource";"/reporting/reports";;"x";;;
-"Ticket Agent";"Object";"/reporting/reports/*{Report.DefinitionID !IN [3,4,5,6,7,8]}";;;;;
+"Ticket Agent";"Object";"/reporting/reports/*{Report.DefinitionID !IN [3,4,5,6,7,8,10]}";;;;;
 "Ticket Agent";"Resource";"/reporting/reportdefinitions";;"x";;;
 "Ticket Agent";"Resource";"/reporting/reportdefinitions/*";;;;;
 "Ticket Agent";"Resource";"/reporting/reportdefinitions/3";;"x";;;
@@ -76,6 +77,7 @@
 "Ticket Agent";"Resource";"/reporting/reportdefinitions/6";;"x";;;
 "Ticket Agent";"Resource";"/reporting/reportdefinitions/7";;"x";;;
 "Ticket Agent";"Resource";"/reporting/reportdefinitions/8";;"x";;;
+"Ticket Agent";"Resource";"/reporting/reportdefinitions/10";;"x";;;
 "Ticket Agent";"Resource";"/system/htmltopdf";;"x";;;
 "Ticket Agent";"Resource";"/system/htmltopdf/convert";;"x";;;
 "Ticket Agent";"Base::Ticket";"*";"x";"x";"x";"x";
@@ -99,7 +101,7 @@
 "Ticket Agent Base Permission";"Resource";"/system/textmodules";;"x";;;
 "Ticket Agent Base Permission";"Resource";"/reporting";;"x";;;
 "Ticket Agent Base Permission";"Resource";"/reporting/reports";;"x";;;
-"Ticket Agent Base Permission";"Object";"/reporting/reports/*{Report.DefinitionID !IN [3,4,5,6,7,8]}";;;;;
+"Ticket Agent Base Permission";"Object";"/reporting/reports/*{Report.DefinitionID !IN [3,4,5,6,7,8,10]}";;;;;
 "Ticket Agent Base Permission";"Resource";"/reporting/reportdefinitions";;"x";;;
 "Ticket Agent Base Permission";"Resource";"/reporting/reportdefinitions/*";;;;;
 "Ticket Agent Base Permission";"Resource";"/reporting/reportdefinitions/3";;"x";;;
@@ -108,6 +110,7 @@
 "Ticket Agent Base Permission";"Resource";"/reporting/reportdefinitions/6";;"x";;;
 "Ticket Agent Base Permission";"Resource";"/reporting/reportdefinitions/7";;"x";;;
 "Ticket Agent Base Permission";"Resource";"/reporting/reportdefinitions/8";;"x";;;
+"Ticket Agent Base Permission";"Resource";"/reporting/reportdefinitions/10";;"x";;;
 "Ticket Agent Base Permission";"Resource";"/system/htmltopdf";;"x";;;
 "Ticket Agent Base Permission";"Resource";"/system/htmltopdf/convert";;"x";;;
 "Ticket Agent Base Permission";"Base::Ticket";"*";;;;;
@@ -252,10 +255,12 @@
 "Report User";"Resource";"/reporting/reportdefinitions/6";;"x";;;
 "Report User";"Resource";"/reporting/reportdefinitions/7";;"x";;;
 "Report User";"Resource";"/reporting/reportdefinitions/8";;"x";;;
+"Report User";"Resource";"/reporting/reportdefinitions/9";;"x";;;
+"Report User";"Resource";"/reporting/reportdefinitions/10";;"x";;;
 "Report User";"Object";"/reporting/reports{}";;;;;
 "Report User";"Object";"/reporting/reports/*{Report.DefinitionID GT 0}";;;;;
-"Report User";"Object";"/reporting/reports{Report.DefinitionID IN [1,2,3,4,5,6,7,8]}";"x";"x";;;
-"Report User";"Object";"/reporting/reports/*{Report.DefinitionID IN [1,2,3,4,5,6,7,8]}";;"x";;;
+"Report User";"Object";"/reporting/reports{Report.DefinitionID IN [1,2,3,4,5,6,7,8,9,10]}";"x";"x";;;
+"Report User";"Object";"/reporting/reports/*{Report.DefinitionID IN [1,2,3,4,5,6,7,8,9,10]}";;"x";;;
 "Report Manager";"Resource";"/reporting";"x";"x";"x";"x";
 "Report Manager";"Resource";"/system/roles";"";"x";"x";"";
 "Textmodule Admin";"Resource";"/system/textmodules";"x";"x";"x";"x";

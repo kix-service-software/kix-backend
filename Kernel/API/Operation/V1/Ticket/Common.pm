@@ -158,9 +158,6 @@ sub GetBasePermissionObjectIDs {
 sub ExecuteBasePermissionModules {
     my ( $Self, %Param ) = @_;
 
-    # we don't have to do the checks if we have no TicketID given
-    return 1 if ( ref( $Param{Data} ) ne 'HASH' || !$Param{Data}->{TicketID} );
-
     # we don't have to do the checks if we have been called by TicketSearch
     return 1 if ( $Self->{CallingOperationType} && $Self->{CallingOperationType} eq 'V1::Ticket::TicketSearch' );
 

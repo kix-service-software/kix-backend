@@ -416,6 +416,7 @@ sub _ReplaceDynamicFieldPlaceholder {
             my $DisplayKeyStrg = $Self->{DynamicFieldBackendObject}->DisplayKeyRender(
                 DynamicFieldConfig => $DynamicFieldConfig,
                 Value              => $Param{Object}->{ 'DynamicField_' . $DynamicFieldConfig->{Name} },
+                HTMLOutput         => $Param{RichText}
             );
 
             if (IsHashRefWithData($DisplayKeyStrg) && defined $DisplayKeyStrg->{Value} && $DisplayKeyStrg->{Value} ne '') {
@@ -447,6 +448,7 @@ sub _ReplaceDynamicFieldPlaceholder {
             my $ShortDisplayValueStrg = $Self->{DynamicFieldBackendObject}->ShortDisplayValueRender(
                 DynamicFieldConfig => $DynamicFieldConfig,
                 Value              => $Param{Object}->{ 'DynamicField_' . $DynamicFieldConfig->{Name} },
+                HTMLOutput         => $Param{RichText}
             );
             if ( IsHashRefWithData($ShortDisplayValueStrg) && $ShortDisplayValueStrg->{Value} ) {
                 $DynamicFieldDisplayValues{ $DynamicFieldConfig->{Name} . '_Short' }

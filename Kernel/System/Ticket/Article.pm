@@ -3358,7 +3358,7 @@ sub PrepareArticle {
     $Param{HistoryComment} = $Param{HistoryComment} || '%%';
 
     # replace placeholders in non-richtext attributes
-    for my $Attribute ( qw(Channel SenderType To From Cc Bcc AccountTime) ) {
+    for my $Attribute ( qw(Channel SenderType To From Cc Bcc AccountTime ReplyTo) ) {
         next if !defined $Param{$Attribute};
 
         $Param{$Attribute} = $Self->_ReplaceValuePlaceholder(
