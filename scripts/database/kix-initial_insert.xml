@@ -5400,7 +5400,7 @@ DefaultValue:
     <Insert Table="report_definition">
         <Data Key="id" Type="AutoIncrement">9</Data>
         <Data Key="name" Type="Quote" Translatable="1">Duration in State and Team</Data>
-        <Data Key="is_periodic">1</Data>
+        <Data Key="is_periodic">0</Data>
         <Data Key="max_reports">1</Data>
         <Data Key="comments" Type="Quote" Translatable="1">Lists of tickets with their durations in specified states and teams.</Data>
         <Data Key="datasource" Type="Quote">GenericSQL</Data>
@@ -5952,7 +5952,7 @@ DefaultValue:
 <Insert Table="role_permission">
     <Data Key="role_id">4</Data>
     <Data Key="type_id">2</Data>
-    <Data Key="target" Type="Quote"><![CDATA[/reporting/reports/*{Report.DefinitionID !IN [3,4,5,6,7,8]}]]></Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting/reports/*{Report.DefinitionID !IN [3,4,5,6,7,8,10]}]]></Data>
     <Data Key="value">0</Data>
     <Data Key="create_by">1</Data>
     <Data Key="create_time">current_timestamp</Data>
@@ -6033,6 +6033,16 @@ DefaultValue:
     <Data Key="role_id">4</Data>
     <Data Key="type_id">1</Data>
     <Data Key="target" Type="Quote"><![CDATA[/reporting/reportdefinitions/8]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">4</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting/reportdefinitions/10]]></Data>
     <Data Key="value">2</Data>
     <Data Key="create_by">1</Data>
     <Data Key="create_time">current_timestamp</Data>
@@ -6262,7 +6272,7 @@ DefaultValue:
 <Insert Table="role_permission">
     <Data Key="role_id">5</Data>
     <Data Key="type_id">2</Data>
-    <Data Key="target" Type="Quote"><![CDATA[/reporting/reports/*{Report.DefinitionID !IN [3,4,5,6,7,8]}]]></Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting/reports/*{Report.DefinitionID !IN [3,4,5,6,7,8,10]}]]></Data>
     <Data Key="value">0</Data>
     <Data Key="create_by">1</Data>
     <Data Key="create_time">current_timestamp</Data>
@@ -6343,6 +6353,16 @@ DefaultValue:
     <Data Key="role_id">5</Data>
     <Data Key="type_id">1</Data>
     <Data Key="target" Type="Quote"><![CDATA[/reporting/reportdefinitions/8]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">5</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting/reportdefinitions/10]]></Data>
     <Data Key="value">2</Data>
     <Data Key="create_by">1</Data>
     <Data Key="create_time">current_timestamp</Data>
@@ -6582,7 +6602,7 @@ DefaultValue:
 <Insert Table="role_permission">
     <Data Key="role_id">17</Data>
     <Data Key="type_id">2</Data>
-    <Data Key="target" Type="Quote"><![CDATA[/reporting/reports/*{Report.DefinitionID !IN [3,4,5,6,7,8]}]]></Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting/reports/*{Report.DefinitionID !IN [3,4,5,6,7,8,10]}]]></Data>
     <Data Key="value">0</Data>
     <Data Key="create_by">1</Data>
     <Data Key="create_time">current_timestamp</Data>
@@ -6663,6 +6683,16 @@ DefaultValue:
     <Data Key="role_id">17</Data>
     <Data Key="type_id">1</Data>
     <Data Key="target" Type="Quote"><![CDATA[/reporting/reportdefinitions/8]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">17</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting/reportdefinitions/10]]></Data>
     <Data Key="value">2</Data>
     <Data Key="create_by">1</Data>
     <Data Key="create_time">current_timestamp</Data>
@@ -8111,6 +8141,26 @@ DefaultValue:
 </Insert>
 <Insert Table="role_permission">
     <Data Key="role_id">14</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting/reportdefinitions/9]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">14</Data>
+    <Data Key="type_id">1</Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting/reportdefinitions/10]]></Data>
+    <Data Key="value">2</Data>
+    <Data Key="create_by">1</Data>
+    <Data Key="create_time">current_timestamp</Data>
+    <Data Key="change_by">1</Data>
+    <Data Key="change_time">current_timestamp</Data>
+</Insert>
+<Insert Table="role_permission">
+    <Data Key="role_id">14</Data>
     <Data Key="type_id">2</Data>
     <Data Key="target" Type="Quote"><![CDATA[/reporting/reports{}]]></Data>
     <Data Key="value">0</Data>
@@ -8132,7 +8182,7 @@ DefaultValue:
 <Insert Table="role_permission">
     <Data Key="role_id">14</Data>
     <Data Key="type_id">2</Data>
-    <Data Key="target" Type="Quote"><![CDATA[/reporting/reports{Report.DefinitionID IN [1,2,3,4,5,6,7,8]}]]></Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting/reports{Report.DefinitionID IN [1,2,3,4,5,6,7,8,9,10]}]]></Data>
     <Data Key="value">3</Data>
     <Data Key="create_by">1</Data>
     <Data Key="create_time">current_timestamp</Data>
@@ -8142,7 +8192,7 @@ DefaultValue:
 <Insert Table="role_permission">
     <Data Key="role_id">14</Data>
     <Data Key="type_id">2</Data>
-    <Data Key="target" Type="Quote"><![CDATA[/reporting/reports/*{Report.DefinitionID IN [1,2,3,4,5,6,7,8]}]]></Data>
+    <Data Key="target" Type="Quote"><![CDATA[/reporting/reports/*{Report.DefinitionID IN [1,2,3,4,5,6,7,8,9,10]}]]></Data>
     <Data Key="value">2</Data>
     <Data Key="create_by">1</Data>
     <Data Key="create_time">current_timestamp</Data>

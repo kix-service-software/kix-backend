@@ -1152,7 +1152,10 @@ sub GenerateRandomString {
     my $DictionaryString = join('', @DictionaryChars);
 
     # generate the string
-    my $String = $CSPRNGObject->string_from($DictionaryString, $Length);
+    my $String;
+    eval {
+        $String = $CSPRNGObject->string_from($DictionaryString, $Length);
+    };
 
     return $String;
 }

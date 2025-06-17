@@ -579,6 +579,51 @@ my @Tests = (
             }
         }
     },
+    {
+        Name   => 'Close of watched ticket',
+        Action => sub {
+            $TicketIDs{'User Counter Test 4'} = $Kernel::OM->Get('Ticket')->TicketCreate(
+                Title          => 'User Counter Test 4',
+                QueueID        => 1,
+                Lock           => 'unlock',
+                Priority       => '3 normal',
+                State          => 'new',
+                OrganisationID => 1,
+                ContactID      => 1,
+                OwnerID        => $UserID2,
+                UserID         => 1,
+            );
+            $Kernel::OM->Get('Watcher')->WatcherAdd(
+                Object      => 'Ticket',
+                ObjectID    => $TicketIDs{'User Counter Test 4'},
+                WatchUserID => $UserID1,
+                UserID      => 1,
+            );
+            return $Kernel::OM->Get('Ticket')->TicketStateSet(
+                TicketID => $TicketIDs{'User Counter Test 4'},
+                State    => 'closed',
+                UserID   => $UserID2,
+            );
+        },
+        Expect => {
+            $UserID1 => {
+                Owned => undef,
+                OwnedAndUnseen => undef,
+                OwnedAndLocked => undef,
+                OwnedAndLockedAndUnseen => undef,
+                Watched => 1,
+                WatchedAndUnseen => 1,
+            },
+            $UserID2 => {
+                Owned => 1,
+                OwnedAndUnseen => undef,
+                OwnedAndLocked => 1,
+                OwnedAndLockedAndUnseen => undef,
+                Watched => 1,
+                WatchedAndUnseen => undef,
+            }
+        }
+    },
 );
 
 

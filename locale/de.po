@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-4-4 12:08+0000\n"
-"PO-Revision-Date: 2025-03-28 10:24+0000\n"
+"POT-Creation-Date: 2025-6-10 14:08+0000\n"
+"PO-Revision-Date: 2025-06-10 14:08+0000\n"
 "Last-Translator: jbrueckner <Joerg.Brueckner@kixdesk.com>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/de/>\n"
@@ -1617,7 +1617,7 @@ msgstr "Sendertyp"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "Show in Customer Portal"
-msgstr "Im Kundenportal verfügbar"
+msgstr "In Kundenportal Anzeigen"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "Subject"
@@ -4407,7 +4407,7 @@ msgstr "Tabelle"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Textarea"
-msgstr "Textbereich"
+msgstr "Textfeld"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Textarea input"
@@ -5213,7 +5213,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Create Article"
-msgstr "Artikel erstellen"
+msgstr "Artikel Erstellen"
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Create Ticket"
@@ -5419,7 +5419,7 @@ msgstr "Artikel Löschen"
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Delete Attachments from Articles"
-msgstr ""
+msgstr "Anhänge aus Artikeln löschen"
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Delete Ticket"
@@ -5508,6 +5508,12 @@ msgstr ""
 msgid ""
 "Executes follow-up checks on attachment contents for mails that don't have a "
 "ticket number in the subject."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid ""
+"Executes follow-up checks on attachment filenames for mails that don't have "
+"a ticket number in the subject."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
@@ -5723,7 +5729,7 @@ msgstr "Neuer Verantwortlicher ist \"%s\" (ID=%s)."
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "None"
-msgstr "Keine/r"
+msgstr "kein(e)"
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Notification sent to \"%s\"."
