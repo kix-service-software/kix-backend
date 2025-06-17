@@ -554,6 +554,8 @@ sub GenerateResponse {
     if ( IsHashRefWithData($Param{Additional}) && IsHashRefWithData($Param{Additional}->{AddHeader}) ) {
         $AddHeader = $Param{Additional}->{AddHeader};
     }
+    $AddHeader->{'KIX-Worker-PID'} = $$;
+    $AddHeader->{'KIX-Request-Duration'} = (Time::HiRes::time() - $Self->{Metric}->{StartTime});
 
     # do we have to return an http error code
     if ( IsStringWithData( $Param{Code} ) && !IsInteger($Param{Code}) ) {

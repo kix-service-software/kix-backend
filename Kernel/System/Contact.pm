@@ -970,7 +970,13 @@ sub ContactUpdate {
     }
 
     my $OldAssignedUserID;
-    if ($Contact{AssignedUserID} && $Contact{AssignedUserID} != $Param{AssignedUserID}) {
+    if (
+        defined( $Contact{AssignedUserID} )
+        && (
+            !defined( $Param{AssignedUserID} )
+            || $Contact{AssignedUserID} != $Param{AssignedUserID}
+        )
+    ) {
         $OldAssignedUserID = $Contact{AssignedUserID};
     }
 

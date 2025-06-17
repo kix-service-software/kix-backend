@@ -110,7 +110,7 @@ sub ValueGet {
     # extract real values
     my @ReturnData;
     for my $Item ( @{$DFValue} ) {
-        push @ReturnData, $Item->{ValueText}
+        push(@ReturnData,$Item->{ValueText});
     }
 
     return \@ReturnData;
@@ -165,23 +165,45 @@ sub ValueLookup {
     return if ( !defined( $Param{Key} ) );
     return q{} if ( $Param{Key} eq q{} );
 
-    # return array or scalar depending on $Param{Key}
-    my $Result;
     if (
-        ref $Param{Key} eq 'ARRAY'
+        ref $Param{Key} ne 'ARRAY'
         && $Param{Key}->[0]
     ) {
-        $Result = $Param{Key};
-    }
-    elsif (
-        ref $Param{Value} ne 'HASH'
-        && ref $Param{Value} ne 'ARRAY'
-        && $Param{Key}
-    ) {
-        $Result = $Param{Key};
+        return $Param{Key};
     }
 
-    return $Result;
+    my $JSONObject      = $Kernel::OM->Get('JSON');
+    my $HTMLUtilsObject = $Kernel::OM->Get('HTMLUtils');
+
+    my @Tables;
+    for my $TableString ( @{$Param{Key}} ) {
+        my $Table = $JSONObject->Decode(
+            Data => $TableString
+        );
+        if (IsArrayRefWithData($Table)) {
+            my @Rows;
+            for my $Row ( @{$Table} ) {
+                if (IsArrayRefWithData($Row)) {
+                    my @PreparedValues;
+                    for my $Value ( @{$Row} ) {
+                        my $Text = defined $Value ? $Value : '';
+                        $Text = $HTMLUtilsObject->ToHTML(
+                            String => $Text
+                        );
+                        push(@PreparedValues, $Text);
+                    }
+                    push(@Rows, \@PreparedValues);
+                }
+            }
+
+            my $RowString = $JSONObject->Encode(
+                Data => \@Rows
+            );
+            push(@Tables, $RowString);
+        }
+    }
+
+    return \@Tables;
 }
 
 sub ValueValidate {
@@ -328,29 +350,9 @@ sub ReadableValueRender {
 sub DisplayValueRender {
     my ( $Self, %Param ) = @_;
 
-    my $HTMLUtilsObject = $Kernel::OM->Get('HTMLUtils');
-    my $HTMLData = $Self->HTMLDisplayValueRender(%Param);
-
-    my $Output = q{};
-    if ( $HTMLData->{Value} ) {
-        $Output = $HTMLUtilsObject->ToAscii(
-            String => $HTMLData->{Value}
-        );
-    }
-    # create return structure
-    my $Data = {
-        Value => $Output,
-        Title => $HTMLData->{Title}
-    };
-
-    return $Data;
-}
-
-sub HTMLDisplayValueRender {
-    my ( $Self, %Param ) = @_;
-
     my $JSONObject     = $Kernel::OM->Get('JSON');
     my $LanguageObject = $Param{LayoutObject}->{LanguageObject};
+    my $HTMLUtilsObject = $Kernel::OM->Get('HTMLUtils');
 
     my $FieldConfig = $Param{DynamicFieldConfig}->{Config};
     my $Output      = q{};
@@ -364,7 +366,90 @@ sub HTMLDisplayValueRender {
     ) {
         $Title  = $Param{Value}->[0];
         $Values = $JSONObject->Decode(
-            Data => $Param{Value}->[0]
+            Data => $Param{Value}->[0] # currently just one table is really supported
+        );
+    }
+    elsif (
+        ref $Param{Value} ne 'HASH'
+        && ref $Param{Value} ne 'ARRAY'
+        && $Param{Value}
+    ) {
+        $Title  = $Param{Value};
+        $Values = $JSONObject->Decode(
+            Data => $Param{Value}
+        );
+    }
+    else {
+        return;
+    }
+
+    my @Columns;
+    for my $Column ( @{$FieldConfig->{Columns}} ) {
+        my $Col = $Column;
+
+        # get column header translation
+        if (
+            $Col
+            && $FieldConfig->{TranslatableColumn}
+        ) {
+            $Col = $LanguageObject->Translate(
+                $Col
+            );
+        }
+
+        push(@Columns, $Col);
+    }
+
+    $Output .= join(' | ', @Columns) . "\n";
+
+    my @Rows;
+    for my $Row ( @{$Values} ) {
+        my $RowValues = IsArrayRefWithData($Row) ? $Row : [$Row];
+        my @RowColumns;
+        for my $Index ( 0 .. scalar(@{$FieldConfig->{Columns}})-1 ) {
+            my $Text = defined $RowValues->[$Index] ? $RowValues->[$Index] : '';
+            push(@RowColumns, $Text);
+        }
+        push(@Rows, join(' | ', @RowColumns));
+    }
+
+    $Output .= join("\n",@Rows);
+
+    if ($Param{HTMLOutput}) {
+        $Output = $HTMLUtilsObject->ToHTML(
+            String => $Output
+        );
+    }
+
+    # create return structure
+    my $Data = {
+        Value => $Output,
+        Title => $Title
+    };
+
+    return $Data;
+}
+
+sub HTMLDisplayValueRender {
+    my ( $Self, %Param ) = @_;
+
+    my $JSONObject     = $Kernel::OM->Get('JSON');
+    my $LanguageObject = $Param{LayoutObject}->{LanguageObject};
+    my $HTMLUtilsObject = $Kernel::OM->Get('HTMLUtils');
+
+    my $FieldConfig = $Param{DynamicFieldConfig}->{Config};
+    my $Output      = q{};
+
+    # get raw Value strings from field value
+    my $Title = q{};
+    my $Values;
+    if (
+        ref $Param{Value} eq 'ARRAY'
+        && $Param{Value}->[0]
+    ) {
+        $Title  = $Param{Value}->[0];
+        $Values = $JSONObject->Decode(
+            Data => $Param{Value}->[0] # currently just one table is really supported
         );
     }
     elsif (
@@ -382,7 +467,7 @@ sub HTMLDisplayValueRender {
     }
 
     $Output = <<"END";
-<table border="1" cellspacing="0" cellpadding="2">
+<table cellspacing="0" cellpadding="2" style="border:1px solid black; width: 100%">
     <thead>
         <tr>
 END
@@ -401,33 +486,37 @@ END
         }
 
         $Output .= <<"END";
-            <th>$Col</th>
+            <th style="border:1px solid black; padding: 5px; text-align: left; background: rgba(0,0,0,.05)">$Col</th>
 END
-        }
+    }
 
-        $Output .= <<"END";
+    $Output .= <<"END";
         </tr>
     </thead>
     <tbody>
 END
 
-        for my $Row ( @{$Values} ) {
+    for my $Row ( @{$Values} ) {
 
-            $Output .= <<"END";
+        $Output .= <<"END";
         <tr>
 END
-            my $RowValues = IsArrayRefWithData($Row) ? $Row : [$Row];
-            for my $Col ( @{$RowValues} ) {
-                $Output .= <<"END";
-            <td>$Col</td>
+        my $RowValues = IsArrayRefWithData($Row) ? $Row : [$Row];
+        for my $Index ( 0 .. scalar(@{$FieldConfig->{Columns}})-1 ) {
+            my $Text = defined $RowValues->[$Index] ? $RowValues->[$Index] : '';
+            $Text = $HTMLUtilsObject->ToHTML(
+                String => $Text
+            );
+            $Output .= <<"END";
+            <td style="border:1px solid black; padding: 5px; text-align: left">$Text</td>
 END
-            }
+        }
         $Output .= <<"END";
         </tr>
 END
-        }
+    }
 
-        $Output .= <<"END";
+    $Output .= <<"END";
     </tbody>
 </table>
 END

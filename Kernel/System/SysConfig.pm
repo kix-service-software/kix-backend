@@ -310,12 +310,18 @@ sub OptionGet {
         Bind => [ \$Param{Name} ],
     );
 
+    my %SpecialColumns = (
+        default_value => 'Default',
+        comments      => 'Comment',
+        group_name    => 'Group'
+    );
+
     my %Data;
     my @Columns = $Kernel::OM->Get('DB')->GetColumnNames();
     for my $Column ( @Columns ) {
         # special handling: use attribute name 'Default' for column 'default_value'
-        if ( $Column eq 'default_value' ) {
-            $Column = 'Default';
+        if ( $SpecialColumns{$Column} ) {
+            $Column = $SpecialColumns{$Column};
 
             next;
         }

@@ -122,6 +122,7 @@ sub _Autostart {
 
 # add middlewares
 builder {
+    enable "Runtime";
     enable "Refresh";
     enable "Deflater",
         content_type => ['application/json'],

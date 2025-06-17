@@ -28,6 +28,13 @@ $Kernel::OM->Get('Config')->Set(
     Key => 'Ticket::EventModulePost',
 );
 
+# set fixed time to get predictable results
+$Helper->FixedTimeSet(
+    $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
+        String => '2014-01-01 12:00:00',
+    )
+);
+
 my %Data = (
     ContactEmail       => 'TicketCreate@test.com',
     OrganisationNumber => 'TicketCreateOrganisation',
@@ -145,9 +152,6 @@ if ($Success) {
                         'MacroUpdate - ExecOrder',
                     );
 
-                    # get system time arround potential target pending time
-                    my @PendingTimeUnix = ( $Kernel::OM->Get('Time')->SystemTime() + $Data{PendingTimeDiff} );
-
                     $Success = $AutomationObject->MacroExecute(
                         ID       => $MacroID,
                         # ObjectID => $TicketID, # no object id
@@ -157,8 +161,6 @@ if ($Success) {
                         $Success,
                         'MacroExecute (source ticket)',
                     );
-
-                    push(@PendingTimeUnix, $Kernel::OM->Get('Time')->SystemTime() + $Data{PendingTimeDiff} );
 
                     my $SourceTicketID = $AutomationObject->{MacroVariables}->{NewTicketID};
                     $Self->True(
@@ -188,9 +190,9 @@ if ($Success) {
                                 $StateID,
                                 'Check state (source ticket)'
                             );
-                            $Self->ContainedIn(
+                            $Self->Is(
                                 $SourceTicket{PendingTimeUnix},
-                                \@PendingTimeUnix,
+                                ( $Kernel::OM->Get('Time')->SystemTime() + $Data{PendingTimeDiff} ),
                                 'Check pending time (source ticket)'
                             );
                             $Self->Is(
@@ -278,8 +280,12 @@ if ($Success) {
                         }
                     );
 
-                    # get system time arround potential target pending time
-                    @PendingTimeUnix = ( $Kernel::OM->Get('Time')->SystemTime() + $Data{DFTextValue} );
+                    # set fixed time to get predictable results
+                    $Helper->FixedTimeSet(
+                        $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
+                            String => '2014-01-02 12:00:00',
+                        )
+                    );
 
                     $Success = $AutomationObject->MacroExecute(
                         ID       => $MacroID,
@@ -290,8 +296,6 @@ if ($Success) {
                         $Success,
                         'MacroExecute (clone ticket)'
                     );
-
-                    push(@PendingTimeUnix, $Kernel::OM->Get('Time')->SystemTime() + $Data{DFTextValue} );
 
                     my $CloneTicketID = $AutomationObject->{MacroVariables}->{NewTicketID};
                     $Self->True(
@@ -326,9 +330,9 @@ if ($Success) {
                                 $StateID,
                                 'Check state (clone ticket)'
                             );
-                            $Self->ContainedIn(
+                            $Self->Is(
                                 $CloneTicket{PendingTimeUnix},
-                                \@PendingTimeUnix,
+                                ( $Kernel::OM->Get('Time')->SystemTime() + $Data{DFTextValue} ),
                                 'Check pending time (clone ticket)'
                             );
                             $Self->Is(

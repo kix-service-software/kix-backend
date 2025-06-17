@@ -608,7 +608,13 @@ TicketCheckList$Number
 
 END
                 Short       => '0/3',
-                Key         => "TicketCheckList$Number<br />- task 1: -<br />- task 2: -<br />- task 3: -<br /><br />",
+                Key         => <<"END",
+TicketCheckList$Number
+- task 1: -
+- task 2: -
+- task 3: -
+
+END
                 HTML        => "<h3>TicketCheckList$Number</h3><table style=\"border:none; width:90%\"><thead><tr><th style=\"padding:10px 15px;\">Action</th><th style=\"padding:10px 15px;\">State</th><tr></thead><tbody><tr><td style=\"padding:10px 15px;\">task 1</td><td style=\"padding:10px 15px;\">-</td></tr><tr><td style=\"padding:10px 15px;\">task 2</td><td style=\"padding:10px 15px;\">-</td></tr><tr><td style=\"padding:10px 15px;\">task 3</td><td style=\"padding:10px 15px;\">-</td></tr></tbody></table>",
                 ObjectValue => {
                     undef => [
@@ -712,29 +718,29 @@ END
                 All         => 'Function:DisplayValueRender',
                 Short       => '3 Zeilen',
                 HTML        => <<'END',
-<table border="1" cellspacing="0" cellpadding="2">
+<table cellspacing="0" cellpadding="2" style="border:1px solid black; width: 100%">
     <thead>
         <tr>
-            <th>Column A</th>
-            <th>Column B</th>
-            <th>Column C</th>
+            <th style="border:1px solid black; padding: 5px; text-align: left; background: rgba(0,0,0,.05)">Column A</th>
+            <th style="border:1px solid black; padding: 5px; text-align: left; background: rgba(0,0,0,.05)">Column B</th>
+            <th style="border:1px solid black; padding: 5px; text-align: left; background: rgba(0,0,0,.05)">Column C</th>
         </tr>
     </thead>
     <tbody>
         <tr>
-            <td>Value 1.0</td>
-            <td></td>
-            <td>Value 3.0</td>
+            <td style="border:1px solid black; padding: 5px; text-align: left">Value 1.0</td>
+            <td style="border:1px solid black; padding: 5px; text-align: left"></td>
+            <td style="border:1px solid black; padding: 5px; text-align: left">Value 3.0</td>
         </tr>
         <tr>
-            <td>Value 1.1</td>
-            <td>Value 2.1</td>
-            <td></td>
+            <td style="border:1px solid black; padding: 5px; text-align: left">Value 1.1</td>
+            <td style="border:1px solid black; padding: 5px; text-align: left">Value 2.1</td>
+            <td style="border:1px solid black; padding: 5px; text-align: left"></td>
         </tr>
         <tr>
-            <td></td>
-            <td>Value 2.2</td>
-            <td></td>
+            <td style="border:1px solid black; padding: 5px; text-align: left"></td>
+            <td style="border:1px solid black; padding: 5px; text-align: left">Value 2.2</td>
+            <td style="border:1px solid black; padding: 5px; text-align: left"></td>
         </tr>
     </tbody>
 </table>
