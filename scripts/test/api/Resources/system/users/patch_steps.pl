@@ -47,3 +47,44 @@ When qr/I update this user$/, sub {
       }
    );
 };
+
+When qr/I update this user pw$/, sub {
+    ( S->{Response}, S->{ResponseContent} ) = _Patch(
+        URL     => S->{API_URL}.'/system/users/'.S->{UserID},
+        Token   => S->{Token},
+        Content => {
+            User => {
+                UserPw => "start123",
+                ValidID => 2
+            }
+        }
+    );
+};
+
+When qr/I update this user pw with incorrect pw$/, sub {
+    ( S->{Response}, S->{ResponseContent} ) = _Patch(
+        URL     => S->{API_URL}.'/system/users/'.S->{UserID},
+        Token   => S->{Token},
+        Content => {
+            User => {
+                UserPw => "1234",
+                ValidID => 2
+            }
+        }
+    );
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

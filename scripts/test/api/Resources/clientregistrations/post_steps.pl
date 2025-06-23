@@ -50,6 +50,21 @@ Given qr/a clientregistration$/, sub {
    );
 };
 
+When qr/added a clientregistration ohne authorization$/, sub {
+    ( S->{Response}, S->{ResponseContent} ) = _Post(
+        URL     => S->{API_URL}.'/clientregistrations',
+        Token   => S->{Token},
+        Content => {
+            ClientRegistration => {
+                ClientID => "KIX-Frontend".rand(),
+                Authorization => "",
+                NotificationURL => "http://kix-frontend.example.org/notifications",
+                NotificationInterval => 30
+            }
+        }
+    );
+};
+
 Given qr/(\d+) of clientregistrations$/, sub {
     my $ClientID;
         
