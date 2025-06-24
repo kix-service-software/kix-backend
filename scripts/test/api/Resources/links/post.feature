@@ -22,3 +22,27 @@ Feature: POST request to the /links resource
     And the error message is "Cannot create Link. A link with these parameters already exists."    
     When I delete this link
     Then the response code is 204
+
+  Scenario: create a link with no targetobject
+    When I create a link with no targetobject
+    Then the response code is 400
+
+  Scenario: create a link with no sourcekey
+    When I create a link with no sourcekey
+    Then the response code is 400
+
+  Scenario: create a link with no type
+    When I create a link with no type
+    Then the response code is 400
+
+
+
+
+
+
+
+
+
+
+
+
