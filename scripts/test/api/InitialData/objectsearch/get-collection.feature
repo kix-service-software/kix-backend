@@ -8,7 +8,7 @@
   Scenario: get the list of existing objectsearch ticket SupportedAttributes
     When I query the collection of objectsearch ticket SupportedAttributes
     Then the response code is 200
-    And the response contains 78 items of type "SupportedAttributes"
+    And the response contains 79 items of type "SupportedAttributes"
     And the response contains the following items of type SupportedAttributes
       | IsSearchable | IsSortable | ObjectSpecifics | ObjectType | Property                                  | ValueType |
       | 1            | 1          |                 | Ticket     | AccountedTime                             | NUMERIC   |
@@ -16,6 +16,7 @@
       | 1            | 0          |                 | Ticket     | ArticleCreateTime                         | DATETIME  |
       | 1            | 0          |                 | Ticket     | ArticleFlag.Seen                          | TEXTUAL   |
       | 1            | 0          |                 | Ticket     | ArticleID                                 | NUMERIC   |
+      | 0            | 1          |                 | Ticket     | AttachmentCount                           | NUMERIC   |
       | 1            | 0          |                 | Ticket     | AttachmentName                            | TEXTUAL   |
       | 1            | 0          |                 | Ticket     | Body                                      | TEXTUAL   |
       | 1            | 0          |                 | Ticket     | Cc                                        | TEXTUAL   |

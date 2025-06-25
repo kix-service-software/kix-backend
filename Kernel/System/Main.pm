@@ -1152,7 +1152,10 @@ sub GenerateRandomString {
     my $DictionaryString = join('', @DictionaryChars);
 
     # generate the string
-    my $String = $CSPRNGObject->string_from($DictionaryString, $Length);
+    my $String;
+    eval {
+        $String = $CSPRNGObject->string_from($DictionaryString, $Length);
+    };
 
     return $String;
 }
@@ -1186,6 +1189,9 @@ sub ResolveValueByKey {
     return if !$Param{Data};
 
     my $Data = $Param{Data};
+
+    # cleanup leading and trailing spaces
+    $Param{Key} =~ s/^\s+|\s+$//;
 
     # handle comma separated variables and merge to array
     my @Keys = split( /,/, $Param{Key} );

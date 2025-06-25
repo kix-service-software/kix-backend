@@ -60,7 +60,6 @@ Feature: GET request to the /tickets resource
     When I query the collection of tickets with offset 4
     Then the response code is 200
     And the response now contains 8 items of type "Ticket"
-#    Then the response content
     When delete all this tickets
     Then the response code is 204
     And the response has no content
@@ -69,7 +68,6 @@ Feature: GET request to the /tickets resource
     Given 8 of tickets
     When I query the collection of tickets with limit 26 and offset 2
     Then the response code is 200
-#    Then the response content
     And the response now contains 0 items of type "Ticket"
     When delete all this tickets
     Then the response code is 204
@@ -79,7 +77,6 @@ Feature: GET request to the /tickets resource
     Given 8 of tickets
     When I query the collection of tickets with sorted by "Ticket.-Title:textual" limit 38 and offset 1
     Then the response code is 200
-#    Then the response content
     And the response now contains 5 items of type "Ticket"
     When delete all this tickets
     Then the response code is 204

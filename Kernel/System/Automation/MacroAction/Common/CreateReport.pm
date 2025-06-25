@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
+# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -47,10 +47,14 @@ sub Describe {
 
     $Self->Description(Kernel::Language::Translatable('Create a report from a report definition.'));
     $Self->AddOption(
-        Name        => 'DefinitionID',
-        Label       => Kernel::Language::Translatable('Report Definition'),
-        Description => Kernel::Language::Translatable('The ID of the report definition.'),
-        Required    => 1,
+        Name          => 'DefinitionID',
+        Label         => Kernel::Language::Translatable('Report Definition'),
+        Description   => Kernel::Language::Translatable('The ID of the report definition.'),
+        Required      => 1,
+        Serialization => {
+            Target => 'Definition',
+            Object => 'Reporting'
+        }
     );
     $Self->AddOption(
         Name        => 'Parameters',

@@ -658,6 +658,57 @@ sub MacroActionListDelete {
     return 1;
 }
 
+
+=item MacroActionDefinitionGet()
+
+get the definition of a macro action
+
+    my $Definition = $AutomationObject->MacroActionDefinitionGet(
+        MacroType       => 'Ticket',
+        MacroActionType => 'Calculation'
+    );
+
+=cut
+
+sub MacroActionDefinitionGet {
+    my ( $Self, %Param ) = @_;
+
+    for my $Needed (
+        qw(
+            MacroType MacroActionType
+        )
+    ) {
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!",
+                Silent   => $Param{Silent}
+            );
+            return;
+        }
+    }
+
+    # load type backend module
+    my $BackendObject = $Self->_LoadMacroActionTypeBackend(
+        MacroType => $Param{MacroType},
+        Name      => $Param{MacroActionType},
+    );
+    return if !$BackendObject;
+
+    # get macro action defintion
+    my %Definition = $BackendObject->DefinitionGet();
+    if ( !%Definition ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "No Definition (MacroType: $Param{MacroType} and MacroActionType $Param{MacroActionType}) found!",
+            Silent   => $Param{Silent}
+        );
+        return;
+    }
+
+    return \%Definition;
+}
+
 =item MacroActionExecute()
 
 executes a macro action
@@ -808,10 +859,26 @@ sub MacroActionExecute {
             );
         }
 
+        if ( IsHashRefWithData( $Definition{Results} ) ) {
+            # reset result variables
+            RESULT:
+            for my $Result ( values( %{ $Definition{Results} } ) ) {
+                $BackendObject->SetResult(
+                    Name   => $Result->{Name},
+                    Value  => undef,
+                    UserID => $Param{UserID},
+                    NoLog  => 1
+                );
+            }
+        }
+
         if ( $BackendObject->{Debug} ) {
             $Kernel::OM->Get('Automation')->LogDebug(
                 Referrer => $Self,
-                Message  => 'Running macro action with config: ' . $Kernel::OM->Get('Main')->Dump( \%Parameters ),
+                Message  => 'Running macro action "'.$MacroAction{Type}.'" with ' . $Kernel::OM->Get('Main')->Dump({
+                    ConfigRaw => \%{$MacroAction{Parameters} || {}},
+                    Config    => \%Parameters,
+                }),
                 UserID   => $Param{UserID},
             );
         }
@@ -1170,7 +1237,7 @@ sub _ReplaceValuePlaceholder {
         my $JSONData = $Kernel::OM->Get('JSON')->Decode(
             Data => $Param{Value},
         );
-        
+
         if ( IsArrayRef( $JSONData ) ) {
             $JSONData = $Self->_ReplacePlaceholderArrayRef(
                 %Param,

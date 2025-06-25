@@ -1223,7 +1223,7 @@ sub _HandlePermissions {
 
     if ( !$HandlerObject || !$HandlerObject->can('UpdateBasePermissions') ) {
         $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
+            Priority => 'info',
             Message  => "No base permission handler for \"$Param{Object}\"!",
         );
         return;
@@ -3105,42 +3105,46 @@ sub _CheckBasePermission {
 
     my $PermissionName = Kernel::API::Operation->REQUEST_METHOD_PERMISSION_MAPPING->{ $Self->{RequestMethod} };
 
+    my %Filter = ();
     my $Result = $Self->GetBasePermissionObjectIDs(
         %Param,
         UserID       => $Self->{Authorization}->{UserID},
         UsageContext => $Self->{Authorization}->{UserType},
         Permission   => $PermissionName,
     );
-    if ( !$Result ) {
-        # return 403, because we don't have permission
-        return $Self->_Error(
-            Code => 'Forbidden',
-        );
-    }
-    elsif ( !IsHashRef($Result) ) {
-        return $Self->_Success();
-    }
-
-    # add corresponding permission filter
-    my %Filter = $Self->_CreateFilterForObject(
-        Object   => $Result->{Object},
-        Field    => $Result->{Attribute},
-        Operator => 'IN',
-        Value    => $Result->{ObjectIDs},
-        Creator  => 'BasePermission',
-    );
-    if ( !%Filter ) {
-        # we can't generate the filter, so this is a false
-        if ( $Self->{PermissionDebug} ) {
-            $Self->_PermissionDebug($Self->{LevelIndent}, sprintf("Unable to create permission filter for base permission!") );
+    if ( defined( $Result ) ) {
+        if ( !IsHashRef( $Result ) ) {
+            return $Self->_Success();
         }
-        return;
+
+        # add corresponding permission filter
+        %Filter = $Self->_CreateFilterForObject(
+            Object   => $Result->{Object},
+            Field    => $Result->{Attribute},
+            Operator => 'IN',
+            Value    => $Result->{ObjectIDs},
+            Creator  => 'BasePermission',
+        );
+        if ( !%Filter ) {
+            # we can't generate the filter, so this is a false
+            if ( $Self->{PermissionDebug} ) {
+                $Self->_PermissionDebug($Self->{LevelIndent}, sprintf("Unable to create permission filter for base permission!") );
+            }
+            return;
+        }
     }
 
     if ( $Self->can('ExecuteBasePermissionModules') ) {
         $Self->ExecuteBasePermissionModules(
             %Param,
             Filter => \%Filter
+        );
+    }
+
+    if ( !IsHashRefWithData( \%Filter ) ) {
+        # return 403, because we don't have permission
+        return $Self->_Error(
+            Code => 'Forbidden',
         );
     }
 

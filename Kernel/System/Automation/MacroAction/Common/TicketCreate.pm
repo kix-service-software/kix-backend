@@ -64,6 +64,10 @@ sub Describe {
             Richtext  => 0,
             Translate => 0,
         },
+        Serialization => {
+            Target => 'Contact',
+            Object => 'Contact'
+        }
     );
     $Self->AddOption(
         Name        => 'Lock',
@@ -84,6 +88,10 @@ sub Describe {
             Richtext  => 0,
             Translate => 0,
         },
+        Serialization => {
+            Target => 'Organisation',
+            Object => 'Organisation'
+        }
     );
     $Self->AddOption(
         Name        => 'OwnerLoginOrID',
@@ -94,6 +102,10 @@ sub Describe {
             Richtext  => 0,
             Translate => 0,
         },
+        Serialization => {
+            Target => 'Owner',
+            Object => 'User'
+        }
     );
     $Self->AddOption(
         Name        => 'Priority',
@@ -114,6 +126,10 @@ sub Describe {
             Richtext  => 0,
             Translate => 0,
         },
+        Serialization => {
+            Target => 'Responsible',
+            Object => 'User'
+        }
     );
     $Self->AddOption(
         Name        => 'State',
