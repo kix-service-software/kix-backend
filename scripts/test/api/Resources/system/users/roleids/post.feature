@@ -12,3 +12,13 @@ Feature: POST request to the /system/users/:UserID/roleids resource
      When I delete this user roleid with UserID 1
      Then the response code is 204
 
+  Scenario: added a user roleid
+    When added a user roleid with fail roleid
+    Then the response code is 400
+    And the response object is Error
+    And the error code is "Validator.Failed"
+    And the error message is "Validation of attribute RoleID failed!"
+
+
+
+

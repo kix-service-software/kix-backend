@@ -18,3 +18,30 @@ Feature: POST request to the /watchers resource
     When I delete this ticket
     Then the response code is 204
     And the response has no content
+
+  Scenario: I create a watcher fail attribute object
+    When I create a watcher fail attribute object
+    Then the response code is 409
+
+  Scenario: I create a watcher fail attribute objectid
+    When I create a watcher fail attribute objectid
+    Then the response code is 409
+    
+  Scenario: I create a watcher fail attribute userid
+    When I create a watcher fail attribute userid
+    Then the response code is 400
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -132,5 +132,40 @@ When qr/added a user with roles$/, sub {
    );
 };
 
+When qr/added a user with no login$/, sub {
+    ( S->{Response}, S->{ResponseContent} ) = _Post(
+        URL     => S->{API_URL}.'/system/users',
+        Token   => S->{Token},
+        Content => {
+            User => {
+                UserLogin => "",
+                UserPw => "secret2".rand(),
+                IsAgent => 1,
+                IsCustomer => 0,
+                RoleIDs => [
+                    3
+                ],
+                ValidID => 1
+            }
+        }
+    );
+};
 
-
+When qr/added a user with the same login$/, sub {
+    ( S->{Response}, S->{ResponseContent} ) = _Post(
+        URL     => S->{API_URL}.'/system/users',
+        Token   => S->{Token},
+        Content => {
+            User => {
+                UserLogin => "samelogin",
+                UserPw => "secret2".rand(),
+                IsAgent => 1,
+                IsCustomer => 0,
+                RoleIDs => [
+                    3
+                ],
+                ValidID => 1
+            }
+        }
+    );
+};
