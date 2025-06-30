@@ -685,6 +685,1324 @@ $Self->Is(
     'Test output for hex chars in 1000 generated random strings with hex dictionary',
 );
 
+my $Data = [
+    {
+        "ChangeBy" => 1,
+        "ChangeTime" => "2025-06-16 14:31:26",
+        "Comment" => undef,
+        "CreateBy" => 1,
+        "CreateTime" => "2025-06-16 14:31:26",
+        "ID" => 1,
+        "Name" => "5 very low",
+        "ObjectIcon" => 25,
+        "ValidID" => 1
+    },
+    {
+        "ChangeBy" => 1,
+        "ChangeTime" => "2025-06-16 14:31:26",
+        "Comment" => undef,
+        "CreateBy" => 1,
+        "CreateTime" => "2025-06-16 14:31:26",
+        "ID" => 2,
+        "Name" => "4 low",
+        "ObjectIcon" => 24,
+        "ValidID" => 1
+    },
+    {
+        "ChangeBy" => 1,
+        "ChangeTime" => "2025-06-16 14:31:26",
+        "Comment" => undef,
+        "CreateBy" => 1,
+        "CreateTime" => "2025-06-16 14:31:26",
+        "ID" => 3,
+        "Name" => "3 normal",
+        "ObjectIcon" => 23,
+        "ValidID" => 1
+    },
+    {
+        "ChangeBy" => 1,
+        "ChangeTime" => "2025-06-16 14:31:26",
+        "Comment" => undef,
+        "CreateBy" => 1,
+        "CreateTime" => "2025-06-16 14:31:26",
+        "ID" => 4,
+        "Name" => "2 high",
+        "ObjectIcon" => 22,
+        "ValidID" => 1
+    },
+    {
+        "ChangeBy" => 1,
+        "ChangeTime" => "2025-06-16 14:31:26",
+        "Comment" => undef,
+        "CreateBy" => 1,
+        "CreateTime" => "2025-06-16 14:31:26",
+        "ID" => 5,
+        "Name" => "1 very high",
+        "ObjectIcon" => 21,
+        "ValidID" => 1
+    }
+];
+
+# test object listing filtering
+@Tests = (
+    {
+        Name     => 'no data',
+        Strict   => 0,
+        Data     => undef,
+        Filter   => {
+        },
+        Expected => []
+    },
+    {
+        Name     => 'data is not an array ref',
+        Strict   => 0,
+        Data     => {},
+        Filter   => {
+        },
+        Expected => []
+    },
+    {
+        Name     => 'no filter',
+        Strict   => 0,
+        Data     => $Data,
+        Filter   => undef,
+        Expected => $Data
+    },
+    {
+        Name     => 'simple AND filter',
+        Strict   => 0,
+        Data     => $Data,
+        Filter   => {
+            AND => [
+                {
+                    Field => 'Name',
+                    Operator => 'EQ',
+                    Value => '2 high'
+                }
+            ]
+        },
+        Expected => [
+            {
+                "ChangeBy" => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment" => undef,
+                "CreateBy" => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID" => 4,
+                "Name" => "2 high",
+                "ObjectIcon" => 22,
+                "ValidID" => 1
+            },
+        ]
+    },
+    {
+        Name     => 'simple OR filter',
+        Strict   => 0,
+        Data     => $Data,
+        Filter   => {
+            OR => [
+                {
+                    Field => 'Name',
+                    Operator => 'EQ',
+                    Value => '2 high'
+                }
+            ]
+        },
+        Expected => [
+            {
+                "ChangeBy" => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment" => undef,
+                "CreateBy" => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID" => 4,
+                "Name" => "2 high",
+                "ObjectIcon" => 22,
+                "ValidID" => 1
+            },
+        ]
+    },
+    {
+        Name     => 'extended AND filter',
+        Strict   => 0,
+        Data     => $Data,
+        Filter   => {
+            AND => [
+                {
+                    Field => 'Name',
+                    Operator => 'EQ',
+                    Value => '2 high'
+                },
+                {
+                    Field => 'ID',
+                    Operator => 'EQ',
+                    Value => 4,
+                    Type => 'NUMERIC'
+                }
+            ]
+        },
+        Expected => [
+            {
+                "ChangeBy" => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment" => undef,
+                "CreateBy" => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID" => 4,
+                "Name" => "2 high",
+                "ObjectIcon" => 22,
+                "ValidID" => 1
+            },
+        ]
+    },
+    {
+        Name     => 'extended AND filter (no match)',
+        Strict   => 0,
+        Data     => $Data,
+        Filter   => {
+            AND => [
+                {
+                    Field => 'Name',
+                    Operator => 'EQ',
+                    Value => '2 high'
+                },
+                {
+                    Field => 'ID',
+                    Operator => 'EQ',
+                    Value => 5,
+                    Type => 'NUMERIC'
+                }
+            ]
+        },
+        Expected => []
+    },
+    {
+        Name     => 'extended OR filter',
+        Strict   => 0,
+        Data     => $Data,
+        Filter   => {
+            OR => [
+                {
+                    Field => 'Name',
+                    Operator => 'EQ',
+                    Value => '2 high'
+                },
+                {
+                    Field => 'ID',
+                    Operator => 'EQ',
+                    Value => 3,
+                    Type => 'NUMERIC'
+                }
+            ]
+        },
+        Expected => [
+            {
+                "ChangeBy" => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment" => undef,
+                "CreateBy" => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID" => 3,
+                "Name" => "3 normal",
+                "ObjectIcon" => 23,
+                "ValidID" => 1
+            },
+            {
+                "ChangeBy" => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment" => undef,
+                "CreateBy" => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID" => 4,
+                "Name" => "2 high",
+                "ObjectIcon" => 22,
+                "ValidID" => 1
+            },
+        ]
+    },
+    {
+        Name     => 'extended OR filter (no match)',
+        Strict   => 0,
+        Data     => $Data,
+        Filter   => {
+            OR => [
+                {
+                    Field => 'Name',
+                    Operator => 'EQ',
+                    Value => '2 higher'
+                },
+                {
+                    Field => 'ID',
+                    Operator => 'EQ',
+                    Value => 99,
+                    Type => 'NUMERIC'
+                }
+            ]
+        },
+        Expected => []
+    },
+    {
+        Name     => 'combined AND/OR filter',
+        Strict   => 0,
+        Data     => $Data,
+        Filter   => {
+            AND => [
+                {
+                    Field => 'ObjectIcon',
+                    Operator => 'IN',
+                    Value => [23,24]
+                }
+            ],
+            OR => [
+                {
+                    Field => 'Name',
+                    Operator => 'EQ',
+                    Value => '2 high'
+                },
+                {
+                    Field => 'ID',
+                    Operator => 'EQ',
+                    Value => 3,
+                    Type => 'NUMERIC'
+                }
+            ]
+        },
+        Expected => [
+            {
+                "ChangeBy" => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment" => undef,
+                "CreateBy" => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID" => 3,
+                "Name" => "3 normal",
+                "ObjectIcon" => 23,
+                "ValidID" => 1
+            },
+        ]
+    },
+    {
+        Name     => 'EQ filter',
+        Strict   => 0,
+        Data     => $Data,
+        Filter   => {
+            AND => [
+                {
+                    Field => 'Name',
+                    Operator => 'EQ',
+                    Value => '2 high',
+                }
+            ],
+        },
+        Expected => [
+            {
+                "ChangeBy" => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment" => undef,
+                "CreateBy" => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID" => 4,
+                "Name" => "2 high",
+                "ObjectIcon" => 22,
+                "ValidID" => 1
+            },
+        ]
+    },
+    {
+        Name     => 'NE filter',
+        Strict   => 0,
+        Data     => $Data,
+        Filter   => {
+            AND => [
+                {
+                    Field => 'Name',
+                    Operator => 'NE',
+                    Value => '2 high',
+                },
+                {
+                    Field => 'Name',
+                    Operator => 'NE',
+                    Value => '3 normal',
+                }
+            ],
+        },
+        Expected => [
+            {
+                "ChangeBy" => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment" => undef,
+                "CreateBy" => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID" => 1,
+                "Name" => "5 very low",
+                "ObjectIcon" => 25,
+                "ValidID" => 1
+            },
+            {
+                "ChangeBy" => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment" => undef,
+                "CreateBy" => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID" => 2,
+                "Name" => "4 low",
+                "ObjectIcon" => 24,
+                "ValidID" => 1
+            },
+            {
+                "ChangeBy" => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment" => undef,
+                "CreateBy" => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID" => 5,
+                "Name" => "1 very high",
+                "ObjectIcon" => 21,
+                "ValidID" => 1
+            }
+        ]
+    },
+    {
+        Name     => 'LT filter',
+        Strict   => 0,
+        Data     => $Data,
+        Filter   => {
+            AND => [
+                {
+                    Field => 'ObjectIcon',
+                    Operator => 'LT',
+                    Value => 22,
+                    Type => 'NUMERIC'
+                },
+            ],
+        },
+        Expected => [
+            {
+                "ChangeBy" => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment" => undef,
+                "CreateBy" => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID" => 5,
+                "Name" => "1 very high",
+                "ObjectIcon" => 21,
+                "ValidID" => 1
+            }
+        ]
+    },
+    {
+        Name     => 'LTE filter',
+        Strict   => 0,
+        Data     => $Data,
+        Filter   => {
+            AND => [
+                {
+                    Field => 'ObjectIcon',
+                    Operator => 'LTE',
+                    Value => 22,
+                    Type => 'NUMERIC'
+                },
+            ],
+        },
+        Expected => [
+            {
+                "ChangeBy" => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment" => undef,
+                "CreateBy" => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID" => 4,
+                "Name" => "2 high",
+                "ObjectIcon" => 22,
+                "ValidID" => 1
+            },
+            {
+                "ChangeBy" => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment" => undef,
+                "CreateBy" => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID" => 5,
+                "Name" => "1 very high",
+                "ObjectIcon" => 21,
+                "ValidID" => 1
+            },
+        ]
+    },
+    {
+        Name     => 'GT filter',
+        Strict   => 0,
+        Data     => $Data,
+        Filter   => {
+            AND => [
+                {
+                    Field => 'ObjectIcon',
+                    Operator => 'GT',
+                    Value => 22,
+                    Type => 'NUMERIC'
+                },
+            ],
+        },
+        Expected => [
+            {
+                "ChangeBy" => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment" => undef,
+                "CreateBy" => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID" => 1,
+                "Name" => "5 very low",
+                "ObjectIcon" => 25,
+                "ValidID" => 1
+            },
+            {
+                "ChangeBy" => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment" => undef,
+                "CreateBy" => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID" => 2,
+                "Name" => "4 low",
+                "ObjectIcon" => 24,
+                "ValidID" => 1
+            },
+            {
+                "ChangeBy" => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment" => undef,
+                "CreateBy" => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID" => 3,
+                "Name" => "3 normal",
+                "ObjectIcon" => 23,
+                "ValidID" => 1
+            },
+        ]
+    },
+    {
+        Name     => 'GTE filter',
+        Strict   => 0,
+        Data     => $Data,
+        Filter   => {
+            AND => [
+                {
+                    Field => 'ObjectIcon',
+                    Operator => 'GTE',
+                    Value => 22,
+                    Type => 'NUMERIC'
+                },
+            ],
+        },
+        Expected => [
+            {
+                "ChangeBy" => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment" => undef,
+                "CreateBy" => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID" => 1,
+                "Name" => "5 very low",
+                "ObjectIcon" => 25,
+                "ValidID" => 1
+            },
+            {
+                "ChangeBy" => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment" => undef,
+                "CreateBy" => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID" => 2,
+                "Name" => "4 low",
+                "ObjectIcon" => 24,
+                "ValidID" => 1
+            },
+            {
+                "ChangeBy" => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment" => undef,
+                "CreateBy" => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID" => 3,
+                "Name" => "3 normal",
+                "ObjectIcon" => 23,
+                "ValidID" => 1
+            },
+                {
+                "ChangeBy" => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment" => undef,
+                "CreateBy" => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID" => 4,
+                "Name" => "2 high",
+                "ObjectIcon" => 22,
+                "ValidID" => 1
+            },
+        ]
+    },
+    {
+        Name     => 'IN filter',
+        Strict   => 0,
+        Data     => $Data,
+        Filter   => {
+            AND => [
+                {
+                    Field => 'Name',
+                    Operator => 'IN',
+                    Value => ['2 high', '4 low']
+                }
+            ],
+        },
+        Expected => [
+            {
+                "ChangeBy" => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment" => undef,
+                "CreateBy" => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID" => 2,
+                "Name" => "4 low",
+                "ObjectIcon" => 24,
+                "ValidID" => 1
+            },
+            {
+                "ChangeBy" => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment" => undef,
+                "CreateBy" => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID" => 4,
+                "Name" => "2 high",
+                "ObjectIcon" => 22,
+                "ValidID" => 1
+            },
+        ]
+    },
+    {
+        Name     => 'STARTSWITH filter',
+        Strict   => 0,
+        Data     => $Data,
+        Filter   => {
+            AND => [
+                {
+                    Field => 'Name',
+                    Operator => 'STARTSWITH',
+                    Value => '2 ',
+                }
+            ],
+        },
+        Expected => [
+            {
+                "ChangeBy" => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment" => undef,
+                "CreateBy" => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID" => 4,
+                "Name" => "2 high",
+                "ObjectIcon" => 22,
+                "ValidID" => 1
+            },
+        ]
+    },
+    {
+        Name     => 'ENDSWITH filter',
+        Strict   => 0,
+        Data     => $Data,
+        Filter   => {
+            AND => [
+                {
+                    Field => 'Name',
+                    Operator => 'ENDSWITH',
+                    Value => 'high',
+                }
+            ],
+        },
+        Expected => [
+            {
+                "ChangeBy" => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment" => undef,
+                "CreateBy" => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID" => 4,
+                "Name" => "2 high",
+                "ObjectIcon" => 22,
+                "ValidID" => 1
+            },
+            {
+                "ChangeBy" => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment" => undef,
+                "CreateBy" => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID" => 5,
+                "Name" => "1 very high",
+                "ObjectIcon" => 21,
+                "ValidID" => 1
+            }
+        ]
+    },
+    {
+        Name     => 'CONTAINS filter',
+        Strict   => 0,
+        Data     => $Data,
+        Filter   => {
+            AND => [
+                {
+                    Field => 'Name',
+                    Operator => 'CONTAINS',
+                    Value => 'er',
+                }
+            ],
+        },
+        Expected => [
+            {
+                "ChangeBy" => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment" => undef,
+                "CreateBy" => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID" => 1,
+                "Name" => "5 very low",
+                "ObjectIcon" => 25,
+                "ValidID" => 1
+            },
+            {
+                "ChangeBy" => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment" => undef,
+                "CreateBy" => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID" => 5,
+                "Name" => "1 very high",
+                "ObjectIcon" => 21,
+                "ValidID" => 1
+            }
+        ]
+    },
+    {
+        Name     => 'LIKE filter',
+        Strict   => 0,
+        Data     => $Data,
+        Filter   => {
+            AND => [
+                {
+                    Field => 'Name',
+                    Operator => 'LIKE',
+                    Value => '*ow*',
+                }
+            ],
+        },
+        Expected => [
+            {
+                "ChangeBy" => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment" => undef,
+                "CreateBy" => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID" => 1,
+                "Name" => "5 very low",
+                "ObjectIcon" => 25,
+                "ValidID" => 1
+            },
+            {
+                "ChangeBy" => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment" => undef,
+                "CreateBy" => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID" => 2,
+                "Name" => "4 low",
+                "ObjectIcon" => 24,
+                "ValidID" => 1
+            },
+        ]
+    },
+
+
+
+
+
+
+
+
+
+
+    {
+        Name     => 'NOT EQ filter',
+        Strict   => 0,
+        Data     => $Data,
+        Filter   => {
+            AND => [
+                {
+                    Field => 'Name',
+                    Operator => 'EQ',
+                    Value => '2 high',
+                    Not => 1
+                }
+            ],
+        },
+        Expected => [
+            {
+                "ChangeBy" => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment" => undef,
+                "CreateBy" => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID" => 1,
+                "Name" => "5 very low",
+                "ObjectIcon" => 25,
+                "ValidID" => 1
+            },
+            {
+                "ChangeBy" => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment" => undef,
+                "CreateBy" => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID" => 2,
+                "Name" => "4 low",
+                "ObjectIcon" => 24,
+                "ValidID" => 1
+            },
+            {
+                "ChangeBy" => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment" => undef,
+                "CreateBy" => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID" => 3,
+                "Name" => "3 normal",
+                "ObjectIcon" => 23,
+                "ValidID" => 1
+            },
+            {
+                "ChangeBy" => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment" => undef,
+                "CreateBy" => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID" => 5,
+                "Name" => "1 very high",
+                "ObjectIcon" => 21,
+                "ValidID" => 1
+            }
+        ]
+    },
+    {
+        Name     => 'NOT NE filter',
+        Strict   => 0,
+        Data     => $Data,
+        Filter   => {
+            AND => [
+                {
+                    Field => 'Name',
+                    Operator => 'NE',
+                    Value => '2 high',
+                    Not => 1,
+                },
+                {
+                    Field => 'Name',
+                    Operator => 'NE',
+                    Value => '3 normal',
+                    Not => 1,
+                }
+            ],
+        },
+        Expected => []
+    },
+    {
+        Name     => 'NOT LT filter',
+        Strict   => 0,
+        Data     => $Data,
+        Filter   => {
+            AND => [
+                {
+                    Field => 'ObjectIcon',
+                    Operator => 'LT',
+                    Value => 22,
+                    Not => 1,
+                    Type => 'NUMERIC'
+                },
+            ],
+        },
+        Expected => [
+            {
+                "ChangeBy" => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment" => undef,
+                "CreateBy" => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID" => 1,
+                "Name" => "5 very low",
+                "ObjectIcon" => 25,
+                "ValidID" => 1
+            },
+            {
+                "ChangeBy" => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment" => undef,
+                "CreateBy" => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID" => 2,
+                "Name" => "4 low",
+                "ObjectIcon" => 24,
+                "ValidID" => 1
+            },
+            {
+                "ChangeBy" => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment" => undef,
+                "CreateBy" => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID" => 3,
+                "Name" => "3 normal",
+                "ObjectIcon" => 23,
+                "ValidID" => 1
+            },
+            {
+                "ChangeBy" => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment" => undef,
+                "CreateBy" => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID" => 4,
+                "Name" => "2 high",
+                "ObjectIcon" => 22,
+                "ValidID" => 1
+            },
+        ]
+    },
+    {
+        Name     => 'NOT LTE filter',
+        Strict   => 0,
+        Data     => $Data,
+        Filter   => {
+            AND => [
+                {
+                    Field => 'ObjectIcon',
+                    Operator => 'LTE',
+                    Value => 22,
+                    Not => 1,
+                    Type => 'NUMERIC'
+                },
+            ],
+        },
+        Expected => [
+            {
+                "ChangeBy" => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment" => undef,
+                "CreateBy" => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID" => 1,
+                "Name" => "5 very low",
+                "ObjectIcon" => 25,
+                "ValidID" => 1
+            },
+            {
+                "ChangeBy" => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment" => undef,
+                "CreateBy" => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID" => 2,
+                "Name" => "4 low",
+                "ObjectIcon" => 24,
+                "ValidID" => 1
+            },
+            {
+                "ChangeBy" => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment" => undef,
+                "CreateBy" => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID" => 3,
+                "Name" => "3 normal",
+                "ObjectIcon" => 23,
+                "ValidID" => 1
+            },
+        ]
+    },
+    {
+        Name     => 'NOT GT filter',
+        Strict   => 0,
+        Data     => $Data,
+        Filter   => {
+            AND => [
+                {
+                    Field => 'ObjectIcon',
+                    Operator => 'GT',
+                    Value => 22,
+                    Not => 1,
+                    Type => 'NUMERIC'
+                },
+            ],
+        },
+        Expected => [
+            {
+                "ChangeBy" => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment" => undef,
+                "CreateBy" => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID" => 4,
+                "Name" => "2 high",
+                "ObjectIcon" => 22,
+                "ValidID" => 1
+            },
+            {
+                "ChangeBy" => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment" => undef,
+                "CreateBy" => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID" => 5,
+                "Name" => "1 very high",
+                "ObjectIcon" => 21,
+                "ValidID" => 1
+            }
+        ]
+    },
+    {
+        Name     => 'NOT GTE filter',
+        Strict   => 0,
+        Data     => $Data,
+        Filter   => {
+            AND => [
+                {
+                    Field => 'ObjectIcon',
+                    Operator => 'GTE',
+                    Value => 22,
+                    Not => 1,
+                    Type => 'NUMERIC'
+                },
+            ],
+        },
+        Expected => [
+            {
+                "ChangeBy" => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment" => undef,
+                "CreateBy" => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID" => 5,
+                "Name" => "1 very high",
+                "ObjectIcon" => 21,
+                "ValidID" => 1
+            }
+        ]
+    },
+    {
+        Name     => 'NOT IN filter',
+        Strict   => 0,
+        Data     => $Data,
+        Filter   => {
+            AND => [
+                {
+                    Field => 'Name',
+                    Operator => 'IN',
+                    Value => ['2 high', '4 low'],
+                    Not => 1,
+                }
+            ],
+        },
+        Expected => [
+            {
+                "ChangeBy" => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment" => undef,
+                "CreateBy" => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID" => 1,
+                "Name" => "5 very low",
+                "ObjectIcon" => 25,
+                "ValidID" => 1
+            },
+            {
+                "ChangeBy" => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment" => undef,
+                "CreateBy" => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID" => 3,
+                "Name" => "3 normal",
+                "ObjectIcon" => 23,
+                "ValidID" => 1
+            },
+            {
+                "ChangeBy" => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment" => undef,
+                "CreateBy" => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID" => 5,
+                "Name" => "1 very high",
+                "ObjectIcon" => 21,
+                "ValidID" => 1
+            }
+        ]
+    },
+    {
+        Name     => 'NOT STARTSWITH filter',
+        Strict   => 0,
+        Data     => $Data,
+        Filter   => {
+            AND => [
+                {
+                    Field => 'Name',
+                    Operator => 'STARTSWITH',
+                    Value => '2 ',
+                    Not => 1,
+                }
+            ],
+        },
+        Expected => [
+            {
+                "ChangeBy" => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment" => undef,
+                "CreateBy" => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID" => 1,
+                "Name" => "5 very low",
+                "ObjectIcon" => 25,
+                "ValidID" => 1
+            },
+            {
+                "ChangeBy" => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment" => undef,
+                "CreateBy" => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID" => 2,
+                "Name" => "4 low",
+                "ObjectIcon" => 24,
+                "ValidID" => 1
+            },
+            {
+                "ChangeBy" => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment" => undef,
+                "CreateBy" => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID" => 3,
+                "Name" => "3 normal",
+                "ObjectIcon" => 23,
+                "ValidID" => 1
+            },
+            {
+                "ChangeBy" => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment" => undef,
+                "CreateBy" => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID" => 5,
+                "Name" => "1 very high",
+                "ObjectIcon" => 21,
+                "ValidID" => 1
+            }
+        ]
+    },
+    {
+        Name     => 'NOT ENDSWITH filter',
+        Strict   => 0,
+        Data     => $Data,
+        Filter   => {
+            AND => [
+                {
+                    Field => 'Name',
+                    Operator => 'ENDSWITH',
+                    Value => 'high',
+                    Not => 1,
+                }
+            ],
+        },
+        Expected => [
+            {
+                "ChangeBy" => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment" => undef,
+                "CreateBy" => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID" => 1,
+                "Name" => "5 very low",
+                "ObjectIcon" => 25,
+                "ValidID" => 1
+            },
+            {
+                "ChangeBy" => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment" => undef,
+                "CreateBy" => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID" => 2,
+                "Name" => "4 low",
+                "ObjectIcon" => 24,
+                "ValidID" => 1
+            },
+            {
+                "ChangeBy" => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment" => undef,
+                "CreateBy" => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID" => 3,
+                "Name" => "3 normal",
+                "ObjectIcon" => 23,
+                "ValidID" => 1
+            },
+        ]
+    },
+    {
+        Name     => 'NOT CONTAINS filter',
+        Strict   => 0,
+        Data     => $Data,
+        Filter   => {
+            AND => [
+                {
+                    Field => 'Name',
+                    Operator => 'CONTAINS',
+                    Value => 'er',
+                    Not => 1,
+                }
+            ],
+        },
+        Expected => [
+            {
+                "ChangeBy" => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment" => undef,
+                "CreateBy" => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID" => 2,
+                "Name" => "4 low",
+                "ObjectIcon" => 24,
+                "ValidID" => 1
+            },
+            {
+                "ChangeBy" => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment" => undef,
+                "CreateBy" => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID" => 3,
+                "Name" => "3 normal",
+                "ObjectIcon" => 23,
+                "ValidID" => 1
+            },
+            {
+                "ChangeBy" => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment" => undef,
+                "CreateBy" => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID" => 4,
+                "Name" => "2 high",
+                "ObjectIcon" => 22,
+                "ValidID" => 1
+            },
+        ]
+    },
+    {
+        Name     => 'NOT LIKE filter',
+        Strict   => 0,
+        Data     => $Data,
+        Filter   => {
+            AND => [
+                {
+                    Field => 'Name',
+                    Operator => 'LIKE',
+                    Value => '*ow*',
+                    Not => 1
+                }
+            ],
+        },
+        Expected => [
+            {
+                "ChangeBy" => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment" => undef,
+                "CreateBy" => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID" => 3,
+                "Name" => "3 normal",
+                "ObjectIcon" => 23,
+                "ValidID" => 1
+            },
+            {
+                "ChangeBy" => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment" => undef,
+                "CreateBy" => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID" => 4,
+                "Name" => "2 high",
+                "ObjectIcon" => 22,
+                "ValidID" => 1
+            },
+            {
+                "ChangeBy" => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment" => undef,
+                "CreateBy" => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID" => 5,
+                "Name" => "1 very high",
+                "ObjectIcon" => 21,
+                "ValidID" => 1
+            }
+        ]
+    },
+    {
+        Name     => 'filter with non-existing property (without strict mode)',
+        Strict   => 0,
+        Data     => $Data,
+        Filter   => {
+            AND => [
+                {
+                    Field => 'Test',
+                    Operator => 'LIKE',
+                    Value => '*ow*',
+                }
+            ],
+        },
+        Expected => []
+    },
+    {
+        Name     => 'filter with non-existing property (with strict mode)',
+        Strict   => 1,
+        Data     => $Data,
+        Filter   => {
+            AND => [
+                {
+                    Field => 'Test',
+                    Operator => 'LIKE',
+                    Value => '*ow*',
+                    Not => 1
+                }
+            ],
+        },
+        Expected => undef
+    },
+);
+
+my $TestCount = 0;
+foreach my $Test ( @Tests ) {
+    $TestCount++;
+
+    my $FilteredData = $MainObject->FilterObjectList(
+        %{$Test},
+    );
+
+    $Self->IsDeeply(
+        $FilteredData,
+        $Test->{Expected},
+        'FilterObjectList() Test "'.$Test->{Name}.'"',
+    );
+}
+
 # check variable replacement
 my $TextContent = $Kernel::OM->Get('Main')->FileRead(
     Location => $Kernel::OM->Get('Config')->Get('Home') . '/scripts/test/system/sample/Main/Variable-Test.txt',
@@ -708,6 +2026,7 @@ my $TestPNGBinJSON = $Kernel::OM->Get('JSON')->Encode(
     Data => $TestPNGBin
 );
 
+# test variable filters
 @Tests = (
     {
         Name => 'simple',
@@ -1003,7 +2322,7 @@ my $TestPNGBinJSON = $Kernel::OM->Get('JSON')->Encode(
 [
     {
         "file": [
-            null,
+            undef,
             "${Article.Attachments:0.Filename}",
             {
                 "content-type": "${Article.Attachments:0.ContentType}"
@@ -1021,7 +2340,7 @@ END
 [
     {
         "file": [
-            null,
+            undef,
             "test.png",
             {
                 "content-type": "image/png"

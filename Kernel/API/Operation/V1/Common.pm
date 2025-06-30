@@ -1369,9 +1369,12 @@ sub _Success {
                 $StartTime = Time::HiRes::time();
             }
 
-            $Self->_ApplyFilter(
+            my $Result = $Self->_ApplyFilter(
                 Data => \%Param,
             );
+            if ( IsHashRefWithData($Result) && exists $Result->{Success} && !$Result->{Success} ) {
+                return $Result;
+            }
 
             if ( $Self->{Debug} ) {
                 $Self->_Debug($Self->{LevelIndent}, sprintf("filtering took %i ms", TimeDiff($StartTime)));
@@ -1835,7 +1838,27 @@ sub _ValidateFilter {
         );
     }
 
+    my $Strict = $Kernel::OM->Get('Config')->Get('API::StrictSearching');
+
+    my %SearchDef;
     foreach my $Object ( keys %{$FilterDef} ) {
+
+        if ( $Param{Type} eq 'search' && $Strict ) {
+            # get the StateType data
+            my $AttributeList = $Kernel::OM->Get('ObjectSearch')->GetSupportedAttributes(
+                ObjectType => $Object
+            );
+            if ( IsArrayRefWithData($AttributeList) ) {
+                ATTRIBUTE:
+                foreach my $Attribute ( @{$AttributeList} ) {
+                    next ATTRIBUTE if !$Attribute->{IsSearchable};
+                    $SearchDef{$Object}->{$Attribute->{Property}} = $Attribute;
+                    $SearchDef{$Object}->{$Attribute->{Property}}->{Operators} = { map {$_ => 1} @{$Attribute->{Operators}} };
+                }
+            }
+        }
+
+        my $SupportedAttributes = $SearchDef{$Object};
 
         # do we have a object definition ?
         if ( !IsHashRefWithData( $FilterDef->{$Object} ) ) {
@@ -1886,8 +1909,21 @@ sub _ValidateFilter {
                     );
                 }
 
+                if ( $Strict && IsHashRefWithData($SupportedAttributes) && !IsHashRefWithData($SupportedAttributes->{$Filter->{Field}}) ) {
+                    return $Self->_Error(
+                        Code    => 'BadRequest',
+                        Message => "Search field \"$Filter->{Field}\" not supported for $Object!",
+                    );
+                }
+
                 # check if filter Operator is valid
-                if (
+                if ( $Strict && IsHashRefWithData($SupportedAttributes) && !$SupportedAttributes->{$Filter->{Field}}->{Operators}->{$Filter->{Operator}} ) {
+                    return $Self->_Error(
+                        Code    => 'BadRequest',
+                        Message => "Search operator \"$Filter->{Operator}\" not supported for property \"$Filter->{Field}\" of $Object!",
+                    );
+                }
+                elsif (
                     !$Filter->{Operator}
                     || !$OperatorTypeMapping{$Filter->{Operator}}
                 ) {
@@ -1898,6 +1934,14 @@ sub _ValidateFilter {
                 }
 
                 # check if type is valid
+                # don't go for strict type checking right now, because that might cause a lot of trouble
+                # if ( $Strict && IsHashRefWithData($SupportedAttributes) && $Filter->{Type} ne $SupportedAttributes->{$Filter->{Field}}->{Type} ) {
+                #     return $Self->_Error(
+                #         Code    => 'BadRequest',
+                #         Message => "Type \"$Filter->{Type}\" not supported for property \"$Filter->{Field}\" of $Object!",
+                #     );
+                # }
+                # elsif ( !$ValidTypes{ $Filter->{Type} } ) {
                 if ( !$ValidTypes{ $Filter->{Type} } ) {
                     return $Self->_Error(
                         Code    => 'BadRequest',
@@ -1906,7 +1950,7 @@ sub _ValidateFilter {
                 }
 
                 # check if combination of filter Operator and type is valid
-                if ( !$OperatorTypeMapping{ $Filter->{Operator} }->{ $Filter->{Type} } ) {
+                if ( !$Strict && !$OperatorTypeMapping{ $Filter->{Operator} }->{ $Filter->{Type} } ) {
                     return $Self->_Error(
                         Code    => 'BadRequest',
                         Message => "Type $Filter->{Type} not valid for operator $Filter->{Operator} in $Object.$Filter->{Field}!",
@@ -1994,25 +2038,37 @@ sub _ApplyFilter {
             }
 
             # filter each contained hash
-            my @FilteredResult = $Kernel::OM->Get('Main')->FilterObjectList(
+            my $FilteredResult = $Kernel::OM->Get('Main')->FilterObjectList(
                 Data   => $ObjectData,
                 Filter => $Filter->{$FilterObject},
+                Strict => $Kernel::OM->Get('Config')->Get('API::StrictFiltering'),
             );
+            if ( !$FilteredResult ) {
+                # get the last error log entry as the message
+                my $Message = $Kernel::OM->Get('Log')->GetLogEntry(
+                    Type => 'error',
+                    What => 'Message',
+                );
+                return $Self->_Error(
+                    Code    => 'BadRequest',
+                    Message => "Error in filter expression ($Message)!",
+                );
+            }
 
             if ( $Param{IsPermissionFilter} && IsHashRefWithData( $Param{Data}->{$Object} ) ) {
 
                 # if we are in the permission filter mode and have prepared something in the beginning, check if we have an item in the filtered result
                 # if not, the item cannot be read
-                $Param{Data}->{$Object} = $FilteredResult[0];
-                $Result{$Object} = scalar @FilteredResult;
+                $Param{Data}->{$Object} = $FilteredResult->[0];
+                $Result{$Object} = scalar @{$FilteredResult};
 
                 if ( $Self->{Debug} ) {
                     $Self->_Debug($Self->{LevelIndent}, sprintf("filtered result contains %i objects", $Result{$Object}));
                 }
             }
             else {
-                $Param{Data}->{$Object} = \@FilteredResult;
-                $Result{$Object} = scalar @FilteredResult;
+                $Param{Data}->{$Object} = $FilteredResult;
+                $Result{$Object} = scalar @{$FilteredResult};
             }
             if ( ref $Param{Data}->{$Object} eq 'ARRAY' && $Self->{Debug} ) {
                 $Self->_Debug($Self->{LevelIndent}, sprintf("filtered result contains %i objects", scalar @{$Param{Data}->{$Object}}));
