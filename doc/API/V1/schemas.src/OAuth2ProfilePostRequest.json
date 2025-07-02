@@ -22,6 +22,10 @@
           "type": "string",
           "description": "Scope to request for the OAuth2 token."
         },
+        "PKCE": {
+          "type": "integer",
+          "description": "Use PKCE for Authorization Code flow."
+        },
         "URLAuth": {
           "type": "string",
           "description": "Base URL for the OAuth2 authorization."
@@ -43,6 +47,7 @@
         "ClientSecret",
         "Name",
         "Scope",
+        "PKCE",
         "URLAuth",
         "URLToken",
         "URLRedirect",

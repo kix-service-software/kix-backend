@@ -80,6 +80,10 @@ sub ParameterDefinition {
         'Profile::Scope' => {
             RequiresValueIfUsed => 1
         },
+        'Profile::PKCE' => {
+            DataType            => 'NUMERIC',
+            RequiresValueIfUsed => 1
+        },
     }
 }
 
