@@ -43,6 +43,11 @@
       "readOnly": true,
       "description": "Scope to request for the OAuth2 token."
     },
+    "PKCE": {
+      "type": "integer",
+      "readOnly": true,
+      "description": "Use PKCE for Authorization Code flow."
+    },
     "URLAuth": {
       "type": "string",
       "readOnly": true,
@@ -73,6 +78,7 @@
     "ID",
     "Name",
     "Scope",
+    "PKCE",
     "URLAuth",
     "URLToken",
     "URLRedirect",
