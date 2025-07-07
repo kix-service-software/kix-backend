@@ -76,6 +76,10 @@ sub ParameterDefinition {
         'Profile::Scope' => {
             Required => 1
         },
+        'Profile::PKCE' => {
+            DataType            => 'NUMERIC',
+            RequiresValueIfUsed => 1,
+        },
     }
 }
 
@@ -92,7 +96,8 @@ perform OAuth2 ProfileCreate Operation. This will return the created ProfileID.
                 URLRedirect  => 'https://...',
                 ClientID     => 'ClientID',
                 ClientSecret => 'ClientSecret',
-                Scope        => 'Scope'
+                Scope        => 'Scope',
+                PKCE         => 1,
                 ValidID      => 1,
             },
         },
@@ -138,6 +143,7 @@ sub Run {
         ClientID     => $Profile->{ClientID},
         ClientSecret => $Profile->{ClientSecret},
         Scope        => $Profile->{Scope},
+        PKCE         => $Profile->{PKCE},
         ValidID      => $Profile->{ValidID} || 1,
         UserID       => $Self->{Authorization}->{UserID},
     );

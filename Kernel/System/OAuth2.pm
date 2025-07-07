@@ -17,6 +17,8 @@ package Kernel::System::OAuth2;
 use strict;
 use warnings;
 
+use Digest::SHA;
+use MIME::Base64;
 use URI;
 use URI::QueryParam;
 
@@ -71,6 +73,7 @@ add new oauth2 profile
         ClientID     => "ClientID",
         ClientSecret => "ClientSecret",
         Scope        => "Scope",
+        PKCE         => 1,
         ValidID      => 1,
         UserID       => 123,
     );
@@ -91,6 +94,9 @@ sub ProfileAdd {
         }
     }
 
+    # init value for PKCE if undefined
+    $Param{PKCE} //= 0;
+
     # check if a profile with this name already exists
     if ( $Self->ProfileLookup( Name => $Param{Name} ) ) {
         $Kernel::OM->Get('Log')->Log(
@@ -106,13 +112,13 @@ sub ProfileAdd {
     # store data
     return if !$DBObject->Do(
         SQL => 'INSERT INTO oauth2_profile (name, url_auth, url_token, url_redirect,'
-            . ' client_id, client_secret, scope, valid_id,'
+            . ' client_id, client_secret, scope, pkce, valid_id,'
             . ' create_time, create_by, change_time, change_by)'
-            . ' VALUES (?, ?, ?, ?, ?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?)',
+            . ' VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?)',
         Bind => [
             \$Param{Name}, \$Param{URLAuth}, \$Param{URLToken}, \$Param{URLRedirect},
-            \$Param{ClientID}, \$Param{ClientSecret}, \$Param{Scope}, \$Param{ValidID},
-            \$Param{UserID}, \$Param{UserID},
+            \$Param{ClientID}, \$Param{ClientSecret}, \$Param{Scope}, \$Param{PKCE},
+            \$Param{ValidID}, \$Param{UserID}, \$Param{UserID},
         ],
     );
 
@@ -163,6 +169,7 @@ returns
         ClientID     => "ClientID",
         ClientSecret => "ClientSecret",
         Scope        => "Scope",
+        PKCE         => 1,
         ValidID      => 1,
         CreateTime   => '2010-04-07 15:41:15',
         CreateBy     => '321',
@@ -204,7 +211,7 @@ sub ProfileGet {
     # ask the database
     return if !$DBObject->Prepare(
         SQL => 'SELECT id, name, url_auth, url_token, url_redirect,'
-            . ' client_id, client_secret, scope, valid_id,'
+            . ' client_id, client_secret, scope, pkce, valid_id,'
             . ' create_time, create_by, change_time, change_by'
             . ' FROM oauth2_profile WHERE id = ?',
         Bind => [ \$Param{ID} ],
@@ -222,11 +229,12 @@ sub ProfileGet {
             ClientID     => $Data[5],
             ClientSecret => $Data[6],
             Scope        => $Data[7],
-            ValidID      => $Data[8],
-            CreateTime   => $Data[9],
-            CreateBy     => $Data[10],
-            ChangeTime   => $Data[11],
-            ChangeBy     => $Data[12],
+            PKCE         => $Data[8],
+            ValidID      => $Data[9],
+            CreateTime   => $Data[10],
+            CreateBy     => $Data[11],
+            ChangeTime   => $Data[12],
+            ChangeBy     => $Data[13],
         );
     }
 
@@ -255,6 +263,7 @@ update profile attributes
         ClientID     => "ClientID",
         ClientSecret => "ClientSecret",
         Scope        => "Scope",
+        PKCE         => 1,
         ValidID      => 1,
         UserID       => 123,
     );
@@ -274,6 +283,9 @@ sub ProfileUpdate {
             return;
         }
     }
+
+    # init value for PKCE if undefined
+    $Param{PKCE} //= 0;
 
     # check if a profile with this name already exists
     my $ExistingID = $Self->ProfileLookup(
@@ -320,13 +332,13 @@ sub ProfileUpdate {
     # sql
     return if !$DBObject->Do(
         SQL => 'UPDATE oauth2_profile SET name = ?, url_auth = ?, url_token = ?, url_redirect = ?,'
-            . ' client_id = ?, client_secret = ?, scope = ?, valid_id = ?,'
+            . ' client_id = ?, client_secret = ?, scope = ?, pkce = ?, valid_id = ?,'
             . ' change_time = current_timestamp, change_by = ?'
             . ' WHERE id = ?',
         Bind => [
             \$Param{Name}, \$Param{URLAuth}, \$Param{URLToken}, \$Param{URLRedirect},
-            \$Param{ClientID}, \$Param{ClientSecret}, \$Param{Scope}, \$Param{ValidID},
-            \$Param{UserID}, \$Param{ID},
+            \$Param{ClientID}, \$Param{ClientSecret}, \$Param{Scope}, \$Param{PKCE},
+            \$Param{ValidID}, \$Param{UserID}, \$Param{ID},
         ],
     );
 
@@ -569,6 +581,9 @@ sub StateAdd {
         TokenType   => $Param{TokenType},
         URLRedirect => $Param{URLRedirect} || $Profile{URLRedirect}
     );
+    if ( $Param{CodeVerifier} ) {
+        $StateData{CodeVerifier} = $Param{CodeVerifier};
+    }
     if ( $Param{Nonce} ) {
         $StateData{Nonce} = $Param{Nonce};
     }
@@ -711,6 +726,19 @@ sub PrepareAuthURL {
         $Param{TokenType} = 'access_token';
     }
 
+    # prepare PKCE, when activated (RFC 7636)
+    my $CodeVerifier;
+    my $CodeChallenge;
+    if ( $Profile{PKCE} ) {
+        $CodeVerifier = $Kernel::OM->Get('Main')->GenerateRandomString(
+            Dictionary => [ 'A'..'Z', 'a'..'z', 0..9, '-', '.', '_', '~' ],
+            Length     => 128,
+        );
+        my $SHAObject = Digest::SHA->new('sha256');
+        $SHAObject->add($CodeVerifier);
+        $CodeChallenge = MIME::Base64::encode_base64url( $SHAObject->digest() );
+    } 
+
     # generate nonce, when requested
     my $Nonce;
     if ( $Param{Nonce} ) {
@@ -721,11 +749,12 @@ sub PrepareAuthURL {
 
     # create state
     my $State = $Self->StateAdd(
-        ProfileID   => $Param{ProfileID},
-        TokenType   => $Param{TokenType},
-        URLRedirect => $URLRedirect,
-        StateData   => $Param{StateData},
-        Nonce       => $Nonce,
+        ProfileID    => $Param{ProfileID},
+        TokenType    => $Param{TokenType},
+        URLRedirect  => $URLRedirect,
+        StateData    => $Param{StateData},
+        Nonce        => $Nonce,
+        CodeVerifier => $CodeVerifier,
     );
     return if ( !$State );
 
@@ -737,6 +766,10 @@ sub PrepareAuthURL {
     $URL->query_param_append( 'response_type', 'code' );
     $URL->query_param_append( 'response_mode', 'query' );
     $URL->query_param_append( 'state',         $State );
+    if ( $CodeChallenge ) {
+        $URL->query_param_append( 'code_challenge',        $CodeChallenge );
+        $URL->query_param_append( 'code_challenge_method', 'S256' );
+    }
     if ( $Nonce ) {
         $URL->query_param_append( 'nonce', $Nonce );
     }
@@ -799,11 +832,12 @@ sub ProcessAuthCode {
 
     # request token with authorization code
     my $Token = $Self->RequestToken(
-        ProfileID   => $StateData->{ProfileID},
-        TokenType   => $StateData->{TokenType},
-        URLRedirect => $StateData->{URLRedirect},
-        GrantType   => 'authorization_code',
-        Code        => $Param{AuthCode},
+        ProfileID    => $StateData->{ProfileID},
+        TokenType    => $StateData->{TokenType},
+        URLRedirect  => $StateData->{URLRedirect},
+        GrantType    => 'authorization_code',
+        Code         => $Param{AuthCode},
+        CodeVerifier => $StateData->{CodeVerifier},
     );
     if ( !$Token ) {
         return;
@@ -955,6 +989,18 @@ sub RequestToken {
         && $Param{Code}
     ) {
         $Data{code} = $Param{Code};
+
+        if ( $Profile{PKCE} ) {
+            if ( !$Param{CodeVerifier} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Got no challenge verifier, but PKCE is activated for profile ($Param{ProfileID})!"
+                );
+                return;
+            }
+
+            $Data{code_verifier} = $Param{CodeVerifier};
+        }
     }
     elsif ( $Param{GrantType} eq 'refresh_token' ) {
 

@@ -1255,12 +1255,23 @@ sub ResolveValueByKey {
     return $Data;
 }
 
+=item FilterObjectList()
+
+filter a list of objects
+
+    my $Value = $MainObject->FilterObjectList(
+        Data   => [],
+        Filter => {},            # API filter expression
+        Strict => 0|1,           # optional, returns undef in case of a non-existing filter property
+    );
+=cut
+
 sub FilterObjectList {
     my ($Self, %Param) = @_;
     my @FilteredResult;
 
     # without useful data, we've got nothing to do
-    return @FilteredResult if !IsArrayRefWithData($Param{Data});
+    return [] if !IsArrayRefWithData($Param{Data});
 
     my $Filter = $Param{Filter} || {};
 
@@ -1294,17 +1305,19 @@ sub FilterObjectList {
                                 if ( exists( $ObjectItem->{$SubObject} ) ) {
 
                                     # execute filter on sub-structure
-                                    my @FilteredData = $Self->FilterObjectList(
+                                    my $FilteredData = $Self->FilterObjectList(
                                         Data   => $SubData,
                                         Filter => {
                                             OR => [
                                                 \%SubFilter
                                             ]
-                                        }
+                                        },
+                                        Strict => $Param{Strict},
                                     );
+                                    return if !$FilteredData;
 
                                     # check filtered SubData
-                                    if ( !IsArrayRefWithData( \@FilteredData ) ) {
+                                    if ( !IsArrayRefWithData( $FilteredData ) ) {
                                         # the filter didn't match the sub-structure
                                         $FilterMatch = 0;
                                     }
@@ -1313,6 +1326,14 @@ sub FilterObjectList {
                                     # the sub-structure attribute doesn't exist, ignore this item
                                     $FilterMatch = 0;
                                 }
+                            }
+                            elsif ($Param{Strict}) {
+                                # filtered attribute not found and strict behaviour enabled - return an error
+                                $Kernel::OM->Get('Log')->Log(
+                                    Priority => 'error',
+                                    Message  => "Unsupported filter property \"$FilterItem->{Field}\"!"
+                                );
+                                return;
                             }
                             else {
                                 # filtered attribute not found, ignore this item
@@ -1530,7 +1551,7 @@ sub FilterObjectList {
         }
     }
 
-    return @FilteredResult;
+    return \@FilteredResult;
 }
 
 =item GetUnique()
