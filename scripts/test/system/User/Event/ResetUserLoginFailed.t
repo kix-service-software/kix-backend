@@ -40,25 +40,12 @@ $Self->True(
     'Prepare SysConfig "Authentication###000-Default" for test',
 );
 $Success = $Helper->ConfigSettingChange(
-    Key   => 'PreferencesGroups###Password',
-    Value => {
-        Module                            => 'Kernel::Output::HTML::Preferences::Password',
-        Column                            => 'User Profile',
-        Label                             => 'Change password',
-        Prio                              => '0500',
-        Area                              => 'Agent',
-        PasswordRegExp                    => '',
-        PasswordMinSize                   => '0',
-        PasswordMin2Lower2UpperCharacters => '0',
-        PasswordMin2Characters            => '0',
-        PasswordNeedDigit                 => '0',
-        PasswordMaxLoginFailed            => '2',
-        Active                            => '1',
-    },
+    Key   => 'Authentication::MaxLoginFailed',
+    Value => 2,
 );
 $Self->True(
     $Success,
-    'Prepare SysConfig "PreferencesGroups###Password" for test',
+    'Prepare SysConfig "Authentication::MaxLoginFailed" for test',
 );
 
 # create user

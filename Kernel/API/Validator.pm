@@ -88,7 +88,8 @@ sub new {
                 BackendObject          => $BackendObject,
                 ConsiderOperationRegEx => $ValidatorList->{$Validator}->{ConsiderOperationRegEx},
                 IgnoreOperationRegEx   => $ValidatorList->{$Validator}->{IgnoreOperationRegEx},
-                Parameters             => $Parameters
+                Parameters             => $Parameters,
+                Config                 => $ValidatorList->{$Validator}->{Config},
             };
         }
     }
@@ -206,7 +207,8 @@ sub _ValidateAttribute {
                 Parameters       => $Validator->{Parameters},
                 Data             => {
                     $Param{Attribute} => $Value
-                }
+                },
+                Config           => $Validator->{Config}
             );
 
             if ( !IsHashRefWithData($ValidatorResult) || !$ValidatorResult->{Success} ) {
