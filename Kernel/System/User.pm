@@ -269,23 +269,6 @@ sub GetUserData {
             );
         }
 
-        # add preferences defaults
-        my $Config = $Kernel::OM->Get('Config')->Get('PreferencesGroups');
-        if ( ref( $Config ) eq 'HASH' ) {
-
-            KEY:
-            for my $Key ( keys( %{ $Config } ) ) {
-
-                next KEY if ( !defined(  $Config->{ $Key }->{DataSelected} ) );
-
-                # check if data is defined
-                next KEY if ( defined( $Preferences{ $Config->{ $Key }->{PrefKey} } ) );
-
-                # set default data
-                $Preferences{ $Config->{ $Key }->{PrefKey} } = $Config->{ $Key }->{DataSelected};
-            }
-        }
-
         # add preferences to data hash
         $Data{Preferences} = \%Preferences;
     }

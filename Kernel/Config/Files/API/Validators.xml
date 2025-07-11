@@ -359,6 +359,53 @@
             </Hash>
         </Setting>
     </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="API::Validator::Module###UserPasswordValidator" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the validator layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::API::Validator::UserPasswordValidator</Item>
+                <Item Key="Validates">UserPw</Item>
+                <Item Key="ConsiderOperationRegEx">User(Create|Update)</Item>
+                <Item Key="IgnoreOperationRegEx"></Item>
+                <Item Key="Config">
+                    <Hash>
+                        <Item Key="RequirementMessage">Password has to be at least 6 characters long. It needs at least 2 upper case, 2 lower case and 1 digit.</Item>
+                        <Item Key="MinSize">6</Item>
+                        <Item Key="MaxSize"></Item>
+                        <Item Key="Checks">
+                            <Array>
+                                <Item>
+                                    <Hash>
+                                        <Item Key="RegExp">[A-Z]</Item>
+                                        <Item Key="MinCount">2</Item>
+                                        <Item Key="Required">1</Item>
+                                    </Hash>
+                                </Item>
+                                <Item>
+                                    <Hash>
+                                        <Item Key="RegExp">[a-z]</Item>
+                                        <Item Key="MinCount">2</Item>
+                                        <Item Key="Required">1</Item>
+                                    </Hash>
+                                </Item>
+                                <Item>
+                                    <Hash>
+                                        <Item Key="RegExp">[0-9]</Item>
+                                        <Item Key="MinCount">1</Item>
+                                        <Item Key="Required">1</Item>
+                                    </Hash>
+                                </Item>
+                            </Array>
+                        </Item>
+                        <Item Key="MinChecks"></Item>
+                        <Item Key="Stopwords">
+                            <Array></Array>
+                        </Item>
+                    </Hash>
+                </Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="API::Validator::Module###ValidValidator" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
