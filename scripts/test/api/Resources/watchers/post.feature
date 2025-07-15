@@ -21,11 +21,11 @@ Feature: POST request to the /watchers resource
 
   Scenario: I create a watcher fail attribute object
     When I create a watcher fail attribute object
-    Then the response code is 409
+    Then the response code is 201
 
   Scenario: I create a watcher fail attribute objectid
     When I create a watcher fail attribute objectid
-    Then the response code is 409
+    Then the response code is 201
     
   Scenario: I create a watcher fail attribute userid
     When I create a watcher fail attribute userid

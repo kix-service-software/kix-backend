@@ -42,7 +42,7 @@ Given qr/a user$/, sub {
       Content => {
         User => {
             UserLogin => "jdoe".rand(),
-            UserPw => "secret1".rand(),
+            UserPw => "SEcret1".rand(),
             IsAgent => 1,
             IsCustomer => 0,
             RoleIDs => [
@@ -81,7 +81,7 @@ Given qr/(\d+) of users$/, sub {
             Content => {
                 User => {
                     UserLogin => $UserLogin,
-                    UserPw => "secret1".rand(),
+                    UserPw => "SEcret1".rand(),
                     IsAgent => 1,
                     IsCustomer => 0,
                     RoleIDs => [
@@ -101,7 +101,7 @@ When qr/added a user$/, sub {
       Content => {
         User => {
             UserLogin => "jdoe".rand(),
-            UserPw => "secret2".rand(),
+            UserPw => "SEcret2".rand(),
             IsAgent => 1,
             IsCustomer => 0,
             RoleIDs => [
@@ -120,7 +120,7 @@ When qr/added a user with roles$/, sub {
       Content => {
         User => {
             UserLogin => "jdoe_roleid",
-            UserPw => "secret2".rand(),
+            UserPw => "SEcret2".rand(),
             IsAgent => 1,
             IsCustomer => 0,
             RoleIDs => [
@@ -139,7 +139,7 @@ When qr/added a user with no login$/, sub {
         Content => {
             User => {
                 UserLogin => "",
-                UserPw => "secret2".rand(),
+                UserPw => "SEcret2".rand(),
                 IsAgent => 1,
                 IsCustomer => 0,
                 RoleIDs => [
@@ -158,7 +158,7 @@ When qr/added a user with the same login$/, sub {
         Content => {
             User => {
                 UserLogin => "samelogin",
-                UserPw => "secret2".rand(),
+                UserPw => "SEcret2".rand(),
                 IsAgent => 1,
                 IsCustomer => 0,
                 RoleIDs => [
