@@ -205,7 +205,7 @@ sub _JoinGet {
     ) {
         push(
             @SQLJoin,
-            "INNER JOIN organisation $OrgaAlias ON $OrgaContactAlias.org_id = $OrgaAlias.id"
+            "LEFT JOIN organisation $OrgaAlias ON $OrgaContactAlias.org_id = $OrgaAlias.id"
         );
         $Param{Flags}->{JoinMap}->{OrganisationJoin} = $OrgaAlias;
     }
@@ -218,7 +218,7 @@ sub _JoinGet {
     ) {
         push(
             @SQLJoin,
-            "INNER JOIN organisation $POrgaAlias ON $POrgaContactAlias.org_id = $POrgaAlias.id"
+            "LEFT JOIN organisation $POrgaAlias ON $POrgaContactAlias.org_id = $POrgaAlias.id"
         );
         $Param{Flags}->{JoinMap}->{POrganisationJoin} = $POrgaAlias;
     }
