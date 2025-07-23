@@ -169,3 +169,23 @@ When qr/added a user with the same login$/, sub {
         }
     );
 };
+
+When qr/added a user with no password policy$/, sub {
+    ( S->{Response}, S->{ResponseContent} ) = _Post(
+        URL     => S->{API_URL}.'/system/users',
+        Token   => S->{Token},
+        Content => {
+            User => {
+                UserLogin => "PPtest",
+                UserPw => "Secret2",
+                IsAgent => 1,
+                IsCustomer => 0,
+                RoleIDs => [
+                    3
+                ],
+                ValidID => 1
+            }
+        }
+    );
+};
+

@@ -28,3 +28,15 @@ Feature: POST request to the /system/users resource
     And the error code is "Object.AlreadyExists"
     And the error message is "Cannot create user. Another user with same login already exists."
 
+  Scenario: added a user with no password policy
+    When added a user with no password policy
+    Then the response code is 400
+    And the error code is "Validator.Failed"
+    And the error message is "Password has to be at least 6 characters long. It needs at least 2 upper case, 2 lower case and 1 digit."
+
+
+
+
+
+
+
