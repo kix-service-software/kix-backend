@@ -140,7 +140,11 @@ sub Run {
     # add preferences
     if ( IsArrayRefWithData( $User->{Preferences} ) ) {
 
+        PREF:
         foreach my $Pref ( @{ $User->{Preferences} } ) {
+            # ignore the UserToken which will be given by the FE, since it was already created by the UserAdd method
+            next PREF if $Pref->{ID} eq 'UserToken';
+
             my $Result = $Self->ExecOperation(
                 OperationType => 'V1::User::UserPreferenceCreate',
                 Data          => {
@@ -161,7 +165,6 @@ sub Run {
     if ( IsArrayRefWithData( $User->{RoleIDs} ) ) {
 
         my %UserRoleList = map { $_ => 1 } $Kernel::OM->Get('Role')->UserRoleList(
-            RoleID => 1,
             UserID => $UserID,
         );
 
