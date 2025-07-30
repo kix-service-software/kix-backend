@@ -545,6 +545,71 @@ sub UserUpdate {
     return 1;
 }
 
+=item DeleteNewlyCreatedUser()
+
+delete a user which was newly created (currently used to delete a user created in a create contact API request)
+
+    my $Success = $ContactObject->DeleteNewlyCreatedUser(
+        UserID => 123,
+        ChangeUserID  => 123,
+    );
+
+=cut
+
+sub DeleteNewlyCreatedUser {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(UserID ChangeUserID)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    # cleanup preferences
+    $Self->DeletePreferences(
+        UserID => $Param{UserID}
+    );
+
+    # delete role assignments
+    $Kernel::OM->Get('Role')->RoleUserDelete(
+        UserID => $Param{UserID}
+    );
+
+    # delete user
+    return if !$Kernel::OM->Get('DB')->Prepare(
+        SQL  => 'DELETE FROM users WHERE id = ?',
+        Bind => [ \$Param{UserID} ],
+    );
+
+    # delete cache
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{CacheType}
+    );
+
+    # trigger event
+    $Self->EventHandler(
+        Event  => 'UserDelete',
+        Data   => {
+            ID => $Param{UserID},
+        },
+        UserID => $Param{ChangeUserID},
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
+        Event     => 'DELETE',
+        Namespace => 'User',
+        ObjectID  => $Param{UserID},
+    );
+
+    return 1;
+}
+
 =item UserSearch()
 
 to search users
@@ -1805,7 +1870,7 @@ delete a user preference
 
     my $Succes = $UserObject->DeletePreferences(
         UserID => 123,
-        Key    => 'some pref key',
+        Key    => 'some pref key',          # optional
     );
 
 =cut
@@ -1826,7 +1891,7 @@ sub DeletePreferences {
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'User.UserPreference',
-        ObjectID  => $Param{UserID} . '::' . $Param{Key},
+        ObjectID  => $Param{UserID} . '::' . ($Param{Key}||''),
     );
 
     return $Result;
