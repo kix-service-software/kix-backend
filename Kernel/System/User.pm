@@ -2234,6 +2234,40 @@ sub DeleteUserCounterObject {
         }
     }
 
+    # prepare user ids to notify of update
+    my @NotifyUserIDs = ();
+    if ( !$Param{UserID} ) {
+        # prepare sql and binds
+        my $SQL = 'SELECT user_id FROM user_counter WHERE object_id = ?';
+        my @Bind = (
+            \$Param{ObjectID},
+        );
+        if ( $Param{Counter} ) {
+            $Param{Counter} =~ s/\*/%/g;
+            $SQL .= ' AND counter LIKE ?';
+            push @Bind, \$Param{Counter};
+        }
+        if ( $Param{Category} ) {
+            $SQL .= ' AND category = ?';
+            push @Bind, \$Param{Category};
+        }
+
+        # prepare sql handle
+        return if !$Kernel::OM->Get('DB')->Prepare(
+            SQL  => $SQL,
+            Bind => \@Bind,
+        );
+
+        # fetch relevant user ids
+        while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
+            push( @NotifyUserIDs, $Row[0] );
+        }
+    }
+    else {
+        push( @NotifyUserIDs, $Param{UserID} );
+    }
+
+    # prepare sql and binds for counter deletion
     my $SQL = 'DELETE FROM user_counter WHERE object_id = ?';
     my @Bind = (
         \$Param{ObjectID},
@@ -2252,19 +2286,22 @@ sub DeleteUserCounterObject {
         push @Bind, \$Param{Category};
     }
 
-    # sql
+    # execute sql
     return if !$Kernel::OM->Get('DB')->Do(
         SQL  => $SQL,
         Bind => \@Bind,
     );
 
-    # push client callback event
-    $Kernel::OM->Get('ClientNotification')->NotifyClients(
-        Event     => 'UPDATE',
-        Namespace => 'User.Counters',
-        UserID    => ($Param{UserID} || '*'),
-        ObjectID  => ( $Param{Category} || '*').'.'.($Param{Counter} || '*'),
-    );
+    # notify all relevant users
+    for my $UserID ( @NotifyUserIDs ) {
+        # push client callback event
+        $Kernel::OM->Get('ClientNotification')->NotifyClients(
+            Event     => 'UPDATE',
+            Namespace => 'User.Counters',
+            UserID    => $UserID,
+            ObjectID  => ( $Param{Category} || '*').'.'.($Param{Counter} || '*'),
+        );
+    }
 
     return 1
 }
