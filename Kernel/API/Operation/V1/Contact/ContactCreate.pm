@@ -170,6 +170,26 @@ sub Run {
         }
     }
 
+    # check if we have to create a user
+    my $CreatedUserID;
+    if ($Contact->{User}) {
+        my $Result = $Self->ExecOperation(
+            OperationType => 'V1::User::UserCreate',
+            Data          => {
+                User   => $Contact->{User}
+            }
+        );
+
+        if ( !$Result->{Success} ) {
+            return $Self->_Error(
+                %{$Result},
+            )
+        }
+
+        $CreatedUserID = $Result->{Data}->{UserID};
+        $Contact->{AssignedUserID} = $CreatedUserID;
+    }
+
     # create Contact
     my $ContactID = $Kernel::OM->Get('Contact')->ContactAdd(
         %{$Contact},
@@ -177,6 +197,13 @@ sub Run {
         UserID          => $Self->{Authorization}->{UserID},
     );
     if ( !$ContactID ) {
+        if ( $CreatedUserID ) {
+            # remove newly created user
+            $Kernel::OM->Get('User')->DeleteNewlyCreatedUser(
+                UserID       => $CreatedUserID,
+                ChangeUserID => $Self->{Authorization}->{UserID}
+            );
+        }
         return $Self->_Error(
             Code    => 'Object.UnableToCreate',
             Message => 'Could not create Contact, please contact the system administrator',

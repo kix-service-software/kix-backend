@@ -412,6 +412,15 @@ $Self->True(
     'UserSearch() - IsOutOfOffice = 0, Preference set, day after',
 );
 
+my $DeleteResult = $Kernel::OM->Get('User')->DeleteNewlyCreatedUser(
+    UserID => $UserID,
+    ChangeUserID => 1,
+);
+$Self->True(
+    $DeleteResult,
+    'DeleteNewlyCreatedUser()',
+);
+
 # reset fixed time
 $Helper->FixedTimeUnset();
 
