@@ -1423,7 +1423,22 @@ sub CheckResourcePermission {
     return ( 1, Kernel::System::Role::Permission::PERMISSION_CRUD )
         if ( !$Kernel::OM->Get('Config')->Get('SecureMode') && $Param{UserID} == 1 );
 
-    my $StartTime;
+    # check usage context of user
+    my %User = $Self->GetUserData(
+        UserID        => $Param{UserID},
+        Valid         => 1,
+        NoPreferences => 1,
+    );
+    if (
+        !%User
+        || !$User{ 'Is' . $Param{UsageContext} }
+    ) {
+        if ( $Self->{PermissionDebug} ) {
+            $Self->_PermissionDebug($Self->{LevelIndent}, "User ID $Param{UserID} is invalid or does not have UsageContext \"$Param{UsageContext}\"");
+        }
+
+        return 0;
+    }
 
     if ( !IsHashRefWithData($Self->{Cache}->{PermissionCheckRoleList}) ) {
         # get list of all roles to resolve names
@@ -1444,14 +1459,11 @@ sub CheckResourcePermission {
         $Self->{Cache}->{PermissionCheckUserRoleList}->{"$Param{UsageContext}::$Param{UserID}"} = \@UserRoleList;
 
         if ( $Self->{PermissionDebug} ) {
-            my $UserLogin = $Self->UserLookup(
-                UserID => $Param{UserID},
-                Silent => 1,
-            );
-            $Self->_PermissionDebug($Self->{LevelIndent}, "active roles assigned to user \"$UserLogin\" (ID $Param{UserID}) as \"$Param{UsageContext}\": " . join(', ', map { '"'.($Self->{Cache}->{PermissionCheckRoleList}->{$_} || '')."\" (ID $_)" } sort @{$Self->{Cache}->{PermissionCheckUserRoleList}->{"$Param{UsageContext}::$Param{UserID}"}}));
+            $Self->_PermissionDebug($Self->{LevelIndent}, "active roles assigned to user \"$User{UserLogin}\" (ID $Param{UserID}) as \"$Param{UsageContext}\": " . join(', ', map { '"'.($Self->{Cache}->{PermissionCheckRoleList}->{$_} || '')."\" (ID $_)" } sort @{$Self->{Cache}->{PermissionCheckUserRoleList}->{"$Param{UsageContext}::$Param{UserID}"}}));
         }
     }
 
+    my $StartTime;
     if ( $Self->{PermissionDebug} ) {
         $StartTime = Time::HiRes::time();
         $Self->_PermissionDebug($Self->{LevelIndent}, "checking $Param{RequestedPermission} permission for target $Param{Target}");
