@@ -164,6 +164,12 @@ sub Search {
     if ( !defined( $Param{Result} ) ) {
         $Param{Result} = 'HASH';
     }
+    if (
+        !defined( $Param{Select} )
+        || $Param{Result} ne 'HASH'
+    ) {
+        $Param{Select} = [];
+    }
     if ( !defined( $Param{Search} ) ) {
         $Param{Search} = {};
     }
@@ -192,72 +198,74 @@ sub Search {
 
     # check parameter
     if ( !defined( $ResultRefMap{ $Param{Result} } ) ) {
-        if ( !$Param{Silent} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Invalid Result!",
-            );
-        }
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Invalid Result!",
+            Silent   => $Param{Silent},
+        );
+        return;
+    }
+    if ( ref( $Param{Select} ) ne 'ARRAY' ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Invalid Select!",
+            Silent   => $Param{Silent},
+        );
         return;
     }
     if ( ref( $Param{Search} ) ne 'HASH' ) {
-        if ( !$Param{Silent} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Invalid Search!",
-            );
-        }
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Invalid Search!",
+            Silent   => $Param{Silent},
+        );
         return;
     }
     if ( ref( $Param{Sort} ) ne 'ARRAY' ) {
-        if ( !$Param{Silent} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Invalid Sort!",
-            );
-        }
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Invalid Sort!",
+            Silent   => $Param{Silent},
+        );
         return;
     }
     if ( $Param{Limit} !~ m/^[0-9]+$/ ) {
-        if ( !$Param{Silent} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Invalid Limit!",
-            );
-        }
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Invalid Limit!",
+            Silent   => $Param{Silent},
+        );
         return;
     }
     if ( $Param{CacheTTL} !~ m/^[0-9]+$/ ) {
-        if ( !$Param{Silent} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Invalid CacheTTL!",
-            );
-        }
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Invalid CacheTTL!",
+            Silent   => $Param{Silent},
+        );
         return;
     }
     if ( $Param{UserID} !~ m/^[1-9][0-9]*$/ ) {
-        if ( !$Param{Silent} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Invalid UserID!",
-            );
-        }
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Invalid UserID!",
+            Silent   => $Param{Silent},
+        );
         return;
     }
     if ( $Param{UserType} !~ m/^(?:Agent|Customer)$/ ) {
-        if ( !$Param{Silent} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Invalid UserType!",
-            );
-        }
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Invalid UserType!",
+            Silent   => $Param{Silent},
+        );
         return;
     }
 
     # prepare cache key data
     my $CacheKeyData = {
         Result   => $Param{Result},
+        Select   => $Param{Select},
         Search   => $Param{Search},
         Sort     => $Param{Sort},
         Limit    => $Param{Limit},

@@ -65,6 +65,7 @@ sub GetSupportedAttributes {
 
     return {
         Fulltext => {
+            IsSelectable   => 0,
             IsSearchable   => 1,
             IsSortable     => 0,
             IsFulltextable => 0,

@@ -52,12 +52,14 @@ sub GetSupportedAttributes {
 
     return {
         Valid => {
+            IsSelectable   => 1,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 0,
             Operators      => ['EQ','NE','IN','!IN']
         },
         ValidID => {
+            IsSelectable   => 1,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 0,
@@ -67,26 +69,8 @@ sub GetSupportedAttributes {
     };
 }
 
-=item Sort()
-
-run this module and return the SQL extensions
-
-    my $Result = $Object->Sort(
-        Attribute => '...'      # required
-    );
-
-    $Result = {
-        Select   => [ ],          # optional
-        OrderBy  => [ ]           # optional
-    };
-
-=cut
-
-sub Sort {
+sub AttributePrepare {
     my ( $Self, %Param ) = @_;
-
-    # check params
-    return if !$Self->_CheckSortParams(%Param);
 
     # check for needed joins
     my $TableAliasTLP = 'tlp' . ( $Param{Flags}->{JoinMap}->{TranslationContactValid} // '' );
@@ -95,68 +79,54 @@ sub Sort {
     if ( $Param{Attribute} eq 'Valid' ) {
         if ( !$Param{Flags}->{JoinMap}->{ContactValid} ) {
             push( @SQLJoin, 'INNER JOIN valid cv ON cv.id = c.valid_id' );
-
             $Param{Flags}->{JoinMap}->{ContactValid} = 1;
         }
 
-        if ( !defined( $Param{Flags}->{JoinMap}->{TranslationContactValid} ) ) {
-            my $Count = $Param{Flags}->{TranslationJoinCounter}++;
-            $TableAliasTLP .= $Count;
-            $TableAliasTL  .= $Count;
+        if ( $Param{PrepareType} eq 'Sort' ) {
+            if ( !defined( $Param{Flags}->{JoinMap}->{TranslationContactValid} ) ) {
+                my $Count = $Param{Flags}->{TranslationJoinCounter}++;
+                $TableAliasTLP .= $Count;
+                $TableAliasTL  .= $Count;
 
-            push( @SQLJoin, "LEFT OUTER JOIN translation_pattern $TableAliasTLP ON $TableAliasTLP.value = cv.name" );
-            push( @SQLJoin, "LEFT OUTER JOIN translation_language $TableAliasTL ON $TableAliasTL.pattern_id = $TableAliasTLP.id AND $TableAliasTL.language = '$Param{Language}'" );
+                push( @SQLJoin, "LEFT OUTER JOIN translation_pattern $TableAliasTLP ON $TableAliasTLP.value = cv.name" );
+                push( @SQLJoin, "LEFT OUTER JOIN translation_language $TableAliasTL ON $TableAliasTL.pattern_id = $TableAliasTLP.id AND $TableAliasTL.language = '$Param{Language}'" );
 
-            $Param{Flags}->{JoinMap}->{TranslationContactValid} = $Count;
+                $Param{Flags}->{JoinMap}->{TranslationContactValid} = $Count;
+            }
         }
     }
 
     # init Definition
     my %AttributeDefinition = (
-        ValidID => {
-            Select  => ['c.valid_id'],
-            OrderBy => ['c.valid_id']
+        ValidID         => {
+            Column       => 'c.valid_id',
+            ConditionDef => {
+                ValueType => 'NUMERIC'
+            }
         },
-        Valid   => {
-            Select  => ["LOWER(COALESCE($TableAliasTL.value, cv.name)) AS TranslateValid"],
-            OrderBy => ['TranslateValid']
+        Valid => {
+            Column       => 'cv.name',
+            ConditionDef => {
+                ValueType => 'STRING'}
         }
     );
-
-    # return sort def
-    return {
-        Join    => \@SQLJoin,
-        Select  => $AttributeDefinition{ $Param{Attribute} }->{Select},
-        OrderBy => $AttributeDefinition{ $Param{Attribute} }->{OrderBy}
-    };
-}
-
-sub AttributePrepare {
-    my ( $Self, %Param ) = @_;
-
-    if ( $Param{Search}->{Field} eq 'Valid' ) {
-        my @Join;
-        if ( !$Param{Flags}->{JoinMap}->{ContactValid} ) {
-            push( @Join, 'INNER JOIN valid cv ON cv.id = c.valid_id' );
-            $Param{Flags}->{JoinMap}->{ContactValid} = 1;
+    
+    my %Attribute = (
+        Column => $AttributeDefinition{ $Param{Attribute} }->{Column},
+        SQLDef => {
+            Join => \@SQLJoin
         }
-
-        return {
-            ConditionDef => {
-                Column => 'cv.name'
-            },
-            SQLDef      => {
-                Join => \@Join
-            }
-        };
+    );
+    if ( $Param{PrepareType} eq 'Condition' ) {
+        $Attribute{ConditionDef} = $AttributeDefinition{ $Param{Attribute} }->{ConditionDef};
+    }
+    elsif ( $Param{PrepareType} eq 'Sort' ) {
+        if ( $Param{Attribute} eq 'Valid' ) {
+            $Attribute{Column} = 'LOWER(COALESCE(' . $TableAliasTL . '.value, cv.name))';
+        }
     }
 
-    return {
-        ConditionDef => {
-            Column    => 'c.valid_id',
-            ValueType => 'NUMERIC'
-        }
-    };
+    return \%Attribute;
 }
 
 1;

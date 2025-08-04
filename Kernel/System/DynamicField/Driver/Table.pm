@@ -51,6 +51,7 @@ sub new {
 
     # set field properties
     $Self->{Properties} = {
+        'IsSelectable'    => 0,
         'IsSearchable'    => 0,
         'IsSortable'      => 0,
         'IsFulltextable'  => 0,
@@ -284,23 +285,6 @@ sub ValueIsDifferent {
         Data1 => \$Param{Value1},
         Data2 => \$Param{Value2}
     );
-}
-
-sub SearchSQLSearchFieldGet {
-    my ( $Self, %Param ) = @_;
-
-    return {
-        Column => "$Param{TableAlias}.value_text"
-    };
-}
-
-sub SearchSQLSortFieldGet {
-    my ( $Self, %Param ) = @_;
-
-    return {
-        Select  => ["$Param{TableAlias}.value_text"],
-        OrderBy => ["$Param{TableAlias}.value_text"]
-    };
 }
 
 sub ReadableValueRender {

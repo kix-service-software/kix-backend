@@ -36,12 +36,14 @@ sub GetSupportedAttributes {
 
     my %Supported = (
         Emails => {
+            IsSelectable   => 0,
             IsSearchable   => 1,
             IsSortable     => 0,
             IsFulltextable => 0,
             Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         Email => {
+            IsSelectable   => 1,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 1,
@@ -51,6 +53,7 @@ sub GetSupportedAttributes {
 
     for ( 1..5 ) {
         $Supported{"Email$_"} = {
+            IsSelectable   => 1,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 1,
@@ -96,12 +99,20 @@ sub Search {
         };
     }
 
-    my $Definition = $Self->AttributePrepare(%Param);
+    my $Definition = $Self->AttributePrepare(
+        Flags       => $Param{Flags},
+        Attribute   => $Param{Search}->{Field},
+        Language    => $Param{Language},
+        UserType    => $Param{UserType},
+        UserID      => $Param{UserID},
+        PrepareType => 'Condition',
+    );
 
     return if !IsHashRefWithData($Definition);
 
     my $Condition = $Self->_GetCondition(
-        %{$Definition->{ConditionDef}},
+        %{$Definition->{ConditionDef} || {}},
+        Column   => $Definition->{Column},
         Operator => $Param{Search}->{Operator},
         Value    => $Param{Search}->{Value},
         Silent   => $Param{Silent}
@@ -110,29 +121,6 @@ sub Search {
     return {
         %{$Definition->{SQLDef} || {}},
         Where => [ $Condition ]
-    };
-}
-
-sub Sort {
-    my ( $Self, %Param ) = @_;
-
-    # check params
-    return if !$Self->_CheckSortParams(%Param);
-
-    # map search attributes to table attributes
-    my %AttributeDefinition = (
-        Email  => 'c.email',
-        Email1 => 'c.email1',
-        Email2 => 'c.email2',
-        Email3 => 'c.email3',
-        Email4 => 'c.email4',
-        Email5 => 'c.email5',
-    );
-
-    # c.email is set by GetBaseDef and does not have to be specified again in the select
-    return {
-        Select  => $Param{Attribute} ne 'Email' ? [ $AttributeDefinition{$Param{Attribute}} ] : [],
-        OrderBy => [$AttributeDefinition{$Param{Attribute}}]
     };
 }
 
@@ -149,13 +137,17 @@ sub AttributePrepare {
         Email5 => 'c.email5',
     );
 
-    return {
-        ConditionDef => {
-            Column          => $AttributeDefinition{ $Param{Search}->{Field} },
+    my %Attribute = (
+        Column => $AttributeDefinition{ $Param{Attribute} },
+    );
+    if ( $Param{PrepareType} eq 'Condition' ) {
+        $Attribute{ConditionDef} = {
             CaseInsensitive => 1,
             NULLValue       => 1
-        }
-    };
+        };
+    }
+
+    return \%Attribute;
 }
 
 1;

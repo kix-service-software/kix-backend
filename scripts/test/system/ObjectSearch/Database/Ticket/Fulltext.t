@@ -41,9 +41,11 @@ my $AttributeList = $AttributeObject->GetSupportedAttributes();
 $Self->IsDeeply(
     $AttributeList, {
         Fulltext => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['LIKE']
+            IsSelectable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 0,
+            Operators      => ['LIKE']
         }
     },
     'GetSupportedAttributes provides expected data'

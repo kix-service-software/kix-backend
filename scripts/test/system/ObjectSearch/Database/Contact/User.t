@@ -42,6 +42,7 @@ $Self->IsDeeply(
     $AttributeList,
     {
         UserID => {
+            IsSelectable   => 1,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 0,
@@ -49,6 +50,7 @@ $Self->IsDeeply(
             ValueType      => 'NUMERIC'
         },
         AssignedUserID => {
+            IsSelectable   => 1,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 0,
@@ -56,12 +58,14 @@ $Self->IsDeeply(
             ValueType      => 'NUMERIC'
         },
         Login => {
+            IsSelectable   => 1,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 1,
             Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         UserLogin => {
+            IsSelectable   => 1,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 1,
@@ -151,6 +155,7 @@ my @SearchTests = (
             Value    => '1'
         },
         Expected     => {
+            'Join' => [],
             'Where' => [
                 'c.user_id = 1'
             ]
@@ -164,6 +169,7 @@ my @SearchTests = (
             Value    => '1'
         },
         Expected     => {
+            'Join' => [],
             'Where' => [
                 '(c.user_id <> 1 OR c.user_id IS NULL)'
             ]
@@ -177,6 +183,7 @@ my @SearchTests = (
             Value    => ['1']
         },
         Expected     => {
+            'Join' => [],
             'Where' => [
                 'c.user_id IN (1)'
             ]
@@ -190,6 +197,7 @@ my @SearchTests = (
             Value    => ['1']
         },
         Expected     => {
+            'Join' => [],
             'Where' => [
                 'c.user_id NOT IN (1)'
             ]
@@ -203,6 +211,7 @@ my @SearchTests = (
             Value    => '1'
         },
         Expected     => {
+            'Join' => [],
             'Where' => [
                 'c.user_id = 1'
             ]
@@ -216,6 +225,7 @@ my @SearchTests = (
             Value    => '1'
         },
         Expected     => {
+            'Join' => [],
             'Where' => [
                 '(c.user_id <> 1 OR c.user_id IS NULL)'
             ]
@@ -229,6 +239,7 @@ my @SearchTests = (
             Value    => ['1']
         },
         Expected     => {
+            'Join' => [],
             'Where' => [
                 'c.user_id IN (1)'
             ]
@@ -242,6 +253,7 @@ my @SearchTests = (
             Value    => ['1']
         },
         Expected     => {
+            'Join' => [],
             'Where' => [
                 'c.user_id NOT IN (1)'
             ]
@@ -536,10 +548,10 @@ my @SortTests = (
         Expected  => {
             'Join' => [],
             'OrderBy' => [
-                'c.user_id'
+                'SortAttr0'
             ],
             'Select' => [
-                'c.user_id'
+                'c.user_id AS SortAttr0'
             ]
         }
     },
@@ -549,10 +561,10 @@ my @SortTests = (
         Expected  => {
             'Join' => [],
             'OrderBy' => [
-                'c.user_id'
+                'SortAttr0'
             ],
             'Select' => [
-                'c.user_id'
+                'c.user_id AS SortAttr0'
             ]
         }
     },
@@ -564,10 +576,10 @@ my @SortTests = (
                 'LEFT JOIN users u0 ON c.user_id = u0.id'
             ],
             'OrderBy' => [
-                'u0.login'
+                'SortAttr0'
             ],
             'Select' => [
-                'u0.login'
+                'u0.login AS SortAttr0'
             ]
         }
     },
@@ -579,10 +591,10 @@ my @SortTests = (
                 'LEFT JOIN users u0 ON c.user_id = u0.id'
             ],
             'OrderBy' => [
-                'u0.login'
+                'SortAttr0'
             ],
             'Select' => [
-                'u0.login'
+                'u0.login AS SortAttr0'
             ]
         }
     }

@@ -164,6 +164,7 @@ sub Search {
     # prepare sql defintion
     my $SQLDef = $Self->_PrepareSQLDef(
         Backend  => $ObjectTypeBackend,
+        Select   => $Param{Select},
         Search   => $Param{Search},
         Sort     => $Param{Sort},
         Language => $Param{Language},
@@ -201,7 +202,21 @@ END
     while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         next if $Objects{ $Row[0] };
         push( @ObjectIDs, $Row[0] );
-        $Objects{ $Row[0] } = $Row[1];
+
+        if ( IsArrayRefWithData( $Param{Select} ) ) {
+            my $ID = shift( @Row );
+            shift( @Row );
+
+            my %Entry = ();
+            for my $Attribute ( @{ $Param{Select} } ) {
+                $Entry{ $Attribute } = shift( @Row );
+            }
+
+            $Objects{ $ID } = \%Entry;
+        }
+        else {
+            $Objects{ $Row[0] } = $Row[1];
+        }
 
         last if (
             $Param{Limit}
@@ -361,6 +376,20 @@ sub _PrepareSQLDef {
         }
     }
     return if ( !$Success );
+
+    # get select def from backend
+    if ( IsArrayRefWithData( $Param{Select} ) ) {
+        my $SelectDef = $Param{Backend}->GetSelectDef(
+            %Param,
+            Flags => \%Flags
+        );
+        return if ( ref( $SelectDef ) ne 'HASH' );
+
+        # add select def to sql def
+        for my $Key ( keys %{ $SelectDef } ) {
+            push( @{ $SQLDef{ $Key } }, @{ $SelectDef->{ $Key } } );
+        }
+    }
 
     # check permission if UserID given and prepare relevant part of SQL statement (not needed for user with id 1)
     if ( $Param{UserID} != 1 ) {

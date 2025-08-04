@@ -42,6 +42,7 @@ $Self->IsDeeply(
     $AttributeList,
     {
         CreateByID => {
+            IsSelectable   => 1,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 0,
@@ -49,6 +50,7 @@ $Self->IsDeeply(
             ValueType      => 'NUMERIC'
         },
         CreateBy => {
+            IsSelectable   => 1,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 0,
@@ -56,6 +58,7 @@ $Self->IsDeeply(
             ValueType      => 'NUMERIC'
         },
         ChangeByID => {
+            IsSelectable   => 1,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 0,
@@ -63,6 +66,7 @@ $Self->IsDeeply(
             ValueType      => 'NUMERIC'
         },
         ChangeBy => {
+            IsSelectable   => 1,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 0,
@@ -583,8 +587,8 @@ my @SortTests = (
         Attribute => 'CreateByID',
         Expected  => {
             'Join'    => [],
-            'Select'  => ['c.create_by'],
-            'OrderBy' => ['c.create_by']
+            'Select'  => ['c.create_by AS SortAttr0'],
+            'OrderBy' => ['SortAttr0']
         }
     },
     {
@@ -595,8 +599,16 @@ my @SortTests = (
                 'INNER JOIN users ccru ON ccru.id = c.create_by',
                 'LEFT OUTER JOIN contact ccruc ON ccruc.user_id = ccru.id'
             ],
-            'Select'  => ['ccruc.lastname','ccruc.firstname','ccru.login'],
-            'OrderBy' => ['LOWER(ccruc.lastname)','LOWER(ccruc.firstname)','LOWER(ccru.login)']
+            'Select'  => [
+                'LOWER(ccruc.lastname) AS SortAttr0',
+                'LOWER(ccruc.firstname) AS SortAttr1',
+                'LOWER(ccru.login) AS SortAttr2'
+            ],
+            'OrderBy' => [
+                'SortAttr0',
+                'SortAttr1',
+                'SortAttr2'
+            ]
         }
     },
     {
@@ -604,8 +616,8 @@ my @SortTests = (
         Attribute => 'ChangeByID',
         Expected  => {
             'Join'    => [],
-            'Select'  => ['c.change_by'],
-            'OrderBy' => ['c.change_by']
+            'Select'  => ['c.change_by AS SortAttr0'],
+            'OrderBy' => ['SortAttr0']
         }
     },
     {
@@ -616,8 +628,16 @@ my @SortTests = (
                 'INNER JOIN users cchu ON cchu.id = c.change_by',
                 'LEFT OUTER JOIN contact cchuc ON cchuc.user_id = cchu.id'
             ],
-            'Select'  => ['cchuc.lastname','cchuc.firstname','cchu.login'],
-            'OrderBy' => ['LOWER(cchuc.lastname)','LOWER(cchuc.firstname)','LOWER(cchu.login)']
+            'Select'  => [
+                'LOWER(cchuc.lastname) AS SortAttr0',
+                'LOWER(cchuc.firstname) AS SortAttr1',
+                'LOWER(cchu.login) AS SortAttr2'
+            ],
+            'OrderBy' => [
+                'SortAttr0',
+                'SortAttr1',
+                'SortAttr2'
+            ]
         }
     }
 );

@@ -42,20 +42,26 @@ $Self->IsDeeply(
     $AttributeList,
     {
         OrganisationID => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','GT','GTE','LT','LTE'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN','GT','GTE','LT','LTE'],
+            ValueType      => 'NUMERIC'
         },
         Organisation => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
         OrganisationNumber => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         }
     },
     'GetSupportedAttributes provides expected data'
@@ -635,10 +641,10 @@ my @SortTests = (
         Expected  => {
             'Join'    => [],
             'OrderBy' => [
-                'st.organisation_id'
+                'SortAttr0'
             ],
             'Select'  => [
-                'st.organisation_id'
+                'st.organisation_id AS SortAttr0'
             ]
         }
     },
@@ -650,10 +656,10 @@ my @SortTests = (
                 'LEFT OUTER JOIN organisation torg ON torg.id = st.organisation_id'
             ],
             'OrderBy' => [
-                'LOWER(torg.name)'
+                'SortAttr0'
             ],
             'Select'  => [
-                'torg.name'
+                'LOWER(torg.name) AS SortAttr0'
             ]
         }
     },
@@ -665,10 +671,10 @@ my @SortTests = (
                 'LEFT OUTER JOIN organisation torg ON torg.id = st.organisation_id'
             ],
             'OrderBy' => [
-                'LOWER(torg.number)'
+                'SortAttr0'
             ],
             'Select'  => [
-                'torg.number'
+                'LOWER(torg.number) AS SortAttr0'
             ]
         }
     }

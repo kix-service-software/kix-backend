@@ -42,6 +42,7 @@ $Self->IsDeeply(
     $AttributeList,
     {
         CreateTime => {
+            IsSelectable   => 1,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 0,
@@ -49,6 +50,7 @@ $Self->IsDeeply(
             ValueType      => 'DATETIME'
         },
         ChangeTime => {
+            IsSelectable   => 1,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 0,
@@ -483,16 +485,16 @@ my @SortTests = (
         Name      => 'Sort: Attribute "CreateTime"',
         Attribute => 'CreateTime',
         Expected  => {
-            Select        => [ 'c.create_time' ],
-            OrderBy       => [ 'c.create_time' ]
+            Select        => [ 'c.create_time AS SortAttr0' ],
+            OrderBy       => [ 'SortAttr0' ]
         }
     },
     {
         Name      => 'Sort: Attribute "ChangeTime"',
         Attribute => 'ChangeTime',
         Expected  => {
-            Select  => [ 'c.change_time' ],
-            OrderBy => [ 'c.change_time' ]
+            Select  => [ 'c.change_time AS SortAttr0' ],
+            OrderBy => [ 'SortAttr0' ]
         }
     }
 );

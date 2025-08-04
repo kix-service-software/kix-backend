@@ -34,68 +34,39 @@ sub GetSupportedAttributes {
 
     return {
         PriorityID => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','GT','GTE','LT','LTE'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN','GT','GTE','LT','LTE'],
+            ValueType      => 'NUMERIC'
         },
         Priority => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         }
     };
 }
 
-sub Search {
+sub AttributePrepare {
     my ( $Self, %Param ) = @_;
 
-    # check params
-    return if ( !$Self->_CheckSearchParams( %Param ) );
-
-    # init mapping
-    my %AttributeMapping = (
+    # init Definition
+    my %AttributeDefinition = (
         PriorityID => {
-            Column    => 'st.ticket_priority_id',
-            ValueType => 'NUMERIC'
+            Column       => 'st.ticket_priority_id',
+            ConditionDef => {
+                ValueType => 'NUMERIC'
+            }
         },
         Priority   => {
-            Column    => 'tp.name'
+            Column       => 'tp.name',
+            ConditionDef => {}
         }
     );
-
-    # check for needed joins
-    my @SQLJoin = ();
-    if ( $Param{Search}->{Field} eq 'Priority' ) {
-        if ( !$Param{Flags}->{JoinMap}->{TicketPriority} ) {
-            push( @SQLJoin, 'INNER JOIN ticket_priority tp ON tp.id = st.ticket_priority_id' );
-
-            $Param{Flags}->{JoinMap}->{TicketPriority} = 1;
-        }
-    }
-
-    # prepare condition
-    my $Condition = $Self->_GetCondition(
-        Operator  => $Param{Search}->{Operator},
-        Column    => $AttributeMapping{ $Param{Search}->{Field} }->{Column},
-        ValueType => $AttributeMapping{ $Param{Search}->{Field} }->{ValueType},
-        Value     => $Param{Search}->{Value},
-        Silent    => $Param{Silent}
-    );
-    return if ( !$Condition );
-
-    # return search def
-    return {
-        Join  => \@SQLJoin,
-        Where => [ $Condition ]
-    };
-}
-
-sub Sort {
-    my ( $Self, %Param ) = @_;
-
-    # check params
-    return if ( !$Self->_CheckSortParams( %Param ) );
 
     # check for needed joins
     my $TableAliasTLP = 'tlp' . ( $Param{Flags}->{JoinMap}->{TranslationTicketPriority} // '' );
@@ -108,36 +79,36 @@ sub Sort {
             $Param{Flags}->{JoinMap}->{TicketPriority} = 1;
         }
 
-        if ( !defined( $Param{Flags}->{JoinMap}->{TranslationTicketPriority} ) ) {
-            my $Count = $Param{Flags}->{TranslationJoinCounter}++;
-            $TableAliasTLP .= $Count;
-            $TableAliasTL  .= $Count;
+        if ( $Param{PrepareType} eq 'Sort' ) {
+            if ( !defined( $Param{Flags}->{JoinMap}->{TranslationTicketPriority} ) ) {
+                my $Count = $Param{Flags}->{TranslationJoinCounter}++;
+                $TableAliasTLP .= $Count;
+                $TableAliasTL  .= $Count;
 
-            push( @SQLJoin, "LEFT OUTER JOIN translation_pattern $TableAliasTLP ON $TableAliasTLP.value = tp.name" );
-            push( @SQLJoin, "LEFT OUTER JOIN translation_language $TableAliasTL ON $TableAliasTL.pattern_id = $TableAliasTLP.id AND $TableAliasTL.language = '$Param{Language}'" );
+                push( @SQLJoin, "LEFT OUTER JOIN translation_pattern $TableAliasTLP ON $TableAliasTLP.value = tp.name" );
+                push( @SQLJoin, "LEFT OUTER JOIN translation_language $TableAliasTL ON $TableAliasTL.pattern_id = $TableAliasTLP.id AND $TableAliasTL.language = '$Param{Language}'" );
 
-            $Param{Flags}->{JoinMap}->{TranslationTicketPriority} = $Count;
+                $Param{Flags}->{JoinMap}->{TranslationTicketPriority} = $Count;
+            }
         }
     }
 
-    # init mapping
-    my %AttributeMapping = (
-        PriorityID => {
-            Select  => ['st.ticket_priority_id'],
-            OrderBy => ['st.ticket_priority_id']
-        },
-        Priority   => {
-            Select  => ["LOWER(COALESCE($TableAliasTL.value, tp.name)) AS TranslatePriority"],
-            OrderBy => ['TranslatePriority']
+    my %Attribute = (
+        Column => $AttributeDefinition{ $Param{Attribute} }->{Column},
+        SQLDef => {
+            Join => \@SQLJoin,
         }
     );
+    if ( $Param{PrepareType} eq 'Condition' ) {
+        $Attribute{ConditionDef} = $AttributeDefinition{ $Param{Attribute} }->{ConditionDef};
+    }
+    elsif ( $Param{PrepareType} eq 'Sort' ) {
+        if ( $Param{Attribute} eq 'Priority' ) {
+            $Attribute{Column} = 'LOWER(COALESCE(' . $TableAliasTL . '.value, tp.name))';
+        }
+    }
 
-    # return sort def
-    return {
-        Join    => \@SQLJoin,
-        Select  => $AttributeMapping{ $Param{Attribute} }->{Select},
-        OrderBy => $AttributeMapping{ $Param{Attribute} }->{OrderBy}
-    };
+    return \%Attribute;
 }
 
 1;

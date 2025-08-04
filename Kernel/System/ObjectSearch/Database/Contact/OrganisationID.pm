@@ -38,6 +38,7 @@ sub GetSupportedAttributes {
 
     return {
         OrganisationID => {
+            IsSelectable   => 0,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 0,
@@ -45,6 +46,7 @@ sub GetSupportedAttributes {
             ValueType      => 'NUMERIC'
         },
         OrganisationIDs => {
+            IsSelectable   => 0,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 0,
@@ -52,18 +54,21 @@ sub GetSupportedAttributes {
             ValueType      => 'NUMERIC'
         },
         Organisation => {
+            IsSelectable   => 0,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 1,
             Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         OrganisationNumber => {
+            IsSelectable   => 0,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 1,
             Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         PrimaryOrganisationID => {
+            IsSelectable   => 1,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 0,
@@ -71,45 +76,19 @@ sub GetSupportedAttributes {
             ValueType      => 'NUMERIC'
         },
         PrimaryOrganisation => {
+            IsSelectable   => 1,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 1,
             Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         PrimaryOrganisationNumber => {
+            IsSelectable   => 1,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 1,
             Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         }
-    };
-}
-
-sub Sort {
-    my ( $Self, %Param ) = @_;
-
-    # check params
-    return if !$Self->_CheckSortParams( %Param );
-
-    my %JoinData = $Self->_JoinGet(
-        %Param
-    );
-
-    # map search attributes to table attributes
-    my %AttributeDefinition = (
-        OrganisationID            => "$JoinData{OCAlias}.org_id",
-        OrganisationIDs           => "$JoinData{OCAlias}.org_id",
-        Organisation              => "$JoinData{OAlias}.name",
-        OrganisationNumber        => "$JoinData{OAlias}.number",
-        PrimaryOrganisationID     => "$JoinData{POCAlias}.org_id",
-        PrimaryOrganisation       => "$JoinData{POAlias}.name",
-        PrimaryOrganisationNumber => "$JoinData{POAlias}.number",
-    );
-
-    return {
-        Select  => [ $AttributeDefinition{ $Param{Attribute} } ],
-        OrderBy => [ $AttributeDefinition{ $Param{Attribute} } ],
-        Join    => $JoinData{Join}
     };
 }
 
@@ -117,63 +96,82 @@ sub AttributePrepare {
     my ( $Self, %Param ) = @_;
 
     my %JoinData = $Self->_JoinGet(
-        %Param
+        Flags     => $Param{Flags},
+        Attribute => $Param{Attribute}
     );
 
     # map search attributes to table attributes
-    my %Attributes = (
+    my %AttributeDefinition = (
         OrganisationID => {
             Column    => "$JoinData{OCAlias}.org_id",
-            ValueType => 'NUMERIC'
+            ConditionDef => {
+                ValueType => 'NUMERIC'
+            }
         },
         OrganisationIDs => {
             Column    => "$JoinData{OCAlias}.org_id",
-            ValueType => 'NUMERIC'
+                ConditionDef => {
+                ValueType => 'NUMERIC'
+            }
         },
         Organisation => {
             Column          =>"$JoinData{OAlias}.name",
-            ValueType       => 'STRING',
-            CaseInsensitive => 1
+            ConditionDef => {
+                ValueType       => 'STRING',
+                CaseInsensitive => 1
+            }
         },
         OrganisationNumber => {
             Column          => "$JoinData{OAlias}.number",
-            ValueType       => 'STRING',
-            CaseInsensitive => 1
+            ConditionDef => {
+                ValueType       => 'STRING',
+                CaseInsensitive => 1
+            }
         },
         PrimaryOrganisationID => {
             Column    => "$JoinData{POCAlias}.org_id",
-            ValueType => 'NUMERIC'
+                ConditionDef => {
+                ValueType => 'NUMERIC'
+            }
         },
         PrimaryOrganisation => {
             Column          => "$JoinData{POAlias}.name",
-            ValueType       => 'STRING',
-            CaseInsensitive => 1
+            ConditionDef => {
+                ValueType       => 'STRING',
+                CaseInsensitive => 1
+            }
         },
         PrimaryOrganisationNumber => {
             Column          => "$JoinData{POAlias}.number",
-            ValueType       => 'STRING',
-            CaseInsensitive => 1
+            ConditionDef => {
+                ValueType       => 'STRING',
+                CaseInsensitive => 1
+            }
         }
     );
 
-    return {
-        ConditionDef => $Attributes{ $Param{Search}->{Field} },
-        SQLDef       => {
+    my %Attribute = (
+        Column => $AttributeDefinition{ $Param{Attribute} }->{Column},
+        SQLDef => {
             Join => $JoinData{Join},
         }
-    };
+    );
+    if ( $Param{PrepareType} eq 'Condition' ) {
+        $Attribute{ConditionDef} = $AttributeDefinition{ $Param{Attribute} }->{ConditionDef};
+    }
+
+    return \%Attribute;
 }
 
 sub _JoinGet {
     my ( $Self, %Param ) = @_;
 
-    my $Attribute = $Param{Search}->{Field} || $Param{Attribute};
     my @SQLJoin;
 
     my $OrgaContactAlias = $Param{Flags}->{JoinMap}->{OrganisationContactJoin} // 'co';
     if (
         !$Param{Flags}->{JoinMap}->{OrganisationContactJoin}
-        && $Attribute !~ m/^Primary/sm
+        && $Param{Attribute} !~ m/^Primary/sm
     ) {
         push(
             @SQLJoin,
@@ -186,7 +184,7 @@ sub _JoinGet {
     my $POrgaContactAlias = $Param{Flags}->{JoinMap}->{POrganisationContactJoin} // 'cpo';
     if (
         !$Param{Flags}->{JoinMap}->{POrganisationContactJoin}
-        && $Attribute =~ m/^Primary/sm
+        && $Param{Attribute} =~ m/^Primary/sm
     ) {
         push(
             @SQLJoin,
@@ -200,8 +198,8 @@ sub _JoinGet {
     my $OrgaAlias = $Param{Flags}->{JoinMap}->{OrganisationJoin} // 'o';
     if (
         !$Param{Flags}->{JoinMap}->{OrganisationJoin}
-        && $Attribute !~ m/ID(?:s|)$/sm
-        && $Attribute !~ m/^Primary/sm
+        && $Param{Attribute} !~ m/ID(?:s|)$/sm
+        && $Param{Attribute} !~ m/^Primary/sm
     ) {
         push(
             @SQLJoin,
@@ -213,8 +211,8 @@ sub _JoinGet {
     my $POrgaAlias = $Param{Flags}->{JoinMap}->{POrganisationJoin} // 'po';
     if (
         !$Param{Flags}->{JoinMap}->{POrganisationJoin}
-        && $Attribute !~ m/ID(?:s|)$/sm
-        && $Attribute =~ m/^Primary/sm
+        && $Param{Attribute} !~ m/ID(?:s|)$/sm
+        && $Param{Attribute} =~ m/^Primary/sm
     ) {
         push(
             @SQLJoin,
