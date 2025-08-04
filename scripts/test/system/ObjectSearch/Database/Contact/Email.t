@@ -42,42 +42,49 @@ $Self->IsDeeply(
     $AttributeList,
     {
         Emails => {
+            IsSelectable   => 0,
             IsSearchable   => 1,
             IsSortable     => 0,
             IsFulltextable => 0,
             Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN'],
         },
         Email => {
+            IsSelectable   => 1,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 1,
             Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN'],
         },
         Email1 => {
+            IsSelectable   => 1,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 1,
             Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN'],
         },
         Email2 => {
+            IsSelectable   => 1,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 1,
             Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN'],
         },
         Email3 => {
+            IsSelectable   => 1,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 1,
             Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN'],
         },
         Email4 => {
+            IsSelectable   => 1,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 1,
             Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN'],
         },
         Email5 => {
+            IsSelectable   => 1,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 1,
@@ -1172,48 +1179,48 @@ my @SortTests = (
         Name      => 'Sort: Attribute "Email"',
         Attribute => 'Email',
         Expected  => {
-            'OrderBy' => ['c.email'],
-            'Select'  => []
+            'OrderBy' => ['SortAttr0'],
+            'Select'  => ['c.email AS SortAttr0']
         }
     },
     {
         Name      => 'Sort: Attribute "Email1"',
         Attribute => 'Email1',
         Expected  => {
-            'OrderBy' => ['c.email1'],
-            'Select'  => ['c.email1']
+            'OrderBy' => ['SortAttr0'],
+            'Select'  => ['c.email1 AS SortAttr0']
         }
     },
     {
         Name      => 'Sort: Attribute "Email2"',
         Attribute => 'Email2',
         Expected  => {
-            'OrderBy' => ['c.email2'],
-            'Select'  => ['c.email2']
+            'OrderBy' => ['SortAttr0'],
+            'Select'  => ['c.email2 AS SortAttr0']
         }
     },
     {
         Name      => 'Sort: Attribute "Email3"',
         Attribute => 'Email3',
         Expected  => {
-            'OrderBy' => ['c.email3'],
-            'Select'  => ['c.email3']
+            'OrderBy' => ['SortAttr0'],
+            'Select'  => ['c.email3 AS SortAttr0']
         }
     },
     {
         Name      => 'Sort: Attribute "Email4"',
         Attribute => 'Email4',
         Expected  => {
-            'OrderBy' => ['c.email4'],
-            'Select'  => ['c.email4']
+            'OrderBy' => ['SortAttr0'],
+            'Select'  => ['c.email4 AS SortAttr0']
         }
     },
     {
         Name      => 'Sort: Attribute "Email5"',
         Attribute => 'Email5',
         Expected  => {
-            'OrderBy' => ['c.email5'],
-            'Select'  => ['c.email5']
+            'OrderBy' => ['SortAttr0'],
+            'Select'  => ['c.email5 AS SortAttr0']
         }
     }
 );

@@ -206,6 +206,43 @@ sub ImportConfigPrepare {
     return $Param{Config};
 }
 
+sub SQLParameterGet {
+    my ( $Self, %Param ) = @_;
+
+    return {
+        Column => "$Param{TableAlias}.value_text",
+    };
+}
+
+sub SearchSQLSearchFieldGet {
+    my ( $Self, %Param ) = @_;
+
+    my $SQLParameter = $Self->SQLParameterGet(
+        %Param,
+        ParameterType => 'Condition'
+    );
+    my %ConditionDef = %{ $SQLParameter->{ConditionDef} || {} };
+
+    return {
+        %ConditionDef,
+        Column => $SQLParameter->{Column}
+    };
+}
+
+sub SearchSQLSortFieldGet {
+    my ( $Self, %Param ) = @_;
+
+    my $SQLParameter = $Self->SQLParameterGet(
+        %Param,
+        ParameterType => 'Sort'
+    );
+
+    return {
+        Select  => [ $SQLParameter->{Column} ],
+        OrderBy => [ $SQLParameter->{Column} ]
+    };
+}
+
 1;
 
 =back

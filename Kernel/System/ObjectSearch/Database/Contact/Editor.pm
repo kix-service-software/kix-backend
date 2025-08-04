@@ -34,6 +34,7 @@ sub GetSupportedAttributes {
 
     return {
         CreateByID => {
+            IsSelectable   => 1,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 0,
@@ -41,6 +42,7 @@ sub GetSupportedAttributes {
             ValueType      => 'NUMERIC'
         },
         CreateBy => {
+            IsSelectable   => 1,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 0,
@@ -50,6 +52,7 @@ sub GetSupportedAttributes {
 #            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
         ChangeByID => {
+            IsSelectable   => 1,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 0,
@@ -57,6 +60,7 @@ sub GetSupportedAttributes {
             ValueType      => 'NUMERIC'
         },
         ChangeBy => {
+            IsSelectable   => 1,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 0,
@@ -65,67 +69,6 @@ sub GetSupportedAttributes {
 ## TODO: login based search instead of id
 #            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         }
-    };
-}
-
-sub Sort {
-    my ( $Self, %Param ) = @_;
-
-    # check params
-    return if ( !$Self->_CheckSortParams( %Param ) );
-
-    # check for needed joins
-    my @SQLJoin = ();
-    if ( $Param{Attribute} eq 'CreateBy' ) {
-        if ( !$Param{Flags}->{JoinMap}->{ContactCreateBy} ) {
-            push( @SQLJoin, 'INNER JOIN users ccru ON ccru.id = c.create_by' );
-
-            $Param{Flags}->{JoinMap}->{ContactCreateBy} = 1;
-        }
-        if ( !$Param{Flags}->{JoinMap}->{ContactCreateByContact} ) {
-            push( @SQLJoin, 'LEFT OUTER JOIN contact ccruc ON ccruc.user_id = ccru.id' );
-
-            $Param{Flags}->{JoinMap}->{ContactCreateByContact} = 1;
-        }
-    }
-    if ( $Param{Attribute} eq 'ChangeBy' ) {
-        if ( !$Param{Flags}->{JoinMap}->{ContactChangeBy} ) {
-            push( @SQLJoin, 'INNER JOIN users cchu ON cchu.id = c.change_by' );
-
-            $Param{Flags}->{JoinMap}->{ContactChangeBy} = 1;
-        }
-        if ( !$Param{Flags}->{JoinMap}->{ContactChangeByContact} ) {
-            push( @SQLJoin, 'LEFT OUTER JOIN contact cchuc ON cchuc.user_id = cchu.id' );
-
-            $Param{Flags}->{JoinMap}->{ContactChangeByContact} = 1;
-        }
-    }
-
-    # init Definition
-    my %AttributeDefinition = (
-        CreateByID => {
-            Select  => ['c.create_by'],
-            OrderBy => ['c.create_by']
-        },
-        CreateBy   => {
-            Select  => ['ccruc.lastname','ccruc.firstname','ccru.login'],
-            OrderBy => ['LOWER(ccruc.lastname)','LOWER(ccruc.firstname)','LOWER(ccru.login)']
-        },
-        ChangeByID => {
-            Select  => ['c.change_by'],
-            OrderBy => ['c.change_by']
-        },
-        ChangeBy   => {
-            Select  => ['cchuc.lastname','cchuc.firstname','cchu.login'],
-            OrderBy => ['LOWER(cchuc.lastname)','LOWER(cchuc.firstname)','LOWER(cchu.login)']
-        }
-    );
-
-    # return sort def
-    return {
-        Join    => \@SQLJoin,
-        Select  => $AttributeDefinition{ $Param{Attribute} }->{Select},
-        OrderBy => $AttributeDefinition{ $Param{Attribute} }->{OrderBy}
     };
 }
 
@@ -135,50 +78,97 @@ sub AttributePrepare {
     # init Definition
     my %AttributeDefinition = (
         CreateByID => {
-            Column          => 'c.create_by',
-            ValueType       => 'NUMERIC'
+            Column       => 'c.create_by',
+            ConditionDef => {
+                ValueType => 'NUMERIC'
+            }
         },
         CreateBy   => {
-            Column          => 'c.create_by',
-            ValueType       => 'NUMERIC'
+            Column       => 'c.create_by',
+            SortColumn   => ['LOWER(ccruc.lastname)','LOWER(ccruc.firstname)','LOWER(ccru.login)'],
+            ConditionDef => {
+                ValueType => 'NUMERIC'
+            }
 ## TODO: login based search instead of id
 #            Column          => 'ccru.login',
 #            CaseInsensitive => 1
         },
         ChangeByID => {
-            Column          => 'c.change_by',
-            ValueType       => 'NUMERIC'
+            Column       => 'c.change_by',
+            ConditionDef => {
+                ValueType => 'NUMERIC'
+            }
         },
         ChangeBy   => {
-            Column          => 'c.change_by',
-            ValueType       => 'NUMERIC'
+            Column       => 'c.change_by',
+            SortColumn   => ['LOWER(cchuc.lastname)','LOWER(cchuc.firstname)','LOWER(cchu.login)'],
+            ConditionDef => {
+                ValueType => 'NUMERIC'
+            }
 ## TODO: login based search instead of id
 #            Column          => 'cchu.login',
 #            CaseInsensitive => 1
         }
     );
 
+    my %Attribute = (
+        Column => $AttributeDefinition{ $Param{Attribute} }->{ $Param{PrepareType} . 'Column' }
+            || $AttributeDefinition{ $Param{Attribute} }->{Column},
+    );
+    if ( $Param{PrepareType} eq 'Condition' ) {
+        $Attribute{ConditionDef} = $AttributeDefinition{ $Param{Attribute} }->{ConditionDef};
 ## TODO: login based search instead of id
-#    # check for needed joins
-#    my @SQLJoin = ();
-#    if ( $Param{Search}->{Field} eq 'CreateBy' ) {
-#        if ( !$Param{Flags}->{JoinMap}->{ContactCreateBy} ) {
-#            push( @SQLJoin, 'INNER JOIN users ccru ON ccru.id = c.create_by' );
+#        # check for needed joins
+#        my @SQLJoin = ();
+#        if ( $Param{Attribute} eq 'CreateBy' ) {
+#            if ( !$Param{Flags}->{JoinMap}->{ContactCreateBy} ) {
+#                push( @SQLJoin, 'INNER JOIN users ccru ON ccru.id = c.create_by' );
 #
-#            $Param{Flags}->{JoinMap}->{ContactCreateBy} = 1;
+#                $Param{Flags}->{JoinMap}->{ContactCreateBy} = 1;
+#            }
 #        }
-#    }
-#    elsif ( $Param{Search}->{Field} eq 'ChangeBy' ) {
-#        if ( !$Param{Flags}->{JoinMap}->{ContactChangeBy} ) {
-#            push( @SQLJoin, 'INNER JOIN users cchu ON cchu.id = c.change_by' );
+#        elsif ( $Param{Attribute} eq 'ChangeBy' ) {
+#            if ( !$Param{Flags}->{JoinMap}->{ContactChangeBy} ) {
+#                push( @SQLJoin, 'INNER JOIN users cchu ON cchu.id = c.change_by' );
 #
-#            $Param{Flags}->{JoinMap}->{ContactChangeBy} = 1;
+#                $Param{Flags}->{JoinMap}->{ContactChangeBy} = 1;
+#            }
 #        }
-#    }
+#
+#        $Attribute{SQLDef}->{Join} = \@SQLJoin;
+    }
+    elsif ( $Param{PrepareType} eq 'Sort' ) {
+        # check for needed joins
+        my @SQLJoin = ();
+        if ( $Param{Attribute} eq 'CreateBy' ) {
+            if ( !$Param{Flags}->{JoinMap}->{ContactCreateBy} ) {
+                push( @SQLJoin, 'INNER JOIN users ccru ON ccru.id = c.create_by' );
 
-    return {
-        ConditionDef => $AttributeDefinition{ $Param{Search}->{Field} }
-    };
+                $Param{Flags}->{JoinMap}->{ContactCreateBy} = 1;
+            }
+            if ( !$Param{Flags}->{JoinMap}->{ContactCreateByContact} ) {
+                push( @SQLJoin, 'LEFT OUTER JOIN contact ccruc ON ccruc.user_id = ccru.id' );
+
+                $Param{Flags}->{JoinMap}->{ContactCreateByContact} = 1;
+            }
+        }
+        if ( $Param{Attribute} eq 'ChangeBy' ) {
+            if ( !$Param{Flags}->{JoinMap}->{ContactChangeBy} ) {
+                push( @SQLJoin, 'INNER JOIN users cchu ON cchu.id = c.change_by' );
+
+                $Param{Flags}->{JoinMap}->{ContactChangeBy} = 1;
+            }
+            if ( !$Param{Flags}->{JoinMap}->{ContactChangeByContact} ) {
+                push( @SQLJoin, 'LEFT OUTER JOIN contact cchuc ON cchuc.user_id = cchu.id' );
+
+                $Param{Flags}->{JoinMap}->{ContactChangeByContact} = 1;
+            }
+        }
+
+        $Attribute{SQLDef}->{Join} = \@SQLJoin;
+    }
+
+    return \%Attribute;
 }
 
 1;

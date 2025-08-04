@@ -42,6 +42,7 @@ $Self->IsDeeply(
     $AttributeList,
     {
         ContactID => {
+            IsSelectable   => 1,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 0,
@@ -49,6 +50,7 @@ $Self->IsDeeply(
             ValueType      => 'NUMERIC'
         },
         ID => {
+            IsSelectable   => 1,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 0,
@@ -361,16 +363,16 @@ my @SortTests = (
         Name      => 'Sort: Attribute "ContactID"',
         Attribute => 'ContactID',
         Expected  => {
-            'Select'  => ['c.id'],
-            'OrderBy' => ['c.id']
+            'Select'  => ['c.id AS SortAttr0'],
+            'OrderBy' => ['SortAttr0']
         }
     },
     {
         Name      => 'Sort: Attribute "ID"',
         Attribute => 'ID',
         Expected  => {
-            'Select'  => ['c.id'],
-            'OrderBy' => ['c.id']
+            'Select'  => ['c.id AS SortAttr0'],
+            'OrderBy' => ['SortAttr0']
         }
     }
 );

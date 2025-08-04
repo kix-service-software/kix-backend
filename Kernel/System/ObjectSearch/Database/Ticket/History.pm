@@ -34,80 +34,99 @@ sub GetSupportedAttributes {
 
     return {
         ChangeTime        => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EQ','LT','LTE','GT','GTE'],
-            ValueType    => 'DATETIME'
+            IsSelectable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 0,
+            Operators      => ['EQ','LT','LTE','GT','GTE'],
+            ValueType      => 'DATETIME'
         },
         CloseTime         => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EQ','LT','LTE','GT','GTE'],
-            ValueType    => 'DATETIME'
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 0,
+            Operators      => ['EQ','LT','LTE','GT','GTE'],
+            ValueType      => 'DATETIME'
         },
         CreatedPriorityID => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE'],
+            ValueType      => 'NUMERIC'
         },
         CreatedQueueID    => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE'],
+            ValueType      => 'NUMERIC'
         },
         CreatedStateID    => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE'],
+            ValueType      => 'NUMERIC'
         },
         CreatedTypeID     => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE'],
+            ValueType      => 'NUMERIC'
         }
     };
 }
 
-sub Search {
+sub AttributePrepare {
     my ( $Self, %Param ) = @_;
 
-    # check params
-    return if ( !$Self->_CheckSearchParams( %Param ) );
-
     # init mapping
-    my %AttributeMapping = (
+    my %AttributeDefinition = (
         ChangeTime        => {
-            Column    => 'th.create_time'
+            Column       => 'th.create_time',
+            ConditionDef => {}
         },
         CloseTime         => {
-            Column    => 'thcl.create_time'
+            Column       => 'thcl.create_time',
+            ConditionDef => {}
         },
         CreatedPriorityID => {
-            Column    => 'thcr.priority_id',
-            ValueType => 'NUMERIC'
+            Column       => 'thcr.priority_id',
+            ConditionDef => {
+                ValueType => 'NUMERIC'
+            }
         },
         CreatedQueueID    => {
-            Column    => 'thcr.queue_id',
-            ValueType => 'NUMERIC'
+            Column       => 'thcr.queue_id',
+            ConditionDef => {
+                ValueType => 'NUMERIC'
+            }
         },
         CreatedStateID    => {
-            Column    => 'thcr.state_id',
-            ValueType => 'NUMERIC'
+            Column       => 'thcr.state_id',
+            ConditionDef => {
+                ValueType => 'NUMERIC'
+            }
         },
         CreatedTypeID     => {
-            Column    => 'thcr.type_id',
-            ValueType => 'NUMERIC'
+            Column       => 'thcr.type_id',
+            ConditionDef => {
+                ValueType => 'NUMERIC'
+            }
         }
     );
 
     # handle joins
     my @SQLJoin = ();
     # handle joins for ChangeTime attribute
-    if ( $Param{Search}->{Field} eq 'ChangeTime' ) {
+    if ( $Param{Attribute} eq 'ChangeTime' ) {
         if ( !$Param{Flags}->{JoinMap}->{TicketHistoryChanged} ) {
             push( @SQLJoin, 'INNER JOIN ticket_history th ON th.ticket_id = st.id' );
 
@@ -115,7 +134,7 @@ sub Search {
         }
     }
     # handle joins for CloseTime attribute
-    elsif ( $Param{Search}->{Field} eq 'CloseTime' ) {
+    elsif ( $Param{Attribute} eq 'CloseTime' ) {
         if ( !$Param{Flags}->{JoinMap}->{TicketHistoryClose} ) {
             push( @SQLJoin, 'LEFT OUTER JOIN ticket_history thcl ON thcl.ticket_id = st.id' );
             push( @SQLJoin, 'INNER JOIN ticket_state thscl ON thscl.id = thcl.state_id' );
@@ -126,7 +145,7 @@ sub Search {
         }
     }
     # handle joins for Created* attributes
-    elsif ( $Param{Search}->{Field} =~ /^Created.+$/ ) {
+    elsif ( $Param{Attribute} =~ /^Created.+$/ ) {
         if ( !$Param{Flags}->{JoinMap}->{TicketHistoryCreated} ) {
             push( @SQLJoin, 'INNER JOIN ticket_history thcr ON thcr.ticket_id = st.id' );
             push( @SQLJoin, 'INNER JOIN ticket_history_type thtcr ON thtcr.id = thcr.history_type_id AND thtcr.name = \'NewTicket\'' );
@@ -135,21 +154,17 @@ sub Search {
         }
     }
 
-    # prepare condition
-    my $Condition = $Self->_GetCondition(
-        Operator  => $Param{Search}->{Operator},
-        Column    => $AttributeMapping{ $Param{Search}->{Field} }->{Column},
-        ValueType => $AttributeMapping{ $Param{Search}->{Field} }->{ValueType},
-        Value     => $Param{Search}->{Value},
-        Silent    => $Param{Silent}
+    my %Attribute = (
+        Column => $AttributeDefinition{ $Param{Attribute} }->{Column},
+        SQLDef => {
+            Join => \@SQLJoin,
+        }
     );
+    if ( $Param{PrepareType} eq 'Condition' ) {
+        $Attribute{ConditionDef} = $AttributeDefinition{ $Param{Attribute} }->{ConditionDef};
+    }
 
-    # return search def
-    return {
-        Join       => \@SQLJoin,
-        Where      => [ $Condition ],
-        IsRelative => $Param{Search}->{IsRelative}
-    };
+    return \%Attribute;
 }
 
 1;

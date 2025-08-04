@@ -43,12 +43,14 @@ $Self->IsDeeply(
     $AttributeList,
     {
         Valid => {
+            IsSelectable   => 1,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 0,
             Operators      => ['EQ','NE','IN','!IN']
         },
         ValidID => {
+            IsSelectable   => 1,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 0,
@@ -270,10 +272,10 @@ my @SortTests = (
         Expected  => {
             'Join'    => [],
             'OrderBy' => [
-                'c.valid_id'
+                'SortAttr0'
             ],
             'Select'  => [
-                'c.valid_id'
+                'c.valid_id AS SortAttr0'
             ]
         }
     },
@@ -287,10 +289,10 @@ my @SortTests = (
                 'LEFT OUTER JOIN translation_language tl0 ON tl0.pattern_id = tlp0.id AND tl0.language = \'en\''
             ],
             'OrderBy' => [
-                'TranslateValid'
+                'SortAttr0'
             ],
             'Select'  => [
-                'LOWER(COALESCE(tl0.value, cv.name)) AS TranslateValid'
+                'LOWER(COALESCE(tl0.value, cv.name)) AS SortAttr0'
             ]
         }
     }

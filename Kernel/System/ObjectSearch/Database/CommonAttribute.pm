@@ -66,6 +66,54 @@ sub GetSupportedAttributes {
     return {};
 }
 
+=item Select()
+
+provides required sql select definition
+
+    my $Result = $Object->Select(
+        Attribute => '...'      # required
+    );
+
+    $Result = {
+        Select  => [],
+        From    => [],
+        Join    => [],
+        Where   => [],
+        GroupBy => [],
+        Having  => [],
+        OrderBy => []
+    };
+
+=cut
+
+sub Select {
+    my ( $Self, %Param ) = @_;
+
+    # check params
+    return if ( !$Self->_CheckSelectParams( %Param ) );
+
+    my $Definition = $Self->AttributePrepare(
+        Flags       => $Param{Flags},
+        Attribute   => $Param{Attribute},
+        Language    => $Param{Language},
+        UserType    => $Param{UserType},
+        UserID      => $Param{UserID},
+        PrepareType => 'Select'
+    );
+    return if !IsHashRefWithData($Definition);
+
+    my $Select = $Definition->{Column};
+    if ( ref( $Definition->{Column} ) eq 'ARRAY' ) {
+        $Select = 'CONCAT(' . join( ', " ", ', @{ $Definition->{Column} } ) . ')';
+    }
+
+    # return search def
+    return {
+        %{$Definition->{SQLDef} || {}},
+        Select => [ $Select . ' AS "' . $Param{Attribute} . '"' ]
+    };
+}
+
 =item Search()
 
 provides required sql search definition
@@ -98,29 +146,35 @@ sub Search {
     # check params
     return if ( !$Self->_CheckSearchParams( %Param ) );
 
-    my $Definition = $Self->AttributePrepare(%Param);
-
+    my $Definition = $Self->AttributePrepare(
+        Flags       => $Param{Flags},
+        Attribute   => $Param{Search}->{Field},
+        Language    => $Param{Language},
+        UserType    => $Param{UserType},
+        UserID      => $Param{UserID},
+        PrepareType => 'Condition'
+    );
     return if !IsHashRefWithData($Definition);
 
     my $Value = $Self->ValuePrepare(
         Search => $Param{Search}
     );
-
     return if !defined $Value;
 
     my $Condition = $Self->_GetCondition(
-        %{$Definition->{ConditionDef}},
+        %{$Definition->{ConditionDef} || {}},
+        Column   => $Definition->{Column},
         Operator => $Param{Search}->{Operator},
         Value    => $Value,
         Silent   => $Param{Silent}
     );
-
     return if ( !$Condition );
 
     # return search def
     return {
         %{$Definition->{SQLDef} || {}},
-        Where => [ $Condition ]
+        Where      => [ $Condition ],
+        IsRelative => $Param{Search}->{IsRelative},
     };
 }
 
@@ -150,7 +204,44 @@ sub Sort {
     # check params
     return if ( !$Self->_CheckSortParams( %Param ) );
 
-    return;
+    my $Definition = $Self->AttributePrepare(
+        Flags       => $Param{Flags},
+        Attribute   => $Param{Attribute},
+        Language    => $Param{Language},
+        UserType    => $Param{UserType},
+        UserID      => $Param{UserID},
+        PrepareType => 'Sort'
+    );
+    return if !IsHashRefWithData($Definition);
+
+    # prepare given columns as array ref and convert if required
+    my @Columns = ();
+    if ( !IsArrayRef( $Definition->{Column} ) ) {
+        push( @Columns, $Definition->{Column} );
+    }
+    else {
+        @Columns = @{ $Definition->{Column} };
+    }
+
+    # prepare Select and OrderBy
+    my @Select = ();
+    my @OrderBy = ();
+    for my $Column ( @Columns ) {
+        my $Count = $Param{Flags}->{SortAttributeCounter}++;
+        my $Alias = 'SortAttr' . $Count;
+        my $Select = $Column . ' AS ' . $Alias;
+        my $OrderBy = $Alias;
+
+        push( @Select, $Select );
+        push( @OrderBy, $OrderBy );
+    }
+
+    # return search def
+    return {
+        %{$Definition->{SQLDef} || {}},
+        Select  => \@Select,
+        OrderBy => \@OrderBy
+    };
 }
 
 =item AttributePrepare()
@@ -158,20 +249,19 @@ sub Sort {
 Returns SQL of the requested attributes
 
     my $Result = $Object->AttributePrepare(
-        Search => {
-            Field    => '...',
-            Operator => '...',
-            Value    => '...'
-        },
-        UserID       => '...',
-        Flags        => {}
+        Attribute   => '...',
+        Language    => '...',
+        UserType    => '...',
+        UserID      => '...',
+        Flags       => {}
+        PrepareType => '...'     # (Select|Condition|Sort|Fulltext)
     );
 
     $Result = {
+        Column       => '...',
         ConditionDef => {
             NULLValue       => 0|1,
             CaseInsensitive => 0|1,
-            Column          => '...',
             ValueType       => '...',
             IsStaticSearch  => 0|1
         },
@@ -917,6 +1007,40 @@ sub _AddSupplement {
     }
 
     return $Condition;
+}
+
+sub _CheckSelectParams {
+    my ($Self, %Param) = @_;
+
+    for my $Needed ( qw(Attribute) ) {
+        if ( !$Param{ $Needed } ) {
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => 'Need ' . $Needed . '!',
+                );
+            }
+            return;
+        }
+    }
+
+    # get supported attributes of backend
+    my $AttributeList = $Self->GetSupportedAttributes();
+
+    if (
+        !defined( $AttributeList->{ $Param{Attribute} } )
+        || !$AttributeList->{ $Param{Attribute} }->{IsSelectable}
+    ) {
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => 'Invalid select attribute "' . $Param{Attribute} . '"!'
+            );
+        }
+        return;
+    }
+
+    return 1;
 }
 
 sub _CheckSearchParams {

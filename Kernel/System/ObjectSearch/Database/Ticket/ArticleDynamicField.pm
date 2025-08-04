@@ -63,11 +63,18 @@ sub GetSupportedAttributes {
                 );
             }
 
+            my $IsFulltextable = $Kernel::OM->Get('DynamicField::Backend')->GetProperty(
+                DynamicFieldConfig => $DynamicFieldConfig,
+                Property           => 'IsFulltextable'
+            );
+
             $Supported{ $AttributeName } = {
-                Operators    => $Operators    || [],
-                IsSearchable => $IsSearchable || 0,
-                IsSortable   => 0,
-                ValueType    => $ValueType    || q{}
+                Operators      => $Operators    || [],
+                IsSelectable   => 0,
+                IsSearchable   => $IsSearchable || 0,
+                IsSortable     => 0,
+                IsFulltextable => $IsFulltextable || 0,
+                ValueType      => $ValueType    || q{}
             };
         }
     }
@@ -75,14 +82,11 @@ sub GetSupportedAttributes {
     return \%Supported;
 }
 
-sub Search {
+sub AttributePrepare {
     my ( $Self, %Param ) = @_;
 
-    # check params
-    return if ( !$Self->_CheckSearchParams( %Param ) );
-
     # get dynamic field config
-    my $DFName = $Param{Search}->{Field};
+    my $DFName = $Param{Attribute};
     $DFName =~ s/DynamicField_//g;
     return if ( !$DFName );
     my $DynamicFieldConfig = $Kernel::OM->Get('DynamicField')->DynamicFieldGet(
@@ -116,30 +120,20 @@ sub Search {
     }
 
     # get search def from dynamic field backend
-    my $SearchFieldRef = $Kernel::OM->Get('DynamicField::Backend')->SearchSQLSearchFieldGet(
+    my $SQLParameter = $Kernel::OM->Get('DynamicField::Backend')->SQLParameterGet(
         DynamicFieldConfig => $DynamicFieldConfig,
         TableAlias         => $TableAlias,
+        ParameterType      => $Param{PrepareType},
     );
-    return if ( !IsHashRefWithData( $SearchFieldRef ) );
+    return if ( !IsHashRefWithData( $SQLParameter ) );
 
-    # prepare condition
-    my $Condition = $Self->_GetCondition(
-        Operator        => $Param{Search}->{Operator},
-        Column          => $SearchFieldRef->{Column},
-        Value           => $Param{Search}->{Value},
-        ValueType       => $SearchFieldRef->{ValueType},
-        CaseInsensitive => $SearchFieldRef->{CaseInsensitive},
-        NULLValue       => 1,
-        Silent          => $Param{Silent}
-    );
-    return if ( !$Condition );
+    if ( $Param{PrepareType} eq 'Condition' ) {
+        $SQLParameter->{ConditionDef}->{NULLValue} = 1;
+    }
 
-    # return search def
-    return {
-        Join       => \@SQLJoin,
-        Where      => [ $Condition ],
-        IsRelative => $Param{Search}->{IsRelative}
-    };
+    $SQLParameter->{SQLDef}->{Join} = \@SQLJoin;
+
+    return $SQLParameter;
 }
 
 1;

@@ -29,6 +29,17 @@
         <Setting>
             <Hash>
                 <Item Key="Module">ObjectSearch::Database::Ticket</Item>
+                <Item Key="FulltextAttributes">
+                    <Array>
+                        <Item>TicketNumber</Item>
+                        <Item>Title</Item>
+                        <Item>To</Item>
+                        <Item>Cc</Item>
+                        <Item>From</Item>
+                        <Item>Subject</Item>
+                        <Item>Body</Item>
+                    </Array>
+                </Item>
             </Hash>
         </Setting>
     </ConfigItem>

@@ -145,6 +145,7 @@ sub Search {
                     Result     => 'ARRAY',
                     UserID     => $Param{UserID},
                     UserType   => $Param{UserType},
+                    Language   => $Param{Language},
                     Search     => \%Search,
                     Silent     => $Param{Silent}
                 );

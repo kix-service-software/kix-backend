@@ -174,21 +174,11 @@ sub ValueValidate {
     return $Success;
 }
 
-
-sub SearchSQLSearchFieldGet {
+sub SQLParameterGet {
     my ( $Self, %Param ) = @_;
 
     return {
         Column => "$Param{TableAlias}.value_date"
-    };
-}
-
-sub SearchSQLSortFieldGet {
-    my ( $Self, %Param ) = @_;
-
-    return {
-        Select  => ["$Param{TableAlias}.value_date"],
-        OrderBy => ["$Param{TableAlias}.value_date"]
     };
 }
 

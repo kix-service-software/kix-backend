@@ -34,84 +34,57 @@ sub GetSupportedAttributes {
 
     return {
         OrganisationID => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','GT','GTE','LT','LTE'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN','GT','GTE','LT','LTE'],
+            ValueType      => 'NUMERIC'
         },
         Organisation => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
         OrganisationNumber => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         }
     };
 }
 
-sub Search {
+sub AttributePrepare {
     my ( $Self, %Param ) = @_;
 
-    # check params
-    return if ( !$Self->_CheckSearchParams( %Param ) );
-
-    # init mapping
-    my %AttributeMapping = (
+    # map search attributes to table attributes
+    my %AttributeDefinition = (
         OrganisationID     => {
-            Column    => 'st.organisation_id',
-            ValueType => 'NUMERIC'
+            Column       => 'st.organisation_id',
+            ConditionDef => {
+                ValueType => 'NUMERIC',
+                NULLValue => 1
+            }
         },
         Organisation       => {
-            Column          => 'torg.name',
-            CaseInsensitive => 1
+            Column       => 'torg.name',
+            ConditionDef => {
+                CaseInsensitive => 1,
+                NULLValue       => 1
+            }
         },
         OrganisationNumber => {
-            Column          => 'torg.number',
-            CaseInsensitive => 1
+            Column       => 'torg.number',
+            ConditionDef => {
+                CaseInsensitive => 1,
+                NULLValue       => 1
+            }
         }
     );
-
-    # check for needed joins
-    my @SQLJoin = ();
-    if (
-        $Param{Search}->{Field} eq 'Organisation'
-        || $Param{Search}->{Field} eq 'OrganisationNumber'
-    ) {
-        if ( !$Param{Flags}->{JoinMap}->{TicketOrganisation} ) {
-            push( @SQLJoin, 'LEFT OUTER JOIN organisation torg ON torg.id = st.organisation_id' );
-
-            $Param{Flags}->{JoinMap}->{TicketOrganisation} = 1;
-        }
-    }
-
-    # prepare condition
-    my $Condition = $Self->_GetCondition(
-        Operator        => $Param{Search}->{Operator},
-        Column          => $AttributeMapping{ $Param{Search}->{Field} }->{Column},
-        ValueType       => $AttributeMapping{ $Param{Search}->{Field} }->{ValueType},
-        Value           => $Param{Search}->{Value},
-        NULLValue       => 1,
-        CaseInsensitive => $AttributeMapping{ $Param{Search}->{Field} }->{CaseInsensitive},
-        Silent          => $Param{Silent}
-    );
-    return if ( !$Condition );
-
-    # return search def
-    return {
-        Join  => \@SQLJoin,
-        Where => [ $Condition ]
-    };
-}
-
-sub Sort {
-    my ( $Self, %Param ) = @_;
-
-
-    # check params
-    return if ( !$Self->_CheckSortParams( %Param ) );
 
     # check for needed joins
     my @SQLJoin = ();
@@ -126,28 +99,25 @@ sub Sort {
         }
     }
 
-    # init mapping
-    my %AttributeMapping = (
-        OrganisationID     => {
-            Select  => ['st.organisation_id'],
-            OrderBy => ['st.organisation_id']
-        },
-        Organisation       => {
-            Select  => ['torg.name'],
-            OrderBy => ['LOWER(torg.name)']
-        },
-        OrganisationNumber => {
-            Select  => ['torg.number'],
-            OrderBy => ['LOWER(torg.number)']
+    my %Attribute = (
+        Column => $AttributeDefinition{ $Param{Attribute} }->{Column},
+        SQLDef => {
+            Join => \@SQLJoin,
         }
     );
+    if ( $Param{PrepareType} eq 'Condition' ) {
+        $Attribute{ConditionDef} = $AttributeDefinition{ $Param{Attribute} }->{ConditionDef};
+    }
+    elsif ( $Param{PrepareType} eq 'Sort' ) {
+        if (
+            $Param{Attribute} eq 'Organisation'
+            || $Param{Attribute} eq 'OrganisationNumber'
+        ) {
+            $Attribute{Column} = 'LOWER(' . $Attribute{Column} . ')';
+        }
+    }
 
-    # return sort def
-    return {
-        Join    => \@SQLJoin,
-        Select  => $AttributeMapping{ $Param{Attribute} }->{Select},
-        OrderBy => $AttributeMapping{ $Param{Attribute} }->{OrderBy}
-    };
+    return \%Attribute;
 }
 
 1;

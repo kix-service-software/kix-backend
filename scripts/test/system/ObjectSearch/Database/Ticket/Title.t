@@ -42,9 +42,11 @@ $Self->IsDeeply(
     $AttributeList,
     {
         Title => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         }
     },
     'GetSupportedAttributes provides expected data'
@@ -254,8 +256,8 @@ my @SortTests = (
         Name      => 'Sort: Attribute "Title"',
         Attribute => 'Title',
         Expected  => {
-            'Select'  => ['st.title'],
-            'OrderBy' => ['LOWER(st.title)']
+            'Select'  => ['LOWER(st.title) AS SortAttr0'],
+            'OrderBy' => ['SortAttr0']
         }
     }
 );

@@ -52,6 +52,9 @@ sub Init {
     # init user join counter with 0
     $Param{Flags}->{UserJoinCounter} = 0;
 
+    # init sort attribute counter with 0
+    $Param{Flags}->{SortAttributeCounter} = 0;
+
     return 1;
 }
 
