@@ -59,6 +59,7 @@ sub new {
 
     # set field properties
     $Self->{Properties} = {
+        'IsSelectable'    => 1,
         'IsSearchable'    => 1,
         'IsSortable'      => 0,
         'IsFulltextable'  => 0,
@@ -190,20 +191,6 @@ sub ValueValidate {
     }
 
     return 1;
-}
-
-sub SearchSQLSearchFieldGet {
-    my ( $Self, %Param ) = @_;
-
-    return {
-        Column => "$Param{TableAlias}.value_text",
-    };
-}
-
-sub SearchSQLSortFieldGet {
-    my ( $Self, %Param ) = @_;
-
-    return;
 }
 
 sub ReadableValueRender {

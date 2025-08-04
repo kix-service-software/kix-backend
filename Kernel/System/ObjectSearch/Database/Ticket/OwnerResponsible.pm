@@ -36,89 +36,116 @@ sub GetSupportedAttributes {
 
     return {
         OwnerID => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','GT','GTE','LT','LTE'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN','GT','GTE','LT','LTE'],
+            ValueType      => 'NUMERIC'
         },
         Owner => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
         OwnerName => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
         OwnerOutOfOffice => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EQ'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 0,
+            Operators      => ['EQ'],
+            ValueType      => 'NUMERIC'
         },
         ResponsibleID => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','GT','GTE','LT','LTE'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN','GT','GTE','LT','LTE'],
+            ValueType      => 'NUMERIC'
         },
         Responsible => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
         ResponsibleName => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
         ResponsibleOutOfOffice => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EQ'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 0,
+            Operators      => ['EQ'],
+            ValueType      => 'NUMERIC'
         }
     };
 }
 
-sub Search {
+sub AttributePrepare {
     my ( $Self, %Param ) = @_;
 
-    # check params
-    return if ( !$Self->_CheckSearchParams( %Param ) );
-
-    # init mapping
-    my %AttributeMapping = (
+    # map search attributes to table attributes
+    my %AttributeDefinition = (
         OwnerID       => {
-            Column    => 'st.user_id',
-            ValueType => 'NUMERIC'
+            Column       => 'st.user_id',
+            ConditionDef => {
+                ValueType => 'NUMERIC'
+            }
         },
         Owner         => {
-            Column    => 'tou.login'
+            Column       => 'tou.login',
+            SortColumn   => ['LOWER(touc.lastname)','LOWER(touc.firstname)','LOWER(tou.login)'],
+            ConditionDef => {}
         },
         OwnerName     => {
-            Column          => ['touc.lastname','touc.firstname'],
-            CaseInsensitive => 1
+            Column       => ['touc.lastname','touc.firstname'],
+            SortColumn   => ['LOWER(touc.lastname)','LOWER(touc.firstname)'],
+            ConditionDef => {
+                CaseInsensitive => 1
+            }
         },
         ResponsibleID => {
-            Column    => 'st.responsible_user_id',
-            ValueType => 'NUMERIC'
+            Column       => 'st.responsible_user_id',
+            ConditionDef => {
+                ValueType => 'NUMERIC'
+            }
         },
         Responsible   => {
-            Column    => 'tru.login'
+            Column       => 'tru.login',
+            SortColumn   => ['LOWER(truc.lastname)','LOWER(truc.firstname)','LOWER(tru.login)'],
+            ConditionDef => {}
         },
         ResponsibleName => {
-            Column          => ['truc.lastname','truc.firstname'],
-            CaseInsensitive => 1
+            Column       => ['truc.lastname','truc.firstname'],
+            SortColumn   => ['LOWER(truc.lastname)','LOWER(truc.firstname)'],
+            ConditionDef => {
+                CaseInsensitive => 1
+            }
         }
     );
 
     # check for needed joins
     my @SQLJoin = ();
     if (
-        $Param{Search}->{Field} eq 'Owner'
-        || $Param{Search}->{Field} eq 'OwnerName'
+        $Param{Attribute} eq 'Owner'
+        || $Param{Attribute} eq 'OwnerName'
     ) {
         if ( !$Param{Flags}->{JoinMap}->{TicketOwner} ) {
             push( @SQLJoin, 'INNER JOIN users tou ON tou.id = st.user_id' );
@@ -127,37 +154,19 @@ sub Search {
         }
         if (
             !$Param{Flags}->{JoinMap}->{TicketOwnerContact}
-            && $Param{Search}->{Field} eq 'OwnerName'
+            && (
+                $Param{Attribute} eq 'OwnerName'
+                || $Param{PrepareType} eq 'Sort'
+            )
         ) {
             push( @SQLJoin, 'LEFT OUTER JOIN contact touc ON touc.user_id = tou.id' );
 
             $Param{Flags}->{JoinMap}->{TicketOwnerContact} = 1;
         }
     }
-    if ( $Param{Search}->{Field} eq 'OwnerOutOfOffice' ) {
-        # get user preferences config
-        my $GeneratorModule = $Kernel::OM->Get('Config')->Get('User::PreferencesModule')
-            || 'Kernel::System::User::Preferences::DB';
-
-        # get generator preferences module
-        my $PreferencesObject = $Kernel::OM->Get($GeneratorModule);
-
-        $AttributeMapping{ $Param{Search}->{Field} } = {
-            AliasStart => 'toupooos',
-            AliasEnd   => 'toupoooe',
-            ColumnName => $PreferencesObject->{PreferencesTableValue}
-        };
-
-        if ( !$Param{Flags}->{JoinMap}->{TicketOwnerOutOfOffice} ) {
-            push( @SQLJoin, "LEFT OUTER JOIN $PreferencesObject->{PreferencesTable} $AttributeMapping{$Param{Search}->{Field}}->{AliasStart} ON $AttributeMapping{$Param{Search}->{Field}}->{AliasStart}.$PreferencesObject->{PreferencesTableUserID} = st.user_id AND $AttributeMapping{$Param{Search}->{Field}}->{AliasStart}.$PreferencesObject->{PreferencesTableKey} = 'OutOfOfficeStart'" );
-            push( @SQLJoin, "LEFT OUTER JOIN $PreferencesObject->{PreferencesTable} $AttributeMapping{$Param{Search}->{Field}}->{AliasEnd} ON $AttributeMapping{$Param{Search}->{Field}}->{AliasEnd}.$PreferencesObject->{PreferencesTableUserID} = st.user_id AND $AttributeMapping{$Param{Search}->{Field}}->{AliasEnd}.$PreferencesObject->{PreferencesTableKey} = 'OutOfOfficeEnd'" );
-
-            $Param{Flags}->{JoinMap}->{TicketOwnerOutOfOffice} = 1;
-        }
-    }
     if (
-        $Param{Search}->{Field} eq 'Responsible'
-        || $Param{Search}->{Field} eq 'ResponsibleName'
+        $Param{Attribute} eq 'Responsible'
+        || $Param{Attribute} eq 'ResponsibleName'
     ) {
         if ( !$Param{Flags}->{JoinMap}->{TicketResponsible} ) {
             push( @SQLJoin, 'INNER JOIN users tru ON tru.id = st.responsible_user_id' );
@@ -166,46 +175,98 @@ sub Search {
         }
         if (
             !$Param{Flags}->{JoinMap}->{TicketResponsibleContact}
-            && $Param{Search}->{Field} eq 'ResponsibleName'
+            && (
+                $Param{Attribute} eq 'ResponsibleName'
+                || $Param{PrepareType} eq 'Sort'
+            )
         ) {
             push( @SQLJoin, 'LEFT OUTER JOIN contact truc ON truc.user_id = tru.id' );
 
             $Param{Flags}->{JoinMap}->{TicketResponsibleContact} = 1;
         }
     }
-    if ( $Param{Search}->{Field} eq 'ResponsibleOutOfOffice' ) {
-        # get user preferences config
-        my $GeneratorModule = $Kernel::OM->Get('Config')->Get('User::PreferencesModule')
-            || 'Kernel::System::User::Preferences::DB';
 
-        # get generator preferences module
-        my $PreferencesObject = $Kernel::OM->Get($GeneratorModule);
-
-        $AttributeMapping{ $Param{Search}->{Field} } = {
-            AliasStart => 'trupooos',
-            AliasEnd   => 'trupoooe',
-            ColumnName => $PreferencesObject->{PreferencesTableValue}
-        };
-
-        if ( !$Param{Flags}->{JoinMap}->{TicketResponsibleOutOfOffice} ) {
-            push( @SQLJoin, "LEFT OUTER JOIN $PreferencesObject->{PreferencesTable} $AttributeMapping{$Param{Search}->{Field}}->{AliasStart} ON $AttributeMapping{$Param{Search}->{Field}}->{AliasStart}.$PreferencesObject->{PreferencesTableUserID} = st.user_id AND $AttributeMapping{$Param{Search}->{Field}}->{AliasStart}.$PreferencesObject->{PreferencesTableKey} = 'OutOfOfficeStart'" );
-            push( @SQLJoin, "LEFT OUTER JOIN $PreferencesObject->{PreferencesTable} $AttributeMapping{$Param{Search}->{Field}}->{AliasEnd} ON $AttributeMapping{$Param{Search}->{Field}}->{AliasEnd}.$PreferencesObject->{PreferencesTableUserID} = st.user_id AND $AttributeMapping{$Param{Search}->{Field}}->{AliasEnd}.$PreferencesObject->{PreferencesTableKey} = 'OutOfOfficeEnd'" );
-
-            $Param{Flags}->{JoinMap}->{TicketResponsibleOutOfOffice} = $PreferencesObject->{PreferencesTableUserID};
+    my %Attribute = (
+        Column => $AttributeDefinition{ $Param{Attribute} }->{ $Param{PrepareType} . 'Column' }
+            || $AttributeDefinition{ $Param{Attribute} }->{Column},
+        SQLDef => {
+            Join => \@SQLJoin,
         }
+    );
+    if ( $Param{PrepareType} eq 'Condition' ) {
+        $Attribute{ConditionDef} = $AttributeDefinition{ $Param{Attribute} }->{ConditionDef};
     }
 
-    # prepare condition
-    my $Condition;
-    my $IsRelative;
-    # special handling for out of office attributes
+    return \%Attribute;
+}
+
+sub Search {
+    my ( $Self, %Param ) = @_;
+
     if (
-        $Param{Search}->{Field} eq 'OwnerOutOfOffice'
-        || $Param{Search}->{Field} eq 'ResponsibleOutOfOffice'
+        ref( $Param{Search} ) eq 'HASH'
+        && $Param{Search}->{Field}
+        && (
+            $Param{Search}->{Field} eq 'OwnerOutOfOffice'
+            || $Param{Search}->{Field} eq 'ResponsibleOutOfOffice'
+        )
     ) {
+        # check params
+        return if ( !$Self->_CheckSearchParams( %Param ) );
+
+        # check for needed joins
+        my @SQLJoin = ();
+        my %AttributeMapping;
+        if ( $Param{Search}->{Field} eq 'OwnerOutOfOffice' ) {
+            # get user preferences config
+            my $GeneratorModule = $Kernel::OM->Get('Config')->Get('User::PreferencesModule')
+                || 'Kernel::System::User::Preferences::DB';
+
+            # get generator preferences module
+            my $PreferencesObject = $Kernel::OM->Get($GeneratorModule);
+
+            %AttributeMapping = (
+                AliasStart => 'toupooos',
+                AliasEnd   => 'toupoooe',
+                ColumnName => $PreferencesObject->{PreferencesTableValue}
+            );
+
+            if ( !$Param{Flags}->{JoinMap}->{TicketOwnerOutOfOffice} ) {
+                push( @SQLJoin, "LEFT OUTER JOIN $PreferencesObject->{PreferencesTable} $AttributeMapping{AliasStart} ON $AttributeMapping{AliasStart}.$PreferencesObject->{PreferencesTableUserID} = st.user_id AND $AttributeMapping{AliasStart}.$PreferencesObject->{PreferencesTableKey} = 'OutOfOfficeStart'" );
+                push( @SQLJoin, "LEFT OUTER JOIN $PreferencesObject->{PreferencesTable} $AttributeMapping{AliasEnd} ON $AttributeMapping{AliasEnd}.$PreferencesObject->{PreferencesTableUserID} = st.user_id AND $AttributeMapping{AliasEnd}.$PreferencesObject->{PreferencesTableKey} = 'OutOfOfficeEnd'" );
+
+                $Param{Flags}->{JoinMap}->{TicketOwnerOutOfOffice} = 1;
+            }
+        }
+        elsif ( $Param{Search}->{Field} eq 'ResponsibleOutOfOffice' ) {
+            # get user preferences config
+            my $GeneratorModule = $Kernel::OM->Get('Config')->Get('User::PreferencesModule')
+                || 'Kernel::System::User::Preferences::DB';
+
+            # get generator preferences module
+            my $PreferencesObject = $Kernel::OM->Get($GeneratorModule);
+
+            %AttributeMapping = (
+                AliasStart => 'trupooos',
+                AliasEnd   => 'trupoooe',
+                ColumnName => $PreferencesObject->{PreferencesTableValue}
+            );
+
+            if ( !$Param{Flags}->{JoinMap}->{TicketResponsibleOutOfOffice} ) {
+                push( @SQLJoin, "LEFT OUTER JOIN $PreferencesObject->{PreferencesTable} $AttributeMapping{AliasStart} ON $AttributeMapping{AliasStart}.$PreferencesObject->{PreferencesTableUserID} = st.user_id AND $AttributeMapping{AliasStart}.$PreferencesObject->{PreferencesTableKey} = 'OutOfOfficeStart'" );
+                push( @SQLJoin, "LEFT OUTER JOIN $PreferencesObject->{PreferencesTable} $AttributeMapping{AliasEnd} ON $AttributeMapping{AliasEnd}.$PreferencesObject->{PreferencesTableUserID} = st.user_id AND $AttributeMapping{AliasEnd}.$PreferencesObject->{PreferencesTableKey} = 'OutOfOfficeEnd'" );
+
+                $Param{Flags}->{JoinMap}->{TicketResponsibleOutOfOffice} = $PreferencesObject->{PreferencesTableUserID};
+            }
+        }
+
+        # prepare condition
+        my $Condition;
+        my $IsRelative;
+
         # prepare column for start and end date
-        my $StartColumn = $AttributeMapping{ $Param{Search}->{Field} }->{AliasStart} . '.' . $AttributeMapping{$Param{Search}->{Field}}->{ColumnName};
-        my $EndColumn   = $AttributeMapping{ $Param{Search}->{Field} }->{AliasEnd} . '.' . $AttributeMapping{$Param{Search}->{Field}}->{ColumnName};
+        my $StartColumn = $AttributeMapping{AliasStart} . '.' . $AttributeMapping{ColumnName};
+        my $EndColumn   = $AttributeMapping{AliasEnd} . '.' . $AttributeMapping{ColumnName};
 
         # get current date
         my $CurrDate = $Kernel::OM->Get('Time')->CurrentTimestamp();
@@ -278,101 +339,19 @@ sub Search {
 
         # this kind of search is always relative
         $IsRelative = 1;
+
+        return if ( !$Condition );
+
+        # return search def
+        return {
+            Join       => \@SQLJoin,
+            Where      => [ $Condition ],
+            IsRelative => $IsRelative
+        };
     }
-    # default handling
     else {
-        $Condition = $Self->_GetCondition(
-            Operator        => $Param{Search}->{Operator},
-            Column          => $AttributeMapping{ $Param{Search}->{Field} }->{Column},
-            ValueType       => $AttributeMapping{ $Param{Search}->{Field} }->{ValueType},
-            Value           => $Param{Search}->{Value},
-            CaseInsensitive => $AttributeMapping{ $Param{Search}->{Field} }->{CaseInsensitive},
-            Silent          => $Param{Silent}
-        );
+        return $Self->SUPER::Search(%Param);
     }
-    return if ( !$Condition );
-
-    # return search def
-    return {
-        Join       => \@SQLJoin,
-        Where      => [ $Condition ],
-        IsRelative => $IsRelative
-    };
-}
-
-sub Sort {
-    my ( $Self, %Param ) = @_;
-
-    # check params
-    return if ( !$Self->_CheckSortParams( %Param ) );
-
-    # check for needed joins
-    my @SQLJoin = ();
-    if (
-        $Param{Attribute} eq 'Owner'
-        || $Param{Attribute} eq 'OwnerName'
-    ) {
-        if ( !$Param{Flags}->{JoinMap}->{TicketOwner} ) {
-            push( @SQLJoin, 'INNER JOIN users tou ON tou.id = st.user_id' );
-
-            $Param{Flags}->{JoinMap}->{TicketOwner} = 1;
-        }
-        if ( !$Param{Flags}->{JoinMap}->{TicketOwnerContact} ) {
-            push( @SQLJoin, 'LEFT OUTER JOIN contact touc ON touc.user_id = tou.id' );
-
-            $Param{Flags}->{JoinMap}->{TicketOwnerContact} = 1;
-        }
-    }
-    if (
-        $Param{Attribute} eq 'Responsible'
-        || $Param{Attribute} eq 'ResponsibleName'
-    ) {
-        if ( !$Param{Flags}->{JoinMap}->{TicketResponsible} ) {
-            push( @SQLJoin, 'INNER JOIN users tru ON tru.id = st.responsible_user_id' );
-
-            $Param{Flags}->{JoinMap}->{TicketResponsible} = 1;
-        }
-        if ( !$Param{Flags}->{JoinMap}->{TicketResponsibleContact} ) {
-            push( @SQLJoin, 'LEFT OUTER JOIN contact truc ON truc.user_id = tru.id' );
-
-            $Param{Flags}->{JoinMap}->{TicketResponsibleContact} = 1;
-        }
-    }
-
-    # init mapping
-    my %AttributeMapping = (
-        OwnerID         => {
-            Select  => ['st.user_id'],
-            OrderBy => ['st.user_id']
-        },
-        Owner           => {
-            Select  => ['touc.lastname','touc.firstname','tou.login'],
-            OrderBy => ['LOWER(touc.lastname)','LOWER(touc.firstname)','LOWER(tou.login)']
-        },
-        OwnerName       => {
-            Select  => ['touc.lastname','touc.firstname'],
-            OrderBy => ['LOWER(touc.lastname)','LOWER(touc.firstname)']
-        },
-        ResponsibleID   => {
-            Select  => ['st.responsible_user_id'],
-            OrderBy => ['st.responsible_user_id']
-        },
-        Responsible     => {
-            Select  => ['truc.lastname','truc.firstname','tru.login'],
-            OrderBy => ['LOWER(truc.lastname)','LOWER(truc.firstname)','LOWER(tru.login)']
-        },
-        ResponsibleName => {
-            Select  => ['truc.lastname','truc.firstname'],
-            OrderBy => ['LOWER(truc.lastname)','LOWER(truc.firstname)']
-        }
-    );
-
-    # return sort def
-    return {
-        Join    => \@SQLJoin,
-        Select  => $AttributeMapping{ $Param{Attribute} }->{Select},
-        OrderBy => $AttributeMapping{ $Param{Attribute} }->{OrderBy}
-    };
 }
 
 1;

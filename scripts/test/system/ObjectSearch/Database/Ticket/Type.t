@@ -42,15 +42,19 @@ $Self->IsDeeply(
     $AttributeList,
     {
         TypeID => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','GT','GTE','LT','LTE'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN','GT','GTE','LT','LTE'],
+            ValueType      => 'NUMERIC'
         },
         Type => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         }
     },
     'GetSupportedAttributes provides expected data'
@@ -391,10 +395,10 @@ my @SortTests = (
         Expected  => {
             'Join'    => [],
             'OrderBy' => [
-                'st.type_id'
+                'SortAttr0'
             ],
             'Select'  => [
-                'st.type_id'
+                'st.type_id AS SortAttr0'
             ]
         }
     },
@@ -408,10 +412,10 @@ my @SortTests = (
                 'LEFT OUTER JOIN translation_language tl0 ON tl0.pattern_id = tlp0.id AND tl0.language = \'en\''
             ],
             'OrderBy' => [
-                'TranslateType'
+                'SortAttr0'
             ],
             'Select'  => [
-                'LOWER(COALESCE(tl0.value, tt.name)) AS TranslateType'
+                'LOWER(COALESCE(tl0.value, tt.name)) AS SortAttr0'
             ]
         }
     }

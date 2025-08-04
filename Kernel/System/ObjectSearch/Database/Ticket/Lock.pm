@@ -34,68 +34,39 @@ sub GetSupportedAttributes {
 
     return {
         LockID => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','GT','GTE','LT','LTE'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN','GT','GTE','LT','LTE'],
+            ValueType      => 'NUMERIC'
         },
         Lock => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         }
     };
 }
 
-sub Search {
+sub AttributePrepare {
     my ( $Self, %Param ) = @_;
 
-    # check params
-    return if ( !$Self->_CheckSearchParams( %Param ) );
-
-    # init mapping
-    my %AttributeMapping = (
+    # init Definition
+    my %AttributeDefinition = (
         LockID => {
-            Column    => 'st.ticket_lock_id',
-            ValueType => 'NUMERIC'
+            Column       => 'st.ticket_lock_id',
+            ConditionDef => {
+                ValueType => 'NUMERIC'
+            }
         },
         Lock   => {
-            Column    => 'tl.name'
+            Column       => 'tl.name',
+            ConditionDef => {}
         }
     );
-
-    # check for needed joins
-    my @SQLJoin = ();
-    if ( $Param{Search}->{Field} eq 'Lock' ) {
-        if ( !$Param{Flags}->{JoinMap}->{TicketLock} ) {
-            push( @SQLJoin, 'INNER JOIN ticket_lock_type tl ON tl.id = st.ticket_lock_id' );
-
-            $Param{Flags}->{JoinMap}->{TicketLock} = 1;
-        }
-    }
-
-    # prepare condition
-    my $Condition = $Self->_GetCondition(
-        Operator  => $Param{Search}->{Operator},
-        Column    => $AttributeMapping{ $Param{Search}->{Field} }->{Column},
-        ValueType => $AttributeMapping{ $Param{Search}->{Field} }->{ValueType},
-        Value     => $Param{Search}->{Value},
-        Silent    => $Param{Silent}
-    );
-    return if ( !$Condition );
-
-    # return search def
-    return {
-        Join  => \@SQLJoin,
-        Where => [ $Condition ]
-    };
-}
-
-sub Sort {
-    my ( $Self, %Param ) = @_;
-
-    # check params
-    return if ( !$Self->_CheckSortParams( %Param ) );
 
     # check for needed joins
     my $TableAliasTLP = 'tlp' . ( $Param{Flags}->{JoinMap}->{TranslationTicketLock} // '' );
@@ -108,36 +79,36 @@ sub Sort {
             $Param{Flags}->{JoinMap}->{TicketLock} = 1;
         }
 
-        if ( !defined( $Param{Flags}->{JoinMap}->{TranslationTicketLock} ) ) {
-            my $Count = $Param{Flags}->{TranslationJoinCounter}++;
-            $TableAliasTLP .= $Count;
-            $TableAliasTL  .= $Count;
+        if ( $Param{PrepareType} eq 'Sort' ) {
+            if ( !defined( $Param{Flags}->{JoinMap}->{TranslationTicketLock} ) ) {
+                my $Count = $Param{Flags}->{TranslationJoinCounter}++;
+                $TableAliasTLP .= $Count;
+                $TableAliasTL  .= $Count;
 
-            push( @SQLJoin, "LEFT OUTER JOIN translation_pattern $TableAliasTLP ON $TableAliasTLP.value = tl.name" );
-            push( @SQLJoin, "LEFT OUTER JOIN translation_language $TableAliasTL ON $TableAliasTL.pattern_id = $TableAliasTLP.id AND $TableAliasTL.language = '$Param{Language}'" );
+                push( @SQLJoin, "LEFT OUTER JOIN translation_pattern $TableAliasTLP ON $TableAliasTLP.value = tl.name" );
+                push( @SQLJoin, "LEFT OUTER JOIN translation_language $TableAliasTL ON $TableAliasTL.pattern_id = $TableAliasTLP.id AND $TableAliasTL.language = '$Param{Language}'" );
 
-            $Param{Flags}->{JoinMap}->{TranslationTicketLock} = $Count;
+                $Param{Flags}->{JoinMap}->{TranslationTicketLock} = $Count;
+            }
         }
     }
 
-    # init mapping
-    my %AttributeMapping = (
-        LockID => {
-            Select  => ['st.ticket_lock_id'],
-            OrderBy => ['st.ticket_lock_id']
-        },
-        Lock   => {
-            Select  => ["LOWER(COALESCE($TableAliasTL.value, tl.name)) AS TranslateLock"],
-            OrderBy => ['TranslateLock']
+    my %Attribute = (
+        Column => $AttributeDefinition{ $Param{Attribute} }->{Column},
+        SQLDef => {
+            Join => \@SQLJoin,
         }
     );
+    if ( $Param{PrepareType} eq 'Condition' ) {
+        $Attribute{ConditionDef} = $AttributeDefinition{ $Param{Attribute} }->{ConditionDef};
+    }
+    elsif ( $Param{PrepareType} eq 'Sort' ) {
+        if ( $Param{Attribute} eq 'Lock' ) {
+            $Attribute{Column} = 'LOWER(COALESCE(' . $TableAliasTL . '.value, tl.name))';
+        }
+    }
 
-    # return sort def
-    return {
-        Join    => \@SQLJoin,
-        Select  => $AttributeMapping{ $Param{Attribute} }->{Select},
-        OrderBy => $AttributeMapping{ $Param{Attribute} }->{OrderBy}
-    };
+    return \%Attribute;
 }
 
 1;

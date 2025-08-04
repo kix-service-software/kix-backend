@@ -11,6 +11,8 @@ package Kernel::System::ObjectSearch::Database::Contact::Times;
 use strict;
 use warnings;
 
+use Kernel::System::VariableCheck qw(:all);
+
 use base qw(
     Kernel::System::ObjectSearch::Database::CommonAttribute
 );
@@ -36,6 +38,7 @@ sub GetSupportedAttributes {
 
     return {
         CreateTime => {
+            IsSelectable   => 1,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 0,
@@ -43,6 +46,7 @@ sub GetSupportedAttributes {
             ValueType      => 'DATETIME'
         },
         ChangeTime => {
+            IsSelectable   => 1,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 0,
@@ -52,11 +56,8 @@ sub GetSupportedAttributes {
     };
 }
 
-sub Sort {
+sub AttributePrepare {
     my ( $Self, %Param ) = @_;
-
-    # check params
-    return if !$Self->_CheckSortParams(%Param);
 
     # map search attributes to table attributes
     my %AttributeDefinition = (
@@ -64,55 +65,16 @@ sub Sort {
         ChangeTime => 'c.change_time',
     );
 
-    return {
-        Select  => [$AttributeDefinition{$Param{Attribute}}],
-        OrderBy => [$AttributeDefinition{$Param{Attribute}}],
-    };
-}
-
-sub AttributePrepare {
-    my ( $Self, %Param ) = @_;
-
-    # map search attributes to table attributes
-    my %Attributes = (
-        CreateTime => 'c.create_time',
-        ChangeTime => 'c.change_time',
+    my %Attribute = (
+        Column => $AttributeDefinition{ $Param{Attribute} },
     );
-
-    return {
-        ConditionDef => {
-            Column    => $Attributes{$Param{Search}->{Field}},
+    if ( $Param{PrepareType} eq 'Condition' ) {
+        $Attribute{ConditionDef} = {
             ValueType => 'DATETIME'
-        },
-        SQLDef => {
-            IsRelative => $Param{Search}->{IsRelative}
-        }
-    };
-}
-
-sub ValuePrepare {
-    my ($Self, %Param) = @_;
-
-    return if !$Param{Search}->{Value};
-
-    # calculate relative times
-    my $SystemTime = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
-        String => $Param{Search}->{Value}
-    );
-
-    if ( !$SystemTime ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Invalid date format found in parameter $Param{Search}->{Field}!",
-        );
-        return;
+        };
     }
 
-    my $Value = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
-        SystemTime => $SystemTime
-    );
-
-    return $Kernel::OM->Get('DB')->Quote( $Value );
+    return \%Attribute;
 }
 
 1;

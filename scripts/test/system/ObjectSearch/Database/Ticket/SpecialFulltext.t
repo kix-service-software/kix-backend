@@ -41,19 +41,25 @@ my $AttributeList = $AttributeObject->GetSupportedAttributes();
 $Self->IsDeeply(
     $AttributeList, {
         OwnerFulltext => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            IsSelectable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 0,
+            Operators      => ['STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
         ResponsibleFulltext => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            IsSelectable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 0,
+            Operators      => ['STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
         OrganisationFulltext => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            IsSelectable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 0,
+            Operators      => ['STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         }
     },
     'GetSupportedAttributes provides expected data'

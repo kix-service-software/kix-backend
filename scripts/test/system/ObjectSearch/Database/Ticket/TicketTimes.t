@@ -42,27 +42,35 @@ $Self->IsDeeply(
     $AttributeList,
     {
         Age            => {
-            IsSearchable => 0,
-            IsSortable   => 1,
-            Operators    => []
+            IsSelectable   => 0,
+            IsSearchable   => 0,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => []
         },
         CreateTime     => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','LT','GT','LTE','GTE'],
-            ValueType    => 'DATETIME'
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','LT','GT','LTE','GTE'],
+            ValueType      => 'DATETIME'
         },
         PendingTime    => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','LT','GT','LTE','GTE'],
-            ValueType    => 'DATETIME'
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','LT','GT','LTE','GTE'],
+            ValueType      => 'DATETIME'
         },
         LastChangeTime => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','LT','GT','LTE','GTE'],
-            ValueType    => 'DATETIME'
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','LT','GT','LTE','GTE'],
+            ValueType      => 'DATETIME'
         }
     },
     'GetSupportedAttributes provides expected data'
@@ -681,8 +689,8 @@ my @SortTests = (
         Name      => 'Sort: Attribute "Age"',
         Attribute => 'Age',
         Expected  => {
-            Select        => [ 'st.create_time_unix' ],
-            OrderBy       => [ 'st.create_time_unix' ],
+            Select        => [ 'st.create_time_unix AS SortAttr0' ],
+            OrderBy       => [ 'SortAttr0' ],
             OrderBySwitch => 1
         }
     },
@@ -690,27 +698,24 @@ my @SortTests = (
         Name      => 'Sort: Attribute "CreateTime"',
         Attribute => 'CreateTime',
         Expected  => {
-            Select        => [ 'st.create_time_unix' ],
-            OrderBy       => [ 'st.create_time_unix' ],
-            OrderBySwitch => undef
+            Select        => [ 'st.create_time_unix AS SortAttr0' ],
+            OrderBy       => [ 'SortAttr0' ]
         }
     },
     {
         Name      => 'Sort: Attribute "PendingTime"',
         Attribute => 'PendingTime',
         Expected  => {
-            Select        => [ 'st.until_time' ],
-            OrderBy       => [ 'st.until_time' ],
-            OrderBySwitch => undef
+            Select        => [ 'st.until_time AS SortAttr0' ],
+            OrderBy       => [ 'SortAttr0' ]
         }
     },
     {
         Name      => 'Sort: Attribute "LastChangeTime"',
         Attribute => 'LastChangeTime',
         Expected  => {
-            Select        => [ 'st.change_time' ],
-            OrderBy       => [ 'st.change_time' ],
-            OrderBySwitch => undef
+            Select        => [ 'st.change_time AS SortAttr0' ],
+            OrderBy       => [ 'SortAttr0' ]
         }
     }
 );

@@ -42,10 +42,12 @@ $Self->IsDeeply(
     $AttributeList,
     {
         AccountedTime => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
+            ValueType      => 'NUMERIC'
         }
     },
     'GetSupportedAttributes provides expected data'
@@ -243,8 +245,8 @@ my @SortTests = (
         Name      => 'Sort: Attribute "AccountedTime"',
         Attribute => 'AccountedTime',
         Expected  => {
-            Select  => [ 'st.accounted_time' ],
-            OrderBy => [ 'st.accounted_time' ]
+            Select  => [ 'st.accounted_time AS SortAttr0' ],
+            OrderBy => [ 'SortAttr0' ]
         }
     }
 );

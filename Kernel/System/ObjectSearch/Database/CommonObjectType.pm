@@ -97,6 +97,58 @@ sub GetBaseDef {
     return {};
 }
 
+=item GetSelectDef()
+
+### TODO ###
+
+=cut
+
+sub GetSelectDef {
+    my ( $Self, %Param ) = @_;
+
+    # init sql def hash
+    my %SQLDef = (
+        Select  => [],
+        From    => [],
+        Join    => [],
+        Where   => [],
+        Having  => [],
+        OrderBy => [],
+    );
+
+    for my $SelectEntry ( @{ $Param{Select} } ) {
+        # check for supported attribute
+        if (
+            ref( $Self->{AttributeMapping}->{ $SelectEntry } ) ne 'HASH'
+            || !$Self->{AttributeMapping}->{ $SelectEntry }->{IsSelectable}
+        ) {
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Unable to select attribute $SelectEntry!",
+                );
+            }
+            return;
+        }
+
+        # get object for attribute
+        my $AttributeModule = $Self->{AttributeMapping}->{ $SelectEntry }->{Object};
+
+        # execute attribute module to prepare SQL
+        my $AttributeDef = $AttributeModule->Select(
+            Attribute => $SelectEntry,
+            Flags     => $Param{Flags}
+        );
+        return if ( !IsHashRef($AttributeDef) );
+
+        for my $Key ( keys( %{ $AttributeDef  } ) ) {
+            push( @{ $SQLDef{ $Key } }, @{ $AttributeDef->{ $Key } } );
+        }
+    }
+
+    return \%SQLDef;
+}
+
 =item GetPermissionDef()
 
 ### TODO ###
@@ -166,9 +218,6 @@ sub GetSearchDef {
                 return;
             }
 
-            # skip attribute if not searchable
-            next if ( !$Self->{AttributeMapping}->{ $Attribute }->{IsSearchable} );
-
             # remember searched attributes, when boolean is 'AND'
             if ( $BoolOperator eq 'AND' ) {
                 $AttributesAND{ $Attribute } = 1;
@@ -213,6 +262,7 @@ sub GetSearchDef {
                     WholeSearch  => $Param{Search}->{ $BoolOperator },   # forward "whole" search, e.g. if behavior depends on other attributes
                     BoolOperator => $BoolOperator,
                     Flags        => $Param{Flags},
+                    Language     => $Param{Language},
                     UserType     => $Param{UserType},
                     UserID       => $Param{UserID},
                     Silent       => $Param{Silent}
@@ -414,24 +464,21 @@ sub GetFulltextDef {
             return;
         }
 
-        # skip attribute if not searchable or fulltextable
-        next if ( !$Self->{AttributeMapping}->{ $Attribute }->{IsFulltextable} );
-        next if ( !$Self->{AttributeMapping}->{ $Attribute }->{IsSearchable} );
-
         # get object for attribute
         my $AttributeModule = $Self->{AttributeMapping}->{ $Attribute }->{Object};
 
         my $AttributeDef = $AttributeModule->AttributePrepare(
-            Flags  => $Param{Flags},
-            Search => {
-                %{$Param{Search}},
-                Field => $Attribute
-            }
+            Flags       => $Param{Flags},
+            Attribute   => $Attribute,
+            Language    => $Param{Language},
+            UserType    => $Param{UserType},
+            UserID      => $Param{UserID},
+            PrepareType => 'Fulltext'
         );
 
         if (
             !IsHashRefWithData( $AttributeDef )
-            || !IsHashRefWithData( $AttributeDef->{ConditionDef} )
+            || !IsStringWithData( $AttributeDef->{Column} )
         ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
@@ -442,17 +489,17 @@ sub GetFulltextDef {
             return;
         }
 
-        if ( defined $AttributeDef->{ConditionDef}->{Column} ) {
-            if ( IsArrayRef( $AttributeDef->{ConditionDef}->{Column} ) ) {
+        if ( defined $AttributeDef->{Column} ) {
+            if ( IsArrayRef( $AttributeDef->{Column} ) ) {
                 push(
                     @{ $SQLDef{Columns} },
-                    @{ $AttributeDef->{ConditionDef}->{Column} }
+                    @{ $AttributeDef->{Column} }
                 );
             }
             else {
                 push(
                     @{ $SQLDef{Columns} },
-                    $AttributeDef->{ConditionDef}->{Column}
+                    $AttributeDef->{Column}
                 );
             }
         }

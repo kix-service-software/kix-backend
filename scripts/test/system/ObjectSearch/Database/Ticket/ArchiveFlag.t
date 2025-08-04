@@ -62,10 +62,12 @@ $Self->IsDeeply(
     $ActiveAttributeList,
     {
         Archived => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN'],
+            ValueType      => 'NUMERIC'
         }
     },
     'GetSupportedAttributes provides expected data when "Ticket::ArchiveSystem" is active'
@@ -319,8 +321,8 @@ my @SortTests = (
         Name      => 'Sort: Attribute "Archived"',
         Attribute => 'Archived',
         Expected  => {
-            Select  => [ 'st.archive_flag' ],
-            OrderBy => [ 'st.archive_flag' ]
+            Select  => [ 'st.archive_flag AS SortAttr0' ],
+            OrderBy => [ 'SortAttr0' ]
         }
     }
 );

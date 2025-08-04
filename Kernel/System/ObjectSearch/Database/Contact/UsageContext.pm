@@ -38,6 +38,7 @@ sub GetSupportedAttributes {
 
     return {
         IsAgent => {
+            IsSelectable   => 0,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 0,
@@ -45,6 +46,7 @@ sub GetSupportedAttributes {
             ValueType      => 'NUMERIC'
         },
         IsCustomer => {
+            IsSelectable   => 0,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 0,
@@ -54,11 +56,8 @@ sub GetSupportedAttributes {
     };
 }
 
-sub Sort {
+sub AttributePrepare {
     my ( $Self, %Param ) = @_;
-
-    # check params
-    return if !$Self->_CheckSortParams(%Param);
 
     my @SQLJoin;
     my $TableAlias = $Param{Flags}->{JoinMap}->{UserJoin} // 'u';
@@ -74,54 +73,27 @@ sub Sort {
 
     # map search attributes to table attributes
     my %AttributeDefinition = (
-        IsAgent    => "COALESCE($TableAlias.is_agent,0) AS isagent",
-        IsCustomer => "COALESCE($TableAlias.is_customer,0) AS iscustomer"
-    );
-
-    # map search attributes to table attributes
-    my %AttributeOrderDefinition = (
-        IsAgent    => 'isagent',
-        IsCustomer => 'iscustomer'
-    );
-
-    return {
-        Select  => [$AttributeDefinition{$Param{Attribute}}],
-        OrderBy => [$AttributeOrderDefinition{$Param{Attribute}}],
-        Join    => \@SQLJoin
-    };
-}
-
-sub AttributePrepare {
-    my ( $Self, %Param ) = @_;
-
-    my @Join;
-    my $TableAlias = $Param{Flags}->{JoinMap}->{UserJoin} // 'u';
-    if ( !$Param{Flags}->{JoinMap}->{UserJoin} ) {
-        my $Count = $Param{Flags}->{UserCounter}++;
-        $TableAlias .= $Count;
-        push(
-            @Join,
-            "LEFT JOIN users $TableAlias ON c.user_id = $TableAlias.id"
-        );
-        $Param{Flags}->{JoinMap}->{UserJoin} = $TableAlias;
-    }
-
-    # map search attributes to table attributes
-    my %Attributes = (
         IsAgent    => "$TableAlias.is_agent",
         IsCustomer => "$TableAlias.is_customer"
     );
 
-    return {
-        ConditionDef => {
-            Column    => $Attributes{$Param{Search}->{Field}},
+    my %Attribute = (
+        Column => $AttributeDefinition{ $Param{Attribute} },
+        SQLDef => {
+            Join => \@SQLJoin
+        }
+    );
+    if ( $Param{PrepareType} eq 'Condition' ) {
+        $Attribute{ConditionDef} = {
             ValueType => 'NUMERIC',
             NULLValue => 1,
-        },
-        SQLDef => {
-            Join => \@Join
-        }
-    };
+        };
+    }
+    elsif ( $Param{PrepareType} eq 'Sort' ) {
+        $Attribute{Column} = 'COALESCE(' . $Attribute{Column} . ',0)';
+    }
+
+    return \%Attribute;
 }
 
 1;

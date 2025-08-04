@@ -34,46 +34,31 @@ sub GetSupportedAttributes {
 
     return {
         Title => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         }
     };
 }
 
-sub Search {
+sub AttributePrepare {
     my ( $Self, %Param ) = @_;
 
-    # check params
-    return if ( !$Self->_CheckSearchParams( %Param ) );
-
-    # prepare condition
-    my $Condition = $Self->_GetCondition(
-        Operator        => $Param{Search}->{Operator},
-        Column          => 'st.title',
-        Value           => $Param{Search}->{Value},
-        CaseInsensitive => 1,
-        Silent          => $Param{Silent}
+    my %Attribute = (
+        Column => 'st.title'
     );
-    return if ( !$Condition );
+    if ( $Param{PrepareType} eq 'Condition' ) {
+        $Attribute{ConditionDef} = {
+            CaseInsensitive => 1
+        };
+    }
+    elsif ( $Param{PrepareType} eq 'Sort' ) {
+        $Attribute{Column} = 'LOWER(st.title)';
+    }
 
-    # return search def
-    return {
-        Where => [ $Condition ]
-    };
-}
-
-sub Sort {
-    my ( $Self, %Param ) = @_;
-
-    # check params
-    return if ( !$Self->_CheckSortParams( %Param ) );
-
-    # return sort def
-    return {
-        Select  => ['st.title'],
-        OrderBy => ['LOWER(st.title)']
-    };
+    return \%Attribute;
 }
 
 1;

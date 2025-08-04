@@ -137,21 +137,14 @@ sub ValueValidate {
     return $Success;
 }
 
-sub SearchSQLSearchFieldGet {
+sub SQLParameterGet {
     my ( $Self, %Param ) = @_;
 
     return {
-        Column          => "$Param{TableAlias}.value_text",
-        CaseInsensitive => 1
-    };
-}
-
-sub SearchSQLSortFieldGet {
-    my ( $Self, %Param ) = @_;
-
-    return {
-        Select  => ["$Param{TableAlias}.value_text"],
-        OrderBy => ["$Param{TableAlias}.value_text"]
+        Column       => "$Param{TableAlias}.value_text",
+        ConditionDef => {
+            CaseInsensitive => 1
+        }
     };
 }
 

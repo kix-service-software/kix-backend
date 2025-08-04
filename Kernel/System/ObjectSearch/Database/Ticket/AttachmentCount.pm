@@ -34,24 +34,28 @@ sub GetSupportedAttributes {
 
     return {
         AttachmentCount => {
-            IsSearchable => 0,
-            IsSortable   => 1,
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 1,
+            IsSearchable   => 0,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            ValueType      => 'NUMERIC'
         },
     };
 }
 
-sub Sort {
+sub AttributePrepare {
     my ( $Self, %Param ) = @_;
 
-    # check params
-    return if ( !$Self->_CheckSortParams(%Param) );
+    my %Attribute = (
+        Column => 'st.attachment_count',
+    );
+    if ( $Param{PrepareType} eq 'Condition' ) {
+        $Attribute{ConditionDef} = {
+            ValueType => 'NUMERIC'
+        };
+    }
 
-    # return sort def
-    return {
-        Select  => ['st.attachment_count'],
-        OrderBy => ['st.attachment_count']
-    };
+    return \%Attribute;
 }
 
 1;

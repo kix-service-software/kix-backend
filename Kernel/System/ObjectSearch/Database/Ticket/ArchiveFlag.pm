@@ -35,10 +35,12 @@ sub GetSupportedAttributes {
     if ( $Kernel::OM->Get('Config')->Get('Ticket::ArchiveSystem') ) {
         return {
             Archived => {
-                IsSearchable => 1,
-                IsSortable   => 1,
-                Operators    => ['EQ','NE','IN','!IN'],
-                ValueType    => 'NUMERIC'
+                IsSelectable   => 1,
+                IsSearchable   => 1,
+                IsSortable     => 1,
+                IsFulltextable => 0,
+                Operators      => ['EQ','NE','IN','!IN'],
+                ValueType      => 'NUMERIC'
             }
         };
     }
@@ -46,36 +48,19 @@ sub GetSupportedAttributes {
     return {};
 }
 
-sub Search {
+sub AttributePrepare {
     my ( $Self, %Param ) = @_;
 
-    # check params
-    return if ( !$Self->_CheckSearchParams( %Param ) );
-
-    my $Condition = $Self->_GetCondition(
-        Operator  => $Param{Search}->{Operator},
-        Column    => 'st.archive_flag',
-        Value     => $Param{Search}->{Value},
-        ValueType => 'NUMERIC',
-        Silent    => $Param{Silent}
+    my %Attribute = (
+        Column => 'st.archive_flag',
     );
-    return if ( !$Condition );
+    if ( $Param{PrepareType} eq 'Condition' ) {
+        $Attribute{ConditionDef} = {
+            ValueType => 'NUMERIC'
+        };
+    }
 
-    return {
-        Where => [ $Condition ]
-    };
-}
-
-sub Sort {
-    my ( $Self, %Param ) = @_;
-
-    # check params
-    return if ( !$Self->_CheckSortParams( %Param ) );
-
-    return {
-        Select  => [ 'st.archive_flag' ],
-        OrderBy => [ 'st.archive_flag' ]
-    };
+    return \%Attribute;
 }
 
 1;

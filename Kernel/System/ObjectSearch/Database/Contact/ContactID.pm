@@ -38,6 +38,7 @@ sub GetSupportedAttributes {
 
     return {
         ContactID => {
+            IsSelectable   => 1,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 0,
@@ -45,6 +46,7 @@ sub GetSupportedAttributes {
             ValueType      => 'NUMERIC'
         },
         ID => {
+            IsSelectable   => 1,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 0,
@@ -54,27 +56,19 @@ sub GetSupportedAttributes {
     };
 }
 
-sub Sort {
-    my ( $Self, %Param ) = @_;
-
-    # check params
-    return if !$Self->_CheckSortParams(%Param);
-
-    return {
-        Select  => ['c.id'],
-        OrderBy => ['c.id'],
-    };
-}
-
 sub AttributePrepare {
     my ( $Self, %Param ) = @_;
 
-    return {
-        ConditionDef => {
-            Column    => 'c.id',
+    my %Attribute = (
+        Column => 'c.id',
+    );
+    if ( $Param{PrepareType} eq 'Condition' ) {
+        $Attribute{ConditionDef} = {
             ValueType => 'NUMERIC'
-        }
-    };
+        };
+    }
+
+    return \%Attribute;
 }
 
 1;

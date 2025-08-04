@@ -1018,6 +1018,70 @@ sub ValueGet {
     return $Self->{$DynamicFieldBackend}->ValueGet(%Param);
 }
 
+=item SQLParameterGet()
+
+returns the SQL parameter for the object search of this field
+
+    my $SQL = $BackendObject->SearchSQLGet(
+        DynamicFieldConfig => $DynamicFieldConfig,      # complete config of the DynamicField
+        TableAlias         => $TableAlias,              # the alias of the already joined dynamic_field_value table to use
+        ParameterType      => $ParameterType,           # (Attribute|Condition|Sort).
+    );
+
+=cut
+
+sub SQLParameterGet {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed (qw(DynamicFieldConfig TableAlias ParameterType)) {
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!",
+                Silent   => $Param{Silent}
+            );
+            return;
+        }
+    }
+
+    # check DynamicFieldConfig (general)
+    if ( !IsHashRefWithData( $Param{DynamicFieldConfig} ) ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "The field configuration is invalid",
+            Silent   => $Param{Silent}
+        );
+        return;
+    }
+
+    # check DynamicFieldConfig (internally)
+    for my $Needed (qw(ID FieldType ObjectType)) {
+        if ( !$Param{DynamicFieldConfig}->{$Needed} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed in DynamicFieldConfig!",
+                Silent   => $Param{Silent}
+            );
+            return;
+        }
+    }
+
+    # set the dynamic field specific backend
+    my $DynamicFieldBackend = 'DynamicField' . $Param{DynamicFieldConfig}->{FieldType} . 'Object';
+
+    if ( !$Self->{$DynamicFieldBackend} ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Backend $Param{DynamicFieldConfig}->{FieldType} is invalid!",
+            Silent   => $Param{Silent},
+        );
+        return;
+    }
+
+    return $Self->{$DynamicFieldBackend}->SQLParameterGet(%Param);
+}
+
 =item SearchSQLGet()
 
 returns the SQL WHERE part that needs to be used to search in a particular

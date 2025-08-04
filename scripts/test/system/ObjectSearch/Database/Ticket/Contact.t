@@ -42,15 +42,19 @@ $Self->IsDeeply(
     $AttributeList,
     {
         ContactID => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','GT','GTE','LT','LTE'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN','GT','GTE','LT','LTE'],
+            ValueType      => 'NUMERIC'
         },
         Contact => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         }
     },
     'GetSupportedAttributes provides expected data'
@@ -145,8 +149,9 @@ my @SearchTests = (
             Value    => '1'
         },
         Expected     => {
-            'Join'  => [],
-            'Where' => [
+            'IsRelative' => undef,
+            'Join'       => [],
+            'Where'      => [
                 'st.contact_id = 1'
             ]
         }
@@ -159,8 +164,9 @@ my @SearchTests = (
             Value    => '0'
         },
         Expected     => {
-            'Join'  => [],
-            'Where' => [
+            'IsRelative' => undef,
+            'Join'       => [],
+            'Where'      => [
                 '(st.contact_id = 0 OR st.contact_id IS NULL)'
             ]
         }
@@ -173,8 +179,9 @@ my @SearchTests = (
             Value    => '1'
         },
         Expected     => {
-            'Join'  => [],
-            'Where' => [
+            'IsRelative' => undef,
+            'Join'       => [],
+            'Where'      => [
                 '(st.contact_id <> 1 OR st.contact_id IS NULL)'
             ]
         }
@@ -187,8 +194,9 @@ my @SearchTests = (
             Value    => '0'
         },
         Expected     => {
-            'Join'  => [],
-            'Where' => [
+            'IsRelative' => undef,
+            'Join'       => [],
+            'Where'      => [
                 'st.contact_id <> 0'
             ]
         }
@@ -201,8 +209,9 @@ my @SearchTests = (
             Value    => ['1']
         },
         Expected     => {
-            'Join'  => [],
-            'Where' => [
+            'IsRelative' => undef,
+            'Join'       => [],
+            'Where'      => [
                 'st.contact_id IN (1)'
             ]
         }
@@ -215,8 +224,9 @@ my @SearchTests = (
             Value    => ['1']
         },
         Expected     => {
-            'Join'  => [],
-            'Where' => [
+            'IsRelative' => undef,
+            'Join'       => [],
+            'Where'      => [
                 'st.contact_id NOT IN (1)'
             ]
         }
@@ -229,8 +239,9 @@ my @SearchTests = (
             Value    => '1'
         },
         Expected     => {
-            'Join'  => [],
-            'Where' => [
+            'IsRelative' => undef,
+            'Join'       => [],
+            'Where'      => [
                 'st.contact_id < 1'
             ]
         }
@@ -243,8 +254,9 @@ my @SearchTests = (
             Value    => '1'
         },
         Expected     => {
-            'Join'  => [],
-            'Where' => [
+            'IsRelative' => undef,
+            'Join'       => [],
+            'Where'      => [
                 'st.contact_id > 1'
             ]
         }
@@ -257,8 +269,9 @@ my @SearchTests = (
             Value    => '1'
         },
         Expected     => {
-            'Join'  => [],
-            'Where' => [
+            'IsRelative' => undef,
+            'Join'       => [],
+            'Where'      => [
                 'st.contact_id <= 1'
             ]
         }
@@ -271,8 +284,9 @@ my @SearchTests = (
             Value    => '1'
         },
         Expected     => {
-            'Join'  => [],
-            'Where' => [
+            'IsRelative' => undef,
+            'Join'       => [],
+            'Where'      => [
                 'st.contact_id >= 1'
             ]
         }
@@ -285,10 +299,11 @@ my @SearchTests = (
             Value    => 'Test'
         },
         Expected     => {
-            'Join' => [
+            'IsRelative' => undef,
+            'Join'       => [
                 'LEFT OUTER JOIN contact tcon ON tcon.id = st.contact_id'
             ],
-            'Where' => [
+            'Where'      => [
                 $CaseSensitive ? '(LOWER(tcon.lastname) = \'test\' OR LOWER(tcon.firstname) = \'test\')' : '(tcon.lastname = \'test\' OR tcon.firstname = \'test\')'
             ]
         }
@@ -301,10 +316,11 @@ my @SearchTests = (
             Value    => q{}
         },
         Expected     => {
-            'Join' => [
+            'IsRelative' => undef,
+            'Join'       => [
                 'LEFT OUTER JOIN contact tcon ON tcon.id = st.contact_id'
             ],
-            'Where' => [
+            'Where'      => [
                 $CaseSensitive ? '(LOWER(tcon.lastname) = \'\' OR tcon.lastname IS NULL OR LOWER(tcon.firstname) = \'\' OR tcon.firstname IS NULL)' : '(tcon.lastname = \'\' OR tcon.lastname IS NULL OR tcon.firstname = \'\' OR tcon.firstname IS NULL)'
             ]
         }
@@ -317,10 +333,11 @@ my @SearchTests = (
             Value    => 'Test'
         },
         Expected     => {
-            'Join' => [
+            'IsRelative' => undef,
+            'Join'       => [
                 'LEFT OUTER JOIN contact tcon ON tcon.id = st.contact_id'
             ],
-            'Where' => [
+            'Where'      => [
                 $CaseSensitive ? '(LOWER(tcon.lastname) != \'test\' OR tcon.lastname IS NULL OR LOWER(tcon.firstname) != \'test\' OR tcon.firstname IS NULL)' : '(tcon.lastname != \'test\' OR tcon.lastname IS NULL OR tcon.firstname != \'test\' OR tcon.firstname IS NULL)'
             ]
         }
@@ -333,10 +350,11 @@ my @SearchTests = (
             Value    => q{}
         },
         Expected     => {
-            'Join' => [
+            'IsRelative' => undef,
+            'Join'       => [
                 'LEFT OUTER JOIN contact tcon ON tcon.id = st.contact_id'
             ],
-            'Where' => [
+            'Where'      => [
                 $CaseSensitive ? '(LOWER(tcon.lastname) != \'\' OR LOWER(tcon.firstname) != \'\')' : '(tcon.lastname != \'\' OR tcon.firstname != \'\')'
             ]
         }
@@ -349,10 +367,11 @@ my @SearchTests = (
             Value    => ['Test']
         },
         Expected     => {
-            'Join' => [
+            'IsRelative' => undef,
+            'Join'       => [
                 'LEFT OUTER JOIN contact tcon ON tcon.id = st.contact_id'
             ],
-            'Where' => [
+            'Where'      => [
                 $CaseSensitive ? '(LOWER(tcon.lastname) IN (\'test\') OR LOWER(tcon.firstname) IN (\'test\'))' : '(tcon.lastname IN (\'test\') OR tcon.firstname IN (\'test\'))'
             ]
         }
@@ -365,10 +384,11 @@ my @SearchTests = (
             Value    => ['Test']
         },
         Expected     => {
-            'Join' => [
+            'IsRelative' => undef,
+            'Join'       => [
                 'LEFT OUTER JOIN contact tcon ON tcon.id = st.contact_id'
             ],
-            'Where' => [
+            'Where'      => [
                 $CaseSensitive ? '(LOWER(tcon.lastname) NOT IN (\'test\') OR LOWER(tcon.firstname) NOT IN (\'test\'))' : '(tcon.lastname NOT IN (\'test\') OR tcon.firstname NOT IN (\'test\'))'
             ]
         }
@@ -381,10 +401,11 @@ my @SearchTests = (
             Value    => 'Test'
         },
         Expected     => {
-            'Join' => [
+            'IsRelative' => undef,
+            'Join'       => [
                 'LEFT OUTER JOIN contact tcon ON tcon.id = st.contact_id'
             ],
-            'Where' => [
+            'Where'      => [
                 $CaseSensitive ? '(LOWER(tcon.lastname) LIKE \'test%\' OR LOWER(tcon.firstname) LIKE \'test%\')' : '(tcon.lastname LIKE \'test%\' OR tcon.firstname LIKE \'test%\')'
             ]
         }
@@ -397,10 +418,11 @@ my @SearchTests = (
             Value    => 'Test'
         },
         Expected     => {
-            'Join' => [
+            'IsRelative' => undef,
+            'Join'       => [
                 'LEFT OUTER JOIN contact tcon ON tcon.id = st.contact_id'
             ],
-            'Where' => [
+            'Where'      => [
                 $CaseSensitive ? '(LOWER(tcon.lastname) LIKE \'%test\' OR LOWER(tcon.firstname) LIKE \'%test\')' : '(tcon.lastname LIKE \'%test\' OR tcon.firstname LIKE \'%test\')'
             ]
         }
@@ -413,10 +435,11 @@ my @SearchTests = (
             Value    => 'Test'
         },
         Expected     => {
-            'Join' => [
+            'IsRelative' => undef,
+            'Join'       => [
                 'LEFT OUTER JOIN contact tcon ON tcon.id = st.contact_id'
             ],
-            'Where' => [
+            'Where'      => [
                 $CaseSensitive ? '(LOWER(tcon.lastname) LIKE \'%test%\' OR LOWER(tcon.firstname) LIKE \'%test%\')' : '(tcon.lastname LIKE \'%test%\' OR tcon.firstname LIKE \'%test%\')'
             ]
         }
@@ -429,10 +452,11 @@ my @SearchTests = (
             Value    => 'Test'
         },
         Expected     => {
-            'Join' => [
+            'IsRelative' => undef,
+            'Join'       => [
                 'LEFT OUTER JOIN contact tcon ON tcon.id = st.contact_id'
             ],
-            'Where' => [
+            'Where'      => [
                 $CaseSensitive ? '(LOWER(tcon.lastname) LIKE \'test\' OR LOWER(tcon.firstname) LIKE \'test\')' : '(tcon.lastname LIKE \'test\' OR tcon.firstname LIKE \'test\')'
             ]
         }
@@ -470,10 +494,10 @@ my @SortTests = (
         Expected  => {
             'Join'    => [],
             'OrderBy' => [
-                'st.contact_id'
+                'SortAttr0'
             ],
             'Select'  => [
-                'st.contact_id'
+                'st.contact_id AS SortAttr0'
             ]
         }
     },
@@ -485,10 +509,10 @@ my @SortTests = (
                 'LEFT OUTER JOIN contact tcon ON tcon.id = st.contact_id'
             ],
             'OrderBy' => [
-                'LOWER(tcon.lastname)', 'LOWER(tcon.firstname)'
+                'SortAttr0', 'SortAttr1'
             ],
             'Select'  => [
-                'tcon.lastname', 'tcon.firstname'
+                'LOWER(tcon.lastname) AS SortAttr0', 'LOWER(tcon.firstname) AS SortAttr1'
             ]
         }
     }

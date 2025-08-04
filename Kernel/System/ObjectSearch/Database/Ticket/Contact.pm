@@ -34,40 +34,47 @@ sub GetSupportedAttributes {
 
     return {
         ContactID => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','GT','GTE','LT','LTE'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN','GT','GTE','LT','LTE'],
+            ValueType      => 'NUMERIC'
         },
         Contact => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         }
     };
 }
 
-sub Search {
+sub AttributePrepare {
     my ( $Self, %Param ) = @_;
 
-    # check params
-    return if ( !$Self->_CheckSearchParams( %Param ) );
-
-    # init mapping
-    my %AttributeMapping = (
+    # map search attributes to table attributes
+    my %AttributeDefinition = (
         ContactID => {
-            Column    => 'st.contact_id',
-            ValueType => 'NUMERIC',
+            Column       => 'st.contact_id',
+            ConditionDef => {
+                ValueType => 'NUMERIC',
+                NULLValue => 1
+            }
         },
         Contact => {
             Column          => ['tcon.lastname','tcon.firstname'],
-            CaseInsensitive => 1
+            ConditionDef => {
+                CaseInsensitive => 1,
+                NULLValue       => 1
+            }
         },
     );
 
     # check for needed joins
     my @SQLJoin = ();
-    if ( $Param{Search}->{Field} eq 'Contact' ) {
+    if ( $Param{Attribute} eq 'Contact' ) {
         if ( !$Param{Flags}->{JoinMap}->{TicketContact} ) {
             push( @SQLJoin, 'LEFT OUTER JOIN contact tcon ON tcon.id = st.contact_id' );
 
@@ -75,61 +82,24 @@ sub Search {
         }
     }
 
-    # prepare condition
-    my $Condition = $Self->_GetCondition(
-        Operator        => $Param{Search}->{Operator},
-        Column          => $AttributeMapping{ $Param{Search}->{Field} }->{Column},
-        ValueType       => $AttributeMapping{ $Param{Search}->{Field} }->{ValueType},
-        Value           => $Param{Search}->{Value},
-        NULLValue       => 1,
-        CaseInsensitive => $AttributeMapping{ $Param{Search}->{Field} }->{CaseInsensitive},
-        Silent          => $Param{Silent}
+    my %Attribute = (
+        Column => $AttributeDefinition{ $Param{Attribute} }->{Column},
+        SQLDef => {
+            Join => \@SQLJoin,
+        }
     );
-    return if ( !$Condition );
-
-    # return search def
-    return {
-        Join  => \@SQLJoin,
-        Where => [ $Condition ]
-    };
-}
-
-sub Sort {
-    my ( $Self, %Param ) = @_;
-
-    # check params
-    return if ( !$Self->_CheckSortParams( %Param ) );
-
-    # check for needed joins
-    my @SQLJoin = ();
-    if (
-        $Param{Attribute} eq 'Contact'
-    ) {
-        if ( !$Param{Flags}->{JoinMap}->{TicketContact} ) {
-            push( @SQLJoin, 'LEFT OUTER JOIN contact tcon ON tcon.id = st.contact_id' );
-
-            $Param{Flags}->{JoinMap}->{TicketContact} = 1;
+    if ( $Param{PrepareType} eq 'Condition' ) {
+        $Attribute{ConditionDef} = $AttributeDefinition{ $Param{Attribute} }->{ConditionDef};
+    }
+    elsif ( $Param{PrepareType} eq 'Sort' ) {
+        if ( $Param{Attribute} eq 'Contact' ) {
+            for my $Column ( @{ $Attribute{Column} } ) {
+                $Column = 'LOWER(' . $Column . ')';
+            }
         }
     }
 
-    # init mapping
-    my %AttributeMapping = (
-        ContactID => {
-            Select  => ['st.contact_id'],
-            OrderBy => ['st.contact_id']
-        },
-        Contact   => {
-            Select  => ['tcon.lastname','tcon.firstname'],
-            OrderBy => ['LOWER(tcon.lastname)','LOWER(tcon.firstname)']
-        }
-    );
-
-    # return sort def
-    return {
-        Join    => \@SQLJoin,
-        Select  => $AttributeMapping{ $Param{Attribute} }->{Select},
-        OrderBy => $AttributeMapping{ $Param{Attribute} }->{OrderBy}
-    };
+    return \%Attribute;
 }
 
 1;

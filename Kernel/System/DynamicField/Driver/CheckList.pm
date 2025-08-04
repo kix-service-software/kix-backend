@@ -58,6 +58,7 @@ sub new {
 
     # set field properties
     $Self->{Properties} = {
+        'IsSelectable'    => 0,
         'IsSearchable'    => 0,
         'IsSortable'      => 0,
         'IsFulltextable'  => 0,

@@ -53,6 +53,9 @@ sub Init {
     # init sla criterion join counter with 0
     $Param{Flags}->{SLACriterionJoinCounter} = 0;
 
+    # init sort attribute counter with 0
+    $Param{Flags}->{SortAttributeCounter} = 0;
+
     return 1;
 }
 

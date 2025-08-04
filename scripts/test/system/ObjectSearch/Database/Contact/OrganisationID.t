@@ -42,6 +42,7 @@ $Self->IsDeeply(
     $AttributeList,
     {
         OrganisationID => {
+            IsSelectable   => 0,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 0,
@@ -49,6 +50,7 @@ $Self->IsDeeply(
             ValueType      => 'NUMERIC'
         },
         OrganisationIDs => {
+            IsSelectable   => 0,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 0,
@@ -56,18 +58,21 @@ $Self->IsDeeply(
             ValueType      => 'NUMERIC'
         },
         Organisation => {
+            IsSelectable   => 0,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 1,
             Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         OrganisationNumber => {
+            IsSelectable   => 0,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 1,
             Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         PrimaryOrganisationID => {
+            IsSelectable   => 1,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 0,
@@ -75,12 +80,14 @@ $Self->IsDeeply(
             ValueType      => 'NUMERIC'
         },
         PrimaryOrganisation => {
+            IsSelectable   => 1,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 1,
             Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         PrimaryOrganisationNumber => {
+            IsSelectable   => 1,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 1,
@@ -951,10 +958,10 @@ my @SortTests = (
                 'LEFT JOIN contact_organisation co ON co.contact_id = c.id'
             ],
             'OrderBy' => [
-                'co.org_id'
+                'SortAttr0'
             ],
             'Select' => [
-                'co.org_id'
+                'co.org_id AS SortAttr0'
             ]
         }
     },
@@ -966,10 +973,10 @@ my @SortTests = (
                 'LEFT JOIN contact_organisation co ON co.contact_id = c.id'
             ],
             'OrderBy' => [
-                'co.org_id'
+                'SortAttr0'
             ],
             'Select' => [
-                'co.org_id'
+                'co.org_id AS SortAttr0'
             ]
         }
     },
@@ -982,10 +989,10 @@ my @SortTests = (
                 'INNER JOIN organisation o ON co.org_id = o.id'
             ],
             'OrderBy' => [
-                'o.name'
+                'SortAttr0'
             ],
             'Select' => [
-                'o.name'
+                'o.name AS SortAttr0'
             ]
         }
     },
@@ -998,10 +1005,10 @@ my @SortTests = (
                 'INNER JOIN organisation o ON co.org_id = o.id'
             ],
             'OrderBy' => [
-                'o.number'
+                'SortAttr0'
             ],
             'Select' => [
-                'o.number'
+                'o.number AS SortAttr0'
             ]
         }
     },
@@ -1014,10 +1021,10 @@ my @SortTests = (
                 'AND cpo.is_primary = 1'
             ],
             'OrderBy' => [
-                'cpo.org_id'
+                'SortAttr0'
             ],
             'Select' => [
-                'cpo.org_id'
+                'cpo.org_id AS SortAttr0'
             ]
         }
     },
@@ -1031,10 +1038,10 @@ my @SortTests = (
                 'INNER JOIN organisation po ON cpo.org_id = po.id'
             ],
             'OrderBy' => [
-                'po.name'
+                'SortAttr0'
             ],
             'Select' => [
-                'po.name'
+                'po.name AS SortAttr0'
             ]
         }
     },
@@ -1048,10 +1055,10 @@ my @SortTests = (
                 'INNER JOIN organisation po ON cpo.org_id = po.id'
             ],
             'OrderBy' => [
-                'po.number'
+                'SortAttr0'
             ],
             'Select' => [
-                'po.number'
+                'po.number AS SortAttr0'
             ]
         }
     }

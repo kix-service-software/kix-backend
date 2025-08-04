@@ -48,69 +48,92 @@ $Self->IsDeeply(
     $AttributeList,
     {
         ArticleID         => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
+            ValueType      => 'NUMERIC'
         },
         ChannelID         => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
+            ValueType      => 'NUMERIC'
         },
         Channel           => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            IsSelectable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
         SenderTypeID      => {
+            IsSelectable => 0,
             IsSearchable => 1,
             IsSortable   => 0,
             Operators    => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
             ValueType    => 'NUMERIC'
         },
         SenderType        => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            IsSelectable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
         CustomerVisible   => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
+            ValueType      => 'NUMERIC'
         },
         From              => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            IsSelectable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
         To                => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            IsSelectable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
         Cc                => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            IsSelectable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
         Subject           => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            IsSelectable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
         Body              => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            IsSelectable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
         ArticleCreateTime => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EQ','LT','GT','LTE','GTE'],
-            ValueType    => 'DATETIME'
+            IsSelectable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 0,
+            Operators      => ['EQ','LT','GT','LTE','GTE'],
+            ValueType      => 'DATETIME'
         }
     },
     'GetSupportedAttributes provides expected data'

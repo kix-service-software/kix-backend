@@ -36,6 +36,7 @@ sub GetSupportedAttributes {
 
     return {
         UserID => {
+            IsSelectable   => 1,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 0,
@@ -43,6 +44,7 @@ sub GetSupportedAttributes {
             ValueType      => 'NUMERIC'
         },
         AssignedUserID => {
+            IsSelectable   => 1,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 0,
@@ -50,12 +52,14 @@ sub GetSupportedAttributes {
             ValueType      => 'NUMERIC'
         },
         Login => {
+            IsSelectable   => 1,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 1,
             Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         UserLogin => {
+            IsSelectable   => 1,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 1,
@@ -64,14 +68,11 @@ sub GetSupportedAttributes {
     };
 }
 
-sub Sort {
+sub AttributePrepare {
     my ( $Self, %Param ) = @_;
 
-    # check params
-    return if !$Self->_CheckSortParams(%Param);
-
-    my @SQLJoin;
     my $TableAlias = $Param{Flags}->{FlagMap}->{UserJoin} // 'u';
+    my @SQLJoin;
     if ( $Param{Attribute} =~ m/Login$/sm ){
         if ( !$Param{Flags}->{FlagMap}->{UserJoin} ) {
             my $Count = $Param{Flags}->{UserCounter}++;
@@ -84,56 +85,51 @@ sub Sort {
         }
     }
 
-    # map search attributes to table attributes
+    # init Definition
     my %AttributeDefinition = (
-        UserID         => 'c.user_id',
-        AssignedUserID => 'c.user_id',
-        Login          => "$TableAlias.login",
-        UserLogin      => "$TableAlias.login",
-    );
-
-    return {
-        Select  => [$AttributeDefinition{$Param{Attribute}}],
-        OrderBy => [$AttributeDefinition{$Param{Attribute}}],
-        Join    => \@SQLJoin
-    };
-}
-
-sub AttributePrepare {
-    my ( $Self, %Param ) = @_;
-
-    if ( $Param{Search}->{Field} =~ m/Login$/sm ){
-        my $TableAlias = $Param{Flags}->{FlagMap}->{UserJoin} // 'u';
-        my @SQLJoin;
-        if ( !$Param{Flags}->{FlagMap}->{UserJoin} ) {
-            my $Count = $Param{Flags}->{UserCounter}++;
-            $TableAlias .= $Count;
-            push(
-                @SQLJoin,
-                "LEFT JOIN users $TableAlias ON c.user_id = $TableAlias.id"
-            );
-            $Param{Flags}->{UserJoin} = $TableAlias;
-        }
-        return {
+        UserID         => {
+            Column       => 'c.user_id',
             ConditionDef => {
-                Column          => "$TableAlias.login",
+                ValueType => 'NUMERIC',
+                NULLValue => 1
+            }
+        },
+        AssignedUserID => {
+            Column       => 'c.user_id',
+            ConditionDef => {
+                ValueType => 'NUMERIC',
+                NULLValue => 1
+            }
+        },
+        Login          => {
+            Column       => $TableAlias . '.login',
+            ConditionDef => {
                 ValueType       => 'STRING',
                 CaseInsensitive => 1,
                 NULLValue       => 1
-            },
-            SQLDef => {
-                Join => \@SQLJoin
             }
-        };
+        },
+        UserLogin      => {
+            Column       => $TableAlias . '.login',
+            ConditionDef => {
+                ValueType       => 'STRING',
+                CaseInsensitive => 1,
+                NULLValue       => 1
+            }
+        }
+    );
+    
+    my %Attribute = (
+        Column => $AttributeDefinition{ $Param{Attribute} }->{Column},
+        SQLDef => {
+            Join => \@SQLJoin
+        }
+    );
+    if ( $Param{PrepareType} eq 'Condition' ) {
+        $Attribute{ConditionDef} = $AttributeDefinition{ $Param{Attribute} }->{ConditionDef};
     }
 
-    return {
-        ConditionDef => {
-            Column    => 'c.user_id',
-            ValueType => 'NUMERIC',
-            NULLValue => 1
-        }
-    };
+    return \%Attribute;
 }
 
 1;

@@ -36,109 +36,118 @@ sub GetSupportedAttributes {
 
     return {
         Age            => {
-            IsSearchable => 0,
-            IsSortable   => 1,
-            Operators    => []
+            IsSelectable   => 0,
+            IsSearchable   => 0,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => []
         },
         CreateTime     => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','LT','GT','LTE','GTE'],
-            ValueType    => 'DATETIME'
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','LT','GT','LTE','GTE'],
+            ValueType      => 'DATETIME'
         },
         PendingTime    => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','LT','GT','LTE','GTE'],
-            ValueType    => 'DATETIME'
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','LT','GT','LTE','GTE'],
+            ValueType      => 'DATETIME'
         },
         LastChangeTime => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','LT','GT','LTE','GTE'],
-            ValueType    => 'DATETIME'
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','LT','GT','LTE','GTE'],
+            ValueType      => 'DATETIME'
         }
     };
 }
 
-sub Search {
+sub AttributePrepare {
     my ( $Self, %Param ) = @_;
 
-    # check params
-    return if ( !$Self->_CheckSearchParams( %Param ) );
-
-    # init mapping
-    my %AttributeMapping = (
+    # init Definition
+    my %AttributeDefinition = (
+        Age            => {
+            Column => 'st.create_time_unix',
+        },
         CreateTime     => {
-            Column    => 'st.create_time_unix',
-            ValueType => 'NUMERIC',
-            Convert   => 'TimeStamp2SystemTime'
+            Column       => 'st.create_time_unix',
+            ConditionDef => {
+                ValueType => 'NUMERIC'
+            }
         },
         PendingTime    => {
-            Column    => 'st.until_time',
-            ValueType => 'NUMERIC',
-            Convert   => 'TimeStamp2SystemTime'
+            Column       => 'st.until_time',
+            ConditionDef => {
+                ValueType => 'NUMERIC'
+            }
         },
         LastChangeTime => {
-            Column    => 'st.change_time',
+            Column       => 'st.change_time',
+            ConditionDef => {}
         }
     );
 
-    # prepare given values as array ref and convert values if required
+    my %Attribute = (
+        Column => $AttributeDefinition{ $Param{Attribute} }->{Column}
+    );
+    if ( $Param{PrepareType} eq 'Condition' ) {
+        $Attribute{ConditionDef} = $AttributeDefinition{ $Param{Attribute} }->{ConditionDef};
+    }
+    elsif ( $Param{PrepareType} eq 'Sort' ) {
+        if ( $Param{Attribute} eq 'Age' ) {
+            $Attribute{SQLDef} = {
+                OrderBySwitch => 1
+            };
+        }
+    }
+
+    return \%Attribute;
+}
+
+sub ValuePrepare {
+    my ($Self, %Param) = @_;
+
+    return if !$Param{Search}->{Value};
+
+    return $Param{Search}->{Value} if (
+        $Param{Search}->{Field} ne 'CreateTime'
+        && $Param{Search}->{Field} ne 'PendingTime'
+    );
+
+    # prepare given values as array ref and convert if required
     my $Values = [];
     if ( !IsArrayRef( $Param{Search}->{Value} ) ) {
-        push( @{ $Values },  $Param{Search}->{Value}  );
+        push( @{ $Values }, $Param{Search}->{Value} );
     }
     else {
-        $Values =  $Param{Search}->{Value} ;
+        $Values = $Param{Search}->{Value};
     }
-    if ( $AttributeMapping{ $Param{Search}->{Field} }->{Convert} ) {
-        for my $Value ( @{ $Values } ) {
-            if ( $AttributeMapping{ $Param{Search}->{Field} }->{Convert} eq 'TimeStamp2SystemTime' ) {
-                $Value = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
-                    String => $Value
-                );
-            }
+
+    # convert timestamp to system time
+    for my $Value ( @{ $Values } ) {
+        $Value = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
+            String => $Value
+        );
+        if ( !$Value ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Invalid date format found in parameter $Param{Search}->{Field}!",
+            );
+            return;
         }
+
+        $Value = $Kernel::OM->Get('DB')->Quote( $Value );
     }
 
-    # prepare condition
-    my $Condition = $Self->_GetCondition(
-        Operator  => $Param{Search}->{Operator},
-        Column    => $AttributeMapping{ $Param{Search}->{Field} }->{Column},
-        ValueType => $AttributeMapping{ $Param{Search}->{Field} }->{ValueType},
-        Value     => $Values,
-        Silent    => $Param{Silent}
-    );
-    return if ( !$Condition );
-
-    # return search def
-    return {
-        Where      => [ $Condition ],
-        IsRelative => $Param{Search}->{IsRelative}
-    };
-}
-
-sub Sort {
-    my ( $Self, %Param ) = @_;
-
-    # check params
-    return if ( !$Self->_CheckSortParams( %Param ) );
-
-    # init mapping
-    my %AttributeMapping = (
-        Age            => 'st.create_time_unix',
-        CreateTime     => 'st.create_time_unix',
-        PendingTime    => 'st.until_time',
-        LastChangeTime => 'st.change_time'
-    );
-
-    # return sort def
-    return {
-        Select        => [ $AttributeMapping{ $Param{Attribute} } ],
-        OrderBy       => [ $AttributeMapping{ $Param{Attribute} } ],
-        OrderBySwitch => ( $Param{Attribute} eq 'Age' ) ? 1 : undef
-    };
+    return $Values;
 }
 
 1;

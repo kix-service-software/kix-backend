@@ -42,9 +42,11 @@ $Self->IsDeeply(
     $ActiveAttributeList,
     {
         AttachmentName => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            IsSelectable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         }
     },
     'GetSupportedAttributes provides expected data'
