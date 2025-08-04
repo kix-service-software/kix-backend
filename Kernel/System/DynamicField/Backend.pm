@@ -590,7 +590,13 @@ sub ValueSet {
         Silent             => $Param{Silent} || 0
     );
 
-    my $NewValue = ref $OldValue eq 'ARRAY' && ref $Param{Value} ne 'ARRAY' ? [$Param{Value}] : $Param{Value};
+    my @NewValue;
+    if ( ref( $Param{Value} ) eq 'ARRAY' ) {
+        @NewValue = @{ $Param{Value} };
+    }
+    else {
+        @NewValue = ( $Param{Value} );
+    }
 
     # do not proceed if there is nothing to update, each dynamic field requires special handling to
     #    determine if two values are different or not, this to prevent false update events,
@@ -600,7 +606,7 @@ sub ValueSet {
         !$Self->ValueIsDifferent(
             DynamicFieldConfig => $Param{DynamicFieldConfig},
             Value1             => $OldValue,
-            Value2             => $NewValue,
+            Value2             => \@NewValue,
             Silent             => $Param{Silent} || 0
         )
     ) {
@@ -608,7 +614,10 @@ sub ValueSet {
     }
 
     # call ValueSet on the specific backend
-    my $Success = $Self->{$DynamicFieldBackend}->ValueSet(%Param);
+    my $Success = $Self->{$DynamicFieldBackend}->ValueSet(
+        %Param,
+        Value => \@NewValue
+    );
 
     if ( !$Success ) {
         return if $Param{Silent};
@@ -628,8 +637,9 @@ sub ValueSet {
     # If an ObjectType handler is registered, use it.
     if ( ref $Self->{$DynamicFieldObjectHandler} ) {
         return $Self->{$DynamicFieldObjectHandler}->PostValueSet(
-            OldValue => $OldValue,
             %Param,
+            OldValue => $OldValue,
+            Value    => \@NewValue
         );
     }
 
