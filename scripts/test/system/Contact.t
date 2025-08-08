@@ -539,7 +539,8 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
 
         # delete the first contact
         my $Success = $ContactObject->ContactDelete(
-            ID => $ContactID,
+            ID     => $ContactID,
+            UserID => 1,
         );
 
         $Self->True(
