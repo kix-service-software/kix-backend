@@ -262,6 +262,9 @@ sub Search {
         return;
     }
 
+    # only use unique select values
+    @{ $Param{Select} } = $Kernel::OM->Get('Main')->GetUnique( @{ $Param{Select} } );
+
     # prepare cache key data
     my $CacheKeyData = {
         Result   => $Param{Result},
