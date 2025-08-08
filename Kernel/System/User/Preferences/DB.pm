@@ -205,7 +205,7 @@ sub DeletePreferences {
 
     if ( $Param{Key} ) {
         push @Bind, \$Param{Key};
-        $SQL .= "AND $Self->{PreferencesTableKey} = ?";
+        $SQL .= " AND $Self->{PreferencesTableKey} = ?";
     }
 
     # delete old data
