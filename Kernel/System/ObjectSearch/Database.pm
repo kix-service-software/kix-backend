@@ -197,19 +197,33 @@ END
         SQL => $SQL
     );
 
+    # preparations for Select handling
+    my @ColumnNames;
+    my %SelectColumns;
+    if ( IsArrayRefWithData( $Param{Select} ) ) {
+        @ColumnNames = $Kernel::OM->Get('DB')->GetColumnNames();
+
+        for my $SelectColumn ( @{ $Param{Select} } ) {
+            $SelectColumns{ $SelectColumn } = 1;
+        }
+    }
+
     my %Objects;
     my @ObjectIDs;
     while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         next if $Objects{ $Row[0] };
         push( @ObjectIDs, $Row[0] );
 
-        if ( IsArrayRefWithData( $Param{Select} ) ) {
-            my $ID = shift( @Row );
-            shift( @Row );
+        if ( %SelectColumns ) {
+            my $ID = $Row[0];
 
             my %Entry = ();
-            for my $Attribute ( @{ $Param{Select} } ) {
-                $Entry{ $Attribute } = shift( @Row );
+            for my $Column ( @ColumnNames ) {
+                my $Value = shift( @Row );
+
+                next if ( !$SelectColumns{ $Column } );
+
+                $Entry{ $Column } = $Value;
             }
 
             $Objects{ $ID } = \%Entry;
