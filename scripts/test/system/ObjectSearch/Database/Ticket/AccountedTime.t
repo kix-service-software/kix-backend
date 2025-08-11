@@ -29,7 +29,7 @@ $Self->Is(
 );
 
 # check supported methods
-for my $Method ( qw(GetSupportedAttributes Search Sort) ) {
+for my $Method ( qw(GetSupportedAttributes AttributePrepare Select Search Sort) ) {
     $Self->True(
         $AttributeObject->can($Method),
         'Attribute object can "' . $Method . '"'
@@ -52,6 +52,70 @@ $Self->IsDeeply(
     },
     'GetSupportedAttributes provides expected data'
 );
+
+# check AttributePrepare
+my @AttributePrepareTests = (
+    {
+        Name      => 'AttributePrepare: empty parameter',
+        Parameter => {},
+        Expected  => {
+            Column => 'st.accounted_time',
+        }
+    },
+    {
+        Name      => 'AttributePrepare: PrepareType "Select"',
+        Parameter => {
+            PrepareType => 'Select'
+        },
+        Expected  => {
+            Column => 'st.accounted_time',
+        }
+    },
+    {
+        Name      => 'AttributePrepare: PrepareType "Condition"',
+        Parameter => {
+            PrepareType => 'Condition'
+        },
+        Expected  => {
+            Column       => 'st.accounted_time',
+            ConditionDef => {
+                ValueType => 'NUMERIC',
+                NULLValue => 1
+            }
+        }
+    },
+    {
+        Name      => 'AttributePrepare: PrepareType "Sort"',
+        Parameter => {
+            PrepareType => 'Sort'
+        },
+        Expected  => {
+            Column => 'st.accounted_time',
+        }
+    },
+    {
+        Name      => 'AttributePrepare: PrepareType "Fulltext"',
+        Parameter => {
+            PrepareType => 'Fulltext'
+        },
+        Expected  => {
+            Column => 'st.accounted_time',
+        }
+    },
+);
+for my $Test ( @AttributePrepareTests ) {
+    my $Result = $AttributeObject->AttributePrepare(
+        Search       => $Test->{Search},
+        BoolOperator => 'AND',
+        UserID       => 1,
+        Silent       => defined( $Test->{Expected} ) ? 0 : 1
+    );
+    $Self->IsDeeply(
+        $Result,
+        $Test->{Expected},
+        $Test->{Name}
+    );
+}
 
 # check Search
 my @SearchTests = (
