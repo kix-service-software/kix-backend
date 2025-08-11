@@ -289,6 +289,7 @@ sub TestContactCreate {
                 UserPw       => $TestContactLogin,
                 ValidID      => 1,
                 ChangeUserID => 1,
+                IsAgent      => 1,
                 IsCustomer   => 1,
             );
 
@@ -298,6 +299,7 @@ sub TestContactCreate {
                 ContactID => $TestContactUserID,
                 Key       => 'UserLanguage',
                 Value     => $UserLanguage,
+                UserID    => 1,
             );
             # rkaiser - T#2017020290001194 - changed customer user to contact
             $Self->{UnitTestObject}->True( 1, "Set user UserLanguage to $UserLanguage" );
