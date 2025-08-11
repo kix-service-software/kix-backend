@@ -421,7 +421,7 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => [$TicketID1,$TicketID2,$TicketID3]
+        Expected => [$TicketID2]
     },
     {
         Name     => "Search: Field Fulltext / Operator LIKE / Value \"\$Title2\"",
