@@ -105,10 +105,46 @@ my @AttributePrepareTests = (
 );
 for my $Test ( @AttributePrepareTests ) {
     my $Result = $AttributeObject->AttributePrepare(
-        Search       => $Test->{Search},
-        BoolOperator => 'AND',
-        UserID       => 1,
-        Silent       => defined( $Test->{Expected} ) ? 0 : 1
+        %{ $Test->{Parameter} },
+        Silent => defined( $Test->{Expected} ) ? 0 : 1
+    );
+    $Self->IsDeeply(
+        $Result,
+        $Test->{Expected},
+        $Test->{Name}
+    );
+}
+
+# check Select
+my @SelectTests = (
+    {
+        Name      => 'Select: Attribute undef',
+        Parameter => {
+            Attribute => undef
+        },
+        Expected  => undef
+    },
+    {
+        Name      => 'Select: Attribute invalid',
+        Parameter => {
+            Attribute => 'Test'
+        },
+        Expected  => undef
+    },
+    {
+        Name      => 'Select: Attribute AccountedTime',
+        Parameter => {
+            Attribute => 'AccountedTime'
+        },
+        Expected  => {
+            Select => ['st.accounted_time AS "AccountedTime"']
+        }
+    }
+);
+for my $Test ( @SelectTests ) {
+    my $Result = $AttributeObject->Select(
+        %{ $Test->{Parameter} },
+        Silent => defined( $Test->{Expected} ) ? 0 : 1
     );
     $Self->IsDeeply(
         $Result,
