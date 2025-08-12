@@ -51,7 +51,7 @@ $Helper->Rollback();
 sub _PrepareData {
 
     # create customer user
-    my $CustomerContactID = $Helper->TestContactCreate(
+    my $CustomerContactID = $Helper->TestUserCreate(
         Roles => [ 'Ticket Agent' ],
     );
     $Self->True(
@@ -69,7 +69,7 @@ sub _PrepareData {
     }
 
     # create other user
-    my $OtherContactID = $Helper->TestContactCreate(
+    my $OtherContactID = $Helper->TestUserCreate(
         Roles => [ 'Ticket Agent' ],
     );
     $Self->True(

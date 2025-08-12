@@ -289,7 +289,6 @@ sub TestContactCreate {
                 UserPw       => $TestContactLogin,
                 ValidID      => 1,
                 ChangeUserID => 1,
-                IsAgent      => 1,
                 IsCustomer   => 1,
             );
 
