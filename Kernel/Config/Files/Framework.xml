@@ -8702,6 +8702,11 @@ Notes:
                 "SearchAttributes": [
                     "RelevantOrganisationID"
                 ]
+            },
+            "ContactID": {
+                "SearchAttributes": [
+                    "ID"
+                ]
             }
         },
         "TicketArticle": {
