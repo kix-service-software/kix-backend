@@ -34,7 +34,7 @@ $Self->Is(
 );
 
 # check supported methods
-for my $Method ( qw(GetSupportedAttributes Search Sort) ) {
+for my $Method ( qw(GetSupportedAttributes FulltextSearch) ) {
     $Self->True(
         $AttributeObject->can($Method),
         'Attribute object can "' . $Method . q{"}
@@ -71,115 +71,109 @@ my $QuoteSemicolon = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteSemicolon
 # check if database is casesensitive
 my $CaseSensitive = $Kernel::OM->Get('DB')->GetDatabaseFunction('CaseSensitive');
 
-# check Search
-my @SearchTests = (
+# check FulltextSearch
+my @FulltextSearchTests = (
     {
-        Name         => 'Search: undef search',
+        Name         => 'FulltextSearch: Search undef / Columns undef',
         Search       => undef,
+        Columns      => undef,
         Expected     => undef
     },
     {
-        Name         => 'Search: Value undef',
+        Name         => 'FulltextSearch: Search->Value undef / Columns valid',
         Search       => {
-            Field    => 'Name',
-            Operator => 'EQ',
+            Field    => 'Fulltext',
+            Operator => 'LIKE',
             Value    => undef
 
         },
+        Columns      => ['Title','Subject'],
         Expected     => undef
     },
     {
-        Name         => 'Search: Field undef',
+        Name         => 'FulltextSearch: Search->Field undef / Columns valid',
         Search       => {
             Field    => undef,
-            Operator => 'EQ',
+            Operator => 'LIKE',
             Value    => 'Test'
         },
+        Columns      => ['Title','Subject'],
         Expected     => undef
     },
     {
-        Name         => 'Search: Field invalid',
+        Name         => 'FulltextSearch: Search->Field invalid / Columns valid',
         Search       => {
             Field    => 'Test',
-            Operator => 'EQ',
+            Operator => 'LIKE',
             Value    => 'Test'
         },
+        Columns      => ['Title','Subject'],
         Expected     => undef
     },
     {
-        Name         => 'Search: Operator undef',
+        Name         => 'FulltextSearch: Search->Operator undef / Columns valid',
         Search       => {
-            Field    => 'Name',
+            Field    => 'Fulltext',
             Operator => undef,
             Value    => 'Test'
         },
+        Columns      => ['Title','Subject'],
         Expected     => undef
     },
     {
-        Name         => 'Search: Operator invalid',
+        Name         => 'FulltextSearch: Search->Operator invalid / Columns valid',
         Search       => {
-            Field    => 'Name',
+            Field    => 'Fulltext',
             Operator => 'Test',
             Value    => 'Test'
         },
+        Columns      => ['Title','Subject'],
         Expected     => undef
     },
     {
-        Name         => 'Search: valid search / Field Fulltext / Operator LIKE',
+        Name         => 'FulltextSearch: Search valid / Columns undef',
         Search       => {
             Field    => 'Fulltext',
             Operator => 'LIKE',
             Value    => 'Test'
         },
+        Columns      => undef,
+        Expected     => undef
+    },
+    {
+        Name         => 'FulltextSearch: Search valid / Columns invalid',
+        Search       => {
+            Field    => 'Fulltext',
+            Operator => 'LIKE',
+            Value    => 'Test'
+        },
+        Columns      => 'Test',
+        Expected     => undef
+    },
+    {
+        Name         => 'FulltextSearch: valid search / Field Fulltext / Operator LIKE',
+        Search       => {
+            Field    => 'Fulltext',
+            Operator => 'LIKE',
+            Value    => 'Test'
+        },
+        Columns      => ['Test'],
         Expected     => {
-            'Join' => [
-                'LEFT JOIN users u0 ON c.user_id = u0.id',
-                'LEFT JOIN contact_organisation co0 ON c.id = co0.contact_id',
-                'LEFT JOIN organisation o0 ON o0.id = co0.org_id'
-            ],
+            'Join' => undef,
             'Where' => [
-                $CaseSensitive ? '(LOWER(c.firstname) LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR LOWER(c.lastname) LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR LOWER(c.email) LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR LOWER(c.email1) LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR LOWER(c.email2) LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR LOWER(c.email3) LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR LOWER(c.email4) LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR LOWER(c.email5) LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR LOWER(c.title) LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR LOWER(c.phone) LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR LOWER(c.fax) LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR LOWER(c.mobile) LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR LOWER(c.street) LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR LOWER(c.city) LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR LOWER(c.zip) LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR LOWER(c.country) LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR LOWER(u0.login) LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR LOWER(o0.number) LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR LOWER(o0.name) LIKE \'%test%\' ESCAPE \'' . $Escape . '\') ' : '(c.firstname LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR c.lastname LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR c.email LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR c.email1 LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR c.email2 LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR c.email3 LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR c.email4 LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR c.email5 LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR c.title LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR c.phone LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR c.fax LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR c.mobile LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR c.street LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR c.city LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR c.zip LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR c.country LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR u0.login LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR o0.number LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR o0.name LIKE \'%test%\' ESCAPE \'' . $Escape . '\') '
+                $CaseSensitive ? '(LOWER(Test) LIKE \'%test%\' ESCAPE \'' . $Escape . '\') ' : '(Test LIKE \'%test%\' ESCAPE \'' . $Escape . '\') '
             ]
         }
     }
 );
-for my $Test ( @SearchTests ) {
-    my $Result = $AttributeObject->Search(
+for my $Test ( @FulltextSearchTests ) {
+    my $Result = $AttributeObject->FulltextSearch(
         Search       => $Test->{Search},
+        Columns      => $Test->{Columns},
         BoolOperator => 'AND',
         UserID       => 1,
+        UserType     => 'Agent',
         Silent       => defined( $Test->{Expected} ) ? 0 : 1
-    );
-    $Self->IsDeeply(
-        $Result,
-        $Test->{Expected},
-        $Test->{Name}
-    );
-}
-
-# check Sort
-my @SortTests = (
-    {
-        Name      => 'Sort: Attribute undef',
-        Attribute => undef,
-        Expected  => undef
-    },
-    {
-        Name      => 'Sort: Attribute invalid',
-        Attribute => 'Test',
-        Expected  => undef
-    },
-    {
-        Name      => 'Sort: Attribute "Fulltext"',
-        Attribute => 'Fulltext',
-        Expected  => undef
-    }
-);
-for my $Test ( @SortTests ) {
-    my $Result = $AttributeObject->Sort(
-        Attribute => $Test->{Attribute},
-        Language  => 'en',
-        Silent    => defined( $Test->{Expected} ) ? 0 : 1
     );
     $Self->IsDeeply(
         $Result,
