@@ -29,7 +29,7 @@ $Self->Is(
 );
 
 # check supported methods
-for my $Method ( qw(GetSupportedAttributes AttributePrepare SelectSearch Sort) ) {
+for my $Method ( qw(GetSupportedAttributes AttributePrepare Select Search Sort) ) {
     $Self->True(
         $AttributeObject->can($Method),
         'Attribute object can "' . $Method . '"'

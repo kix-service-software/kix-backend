@@ -217,9 +217,6 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
         "ObjectSearch - Contact - PrimaryOrganisationID=\'$OrganisationIDForUpdate\' - $ContactID is found",
     );
 
-    # START CaseSensitive
-    $ConfigObject->{Contact}->{Params}->{SearchCaseSensitive} = 1;
-
     $Kernel::OM->ObjectsDiscard( Objects => ['Contact'] );
     $ContactObject = $Kernel::OM->Get('Contact');
 
@@ -232,7 +229,7 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
                 {
                     Field    => 'Fulltext',
                     Operator => 'LIKE',
-                    Value    => lc( $ContactRandom )
+                    Value    => 'test@example.org' . $Key
                 },
                 {
                     Field    => 'Valid',
@@ -249,7 +246,7 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
 
     $Self->True(
         $List{$ContactID},
-        "ObjectSearch - Contact - Fulltext=\'" . lc( $ContactRandom ) . "\'- $ContactID is found",
+        "ObjectSearch - Contact - Fulltext=\'" . 'test@example.org' . $Key . "\'- $ContactID is found",
     );
 
     my @TestData = (
@@ -361,7 +358,7 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
                     {
                         Field    => 'Fulltext',
                         Operator => 'LIKE',
-                        Value    => lc("$ContactRandom"),
+                        Value    => lc('test@example.org' . $Key),
                     },
                     {
                         Field    => 'Valid',
@@ -370,7 +367,7 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
                     }
                 ]
             },
-            Text   =>  "ObjectSearch - Contact - Fulltext LIKE lc('') - $ContactID",
+            Text   =>  "ObjectSearch - Contact - Fulltext LIKE lc(Email) - $ContactID",
         },
         {
             Search => {
@@ -378,7 +375,7 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
                     {
                         Field    => 'Fulltext',
                         Operator => 'LIKE',
-                        Value    => lc("$ContactRandom*"),
+                        Value    => lc('test@example.org' . $Key . '*'),
                     },
                     {
                         Field    => 'Valid',
@@ -387,7 +384,7 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
                     }
                 ]
             },
-            Text   =>  "ObjectSearch - Contact - Fulltext LIKE lc('\$ContactRandom*') - $ContactID",
+            Text   =>  "ObjectSearch - Contact - Fulltext LIKE lc(Email*) - $ContactID",
         },
         {
             Search => {
@@ -395,7 +392,7 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
                     {
                         Field    => 'Fulltext',
                         Operator => 'LIKE',
-                        Value    => lc("*$ContactRandom"),
+                        Value    => lc('*test@example.org' . $Key),
                     },
                     {
                         Field    => 'Valid',
@@ -404,7 +401,7 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
                     }
                 ]
             },
-            Text   =>  "ObjectSearch - Contact - Fulltext LIKE lc(\"*\$ContactRandom\") - $ContactID",
+            Text   =>  "ObjectSearch - Contact - Fulltext LIKE lc(*Email) - $ContactID",
         },
         {
             Search => {
@@ -412,7 +409,7 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
                     {
                         Field    => 'Fulltext',
                         Operator => 'LIKE',
-                        Value    => lc("*$ContactRandom*"),
+                        Value    => lc('*test@example.org' . $Key . '*'),
                     },
                     {
                         Field    => 'Valid',
@@ -421,7 +418,7 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
                     }
                 ]
             },
-            Text   =>  "ObjectSearch - Contact - Fulltext CONTAINS lc(\"\*$ContactRandom\") - $ContactID",
+            Text   =>  "ObjectSearch - Contact - Fulltext LIKE lc(*Email*) - $ContactID",
         },
         {
             Search => {
@@ -429,7 +426,7 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
                     {
                         Field    => 'Fulltext',
                         Operator => 'LIKE',
-                        Value    => lc("$ContactRandom"),
+                        Value    => uc('test@example.org' . $Key),
                     },
                     {
                         Field    => 'Valid',
@@ -438,7 +435,7 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
                     }
                 ]
             },
-            Text   =>  "ObjectSearch - Contact - Fulltext LIKE uc('') - $ContactID",
+            Text   =>  "ObjectSearch - Contact - Fulltext LIKE uc(Email) - $ContactID",
         },
         {
             Search => {
@@ -446,7 +443,7 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
                     {
                         Field    => 'Fulltext',
                         Operator => 'LIKE',
-                        Value    => uc("$ContactRandom*"),
+                        Value    => uc('test@example.org' . $Key . '*'),
                     },
                     {
                         Field    => 'Valid',
@@ -455,7 +452,7 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
                     }
                 ]
             },
-            Text   =>  "ObjectSearch - Contact - Fulltext LIKE uc('\$ContactRandom*') - $ContactID",
+            Text   =>  "ObjectSearch - Contact - Fulltext LIKE uc(Email*) - $ContactID",
         },
         {
             Search => {
@@ -463,7 +460,7 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
                     {
                         Field    => 'Fulltext',
                         Operator => 'LIKE',
-                        Value    => uc("*$ContactRandom"),
+                        Value    => uc('*test@example.org' . $Key),
                     },
                     {
                         Field    => 'Valid',
@@ -472,7 +469,7 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
                     }
                 ]
             },
-            Text   =>  "ObjectSearch - Contact - Fulltext LIKE lucc(\"*\$ContactRandom\") - $ContactID",
+            Text   =>  "ObjectSearch - Contact - Fulltext LIKE uc(*Email) - $ContactID",
         },
         {
             Search => {
@@ -480,7 +477,7 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
                     {
                         Field    => 'Fulltext',
                         Operator => 'LIKE',
-                        Value    => uc("*$ContactRandom*"),
+                        Value    => uc('*test@example.org' . $Key . '*'),
                     },
                     {
                         Field    => 'Valid',
@@ -489,7 +486,7 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
                     }
                 ]
             },
-            Text   =>  "ObjectSearch - Contact - Fulltext LIKE uc(\"\*$ContactRandom\") - $ContactID",
+            Text   =>  "ObjectSearch - Contact - Fulltext LIKE uc(*Email*) - $ContactID",
         }
     );
 
