@@ -139,6 +139,9 @@ $Self->IsDeeply(
     'GetSupportedAttributes provides expected data'
 );
 
+# check Select
+# attributes of this backend are not selectable
+
 # Quoting ESCAPE character backslash
 my $QuoteBack = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteBack');
 my $Escape = "\\";
