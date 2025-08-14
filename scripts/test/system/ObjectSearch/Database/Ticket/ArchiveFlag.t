@@ -29,7 +29,7 @@ $Self->Is(
 );
 
 # check supported methods
-for my $Method ( qw(GetSupportedAttributes Search Sort) ) {
+for my $Method ( qw(GetSupportedAttributes AttributePrepare Select Search Sort) ) {
     $Self->True(
         $AttributeObject->can($Method),
         'Attribute object can "' . $Method . '"'
@@ -72,6 +72,105 @@ $Self->IsDeeply(
     },
     'GetSupportedAttributes provides expected data when "Ticket::ArchiveSystem" is active'
 );
+
+# check AttributePrepare
+my @AttributePrepareTests = (
+    {
+        Name      => 'AttributePrepare: empty parameter',
+        Parameter => {},
+        Expected  => {
+            Column => 'st.archive_flag',
+        }
+    },
+    {
+        Name      => 'AttributePrepare: PrepareType "Select"',
+        Parameter => {
+            PrepareType => 'Select'
+        },
+        Expected  => {
+            Column => 'st.archive_flag',
+        }
+    },
+    {
+        Name      => 'AttributePrepare: PrepareType "Condition"',
+        Parameter => {
+            PrepareType => 'Condition'
+        },
+        Expected  => {
+            Column       => 'st.archive_flag',
+            ConditionDef => {
+                ValueType => 'NUMERIC'
+            }
+        }
+    },
+    {
+        Name      => 'AttributePrepare: PrepareType "Sort"',
+        Parameter => {
+            PrepareType => 'Sort'
+        },
+        Expected  => {
+            Column => 'st.archive_flag',
+        }
+    },
+    {
+        Name      => 'AttributePrepare: PrepareType "Fulltext"',
+        Parameter => {
+            PrepareType => 'Fulltext'
+        },
+        Expected  => {
+            Column => 'st.archive_flag',
+        }
+    },
+);
+for my $Test ( @AttributePrepareTests ) {
+    my $Result = $AttributeObject->AttributePrepare(
+        %{ $Test->{Parameter} },
+        Silent => defined( $Test->{Expected} ) ? 0 : 1
+    );
+    $Self->IsDeeply(
+        $Result,
+        $Test->{Expected},
+        $Test->{Name}
+    );
+}
+
+# check Select
+my @SelectTests = (
+    {
+        Name      => 'Select: Attribute undef',
+        Parameter => {
+            Attribute => undef
+        },
+        Expected  => undef
+    },
+    {
+        Name      => 'Select: Attribute invalid',
+        Parameter => {
+            Attribute => 'Test'
+        },
+        Expected  => undef
+    },
+    {
+        Name      => 'Select: Attribute Archived',
+        Parameter => {
+            Attribute => 'Archived'
+        },
+        Expected  => {
+            Select => ['st.archive_flag AS "Archived"']
+        }
+    }
+);
+for my $Test ( @SelectTests ) {
+    my $Result = $AttributeObject->Select(
+        %{ $Test->{Parameter} },
+        Silent => defined( $Test->{Expected} ) ? 0 : 1
+    );
+    $Self->IsDeeply(
+        $Result,
+        $Test->{Expected},
+        $Test->{Name}
+    );
+}
 
 # check Search
 my @SearchTests = (

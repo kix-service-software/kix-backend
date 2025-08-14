@@ -78,12 +78,12 @@ sub GetSupportedAttributes {
             );
 
             $Supported{ $AttributeName } = {
-                Operators      => $Operators    || [],
-                IsSelectable   => $IsSelectable || 0,
-                IsSearchable   => $IsSearchable || 0,
-                IsSortable     => $IsSortable   || 0,
+                Operators      => $Operators      || [],
+                IsSelectable   => $IsSelectable   || 0,
+                IsSearchable   => $IsSearchable   || 0,
+                IsSortable     => $IsSortable     || 0,
                 IsFulltextable => $IsFulltextable || 0,
-                ValueType      => $ValueType    || q{}
+                ValueType      => $ValueType      || q{}
             };
         }
     }

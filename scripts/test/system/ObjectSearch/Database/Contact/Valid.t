@@ -29,7 +29,7 @@ $Self->Is(
 );
 
 # check supported methods
-for my $Method ( qw(GetSupportedAttributes Search Sort) ) {
+for my $Method ( qw(GetSupportedAttributes AttributePrepare Select Search Sort) ) {
     $Self->True(
         $AttributeObject->can($Method),
         'Attribute object can "' . $Method . q{"}
@@ -131,9 +131,11 @@ my @SearchTests = (
             Value    => '1'
         },
         Expected     => {
-            'Where' => [
+            'Where'      => [
                 'c.valid_id = 1'
-            ]
+            ],
+            'IsRelative' => undef,
+            'Join'       => []
         }
     },
     {
@@ -146,7 +148,9 @@ my @SearchTests = (
         Expected     => {
             'Where' => [
                 'c.valid_id <> 1'
-            ]
+            ],
+            'IsRelative' => undef,
+            'Join'       => []
         }
     },
     {
@@ -159,7 +163,9 @@ my @SearchTests = (
         Expected     => {
             'Where' => [
                 'c.valid_id IN (1)'
-            ]
+            ],
+            'IsRelative' => undef,
+            'Join'       => []
         }
     },
     {
@@ -172,7 +178,9 @@ my @SearchTests = (
         Expected     => {
             'Where' => [
                 'c.valid_id NOT IN (1)'
-            ]
+            ],
+            'IsRelative' => undef,
+            'Join'       => []
         }
     },
     {

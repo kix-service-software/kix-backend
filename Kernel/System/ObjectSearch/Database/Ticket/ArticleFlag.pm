@@ -67,7 +67,7 @@ sub AttributePrepare {
     if ( !defined( $Param{Flags}->{JoinMap}->{ 'ArticleFlag_' . $Flag } ) ) {
         my $Count = $Param{Flags}->{ArticleFlagJoinCounter}++;
         $TableAlias .= $Count;
-        push( @SQLJoin, "LEFT OUTER JOIN article_flag $TableAlias ON $TableAlias.article_id = ta.id AND $TableAlias.article_key = \'$Flag\' AND af_left0.create_by = $Param{UserID}" );
+        push( @SQLJoin, "LEFT OUTER JOIN article_flag $TableAlias ON $TableAlias.article_id = ta.id AND $TableAlias.article_key = \'$Flag\' AND $TableAlias.create_by = $Param{UserID}" );
 
         $Param{Flags}->{JoinMap}->{ 'ArticleFlag_' . $Flag } = $Count;
     }

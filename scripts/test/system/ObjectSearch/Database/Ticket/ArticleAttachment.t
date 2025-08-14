@@ -29,7 +29,7 @@ $Self->Is(
 );
 
 # check supported methods
-for my $Method ( qw(GetSupportedAttributes Search Sort) ) {
+for my $Method ( qw(GetSupportedAttributes AttributePrepare Select Search Sort) ) {
     $Self->True(
         $AttributeObject->can($Method),
         'Attribute object can "' . $Method . '"'
@@ -51,6 +51,137 @@ $Self->IsDeeply(
     },
     'GetSupportedAttributes provides expected data'
 );
+
+# check AttributePrepare
+my @AttributePrepareTests = (
+    {
+        Name      => 'AttributePrepare: empty parameter',
+        Parameter => {},
+        Expected  => {
+            Column       => 'att.filename',
+            ConditionDef => {
+                CaseInsensitive => 1,
+                NULLValue       => 1,
+            },
+            SQLDef => {
+                Join => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id',
+                    'LEFT OUTER JOIN article_attachment att ON att.article_id = ta.id'
+                ]
+            }
+        }
+    },
+    {
+        Name      => 'AttributePrepare: PrepareType "Select"',
+        Parameter => {
+            PrepareType => 'Select'
+        },
+        Expected  => {
+            Column       => 'att.filename',
+            ConditionDef => {
+                CaseInsensitive => 1,
+                NULLValue       => 1,
+            },
+            SQLDef => {
+                Join => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id',
+                    'LEFT OUTER JOIN article_attachment att ON att.article_id = ta.id'
+                ]
+            }
+        }
+    },
+    {
+        Name      => 'AttributePrepare: PrepareType "Condition"',
+        Parameter => {
+            PrepareType => 'Condition'
+        },
+        Expected  => {
+            Column       => 'att.filename',
+            ConditionDef => {
+                CaseInsensitive => 1,
+                NULLValue       => 1,
+            },
+            SQLDef => {
+                Join => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id',
+                    'LEFT OUTER JOIN article_attachment att ON att.article_id = ta.id'
+                ]
+            }
+        }
+    },
+    {
+        Name      => 'AttributePrepare: PrepareType "Condition" / UserType "Customer"',
+        Parameter => {
+            PrepareType => 'Condition',
+            UserType    => 'Customer'
+        },
+        Expected  => {
+            Column       => 'att.filename',
+            ConditionDef => {
+                CaseInsensitive => 1,
+                NULLValue       => 1,
+            },
+            SQLDef => {
+                Join => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id AND ta.customer_visible = 1',
+                    'LEFT OUTER JOIN article_attachment att ON att.article_id = ta.id'
+                ]
+            }
+        }
+    },
+    {
+        Name      => 'AttributePrepare: PrepareType "Sort"',
+        Parameter => {
+            PrepareType => 'Sort'
+        },
+        Expected  => {
+            Column       => 'att.filename',
+            ConditionDef => {
+                CaseInsensitive => 1,
+                NULLValue       => 1,
+            },
+            SQLDef => {
+                Join => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id',
+                    'LEFT OUTER JOIN article_attachment att ON att.article_id = ta.id'
+                ]
+            }
+        }
+    },
+    {
+        Name      => 'AttributePrepare: PrepareType "Fulltext"',
+        Parameter => {
+            PrepareType => 'Fulltext'
+        },
+        Expected  => {
+            Column       => 'att.filename',
+            ConditionDef => {
+                CaseInsensitive => 1,
+                NULLValue       => 1,
+            },
+            SQLDef => {
+                Join => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id',
+                    'LEFT OUTER JOIN article_attachment att ON att.article_id = ta.id'
+                ]
+            }
+        }
+    },
+);
+for my $Test ( @AttributePrepareTests ) {
+    my $Result = $AttributeObject->AttributePrepare(
+        %{ $Test->{Parameter} },
+        Silent => defined( $Test->{Expected} ) ? 0 : 1
+    );
+    $Self->IsDeeply(
+        $Result,
+        $Test->{Expected},
+        $Test->{Name}
+    );
+}
+
+# check Select
+# attributes of this backend are not selectable
 
 # Quoting ESCAPE character backslash
 my $QuoteBack = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteBack');

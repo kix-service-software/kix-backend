@@ -3958,6 +3958,13 @@ sub _ReplaceVariablesInPermission {
                     $Contact{RelevantOrganisationID} = 'NOT_ALLOWED';
                 }
 
+                if ( !IsArrayRefWithData($Contact{OrganisationIDs}) ) {
+                    # it's a contact without an assigned organisation
+                    # explicitely push an undef value here, to generate a correct permission condition value
+                    # otherwise it's the condition "undef IN []" which fails
+                    push @{$Contact{OrganisationIDs}}, undef;
+                }
+
                 $User{Contact} = \%Contact;
             }
 
@@ -4350,22 +4357,25 @@ sub _GetCustomerUserVisibleObjectIds {
             $Self->AddCacheDependency(Type => 'ObjectSearch_' . $CacheObjectType);
 
             if ($Param{ObjectType} eq 'ConfigItem') {
+                my @ANDSearch = (
+                    {
+                        Field => 'AssignedContact',
+                        Operator => 'EQ',
+                        Type     => 'NUMERIC',
+                        Value    => $ContactData{ID}
+                    },
+                );
+                if ( $ContactData{RelevantOrganisationID} || $ContactData{PrimaryOrganisationID} ) {
+                    push @ANDSearch, {
+                        Field => 'AssignedOrganisation',
+                        Operator => 'IN',
+                        Type     => 'NUMERIC',
+                        Value    => $ContactData{RelevantOrganisationID} || $ContactData{PrimaryOrganisationID}
+                    };
+                }
                 my @IDs = $Kernel::OM->Get('ObjectSearch')->Search(
                     Search => {
-                        AND => [
-                            {
-                                Field => 'AssignedContact',
-                                Operator => 'EQ',
-                                Type     => 'NUMERIC',
-                                Value    => $ContactData{ID}
-                            },
-                            {
-                                Field => 'AssignedOrganisation',
-                                Operator => 'IN',
-                                Type     => 'NUMERIC',
-                                Value    => $ContactData{RelevantOrganisationID} || $ContactData{PrimaryOrganisationID}
-                            }
-                        ]
+                        AND => \@ANDSearch
                     },
                     Result     => 'ARRAY',
                     ObjectType => 'ConfigItem',
