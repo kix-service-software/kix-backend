@@ -492,8 +492,15 @@ sub _CheckAttachment {
 
     my $Attachment = $Param{Attachment};
 
+    if ( !defined $Attachment->{Content}  ) {
+        return $Self->_Error(
+            Code    => 'BadRequest',
+            Message => "Parameter Attachment::Content is missing!",
+        );
+    }
+
     # check attachment item internally
-    for my $Needed (qw(Filename Content)) {
+    for my $Needed (qw(Filename)) {
         if ( !$Attachment->{$Needed} ) {
             return $Self->_Error(
                 Code    => 'BadRequest',
