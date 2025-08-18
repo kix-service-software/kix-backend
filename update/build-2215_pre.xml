@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<database Name="kix">
+
+    <TableAlter Name="migration">
+        <ColumnAdd Name="create_time" Required="true" Type="DATE"/>
+        <ColumnAdd Name="change_time" Required="false" Type="DATE"/>
+    </TableAlter>
+
+</database>
