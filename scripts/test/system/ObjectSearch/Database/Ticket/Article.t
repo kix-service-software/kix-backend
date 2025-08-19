@@ -139,6 +139,107 @@ $Self->IsDeeply(
     'GetSupportedAttributes provides expected data'
 );
 
+# check AttributePrepare
+my @AttributePrepareTests = (
+    {
+        Name      => 'AttributePrepare: Attribute "ArticleID"',
+        Parameter => {
+            Attribute => 'ArticleID'
+        },
+        Expected  => {
+            Column => 'ta.id',
+            SQLDef => {
+                Join => ['LEFT OUTER JOIN article ta ON ta.ticket_id = st.id'],
+            }
+        }
+    },
+    {
+        Name      => 'AttributePrepare: Attribute "ArticleID" / PrepareType "Select"',
+        Parameter => {
+            Attribute   => 'ArticleID',
+            PrepareType => 'Select'
+        },
+        Expected  => {
+            Column => 'ta.id',
+            SQLDef => {
+                Join => ['LEFT OUTER JOIN article ta ON ta.ticket_id = st.id'],
+            }
+        }
+    },
+    {
+        Name      => 'AttributePrepare: Attribute "ArticleID" / PrepareType "Condition"',
+        Parameter => {
+            Attribute   => 'ArticleID',
+            PrepareType => 'Condition'
+        },
+        Expected  => {
+            Column       => 'ta.id',
+            SQLDef       => {
+                Join => ['LEFT OUTER JOIN article ta ON ta.ticket_id = st.id'],
+            },
+            ConditionDef => {
+                ValueType => 'NUMERIC',
+                NULLValue => 1
+            }
+        }
+    },
+    {
+        Name      => 'AttributePrepare: Attribute "ArticleID" / PrepareType "Condition" / UserType "Customer"',
+        Parameter => {
+            Attribute   => 'ArticleID',
+            PrepareType => 'Condition',
+            UserType    => 'Customer'
+        },
+        Expected  => {
+            Column       => 'ta.id',
+            SQLDef       => {
+                Join => ['LEFT OUTER JOIN article ta ON ta.ticket_id = st.id AND ta.customer_visible = 1'],
+            },
+            ConditionDef => {
+                ValueType => 'NUMERIC',
+                NULLValue => 1
+            }
+        }
+    },
+    {
+        Name      => 'AttributePrepare: Attribute "ArticleID" / PrepareType "Sort"',
+        Parameter => {
+            Attribute   => 'ArticleID',
+            PrepareType => 'Sort'
+        },
+        Expected  => {
+            Column => 'ta.id',
+            SQLDef => {
+                Join => ['LEFT OUTER JOIN article ta ON ta.ticket_id = st.id'],
+            }
+        }
+    },
+    {
+        Name      => 'AttributePrepare: Attribute "ArticleID" / PrepareType "Fulltext"',
+        Parameter => {
+            Attribute   => 'ArticleID',
+            PrepareType => 'Fulltext'
+        },
+        Expected  => {
+            Column => 'ta.id',
+            SQLDef => {
+                Join => ['LEFT OUTER JOIN article ta ON ta.ticket_id = st.id'],
+            }
+        }
+    },
+);
+for my $Test ( @AttributePrepareTests ) {
+    my $Result = $AttributeObject->AttributePrepare(
+        %{ $Test->{Parameter} },
+        Silent => defined( $Test->{Expected} ) ? 0 : 1
+    );
+    $Self->IsDeeply(
+        $Result,
+        $Test->{Expected},
+        $Test->{Name}
+    );
+}
+
 # check Select
 my @SelectTests = (
     {
@@ -160,9 +261,7 @@ my @SelectTests = (
         Parameter => {
             Attribute => 'ArticleID'
         },
-        Expected  => {
-            Select => undef
-        }
+        Expected  => undef
     },
     {
         Name      => 'Select: Attribute "ChannelID"',
@@ -293,7 +392,7 @@ for my $UserType ( qw(Agent Customer) ) {
             Expected     => undef
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Value undef',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "ArticleID" / Operation "EQ" / Value undef',
             Search       => {
                 Field    => 'ArticleID',
                 Operator => 'EQ',
@@ -303,7 +402,7 @@ for my $UserType ( qw(Agent Customer) ) {
             Expected     => undef
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Value invalid',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "ArticleID" / Operation "EQ" / Value invalid',
             Search       => {
                 Field    => 'ArticleID',
                 Operator => 'EQ',
@@ -312,7 +411,7 @@ for my $UserType ( qw(Agent Customer) ) {
             Expected     => undef
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field undef',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "undef" / Operation "EQ" / Value "1"',
             Search       => {
                 Field    => undef,
                 Operator => 'EQ',
@@ -321,7 +420,7 @@ for my $UserType ( qw(Agent Customer) ) {
             Expected     => undef
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field invalid',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "invalid" / Operation "EQ" / Value "1"',
             Search       => {
                 Field    => 'Test',
                 Operator => 'EQ',
@@ -330,7 +429,7 @@ for my $UserType ( qw(Agent Customer) ) {
             Expected     => undef
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Operator undef',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "ArticleID" / Operator undef / Value "1"',
             Search       => {
                 Field    => 'ArticleID',
                 Operator => undef,
@@ -339,7 +438,7 @@ for my $UserType ( qw(Agent Customer) ) {
             Expected     => undef
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Operator invalid',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "ArticleID" / Operator invalid / Value "1"',
             Search       => {
                 Field    => 'ArticleID',
                 Operator => 'Test',
@@ -348,7 +447,7 @@ for my $UserType ( qw(Agent Customer) ) {
             Expected     => undef
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field ArticleID / Operator EQ',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "ArticleID" / Operator "EQ" / Value "1"',
             Search       => {
                 Field    => 'ArticleID',
                 Operator => 'EQ',
@@ -364,7 +463,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field ArticleID / Operator EQ / Value zero',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "ArticleID" / Operator "EQ" / Value "0"',
             Search       => {
                 Field    => 'ArticleID',
                 Operator => 'EQ',
@@ -380,7 +479,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field ArticleID / Operator NE',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "ArticleID" / Operator "NE" / Value "1"',
             Search       => {
                 Field    => 'ArticleID',
                 Operator => 'NE',
@@ -396,7 +495,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field ArticleID / Operator NE / Value zero',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "ArticleID" / Operator "NE" / Value "0"',
             Search       => {
                 Field    => 'ArticleID',
                 Operator => 'NE',
@@ -412,7 +511,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field ArticleID / Operator IN',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "ArticleID" / Operator "IN" / Value ["1"]',
             Search       => {
                 Field    => 'ArticleID',
                 Operator => 'IN',
@@ -428,7 +527,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field ArticleID / Operator !IN',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "ArticleID" / Operator "!IN" / Value ["1"]',
             Search       => {
                 Field    => 'ArticleID',
                 Operator => '!IN',
@@ -444,7 +543,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field ArticleID / Operator LT',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "ArticleID" / Operator "LT" / Value "1"',
             Search       => {
                 Field    => 'ArticleID',
                 Operator => 'LT',
@@ -460,7 +559,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field ArticleID / Operator GT',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "ArticleID" / Operator "GT" / Value "1"',
             Search       => {
                 Field    => 'ArticleID',
                 Operator => 'GT',
@@ -476,7 +575,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field ArticleID / Operator LTE',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "ArticleID" / Operator "LTE" / Value "1"',
             Search       => {
                 Field    => 'ArticleID',
                 Operator => 'LTE',
@@ -492,7 +591,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field ArticleID / Operator GTE',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "ArticleID" / Operator "GTE" / Value "1"',
             Search       => {
                 Field    => 'ArticleID',
                 Operator => 'GTE',
@@ -508,7 +607,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field ChannelID / Operator EQ',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "ChannelID" / Operator "EQ" / Value "1"',
             Search       => {
                 Field    => 'ChannelID',
                 Operator => 'EQ',
@@ -524,7 +623,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field ChannelID / Operator EQ / Value zero',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "ChannelID" / Operator "EQ" / Value "0"',
             Search       => {
                 Field    => 'ChannelID',
                 Operator => 'EQ',
@@ -540,7 +639,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field ChannelID / Operator NE',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "ChannelID" / Operator "NE" / Value "1"',
             Search       => {
                 Field    => 'ChannelID',
                 Operator => 'NE',
@@ -556,7 +655,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field ChannelID / Operator NE / Value zero',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "ChannelID" / Operator "NE" / Value "0"',
             Search       => {
                 Field    => 'ChannelID',
                 Operator => 'NE',
@@ -572,7 +671,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field ChannelID / Operator IN',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "ChannelID" / Operator "IN" / Value ["1"]',
             Search       => {
                 Field    => 'ChannelID',
                 Operator => 'IN',
@@ -588,7 +687,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field ChannelID / Operator !IN',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "ChannelID" / Operator "!IN" / Value ["1"]',
             Search       => {
                 Field    => 'ChannelID',
                 Operator => '!IN',
@@ -604,7 +703,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field ChannelID / Operator LT',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "ChannelID" / Operator "LT" / Value "1"',
             Search       => {
                 Field    => 'ChannelID',
                 Operator => 'LT',
@@ -620,7 +719,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field ChannelID / Operator GT',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "ChannelID" / Operator "GT" / Value "1"',
             Search       => {
                 Field    => 'ChannelID',
                 Operator => 'GT',
@@ -636,7 +735,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field ChannelID / Operator LTE',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "ChannelID" / Operator "LTE" / Value "1"',
             Search       => {
                 Field    => 'ChannelID',
                 Operator => 'LTE',
@@ -652,7 +751,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field ChannelID / Operator GTE',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "ChannelID" / Operator "GTE" / Value "1"',
             Search       => {
                 Field    => 'ChannelID',
                 Operator => 'GTE',
@@ -668,7 +767,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field Channel / Operator EQ',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "Channel" / Operator "EQ" / Value "Test"',
             Search       => {
                 Field    => 'Channel',
                 Operator => 'EQ',
@@ -685,7 +784,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field Channel / Operator EQ / Value empty string',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "Channel" / Operator "EQ" / Value ""',
             Search       => {
                 Field    => 'Channel',
                 Operator => 'EQ',
@@ -702,7 +801,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field Channel / Operator NE',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "Channel" / Operator "NE" / Value "Test"',
             Search       => {
                 Field    => 'Channel',
                 Operator => 'NE',
@@ -719,7 +818,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field Channel / Operator NE / Value empty string',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "Channel" / Operator "NE" / Value ""',
             Search       => {
                 Field    => 'Channel',
                 Operator => 'NE',
@@ -736,7 +835,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field Channel / Operator IN',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "Channel" / Operator "IN" / Value ["Test"]',
             Search       => {
                 Field    => 'Channel',
                 Operator => 'IN',
@@ -753,7 +852,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field Channel / Operator !IN',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "Channel" / Operator "!IN" / Value ["Test"]',
             Search       => {
                 Field    => 'Channel',
                 Operator => '!IN',
@@ -770,7 +869,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field Channel / Operator STARTSWITH',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "Channel" / Operator "STARTSWITH" / Value "Test"',
             Search       => {
                 Field    => 'Channel',
                 Operator => 'STARTSWITH',
@@ -787,7 +886,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field Channel / Operator ENDSWITH',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "Channel" / Operator "ENDSWITH" / Value "Test"',
             Search       => {
                 Field    => 'Channel',
                 Operator => 'ENDSWITH',
@@ -804,7 +903,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field Channel / Operator CONTAINS',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "Channel" / Operator "CONTAINS" / Value "Test"',
             Search       => {
                 Field    => 'Channel',
                 Operator => 'CONTAINS',
@@ -821,7 +920,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field Channel / Operator LIKE',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "Channel" / Operator "LIKE" / Value "Test"',
             Search       => {
                 Field    => 'Channel',
                 Operator => 'LIKE',
@@ -838,7 +937,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field SenderTypeID / Operator EQ',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "SenderTypeID" / Operator "EQ" / Value "1"',
             Search       => {
                 Field    => 'SenderTypeID',
                 Operator => 'EQ',
@@ -854,7 +953,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field SenderTypeID / Operator EQ / Value zero',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "SenderTypeID" / Operator "EQ" / Value "0"',
             Search       => {
                 Field    => 'SenderTypeID',
                 Operator => 'EQ',
@@ -870,7 +969,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field SenderTypeID / Operator NE',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "SenderTypeID" / Operator "NE" / Value "1"',
             Search       => {
                 Field    => 'SenderTypeID',
                 Operator => 'NE',
@@ -886,7 +985,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field SenderTypeID / Operator NE / Value zero',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "SenderTypeID" / Operator "NE" / Value "0"',
             Search       => {
                 Field    => 'SenderTypeID',
                 Operator => 'NE',
@@ -902,7 +1001,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field SenderTypeID / Operator IN',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "SenderTypeID" / Operator "IN" / Value ["1"]',
             Search       => {
                 Field    => 'SenderTypeID',
                 Operator => 'IN',
@@ -918,7 +1017,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field SenderTypeID / Operator !IN',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "SenderTypeID" / Operator "!IN" / Value ["1"]',
             Search       => {
                 Field    => 'SenderTypeID',
                 Operator => '!IN',
@@ -934,7 +1033,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field SenderTypeID / Operator LT',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "SenderTypeID" / Operator "LT" / Value "1"',
             Search       => {
                 Field    => 'SenderTypeID',
                 Operator => 'LT',
@@ -950,7 +1049,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field SenderTypeID / Operator GT',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "SenderTypeID" / Operator "GT" / Value "1"',
             Search       => {
                 Field    => 'SenderTypeID',
                 Operator => 'GT',
@@ -966,7 +1065,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field SenderTypeID / Operator LTE',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "SenderTypeID" / Operator "LTE" / Value "1"',
             Search       => {
                 Field    => 'SenderTypeID',
                 Operator => 'LTE',
@@ -982,7 +1081,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field SenderTypeID / Operator GTE',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "SenderTypeID" / Operator "GTE" / Value "1"',
             Search       => {
                 Field    => 'SenderTypeID',
                 Operator => 'GTE',
@@ -998,7 +1097,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field SenderType / Operator EQ',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "SenderType" / Operator "EQ" / Value "Test"',
             Search       => {
                 Field    => 'SenderType',
                 Operator => 'EQ',
@@ -1015,7 +1114,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field SenderType / Operator EQ / Value empty string',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "SenderType" / Operator "EQ" / Value ""',
             Search       => {
                 Field    => 'SenderType',
                 Operator => 'EQ',
@@ -1032,7 +1131,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field SenderType / Operator NE',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "SenderType" / Operator "NE" / Value "Test"',
             Search       => {
                 Field    => 'SenderType',
                 Operator => 'NE',
@@ -1049,7 +1148,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field SenderType / Operator NE / Value empty string',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "SenderType" / Operator "NE" / Value ""',
             Search       => {
                 Field    => 'SenderType',
                 Operator => 'NE',
@@ -1066,7 +1165,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field SenderType / Operator IN',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "SenderType" / Operator "IN" / Value ["Test"]',
             Search       => {
                 Field    => 'SenderType',
                 Operator => 'IN',
@@ -1083,7 +1182,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field SenderType / Operator !IN',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "SenderType" / Operator "!IN" / Value ["Test"]',
             Search       => {
                 Field    => 'SenderType',
                 Operator => '!IN',
@@ -1100,7 +1199,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field SenderType / Operator STARTSWITH',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "SenderType" / Operator "STARTSWITH" / Value "Test"',
             Search       => {
                 Field    => 'SenderType',
                 Operator => 'STARTSWITH',
@@ -1117,7 +1216,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field SenderType / Operator ENDSWITH',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "SenderType" / Operator "ENDSWITH" / Value "Test"',
             Search       => {
                 Field    => 'SenderType',
                 Operator => 'ENDSWITH',
@@ -1134,7 +1233,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field SenderType / Operator CONTAINS',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "SenderType" / Operator "CONTAINS" / Value "Test"',
             Search       => {
                 Field    => 'SenderType',
                 Operator => 'CONTAINS',
@@ -1151,7 +1250,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field SenderType / Operator LIKE',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "SenderType" / Operator "LIKE" / Value "Test"',
             Search       => {
                 Field    => 'SenderType',
                 Operator => 'LIKE',
@@ -1168,7 +1267,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field CustomerVisible / Operator EQ',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "CustomerVisible" / Operator "EQ" / Value "1"',
             Search       => {
                 Field    => 'CustomerVisible',
                 Operator => 'EQ',
@@ -1184,7 +1283,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field CustomerVisible / Operator EQ / Value zero',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "CustomerVisible" / Operator "EQ" / Value "0"',
             Search       => {
                 Field    => 'CustomerVisible',
                 Operator => 'EQ',
@@ -1200,7 +1299,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field CustomerVisible / Operator NE',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "CustomerVisible" / Operator "NE" / Value "1"',
             Search       => {
                 Field    => 'CustomerVisible',
                 Operator => 'NE',
@@ -1216,7 +1315,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field CustomerVisible / Operator NE / Value zero',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "CustomerVisible" / Operator "NE" / Value "0"',
             Search       => {
                 Field    => 'CustomerVisible',
                 Operator => 'NE',
@@ -1232,7 +1331,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field CustomerVisible / Operator IN',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "CustomerVisible" / Operator "IN" / Value ["1"]',
             Search       => {
                 Field    => 'CustomerVisible',
                 Operator => 'IN',
@@ -1248,7 +1347,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field CustomerVisible / Operator !IN',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "CustomerVisible" / Operator "!IN" / Value ["1"]',
             Search       => {
                 Field    => 'CustomerVisible',
                 Operator => '!IN',
@@ -1264,7 +1363,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field CustomerVisible / Operator LT',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "CustomerVisible" / Operator "LT" / Value "1"',
             Search       => {
                 Field    => 'CustomerVisible',
                 Operator => 'LT',
@@ -1280,7 +1379,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field CustomerVisible / Operator GT',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "CustomerVisible" / Operator "GT" / Value "1"',
             Search       => {
                 Field    => 'CustomerVisible',
                 Operator => 'GT',
@@ -1296,7 +1395,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field CustomerVisible / Operator LTE',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "CustomerVisible" / Operator "LTE" / Value "1"',
             Search       => {
                 Field    => 'CustomerVisible',
                 Operator => 'LTE',
@@ -1312,7 +1411,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field CustomerVisible / Operator GTE',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "CustomerVisible" / Operator "GTE" / Value "1"',
             Search       => {
                 Field    => 'CustomerVisible',
                 Operator => 'GTE',
@@ -1328,7 +1427,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field From / Operator EQ',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "From" / Operator "EQ" / Value "Test"',
             Search       => {
                 Field    => 'From',
                 Operator => 'EQ',
@@ -1344,7 +1443,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field From / Operator EQ / Value empty string',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "From" / Operator "EQ" / Value ""',
             Search       => {
                 Field    => 'From',
                 Operator => 'EQ',
@@ -1360,7 +1459,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field From / Operator NE',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "From" / Operator "NE" / Value "Test"',
             Search       => {
                 Field    => 'From',
                 Operator => 'NE',
@@ -1376,7 +1475,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field From / Operator NE / Value empty string',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "From" / Operator "NE" / Value ""',
             Search       => {
                 Field    => 'From',
                 Operator => 'NE',
@@ -1392,7 +1491,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field From / Operator IN',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "From" / Operator "IN" / Value ["Test"]',
             Search       => {
                 Field    => 'From',
                 Operator => 'IN',
@@ -1408,7 +1507,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field From / Operator !IN',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "From" / Operator "!IN" / Value ["Test"]',
             Search       => {
                 Field    => 'From',
                 Operator => '!IN',
@@ -1424,7 +1523,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field From / Operator STARTSWITH',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "From" / Operator "STARTSWITH" / Value "Test"',
             Search       => {
                 Field    => 'From',
                 Operator => 'STARTSWITH',
@@ -1440,7 +1539,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field From / Operator ENDSWITH',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "From" / Operator "ENDSWITH" / Value "Test"',
             Search       => {
                 Field    => 'From',
                 Operator => 'ENDSWITH',
@@ -1456,7 +1555,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field From / Operator CONTAINS',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "From" / Operator "CONTAINS" / Value "Test"',
             Search       => {
                 Field    => 'From',
                 Operator => 'CONTAINS',
@@ -1472,7 +1571,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field From / Operator LIKE',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "From" / Operator "LIKE" / Value "Test"',
             Search       => {
                 Field    => 'From',
                 Operator => 'LIKE',
@@ -1488,7 +1587,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field To / Operator EQ',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "To" / Operator "EQ" / Value "1"',
             Search       => {
                 Field    => 'To',
                 Operator => 'EQ',
@@ -1504,7 +1603,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field To / Operator EQ / Value empty string',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "To" / Operator "EQ" / Value ""',
             Search       => {
                 Field    => 'To',
                 Operator => 'EQ',
@@ -1520,7 +1619,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field To / Operator NE',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "To" / Operator "NE" / Value "1"',
             Search       => {
                 Field    => 'To',
                 Operator => 'NE',
@@ -1536,7 +1635,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field To / Operator NE / Value empty string',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "To" / Operator "NE" / Value ""',
             Search       => {
                 Field    => 'To',
                 Operator => 'NE',
@@ -1552,7 +1651,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field To / Operator IN',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "To" / Operator "IN" / Value ["1"]',
             Search       => {
                 Field    => 'To',
                 Operator => 'IN',
@@ -1568,7 +1667,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field To / Operator !IN',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "To" / Operator "!IN" / Value ["1"]',
             Search       => {
                 Field    => 'To',
                 Operator => '!IN',
@@ -1584,7 +1683,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field To / Operator STARTSWITH',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "To" / Operator "STARTSWITH" / Value "Test"',
             Search       => {
                 Field    => 'To',
                 Operator => 'STARTSWITH',
@@ -1600,7 +1699,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field To / Operator ENDSWITH',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "To" / Operator "ENDSWITH" / Value "Test"',
             Search       => {
                 Field    => 'To',
                 Operator => 'ENDSWITH',
@@ -1616,7 +1715,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field To / Operator CONTAINS',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "To" / Operator "CONTAINS" / Value "Test"',
             Search       => {
                 Field    => 'To',
                 Operator => 'CONTAINS',
@@ -1632,7 +1731,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field To / Operator LIKE',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "To" / Operator "LIKE" / Value "Test"',
             Search       => {
                 Field    => 'To',
                 Operator => 'LIKE',
@@ -1648,7 +1747,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field Cc / Operator EQ',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "Cc" / Operator "EQ" / Value "1"',
             Search       => {
                 Field    => 'Cc',
                 Operator => 'EQ',
@@ -1664,7 +1763,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field Cc / Operator EQ / Value empty string',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "Cc" / Operator "EQ" / Value ""',
             Search       => {
                 Field    => 'Cc',
                 Operator => 'EQ',
@@ -1680,7 +1779,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field Cc / Operator NE',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "Cc" / Operator "NE" / Value "1"',
             Search       => {
                 Field    => 'Cc',
                 Operator => 'NE',
@@ -1696,7 +1795,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field Cc / Operator NE / Value empty string',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "Cc" / Operator "NE" / Value ""',
             Search       => {
                 Field    => 'Cc',
                 Operator => 'NE',
@@ -1712,7 +1811,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field Cc / Operator IN',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "Cc" / Operator "IN" / Value ["1"]',
             Search       => {
                 Field    => 'Cc',
                 Operator => 'IN',
@@ -1728,7 +1827,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field Cc / Operator !IN',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "Cc" / Operator "!IN" / Value ["1"]',
             Search       => {
                 Field    => 'Cc',
                 Operator => '!IN',
@@ -1744,7 +1843,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field Cc / Operator STARTSWITH',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "Cc" / Operator "STARTSWITH" / Value "Test"',
             Search       => {
                 Field    => 'Cc',
                 Operator => 'STARTSWITH',
@@ -1760,7 +1859,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field Cc / Operator ENDSWITH',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "Cc" / Operator "ENDSWITH" / Value "Test"',
             Search       => {
                 Field    => 'Cc',
                 Operator => 'ENDSWITH',
@@ -1776,7 +1875,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field Cc / Operator CONTAINS',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "Cc" / Operator "CONTAINS" / Value "Test"',
             Search       => {
                 Field    => 'Cc',
                 Operator => 'CONTAINS',
@@ -1792,7 +1891,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field Cc / Operator LIKE',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "Cc" / Operator "LIKE" / Value "Test"',
             Search       => {
                 Field    => 'Cc',
                 Operator => 'LIKE',
@@ -1808,7 +1907,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field Subject / Operator EQ',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "Subject" / Operator "EQ" / Value "1"',
             Search       => {
                 Field    => 'Subject',
                 Operator => 'EQ',
@@ -1824,7 +1923,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field Subject / Operator EQ / Value empty string',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "Subject" / Operator "EQ" / Value ""',
             Search       => {
                 Field    => 'Subject',
                 Operator => 'EQ',
@@ -1840,7 +1939,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field Subject / Operator NE',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "Subject" / Operator "NE" / Value "1"',
             Search       => {
                 Field    => 'Subject',
                 Operator => 'NE',
@@ -1856,7 +1955,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field Subject / Operator NE / Value empty string',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "Subject" / Operator "NE" / Value ""',
             Search       => {
                 Field    => 'Subject',
                 Operator => 'NE',
@@ -1872,7 +1971,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field Subject / Operator IN',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "Subject" / Operator "IN" / Value ["1"]',
             Search       => {
                 Field    => 'Subject',
                 Operator => 'IN',
@@ -1888,7 +1987,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field Subject / Operator !IN',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "Subject" / Operator "!IN" / Value ["1"]',
             Search       => {
                 Field    => 'Subject',
                 Operator => '!IN',
@@ -1904,7 +2003,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field Subject / Operator STARTSWITH',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "Subject" / Operator "STARTSWITH" / Value "Test"',
             Search       => {
                 Field    => 'Subject',
                 Operator => 'STARTSWITH',
@@ -1920,7 +2019,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field Subject / Operator ENDSWITH',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "Subject" / Operator "ENDSWITH" / Value "Test"',
             Search       => {
                 Field    => 'Subject',
                 Operator => 'ENDSWITH',
@@ -1936,7 +2035,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field Subject / Operator CONTAINS',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "Subject" / Operator "CONTAINS" / Value "Test"',
             Search       => {
                 Field    => 'Subject',
                 Operator => 'CONTAINS',
@@ -1952,7 +2051,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field Subject / Operator LIKE',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "Subject" / Operator "LIKE" / Value "Test"',
             Search       => {
                 Field    => 'Subject',
                 Operator => 'LIKE',
@@ -1968,7 +2067,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field Body / Operator EQ',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "Body" / Operator "EQ" / Value "1"',
             Search       => {
                 Field    => 'Body',
                 Operator => 'EQ',
@@ -1984,7 +2083,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field Body / Operator EQ / Value empty string',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "Body" / Operator "EQ" / Value ""',
             Search       => {
                 Field    => 'Body',
                 Operator => 'EQ',
@@ -2000,7 +2099,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field Body / Operator NE',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "Body" / Operator "NE" / Value "1"',
             Search       => {
                 Field    => 'Body',
                 Operator => 'NE',
@@ -2016,7 +2115,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field Body / Operator NE / Value empty string',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "Body" / Operator "NE" / Value ""',
             Search       => {
                 Field    => 'Body',
                 Operator => 'NE',
@@ -2032,7 +2131,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field Body / Operator IN',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "Body" / Operator "IN" / Value ["1"]',
             Search       => {
                 Field    => 'Body',
                 Operator => 'IN',
@@ -2048,7 +2147,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field Body / Operator !IN',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "Body" / Operator "!IN" / Value ["1"]',
             Search       => {
                 Field    => 'Body',
                 Operator => '!IN',
@@ -2064,7 +2163,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field Body / Operator STARTSWITH',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "Body" / Operator "STARTSWITH" / Value "Test"',
             Search       => {
                 Field    => 'Body',
                 Operator => 'STARTSWITH',
@@ -2080,7 +2179,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field Body / Operator ENDSWITH',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "Body" / Operator "ENDSWITH" / Value "Test"',
             Search       => {
                 Field    => 'Body',
                 Operator => 'ENDSWITH',
@@ -2096,7 +2195,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field Body / Operator CONTAINS',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "Body" / Operator "CONTAINS" / Value "Test"',
             Search       => {
                 Field    => 'Body',
                 Operator => 'CONTAINS',
@@ -2112,7 +2211,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field Body / Operator LIKE',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "Body" / Operator "LIKE" / Value "Test"',
             Search       => {
                 Field    => 'Body',
                 Operator => 'LIKE',
@@ -2128,7 +2227,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field ArticleCreateTime / Operator EQ / absolute value',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "ArticleCreateTime" / Operator "EQ" / Value "2014-01-01 12:00:00"',
             Search       => {
                 Field    => 'ArticleCreateTime',
                 Operator => 'EQ',
@@ -2145,7 +2244,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field ArticleCreateTime / Operator EQ / relative value',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "ArticleCreateTime" / Operator "EQ" / Value "+1h"',
             Search       => {
                 Field    => 'ArticleCreateTime',
                 Operator => 'EQ',
@@ -2162,7 +2261,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field ArticleCreateTime / Operator LT / absolute value',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "ArticleCreateTime" / Operator "LT" / Value "2014-01-01 12:00:00"',
             Search       => {
                 Field    => 'ArticleCreateTime',
                 Operator => 'LT',
@@ -2179,7 +2278,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field ArticleCreateTime / Operator LT / relative value',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "ArticleCreateTime" / Operator "LT" / Value "+1h"',
             Search       => {
                 Field    => 'ArticleCreateTime',
                 Operator => 'LT',
@@ -2196,7 +2295,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field ArticleCreateTime / Operator GT / absolute value',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "ArticleCreateTime" / Operator "GT" / Value "2014-01-01 12:00:00"',
             Search       => {
                 Field    => 'ArticleCreateTime',
                 Operator => 'GT',
@@ -2213,7 +2312,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field ArticleCreateTime / Operator GT / relative value',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "ArticleCreateTime" / Operator "GT" / Value "+1h"',
             Search       => {
                 Field    => 'ArticleCreateTime',
                 Operator => 'GT',
@@ -2230,7 +2329,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field ArticleCreateTime / Operator LTE / absolute value',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "ArticleCreateTime" / Operator "LTE" / Value "2014-01-01 12:00:00"',
             Search       => {
                 Field    => 'ArticleCreateTime',
                 Operator => 'LTE',
@@ -2247,7 +2346,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field ArticleCreateTime / Operator LTE / relative value',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "ArticleCreateTime" / Operator "LTE" / Value "+1h"',
             Search       => {
                 Field    => 'ArticleCreateTime',
                 Operator => 'LTE',
@@ -2264,7 +2363,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field ArticleCreateTime / Operator GTE / absolute value',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "ArticleCreateTime" / Operator "GTE" / Value "2014-01-01 12:00:00"',
             Search       => {
                 Field    => 'ArticleCreateTime',
                 Operator => 'GTE',
@@ -2281,7 +2380,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / valid search / Field ArticleCreateTime / Operator GTE / relative value',
+            Name         => 'Search: SearchIndexModule RuntimeDB / UserType ' . $UserType . ' / Field "ArticleCreateTime" / Operator "GTE" / Value "+1h"',
             Search       => {
                 Field    => 'ArticleCreateTime',
                 Operator => 'GTE',
@@ -2336,7 +2435,7 @@ for my $UserType ( qw(Agent Customer) ) {
             Expected     => undef
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Value undef',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "ArticleID" / Operator "EQ" / Value undef',
             Search       => {
                 Field    => 'ArticleID',
                 Operator => 'EQ',
@@ -2346,7 +2445,7 @@ for my $UserType ( qw(Agent Customer) ) {
             Expected     => undef
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Value invalid',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "ArticleID" / Operator "EQ" / Value invalid',
             Search       => {
                 Field    => 'ArticleID',
                 Operator => 'EQ',
@@ -2355,7 +2454,7 @@ for my $UserType ( qw(Agent Customer) ) {
             Expected     => undef
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field undef',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field undef / Operator "EQ" / Value "1"',
             Search       => {
                 Field    => undef,
                 Operator => 'EQ',
@@ -2364,7 +2463,7 @@ for my $UserType ( qw(Agent Customer) ) {
             Expected     => undef
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field invalid',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field invalid / Operator "EQ" / Value "1"',
             Search       => {
                 Field    => 'Test',
                 Operator => 'EQ',
@@ -2373,7 +2472,7 @@ for my $UserType ( qw(Agent Customer) ) {
             Expected     => undef
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Operator undef',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "ArticleID" / Operator undef / Value "1"',
             Search       => {
                 Field    => 'ArticleID',
                 Operator => undef,
@@ -2382,7 +2481,7 @@ for my $UserType ( qw(Agent Customer) ) {
             Expected     => undef
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Operator invalid',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "ArticleID" / Operator invalid / Value "1"',
             Search       => {
                 Field    => 'ArticleID',
                 Operator => 'Test',
@@ -2391,7 +2490,7 @@ for my $UserType ( qw(Agent Customer) ) {
             Expected     => undef
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field ArticleID / Operator EQ',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "ArticleID" / Operator "EQ" / Value "1"',
             Search       => {
                 Field    => 'ArticleID',
                 Operator => 'EQ',
@@ -2407,7 +2506,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field ArticleID / Operator EQ / Value zero',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "ArticleID" / Operator "EQ" / Value "0"',
             Search       => {
                 Field    => 'ArticleID',
                 Operator => 'EQ',
@@ -2423,7 +2522,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field ArticleID / Operator NE',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "ArticleID" / Operator "NE" / Value "1"',
             Search       => {
                 Field    => 'ArticleID',
                 Operator => 'NE',
@@ -2439,7 +2538,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field ArticleID / Operator NE / Value zero',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "ArticleID" / Operator "NE" / Value "0"',
             Search       => {
                 Field    => 'ArticleID',
                 Operator => 'NE',
@@ -2455,7 +2554,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field ArticleID / Operator IN',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "ArticleID" / Operator "IN" / Value ["1"]',
             Search       => {
                 Field    => 'ArticleID',
                 Operator => 'IN',
@@ -2471,7 +2570,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field ArticleID / Operator !IN',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "ArticleID" / Operator "!IN" / Value ["1"]',
             Search       => {
                 Field    => 'ArticleID',
                 Operator => '!IN',
@@ -2487,7 +2586,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field ArticleID / Operator LT',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "ArticleID" / Operator "LT" / Value "1"',
             Search       => {
                 Field    => 'ArticleID',
                 Operator => 'LT',
@@ -2503,7 +2602,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field ArticleID / Operator GT',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "ArticleID" / Operator "GT" / Value "1"',
             Search       => {
                 Field    => 'ArticleID',
                 Operator => 'GT',
@@ -2519,7 +2618,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field ArticleID / Operator LTE',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "ArticleID" / Operator "LTE" / Value "1"',
             Search       => {
                 Field    => 'ArticleID',
                 Operator => 'LTE',
@@ -2535,7 +2634,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field ArticleID / Operator GTE',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "ArticleID" / Operator "GTE" / Value "1"',
             Search       => {
                 Field    => 'ArticleID',
                 Operator => 'GTE',
@@ -2551,7 +2650,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field ChannelID / Operator EQ',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "ChannelID" / Operator "EQ" / Value "1"',
             Search       => {
                 Field    => 'ChannelID',
                 Operator => 'EQ',
@@ -2567,7 +2666,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field ChannelID / Operator EQ / Value zero',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "ChannelID" / Operator "EQ" / Value "0"',
             Search       => {
                 Field    => 'ChannelID',
                 Operator => 'EQ',
@@ -2583,7 +2682,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field ChannelID / Operator NE',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "ChannelID" / Operator "NE" / Value "1"',
             Search       => {
                 Field    => 'ChannelID',
                 Operator => 'NE',
@@ -2599,7 +2698,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field ChannelID / Operator NE / Value zero',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "ChannelID" / Operator "NE" / Value "0"',
             Search       => {
                 Field    => 'ChannelID',
                 Operator => 'NE',
@@ -2615,7 +2714,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field ChannelID / Operator IN',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "ChannelID" / Operator "IN" / Value ["1"]',
             Search       => {
                 Field    => 'ChannelID',
                 Operator => 'IN',
@@ -2631,7 +2730,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field ChannelID / Operator !IN',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "ChannelID" / Operator "!IN" / Value ["1"]',
             Search       => {
                 Field    => 'ChannelID',
                 Operator => '!IN',
@@ -2647,7 +2746,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field ChannelID / Operator LT',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "ChannelID" / Operator "LT" / Value "1"',
             Search       => {
                 Field    => 'ChannelID',
                 Operator => 'LT',
@@ -2663,7 +2762,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field ChannelID / Operator GT',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "ChannelID" / Operator "GT" / Value "1"',
             Search       => {
                 Field    => 'ChannelID',
                 Operator => 'GT',
@@ -2679,7 +2778,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field ChannelID / Operator LTE',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "ChannelID" / Operator "LTE" / Value "1"',
             Search       => {
                 Field    => 'ChannelID',
                 Operator => 'LTE',
@@ -2695,7 +2794,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field ChannelID / Operator GTE',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "ChannelID" / Operator "GTE" / Value "1"',
             Search       => {
                 Field    => 'ChannelID',
                 Operator => 'GTE',
@@ -2711,7 +2810,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field Channel / Operator EQ',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "Channel" / Operator "EQ" / Value "Test"',
             Search       => {
                 Field    => 'Channel',
                 Operator => 'EQ',
@@ -2728,7 +2827,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field Channel / Operator EQ / Value empty string',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "Channel" / Operator "EQ" / Value ""',
             Search       => {
                 Field    => 'Channel',
                 Operator => 'EQ',
@@ -2745,7 +2844,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field Channel / Operator NE',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "Channel" / Operator "NE" / Value "Test"',
             Search       => {
                 Field    => 'Channel',
                 Operator => 'NE',
@@ -2762,7 +2861,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field Channel / Operator NE / Value empty string',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "Channel" / Operator "NE" / Value ""',
             Search       => {
                 Field    => 'Channel',
                 Operator => 'NE',
@@ -2779,7 +2878,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field Channel / Operator IN',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "Channel" / Operator "IN" / Value ["Test"]',
             Search       => {
                 Field    => 'Channel',
                 Operator => 'IN',
@@ -2796,7 +2895,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field Channel / Operator !IN',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "Channel" / Operator "!IN" / Value ["Test"]',
             Search       => {
                 Field    => 'Channel',
                 Operator => '!IN',
@@ -2813,7 +2912,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field Channel / Operator STARTSWITH',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "Channel" / Operator "STARTSWITH" / Value "Test"',
             Search       => {
                 Field    => 'Channel',
                 Operator => 'STARTSWITH',
@@ -2830,7 +2929,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field Channel / Operator ENDSWITH',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "Channel" / Operator "ENDSWITH" / Value "Test"',
             Search       => {
                 Field    => 'Channel',
                 Operator => 'ENDSWITH',
@@ -2847,7 +2946,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field Channel / Operator CONTAINS',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "Channel" / Operator "CONTAINS" / Value "Test"',
             Search       => {
                 Field    => 'Channel',
                 Operator => 'CONTAINS',
@@ -2864,7 +2963,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field Channel / Operator LIKE',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "Channel" / Operator "LIKE" / Value "Test"',
             Search       => {
                 Field    => 'Channel',
                 Operator => 'LIKE',
@@ -2881,7 +2980,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field SenderTypeID / Operator EQ',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "SenderTypeID" / Operator "EQ" / Value "1"',
             Search       => {
                 Field    => 'SenderTypeID',
                 Operator => 'EQ',
@@ -2897,7 +2996,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field SenderTypeID / Operator EQ / Value zero',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "SenderTypeID" / Operator "EQ" / Value "0"',
             Search       => {
                 Field    => 'SenderTypeID',
                 Operator => 'EQ',
@@ -2913,7 +3012,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field SenderTypeID / Operator NE',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "SenderTypeID" / Operator "NE" / Value "1"',
             Search       => {
                 Field    => 'SenderTypeID',
                 Operator => 'NE',
@@ -2929,7 +3028,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field SenderTypeID / Operator NE / Value zero',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "SenderTypeID" / Operator "NE" / Value "0"',
             Search       => {
                 Field    => 'SenderTypeID',
                 Operator => 'NE',
@@ -2945,7 +3044,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field SenderTypeID / Operator IN',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "SenderTypeID" / Operator "IN" / Value ["1"]',
             Search       => {
                 Field    => 'SenderTypeID',
                 Operator => 'IN',
@@ -2961,7 +3060,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field SenderTypeID / Operator !IN',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "SenderTypeID" / Operator "!IN" / Value ["1"]',
             Search       => {
                 Field    => 'SenderTypeID',
                 Operator => '!IN',
@@ -2977,7 +3076,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field SenderTypeID / Operator LT',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "SenderTypeID" / Operator "LT" / Value "1"',
             Search       => {
                 Field    => 'SenderTypeID',
                 Operator => 'LT',
@@ -2993,7 +3092,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field SenderTypeID / Operator GT',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "SenderTypeID" / Operator "GT" / Value "1"',
             Search       => {
                 Field    => 'SenderTypeID',
                 Operator => 'GT',
@@ -3009,7 +3108,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field SenderTypeID / Operator LTE',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "SenderTypeID" / Operator "LTE" / Value "1"',
             Search       => {
                 Field    => 'SenderTypeID',
                 Operator => 'LTE',
@@ -3025,7 +3124,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field SenderTypeID / Operator GTE',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "SenderTypeID" / Operator "GTE" / Value "1"',
             Search       => {
                 Field    => 'SenderTypeID',
                 Operator => 'GTE',
@@ -3041,7 +3140,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field SenderType / Operator EQ',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "SenderType" / Operator "EQ" / Value "Test"',
             Search       => {
                 Field    => 'SenderType',
                 Operator => 'EQ',
@@ -3058,7 +3157,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field SenderType / Operator EQ / Value empty string',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "SenderType" / Operator "EQ" / Value ""',
             Search       => {
                 Field    => 'SenderType',
                 Operator => 'EQ',
@@ -3075,7 +3174,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field SenderType / Operator NE',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "SenderType" / Operator "NE" / Value "Test"',
             Search       => {
                 Field    => 'SenderType',
                 Operator => 'NE',
@@ -3092,7 +3191,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field SenderType / Operator NE / Value empty string',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "SenderType" / Operator "NE" / Value ""',
             Search       => {
                 Field    => 'SenderType',
                 Operator => 'NE',
@@ -3109,7 +3208,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field SenderType / Operator IN',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "SenderType" / Operator "IN" / Value ["Test"]',
             Search       => {
                 Field    => 'SenderType',
                 Operator => 'IN',
@@ -3126,7 +3225,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field SenderType / Operator !IN',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "SenderType" / Operator "!IN" / Value ["Test"]',
             Search       => {
                 Field    => 'SenderType',
                 Operator => '!IN',
@@ -3143,7 +3242,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field SenderType / Operator STARTSWITH',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "SenderType" / Operator "STARTSWITH" / Value "Test"',
             Search       => {
                 Field    => 'SenderType',
                 Operator => 'STARTSWITH',
@@ -3160,7 +3259,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field SenderType / Operator ENDSWITH',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "SenderType" / Operator "ENDSWITH" / Value "Test"',
             Search       => {
                 Field    => 'SenderType',
                 Operator => 'ENDSWITH',
@@ -3177,7 +3276,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field SenderType / Operator CONTAINS',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "SenderType" / Operator "CONTAINS" / Value "Test"',
             Search       => {
                 Field    => 'SenderType',
                 Operator => 'CONTAINS',
@@ -3194,7 +3293,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field SenderType / Operator LIKE',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "SenderType" / Operator "LIKE" / Value "Test"',
             Search       => {
                 Field    => 'SenderType',
                 Operator => 'LIKE',
@@ -3211,7 +3310,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field CustomerVisible / Operator EQ',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "CustomerVisible" / Operator "EQ" / Value "1"',
             Search       => {
                 Field    => 'CustomerVisible',
                 Operator => 'EQ',
@@ -3227,7 +3326,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field CustomerVisible / Operator EQ / Value zero',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "CustomerVisible" / Operator "EQ" / Value "0"',
             Search       => {
                 Field    => 'CustomerVisible',
                 Operator => 'EQ',
@@ -3243,7 +3342,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field CustomerVisible / Operator NE',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "CustomerVisible" / Operator "NE" / Value "1"',
             Search       => {
                 Field    => 'CustomerVisible',
                 Operator => 'NE',
@@ -3259,7 +3358,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field CustomerVisible / Operator NE / Value zero',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "CustomerVisible" / Operator "NE" / Value "0"',
             Search       => {
                 Field    => 'CustomerVisible',
                 Operator => 'NE',
@@ -3275,7 +3374,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field CustomerVisible / Operator IN',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "CustomerVisible" / Operator "IN" / Value ["1"]',
             Search       => {
                 Field    => 'CustomerVisible',
                 Operator => 'IN',
@@ -3291,7 +3390,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field CustomerVisible / Operator !IN',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "CustomerVisible" / Operator "!IN" / Value ["1"]',
             Search       => {
                 Field    => 'CustomerVisible',
                 Operator => '!IN',
@@ -3307,7 +3406,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field CustomerVisible / Operator LT',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "CustomerVisible" / Operator "LT" / Value "1"',
             Search       => {
                 Field    => 'CustomerVisible',
                 Operator => 'LT',
@@ -3323,7 +3422,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field CustomerVisible / Operator GT',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "CustomerVisible" / Operator "GT" / Value "1"',
             Search       => {
                 Field    => 'CustomerVisible',
                 Operator => 'GT',
@@ -3339,7 +3438,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field CustomerVisible / Operator LTE',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "CustomerVisible" / Operator "LTE" / Value "1"',
             Search       => {
                 Field    => 'CustomerVisible',
                 Operator => 'LTE',
@@ -3355,7 +3454,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field CustomerVisible / Operator GTE',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "CustomerVisible" / Operator "GTE" / Value "1"',
             Search       => {
                 Field    => 'CustomerVisible',
                 Operator => 'GTE',
@@ -3371,7 +3470,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field From / Operator EQ',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "From" / Operator "EQ" / Value "Test"',
             Search       => {
                 Field    => 'From',
                 Operator => 'EQ',
@@ -3387,7 +3486,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field From / Operator EQ / Value empty string',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "From" / Operator "EQ" / Value ""',
             Search       => {
                 Field    => 'From',
                 Operator => 'EQ',
@@ -3403,7 +3502,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field From / Operator NE',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "From" / Operator "NE" / Value "Test"',
             Search       => {
                 Field    => 'From',
                 Operator => 'NE',
@@ -3419,7 +3518,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field From / Operator NE / Value empty string',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "From" / Operator "NE" / Value ""',
             Search       => {
                 Field    => 'From',
                 Operator => 'NE',
@@ -3435,7 +3534,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field From / Operator IN',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "From" / Operator "IN" / Value ["Test"]',
             Search       => {
                 Field    => 'From',
                 Operator => 'IN',
@@ -3451,7 +3550,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field From / Operator !IN',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "From" / Operator "!IN" / Value ["Test"]',
             Search       => {
                 Field    => 'From',
                 Operator => '!IN',
@@ -3467,7 +3566,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field From / Operator STARTSWITH',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "From" / Operator "STARTSWITH" / Value "Test"',
             Search       => {
                 Field    => 'From',
                 Operator => 'STARTSWITH',
@@ -3483,7 +3582,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field From / Operator ENDSWITH',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "From" / Operator "ENDSWITH" / Value "Test"',
             Search       => {
                 Field    => 'From',
                 Operator => 'ENDSWITH',
@@ -3499,7 +3598,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field From / Operator CONTAINS',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "From" / Operator "CONTAINS" / Value "Test"',
             Search       => {
                 Field    => 'From',
                 Operator => 'CONTAINS',
@@ -3515,7 +3614,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field From / Operator LIKE',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "From" / Operator "LIKE" / Value "Test"',
             Search       => {
                 Field    => 'From',
                 Operator => 'LIKE',
@@ -3531,7 +3630,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field To / Operator EQ',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "To" / Operator "EQ" / Value "Test"',
             Search       => {
                 Field    => 'To',
                 Operator => 'EQ',
@@ -3547,7 +3646,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field To / Operator EQ / Value empty string',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "To" / Operator "EQ" / Value ""',
             Search       => {
                 Field    => 'To',
                 Operator => 'EQ',
@@ -3563,7 +3662,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field To / Operator NE',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "To" / Operator "NE" / Value "Test"',
             Search       => {
                 Field    => 'To',
                 Operator => 'NE',
@@ -3579,7 +3678,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field To / Operator NE / Value empty string',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "To" / Operator "NE" / Value ""',
             Search       => {
                 Field    => 'To',
                 Operator => 'NE',
@@ -3595,7 +3694,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field To / Operator IN',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "To" / Operator "IN" / Value ["Test"]',
             Search       => {
                 Field    => 'To',
                 Operator => 'IN',
@@ -3611,7 +3710,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field To / Operator !IN',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "To" / Operator "!IN" / Value ["Test"]',
             Search       => {
                 Field    => 'To',
                 Operator => '!IN',
@@ -3627,7 +3726,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field To / Operator STARTSWITH',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "To" / Operator "STARTSWITH" / Value "Test"',
             Search       => {
                 Field    => 'To',
                 Operator => 'STARTSWITH',
@@ -3643,7 +3742,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field To / Operator ENDSWITH',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "To" / Operator "ENDSWITH" / Value "Test"',
             Search       => {
                 Field    => 'To',
                 Operator => 'ENDSWITH',
@@ -3659,7 +3758,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field To / Operator CONTAINS',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "To" / Operator "CONTAINS" / Value "Test"',
             Search       => {
                 Field    => 'To',
                 Operator => 'CONTAINS',
@@ -3675,7 +3774,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field To / Operator LIKE',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "To" / Operator "LIKE" / Value "Test"',
             Search       => {
                 Field    => 'To',
                 Operator => 'LIKE',
@@ -3691,7 +3790,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field Cc / Operator EQ',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "Cc" / Operator "EQ" / Value "Test"',
             Search       => {
                 Field    => 'Cc',
                 Operator => 'EQ',
@@ -3707,7 +3806,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field Cc / Operator EQ / Value empty string',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "Cc" / Operator "EQ" / Value ""',
             Search       => {
                 Field    => 'Cc',
                 Operator => 'EQ',
@@ -3723,7 +3822,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field Cc / Operator NE',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "Cc" / Operator "NE" / Value "Test"',
             Search       => {
                 Field    => 'Cc',
                 Operator => 'NE',
@@ -3739,7 +3838,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field Cc / Operator NE / Value empty string',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "Cc" / Operator "NE" / Value ""',
             Search       => {
                 Field    => 'Cc',
                 Operator => 'NE',
@@ -3755,7 +3854,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field Cc / Operator IN',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "Cc" / Operator "IN" / Value ["Test"]',
             Search       => {
                 Field    => 'Cc',
                 Operator => 'IN',
@@ -3771,7 +3870,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field Cc / Operator !IN',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "Cc" / Operator "!IN" / Value ["Test"]',
             Search       => {
                 Field    => 'Cc',
                 Operator => '!IN',
@@ -3787,7 +3886,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field Cc / Operator STARTSWITH',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "Cc" / Operator "STARTSWITH" / Value "Test"',
             Search       => {
                 Field    => 'Cc',
                 Operator => 'STARTSWITH',
@@ -3803,7 +3902,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field Cc / Operator ENDSWITH',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "Cc" / Operator "ENDSWITH" / Value "Test"',
             Search       => {
                 Field    => 'Cc',
                 Operator => 'ENDSWITH',
@@ -3819,7 +3918,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field Cc / Operator CONTAINS',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "Cc" / Operator "CONTAINS" / Value "Test"',
             Search       => {
                 Field    => 'Cc',
                 Operator => 'CONTAINS',
@@ -3835,7 +3934,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field Cc / Operator LIKE',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "Cc" / Operator "LIKE" / Value "Test"',
             Search       => {
                 Field    => 'Cc',
                 Operator => 'LIKE',
@@ -3851,7 +3950,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field Subject / Operator EQ',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "Subject" / Operator "EQ" / Value "Test"',
             Search       => {
                 Field    => 'Subject',
                 Operator => 'EQ',
@@ -3867,7 +3966,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field Subject / Operator EQ / Value empty string',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "Subject" / Operator "EQ" / Value ""',
             Search       => {
                 Field    => 'Subject',
                 Operator => 'EQ',
@@ -3883,7 +3982,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field Subject / Operator NE',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "Subject" / Operator "NE" / Value "Test"',
             Search       => {
                 Field    => 'Subject',
                 Operator => 'NE',
@@ -3899,7 +3998,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field Subject / Operator NE / Value empty string',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "Subject" / Operator "NE" / Value ""',
             Search       => {
                 Field    => 'Subject',
                 Operator => 'NE',
@@ -3915,7 +4014,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field Subject / Operator IN',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "Subject" / Operator "IN" / Value ["Test"]',
             Search       => {
                 Field    => 'Subject',
                 Operator => 'IN',
@@ -3931,7 +4030,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field Subject / Operator !IN',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "Subject" / Operator "!IN" / Value ["Test"]',
             Search       => {
                 Field    => 'Subject',
                 Operator => '!IN',
@@ -3947,7 +4046,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field Subject / Operator STARTSWITH',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "Subject" / Operator "STARTSWITH" / Value "Test"',
             Search       => {
                 Field    => 'Subject',
                 Operator => 'STARTSWITH',
@@ -3963,7 +4062,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field Subject / Operator ENDSWITH',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "Subject" / Operator "ENDSWITH" / Value "Test"',
             Search       => {
                 Field    => 'Subject',
                 Operator => 'ENDSWITH',
@@ -3979,7 +4078,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field Subject / Operator CONTAINS',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "Subject" / Operator "CONTAINS" / Value "Test"',
             Search       => {
                 Field    => 'Subject',
                 Operator => 'CONTAINS',
@@ -3995,7 +4094,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field Subject / Operator LIKE',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "Subject" / Operator "LIKE" / Value "Test"',
             Search       => {
                 Field    => 'Subject',
                 Operator => 'LIKE',
@@ -4011,7 +4110,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field Body / Operator EQ',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "Body" / Operator "EQ" / Value "Test"',
             Search       => {
                 Field    => 'Body',
                 Operator => 'EQ',
@@ -4027,7 +4126,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field Body / Operator EQ / Value empty string',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "Body" / Operator "EQ" / Value ""',
             Search       => {
                 Field    => 'Body',
                 Operator => 'EQ',
@@ -4043,7 +4142,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field Body / Operator NE',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "Body" / Operator "NE" / Value "Test"',
             Search       => {
                 Field    => 'Body',
                 Operator => 'NE',
@@ -4059,7 +4158,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field Body / Operator NE / Value empty string',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "Body" / Operator "NE" / Value ""',
             Search       => {
                 Field    => 'Body',
                 Operator => 'NE',
@@ -4075,7 +4174,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field Body / Operator IN',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "Body" / Operator "IN" / Value ["Test"]',
             Search       => {
                 Field    => 'Body',
                 Operator => 'IN',
@@ -4091,7 +4190,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field Body / Operator !IN',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "Body" / Operator "!IN" / Value ["Test"]',
             Search       => {
                 Field    => 'Body',
                 Operator => '!IN',
@@ -4107,7 +4206,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field Body / Operator STARTSWITH',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "Body" / Operator "STARTSWITH" / Value "Test"',
             Search       => {
                 Field    => 'Body',
                 Operator => 'STARTSWITH',
@@ -4123,7 +4222,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field Body / Operator ENDSWITH',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "Body" / Operator "ENDSWITH" / Value "Test"',
             Search       => {
                 Field    => 'Body',
                 Operator => 'ENDSWITH',
@@ -4139,7 +4238,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field Body / Operator CONTAINS',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "Body" / Operator "CONTAINS" / Value "Test"',
             Search       => {
                 Field    => 'Body',
                 Operator => 'CONTAINS',
@@ -4155,7 +4254,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field Body / Operator LIKE',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "Body" / Operator "LIKE" / Value "Test"',
             Search       => {
                 Field    => 'Body',
                 Operator => 'LIKE',
@@ -4171,7 +4270,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field ArticleCreateTime / Operator EQ / absolute value',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "ArticleCreateTime" / Operator "EQ" / Value "2014-01-01 12:00:00"',
             Search       => {
                 Field    => 'ArticleCreateTime',
                 Operator => 'EQ',
@@ -4188,7 +4287,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field ArticleCreateTime / Operator EQ / relative value',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "ArticleCreateTime" / Operator "EQ" / Value "+1h"',
             Search       => {
                 Field    => 'ArticleCreateTime',
                 Operator => 'EQ',
@@ -4205,7 +4304,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field ArticleCreateTime / Operator LT / absolute value',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "ArticleCreateTime" / Operator "LT" / Value "2014-01-01 12:00:00"',
             Search       => {
                 Field    => 'ArticleCreateTime',
                 Operator => 'LT',
@@ -4222,7 +4321,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field ArticleCreateTime / Operator LT / relative value',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "ArticleCreateTime" / Operator "LT" / Value "+1h"',
             Search       => {
                 Field    => 'ArticleCreateTime',
                 Operator => 'LT',
@@ -4239,7 +4338,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field ArticleCreateTime / Operator GT / absolute value',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "ArticleCreateTime" / Operator "GT" / Value "2014-01-01 12:00:00"',
             Search       => {
                 Field    => 'ArticleCreateTime',
                 Operator => 'GT',
@@ -4256,7 +4355,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field ArticleCreateTime / Operator GT / relative value',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "ArticleCreateTime" / Operator "GT" / Value "+1h"',
             Search       => {
                 Field    => 'ArticleCreateTime',
                 Operator => 'GT',
@@ -4273,7 +4372,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field ArticleCreateTime / Operator LTE / absolute value',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "ArticleCreateTime" / Operator "LTE" / Value "2014-01-01 12:00:00"',
             Search       => {
                 Field    => 'ArticleCreateTime',
                 Operator => 'LTE',
@@ -4290,7 +4389,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field ArticleCreateTime / Operator LTE / relative value',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "ArticleCreateTime" / Operator "LTE" / Value "+1h"',
             Search       => {
                 Field    => 'ArticleCreateTime',
                 Operator => 'LTE',
@@ -4307,7 +4406,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field ArticleCreateTime / Operator GTE / absolute value',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "ArticleCreateTime" / Operator "GTE" / Value "2014-01-01 12:00:00"',
             Search       => {
                 Field    => 'ArticleCreateTime',
                 Operator => 'GTE',
@@ -4324,7 +4423,7 @@ for my $UserType ( qw(Agent Customer) ) {
             }
         },
         {
-            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / valid search / Field ArticleCreateTime / Operator GTE / relative value',
+            Name         => 'Search: SearchIndexModule StaticDB / UserType ' . $UserType . ' / Field "ArticleCreateTime" / Operator "GTE" / Value "+1h"',
             Search       => {
                 Field    => 'ArticleCreateTime',
                 Operator => 'GTE',
@@ -4593,7 +4692,7 @@ $Kernel::OM->ObjectsDiscard(
 # test Search for StaticDB
 my @IntegrationSearchTestsStaticDB = (
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field ArticleID / Operator EQ / Value $ArticleID2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "ArticleID" / Operator "EQ" / Value $ArticleID2',
         Search   => {
             'AND' => [
                 {
@@ -4607,7 +4706,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field ArticleID / Operator NE / Value $ArticleID2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "ArticleID" / Operator "NE" / Value $ArticleID2',
         Search   => {
             'AND' => [
                 {
@@ -4621,7 +4720,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1,$TicketID3]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field ArticleID / Operator IN / Value [$ArticleID1]',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "ArticleID" / Operator "IN" / Value [$ArticleID1]',
         Search   => {
             'AND' => [
                 {
@@ -4635,7 +4734,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field ArticleID / Operator !IN / Value [$ArticleID1]',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "ArticleID" / Operator "!IN" / Value [$ArticleID1]',
         Search   => {
             'AND' => [
                 {
@@ -4649,7 +4748,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field ArticleID / Operator LT / Value $ArticleID2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "ArticleID" / Operator "LT" / Value $ArticleID2',
         Search   => {
             'AND' => [
                 {
@@ -4663,7 +4762,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field ArticleID / Operator LTE / Value $ArticleID2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "ArticleID" / Operator "LTE" / Value $ArticleID2',
         Search   => {
             'AND' => [
                 {
@@ -4677,7 +4776,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1,$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field ArticleID / Operator GT / Value $ArticleID2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "ArticleID" / Operator "GT" / Value $ArticleID2',
         Search   => {
             'AND' => [
                 {
@@ -4691,7 +4790,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => []
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field ArticleID / Operator GTE / Value $ArticleID2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "ArticleID" / Operator "GTE" / Value $ArticleID2',
         Search   => {
             'AND' => [
                 {
@@ -4705,7 +4804,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field ArticleID / Operator EQ / Value $ArticleID2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "ArticleID" / Operator "EQ" / Value $ArticleID2',
         Search   => {
             'AND' => [
                 {
@@ -4719,7 +4818,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field ArticleID / Operator NE / Value $ArticleID2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "ArticleID" / Operator "NE" / Value $ArticleID2',
         Search   => {
             'AND' => [
                 {
@@ -4733,7 +4832,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1,$TicketID3]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field ArticleID / Operator IN / Value [$ArticleID1]',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "ArticleID" / Operator "IN" / Value [$ArticleID1]',
         Search   => {
             'AND' => [
                 {
@@ -4747,7 +4846,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => []
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field ArticleID / Operator !IN / Value [$ArticleID1]',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "ArticleID" / Operator "!IN" / Value [$ArticleID1]',
         Search   => {
             'AND' => [
                 {
@@ -4761,7 +4860,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field ArticleID / Operator LT / Value $ArticleID2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "ArticleID" / Operator "LT" / Value $ArticleID2',
         Search   => {
             'AND' => [
                 {
@@ -4775,7 +4874,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => []
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field ArticleID / Operator LTE / Value $ArticleID2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "ArticleID" / Operator "LTE" / Value $ArticleID2',
         Search   => {
             'AND' => [
                 {
@@ -4789,7 +4888,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field ArticleID / Operator GT / Value $ArticleID2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "ArticleID" / Operator "GT" / Value $ArticleID2',
         Search   => {
             'AND' => [
                 {
@@ -4803,7 +4902,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => []
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field ArticleID / Operator GTE / Value $ArticleID2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "ArticleID" / Operator "GTE" / Value $ArticleID2',
         Search   => {
             'AND' => [
                 {
@@ -4817,7 +4916,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field ChannelID / Operator EQ / Value $ChannelID2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "ChannelID" / Operator "EQ" / Value $ChannelID2',
         Search   => {
             'AND' => [
                 {
@@ -4831,7 +4930,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field ChannelID / Operator NE / Value $ChannelID2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "ChannelID" / Operator "NE" / Value $ChannelID2',
         Search   => {
             'AND' => [
                 {
@@ -4845,7 +4944,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1,$TicketID3]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field ChannelID / Operator IN / Value [$ChannelID1]',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "ChannelID" / Operator "IN" / Value [$ChannelID1]',
         Search   => {
             'AND' => [
                 {
@@ -4859,7 +4958,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field ChannelID / Operator !IN / Value [$ChannelID1]',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "ChannelID" / Operator "!IN" / Value [$ChannelID1]',
         Search   => {
             'AND' => [
                 {
@@ -4873,7 +4972,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field ChannelID / Operator LT / Value $ChannelID2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "ChannelID" / Operator "LT" / Value $ChannelID2',
         Search   => {
             'AND' => [
                 {
@@ -4887,7 +4986,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field ChannelID / Operator LTE / Value $ChannelID2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "ChannelID" / Operator "LTE" / Value $ChannelID2',
         Search   => {
             'AND' => [
                 {
@@ -4901,7 +5000,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1,$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field ChannelID / Operator GT / Value $ChannelID2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "ChannelID" / Operator "GT" / Value $ChannelID2',
         Search   => {
             'AND' => [
                 {
@@ -4915,7 +5014,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => []
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field ChannelID / Operator GTE / Value $ChannelID2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "ChannelID" / Operator "GTE" / Value $ChannelID2',
         Search   => {
             'AND' => [
                 {
@@ -4929,7 +5028,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field ChannelID / Operator EQ / Value $ChannelID2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "ChannelID" / Operator "EQ" / Value $ChannelID2',
         Search   => {
             'AND' => [
                 {
@@ -4943,7 +5042,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field ChannelID / Operator NE / Value $ChannelID2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "ChannelID" / Operator "NE" / Value $ChannelID2',
         Search   => {
             'AND' => [
                 {
@@ -4957,7 +5056,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1,$TicketID3]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field ChannelID / Operator IN / Value [$ChannelID1]',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "ChannelID" / Operator "IN" / Value [$ChannelID1]',
         Search   => {
             'AND' => [
                 {
@@ -4971,7 +5070,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => []
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field ChannelID / Operator !IN / Value [$ChannelID1]',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "ChannelID" / Operator "!IN" / Value [$ChannelID1]',
         Search   => {
             'AND' => [
                 {
@@ -4985,7 +5084,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field ChannelID / Operator LT / Value $ChannelID2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "ChannelID" / Operator "LT" / Value $ChannelID2',
         Search   => {
             'AND' => [
                 {
@@ -4999,7 +5098,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => []
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field ChannelID / Operator LTE / Value $ChannelID2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "ChannelID" / Operator "LTE" / Value $ChannelID2',
         Search   => {
             'AND' => [
                 {
@@ -5013,7 +5112,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field ChannelID / Operator GT / Value $ChannelID2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "ChannelID" / Operator "GT" / Value $ChannelID2',
         Search   => {
             'AND' => [
                 {
@@ -5027,7 +5126,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => []
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field ChannelID / Operator GTE / Value $ChannelID2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "ChannelID" / Operator "GTE" / Value $ChannelID2',
         Search   => {
             'AND' => [
                 {
@@ -5041,7 +5140,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field Channel / Operator EQ / Value $ChannelName2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "Channel" / Operator "EQ" / Value $ChannelName2',
         Search   => {
             'AND' => [
                 {
@@ -5055,7 +5154,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field Channel / Operator NE / Value $ChannelName2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "Channel" / Operator "NE" / Value $ChannelName2',
         Search   => {
             'AND' => [
                 {
@@ -5069,7 +5168,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1,$TicketID3]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field Channel / Operator IN / Value [$ChannelName1]',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "Channel" / Operator "IN" / Value [$ChannelName1]',
         Search   => {
             'AND' => [
                 {
@@ -5083,7 +5182,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field Channel / Operator !IN / Value [$ChannelName1]',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "Channel" / Operator "!IN" / Value [$ChannelName1]',
         Search   => {
             'AND' => [
                 {
@@ -5097,7 +5196,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field Channel / Operator STARTSWITH / Value $ChannelName2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "Channel" / Operator "STARTSWITH" / Value $ChannelName2',
         Search   => {
             'AND' => [
                 {
@@ -5111,7 +5210,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field Channel / Operator STARTSWITH / Value substr($ChannelName2,0,2)',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "Channel" / Operator "STARTSWITH" / Value substr($ChannelName2,0,2)',
         Search   => {
             'AND' => [
                 {
@@ -5125,7 +5224,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field Channel / Operator ENDSWITH / Value $ChannelName2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "Channel" / Operator "ENDSWITH" / Value $ChannelName2',
         Search   => {
             'AND' => [
                 {
@@ -5139,7 +5238,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field Channel / Operator ENDSWITH / Value substr($ChannelName2,-2)',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "Channel" / Operator "ENDSWITH" / Value substr($ChannelName2,-2)',
         Search   => {
             'AND' => [
                 {
@@ -5153,7 +5252,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field Channel / Operator CONTAINS / Value $ChannelName2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "Channel" / Operator "CONTAINS" / Value $ChannelName2',
         Search   => {
             'AND' => [
                 {
@@ -5167,7 +5266,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field Channel / Operator CONTAINS / Value substr($ChannelName2,1,-1)',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "Channel" / Operator "CONTAINS" / Value substr($ChannelName2,1,-1)',
         Search   => {
             'AND' => [
                 {
@@ -5181,7 +5280,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field Channel / Operator LIKE / Value $ChannelName2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "Channel" / Operator "LIKE" / Value $ChannelName2',
         Search   => {
             'AND' => [
                 {
@@ -5195,7 +5294,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field Channel / Operator EQ / Value $ChannelName2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "Channel" / Operator "EQ" / Value $ChannelName2',
         Search   => {
             'AND' => [
                 {
@@ -5209,7 +5308,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field Channel / Operator NE / Value $ChannelName2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "Channel" / Operator "NE" / Value $ChannelName2',
         Search   => {
             'AND' => [
                 {
@@ -5223,7 +5322,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1,$TicketID3]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field Channel / Operator IN / Value [$ChannelName1]',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "Channel" / Operator "IN" / Value [$ChannelName1]',
         Search   => {
             'AND' => [
                 {
@@ -5237,7 +5336,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => []
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field Channel / Operator !IN / Value [$ChannelName1]',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "Channel" / Operator "!IN" / Value [$ChannelName1]',
         Search   => {
             'AND' => [
                 {
@@ -5251,7 +5350,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field Channel / Operator STARTSWITH / Value $ChannelName2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "Channel" / Operator "STARTSWITH" / Value $ChannelName2',
         Search   => {
             'AND' => [
                 {
@@ -5265,7 +5364,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field Channel / Operator STARTSWITH / Value substr($ChannelName2,0,2)',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "Channel" / Operator "STARTSWITH" / Value substr($ChannelName2,0,2)',
         Search   => {
             'AND' => [
                 {
@@ -5279,7 +5378,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field Channel / Operator ENDSWITH / Value $ChannelName2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "Channel" / Operator "ENDSWITH" / Value $ChannelName2',
         Search   => {
             'AND' => [
                 {
@@ -5293,7 +5392,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field Channel / Operator ENDSWITH / Value substr($ChannelName2,-2)',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "Channel" / Operator "ENDSWITH" / Value substr($ChannelName2,-2)',
         Search   => {
             'AND' => [
                 {
@@ -5307,7 +5406,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field Channel / Operator CONTAINS / Value $ChannelName2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "Channel" / Operator "CONTAINS" / Value $ChannelName2',
         Search   => {
             'AND' => [
                 {
@@ -5321,7 +5420,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field Channel / Operator CONTAINS / Value substr($ChannelName2,1,-1)',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "Channel" / Operator "CONTAINS" / Value substr($ChannelName2,1,-1)',
         Search   => {
             'AND' => [
                 {
@@ -5335,7 +5434,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field Channel / Operator LIKE / Value $ChannelName2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "Channel" / Operator "LIKE" / Value $ChannelName2',
         Search   => {
             'AND' => [
                 {
@@ -5349,7 +5448,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field SenderTypeID / Operator EQ / Value $SenderTypeID2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "SenderTypeID" / Operator "EQ" / Value $SenderTypeID2',
         Search   => {
             'AND' => [
                 {
@@ -5363,7 +5462,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field SenderTypeID / Operator NE / Value $SenderTypeID2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "SenderTypeID" / Operator "NE" / Value $SenderTypeID2',
         Search   => {
             'AND' => [
                 {
@@ -5377,7 +5476,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1,$TicketID3]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field SenderTypeID / Operator IN / Value [$SenderTypeID1]',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "SenderTypeID" / Operator "IN" / Value [$SenderTypeID1]',
         Search   => {
             'AND' => [
                 {
@@ -5391,7 +5490,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field SenderTypeID / Operator !IN / Value [$SenderTypeID1]',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "SenderTypeID" / Operator "!IN" / Value [$SenderTypeID1]',
         Search   => {
             'AND' => [
                 {
@@ -5405,7 +5504,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field SenderTypeID / Operator LT / Value $SenderTypeID2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "SenderTypeID" / Operator "LT" / Value $SenderTypeID2',
         Search   => {
             'AND' => [
                 {
@@ -5419,7 +5518,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field SenderTypeID / Operator LTE / Value $SenderTypeID2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "SenderTypeID" / Operator "LTE" / Value $SenderTypeID2',
         Search   => {
             'AND' => [
                 {
@@ -5433,7 +5532,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1,$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field SenderTypeID / Operator GT / Value $SenderTypeID2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "SenderTypeID" / Operator "GT" / Value $SenderTypeID2',
         Search   => {
             'AND' => [
                 {
@@ -5447,7 +5546,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => []
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field SenderTypeID / Operator GTE / Value $SenderTypeID2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "SenderTypeID" / Operator "GTE" / Value $SenderTypeID2',
         Search   => {
             'AND' => [
                 {
@@ -5461,7 +5560,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field SenderTypeID / Operator EQ / Value $SenderTypeID2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "SenderTypeID" / Operator "EQ" / Value $SenderTypeID2',
         Search   => {
             'AND' => [
                 {
@@ -5475,7 +5574,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field SenderTypeID / Operator NE / Value $SenderTypeID2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "SenderTypeID" / Operator "NE" / Value $SenderTypeID2',
         Search   => {
             'AND' => [
                 {
@@ -5489,7 +5588,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1,$TicketID3]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field SenderTypeID / Operator IN / Value [$SenderTypeID1]',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "SenderTypeID" / Operator "IN" / Value [$SenderTypeID1]',
         Search   => {
             'AND' => [
                 {
@@ -5503,7 +5602,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => []
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field SenderTypeID / Operator !IN / Value [$SenderTypeID1]',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "SenderTypeID" / Operator "!IN" / Value [$SenderTypeID1]',
         Search   => {
             'AND' => [
                 {
@@ -5517,7 +5616,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field SenderTypeID / Operator LT / Value $SenderTypeID2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "SenderTypeID" / Operator "LT" / Value $SenderTypeID2',
         Search   => {
             'AND' => [
                 {
@@ -5531,7 +5630,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => []
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field SenderTypeID / Operator LTE / Value $SenderTypeID2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "SenderTypeID" / Operator "LTE" / Value $SenderTypeID2',
         Search   => {
             'AND' => [
                 {
@@ -5545,7 +5644,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field SenderTypeID / Operator GT / Value $SenderTypeID2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "SenderTypeID" / Operator "GT" / Value $SenderTypeID2',
         Search   => {
             'AND' => [
                 {
@@ -5559,7 +5658,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => []
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field SenderTypeID / Operator GTE / Value $SenderTypeID2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "SenderTypeID" / Operator "GTE" / Value $SenderTypeID2',
         Search   => {
             'AND' => [
                 {
@@ -5573,7 +5672,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field SenderType / Operator EQ / Value $SenderTypeName2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "SenderType" / Operator "EQ" / Value $SenderTypeName2',
         Search   => {
             'AND' => [
                 {
@@ -5587,7 +5686,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field SenderType / Operator NE / Value $SenderTypeName2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "SenderType" / Operator "NE" / Value $SenderTypeName2',
         Search   => {
             'AND' => [
                 {
@@ -5601,7 +5700,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1,$TicketID3]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field SenderType / Operator IN / Value [$SenderTypeName1]',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "SenderType" / Operator "IN" / Value [$SenderTypeName1]',
         Search   => {
             'AND' => [
                 {
@@ -5615,7 +5714,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field SenderType / Operator !IN / Value [$SenderTypeName1]',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "SenderType" / Operator "!IN" / Value [$SenderTypeName1]',
         Search   => {
             'AND' => [
                 {
@@ -5629,7 +5728,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field SenderType / Operator STARTSWITH / Value $SenderTypeName2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "SenderType" / Operator "STARTSWITH" / Value $SenderTypeName2',
         Search   => {
             'AND' => [
                 {
@@ -5643,7 +5742,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field SenderType / Operator STARTSWITH / Value substr($SenderTypeName2,0,2)',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "SenderType" / Operator "STARTSWITH" / Value substr($SenderTypeName2,0,2)',
         Search   => {
             'AND' => [
                 {
@@ -5657,7 +5756,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field SenderType / Operator ENDSWITH / Value $SenderTypeName2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "SenderType" / Operator "ENDSWITH" / Value $SenderTypeName2',
         Search   => {
             'AND' => [
                 {
@@ -5671,7 +5770,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field SenderType / Operator ENDSWITH / Value substr($SenderTypeName2,-2)',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "SenderType" / Operator "ENDSWITH" / Value substr($SenderTypeName2,-2)',
         Search   => {
             'AND' => [
                 {
@@ -5685,7 +5784,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field SenderType / Operator CONTAINS / Value $SenderTypeName2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "SenderType" / Operator "CONTAINS" / Value $SenderTypeName2',
         Search   => {
             'AND' => [
                 {
@@ -5699,7 +5798,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field SenderType / Operator CONTAINS / Value substr($SenderTypeName2,1,-1)',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "SenderType" / Operator "CONTAINS" / Value substr($SenderTypeName2,1,-1)',
         Search   => {
             'AND' => [
                 {
@@ -5713,7 +5812,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field SenderType / Operator LIKE / Value $SenderTypeName2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "SenderType" / Operator "LIKE" / Value $SenderTypeName2',
         Search   => {
             'AND' => [
                 {
@@ -5727,7 +5826,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field SenderType / Operator EQ / Value $SenderTypeName2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "SenderType" / Operator "EQ" / Value $SenderTypeName2',
         Search   => {
             'AND' => [
                 {
@@ -5741,7 +5840,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field SenderType / Operator NE / Value $SenderTypeName2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "SenderType" / Operator "NE" / Value $SenderTypeName2',
         Search   => {
             'AND' => [
                 {
@@ -5755,7 +5854,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1,$TicketID3]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field SenderType / Operator IN / Value [$SenderTypeName1]',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "SenderType" / Operator "IN" / Value [$SenderTypeName1]',
         Search   => {
             'AND' => [
                 {
@@ -5769,7 +5868,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => []
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field SenderType / Operator !IN / Value [$SenderTypeName1]',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "SenderType" / Operator "!IN" / Value [$SenderTypeName1]',
         Search   => {
             'AND' => [
                 {
@@ -5783,7 +5882,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field SenderType / Operator STARTSWITH / Value $SenderTypeName2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "SenderType" / Operator "STARTSWITH" / Value $SenderTypeName2',
         Search   => {
             'AND' => [
                 {
@@ -5797,7 +5896,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field SenderType / Operator STARTSWITH / Value substr($SenderTypeName2,0,2)',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "SenderType" / Operator "STARTSWITH" / Value substr($SenderTypeName2,0,2)',
         Search   => {
             'AND' => [
                 {
@@ -5811,7 +5910,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field SenderType / Operator ENDSWITH / Value $SenderTypeName2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "SenderType" / Operator "ENDSWITH" / Value $SenderTypeName2',
         Search   => {
             'AND' => [
                 {
@@ -5825,7 +5924,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field SenderType / Operator ENDSWITH / Value substr($SenderTypeName2,-2)',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "SenderType" / Operator "ENDSWITH" / Value substr($SenderTypeName2,-2)',
         Search   => {
             'AND' => [
                 {
@@ -5839,7 +5938,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field SenderType / Operator CONTAINS / Value $SenderTypeName2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "SenderType" / Operator "CONTAINS" / Value $SenderTypeName2',
         Search   => {
             'AND' => [
                 {
@@ -5853,7 +5952,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field SenderType / Operator CONTAINS / Value substr($SenderTypeName2,1,-1)',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "SenderType" / Operator "CONTAINS" / Value substr($SenderTypeName2,1,-1)',
         Search   => {
             'AND' => [
                 {
@@ -5867,7 +5966,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field SenderType / Operator LIKE / Value $SenderTypeName2',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "SenderType" / Operator "LIKE" / Value $SenderTypeName2',
         Search   => {
             'AND' => [
                 {
@@ -5881,7 +5980,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field CustomerVisible / Operator EQ / Value 0',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "CustomerVisible" / Operator "EQ" / Value 0',
         Search   => {
             'AND' => [
                 {
@@ -5895,7 +5994,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1,$TicketID3]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field CustomerVisible / Operator NE / Value 0',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "CustomerVisible" / Operator "NE" / Value 0',
         Search   => {
             'AND' => [
                 {
@@ -5909,7 +6008,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field CustomerVisible / Operator IN / Value [1]',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "CustomerVisible" / Operator "IN" / Value [1]',
         Search   => {
             'AND' => [
                 {
@@ -5923,7 +6022,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field CustomerVisible / Operator !IN / Value [1]',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "CustomerVisible" / Operator "!IN" / Value [1]',
         Search   => {
             'AND' => [
                 {
@@ -5937,7 +6036,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field CustomerVisible / Operator LT / Value 1',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "CustomerVisible" / Operator "LT" / Value 1',
         Search   => {
             'AND' => [
                 {
@@ -5951,7 +6050,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field CustomerVisible / Operator LTE / Value 1',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "CustomerVisible" / Operator "LTE" / Value 1',
         Search   => {
             'AND' => [
                 {
@@ -5965,7 +6064,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1,$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field CustomerVisible / Operator GT / Value 0',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "CustomerVisible" / Operator "GT" / Value 0',
         Search   => {
             'AND' => [
                 {
@@ -5979,7 +6078,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field CustomerVisible / Operator GTE / Value 0',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "CustomerVisible" / Operator "GTE" / Value 0',
         Search   => {
             'AND' => [
                 {
@@ -5993,7 +6092,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1,$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field CustomerVisible / Operator EQ / Value 0',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "CustomerVisible" / Operator "EQ" / Value 0',
         Search   => {
             'AND' => [
                 {
@@ -6007,7 +6106,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1,$TicketID3]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field CustomerVisible / Operator NE / Value 0',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "CustomerVisible" / Operator "NE" / Value 0',
         Search   => {
             'AND' => [
                 {
@@ -6021,7 +6120,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field CustomerVisible / Operator IN / Value [1]',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "CustomerVisible" / Operator "IN" / Value [1]',
         Search   => {
             'AND' => [
                 {
@@ -6035,7 +6134,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field CustomerVisible / Operator !IN / Value [1]',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "CustomerVisible" / Operator "!IN" / Value [1]',
         Search   => {
             'AND' => [
                 {
@@ -6049,7 +6148,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => []
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field CustomerVisible / Operator LT / Value 1',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "CustomerVisible" / Operator "LT" / Value 1',
         Search   => {
             'AND' => [
                 {
@@ -6063,7 +6162,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => []
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field CustomerVisible / Operator LTE / Value 1',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "CustomerVisible" / Operator "LTE" / Value 1',
         Search   => {
             'AND' => [
                 {
@@ -6077,7 +6176,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field CustomerVisible / Operator GT / Value 0',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "CustomerVisible" / Operator "GT" / Value 0',
         Search   => {
             'AND' => [
                 {
@@ -6091,7 +6190,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field CustomerVisible / Operator GTE / Value 0',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "CustomerVisible" / Operator "GTE" / Value 0',
         Search   => {
             'AND' => [
                 {
@@ -6105,7 +6204,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field From / Operator EQ / Value "customer customer@external.com"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "From" / Operator "EQ" / Value "customer customer@external.com"',
         Search   => {
             'AND' => [
                 {
@@ -6119,7 +6218,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field From / Operator NE / Value "customer customer@external.com"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "From" / Operator "NE" / Value "customer customer@external.com"',
         Search   => {
             'AND' => [
                 {
@@ -6133,7 +6232,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1,$TicketID3]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field From / Operator IN / Value ["agent agent@kixdesk.com"]',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "From" / Operator "IN" / Value ["agent agent@kixdesk.com"]',
         Search   => {
             'AND' => [
                 {
@@ -6147,7 +6246,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field From / Operator !IN / Value ["agent agent@kixdesk.com"]',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "From" / Operator "!IN" / Value ["agent agent@kixdesk.com"]',
         Search   => {
             'AND' => [
                 {
@@ -6161,7 +6260,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field From / Operator STARTSWITH / Value "customer customer@external.com"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "From" / Operator "STARTSWITH" / Value "customer customer@external.com"',
         Search   => {
             'AND' => [
                 {
@@ -6175,7 +6274,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field From / Operator STARTSWITH / Value "customer"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "From" / Operator "STARTSWITH" / Value "customer"',
         Search   => {
             'AND' => [
                 {
@@ -6189,7 +6288,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field From / Operator ENDSWITH / Value "customer customer@external.com"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "From" / Operator "ENDSWITH" / Value "customer customer@external.com"',
         Search   => {
             'AND' => [
                 {
@@ -6203,7 +6302,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field From / Operator ENDSWITH / Value "external.com"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "From" / Operator "ENDSWITH" / Value "external.com"',
         Search   => {
             'AND' => [
                 {
@@ -6217,7 +6316,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field From / Operator CONTAINS / Value "customer customer@external.com"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "From" / Operator "CONTAINS" / Value "customer customer@external.com"',
         Search   => {
             'AND' => [
                 {
@@ -6231,7 +6330,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field From / Operator CONTAINS / Value "mer@ext"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "From" / Operator "CONTAINS" / Value "mer@ext"',
         Search   => {
             'AND' => [
                 {
@@ -6245,7 +6344,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field From / Operator LIKE / Value "customer customer@external.com"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "From" / Operator "LIKE" / Value "customer customer@external.com"',
         Search   => {
             'AND' => [
                 {
@@ -6259,7 +6358,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field From / Operator EQ / Value "customer customer@external.com"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "From" / Operator "EQ" / Value "customer customer@external.com"',
         Search   => {
             'AND' => [
                 {
@@ -6273,7 +6372,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field From / Operator NE / Value "customer customer@external.com"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "From" / Operator "NE" / Value "customer customer@external.com"',
         Search   => {
             'AND' => [
                 {
@@ -6287,7 +6386,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1,$TicketID3]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field From / Operator IN / Value ["agent agent@kixdesk.com"]',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "From" / Operator "IN" / Value ["agent agent@kixdesk.com"]',
         Search   => {
             'AND' => [
                 {
@@ -6301,7 +6400,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => []
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field From / Operator !IN / Value ["agent agent@kixdesk.com"]',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "From" / Operator "!IN" / Value ["agent agent@kixdesk.com"]',
         Search   => {
             'AND' => [
                 {
@@ -6315,7 +6414,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field From / Operator STARTSWITH / Value "customer customer@external.com"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "From" / Operator "STARTSWITH" / Value "customer customer@external.com"',
         Search   => {
             'AND' => [
                 {
@@ -6329,7 +6428,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field From / Operator STARTSWITH / Value "customer"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "From" / Operator "STARTSWITH" / Value "customer"',
         Search   => {
             'AND' => [
                 {
@@ -6343,7 +6442,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field From / Operator ENDSWITH / Value "customer customer@external.com"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "From" / Operator "ENDSWITH" / Value "customer customer@external.com"',
         Search   => {
             'AND' => [
                 {
@@ -6357,7 +6456,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field From / Operator ENDSWITH / Value "external.com"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "From" / Operator "ENDSWITH" / Value "external.com"',
         Search   => {
             'AND' => [
                 {
@@ -6371,7 +6470,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field From / Operator CONTAINS / Value "customer customer@external.com"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "From" / Operator "CONTAINS" / Value "customer customer@external.com"',
         Search   => {
             'AND' => [
                 {
@@ -6385,7 +6484,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field From / Operator CONTAINS / Value "mer@ext"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "From" / Operator "CONTAINS" / Value "mer@ext"',
         Search   => {
             'AND' => [
                 {
@@ -6399,7 +6498,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field From / Operator LIKE / Value "customer customer@external.com"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "From" / Operator "LIKE" / Value "customer customer@external.com"',
         Search   => {
             'AND' => [
                 {
@@ -6413,7 +6512,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field To / Operator EQ / Value "agent agent@kixdesk.com"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "To" / Operator "EQ" / Value "agent agent@kixdesk.com"',
         Search   => {
             'AND' => [
                 {
@@ -6427,7 +6526,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field To / Operator NE / Value "agent agent@kixdesk.com"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "To" / Operator "NE" / Value "agent agent@kixdesk.com"',
         Search   => {
             'AND' => [
                 {
@@ -6441,7 +6540,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1,$TicketID3]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field To / Operator IN / Value ["customer customer@external.com"]',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "To" / Operator "IN" / Value ["customer customer@external.com"]',
         Search   => {
             'AND' => [
                 {
@@ -6455,7 +6554,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field To / Operator !IN / Value ["customer customer@external.com"]',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "To" / Operator "!IN" / Value ["customer customer@external.com"]',
         Search   => {
             'AND' => [
                 {
@@ -6469,7 +6568,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field To / Operator STARTSWITH / Value "agent agent@kixdesk.com"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "To" / Operator "STARTSWITH" / Value "agent agent@kixdesk.com"',
         Search   => {
             'AND' => [
                 {
@@ -6483,7 +6582,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field To / Operator STARTSWITH / Value "agent"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "To" / Operator "STARTSWITH" / Value "agent"',
         Search   => {
             'AND' => [
                 {
@@ -6497,7 +6596,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field To / Operator ENDSWITH / Value "agent agent@kixdesk.com"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "To" / Operator "ENDSWITH" / Value "agent agent@kixdesk.com"',
         Search   => {
             'AND' => [
                 {
@@ -6511,7 +6610,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field To / Operator ENDSWITH / Value "kixdesk.com"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "To" / Operator "ENDSWITH" / Value "kixdesk.com"',
         Search   => {
             'AND' => [
                 {
@@ -6525,7 +6624,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field To / Operator CONTAINS / Value "agent agent@kixdesk.com"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "To" / Operator "CONTAINS" / Value "agent agent@kixdesk.com"',
         Search   => {
             'AND' => [
                 {
@@ -6539,7 +6638,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field To / Operator CONTAINS / Value "ent@kix"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "To" / Operator "CONTAINS" / Value "ent@kix"',
         Search   => {
             'AND' => [
                 {
@@ -6553,7 +6652,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field To / Operator LIKE / Value "agent agent@kixdesk.com"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "To" / Operator "LIKE" / Value "agent agent@kixdesk.com"',
         Search   => {
             'AND' => [
                 {
@@ -6567,7 +6666,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field To / Operator EQ / Value "agent agent@kixdesk.com"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "To" / Operator "EQ" / Value "agent agent@kixdesk.com"',
         Search   => {
             'AND' => [
                 {
@@ -6581,7 +6680,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field To / Operator NE / Value "agent agent@kixdesk.com"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "To" / Operator "NE" / Value "agent agent@kixdesk.com"',
         Search   => {
             'AND' => [
                 {
@@ -6595,7 +6694,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1,$TicketID3]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field To / Operator IN / Value ["customer customer@external.com"]',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "To" / Operator "IN" / Value ["customer customer@external.com"]',
         Search   => {
             'AND' => [
                 {
@@ -6609,7 +6708,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => []
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field To / Operator !IN / Value ["customer customer@external.com"]',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "To" / Operator "!IN" / Value ["customer customer@external.com"]',
         Search   => {
             'AND' => [
                 {
@@ -6623,7 +6722,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field To / Operator STARTSWITH / Value "agent agent@kixdesk.com"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "To" / Operator "STARTSWITH" / Value "agent agent@kixdesk.com"',
         Search   => {
             'AND' => [
                 {
@@ -6637,7 +6736,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field To / Operator STARTSWITH / Value "agent"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "To" / Operator "STARTSWITH" / Value "agent"',
         Search   => {
             'AND' => [
                 {
@@ -6651,7 +6750,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field To / Operator ENDSWITH / Value "agent agent@kixdesk.com"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "To" / Operator "ENDSWITH" / Value "agent agent@kixdesk.com"',
         Search   => {
             'AND' => [
                 {
@@ -6665,7 +6764,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field To / Operator ENDSWITH / Value "kixdesk.com"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "To" / Operator "ENDSWITH" / Value "kixdesk.com"',
         Search   => {
             'AND' => [
                 {
@@ -6679,7 +6778,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field To / Operator CONTAINS / Value "agent agent@kixdesk.com"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "To" / Operator "CONTAINS" / Value "agent agent@kixdesk.com"',
         Search   => {
             'AND' => [
                 {
@@ -6693,7 +6792,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field To / Operator CONTAINS / Value "ent@kix"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "To" / Operator "CONTAINS" / Value "ent@kix"',
         Search   => {
             'AND' => [
                 {
@@ -6707,7 +6806,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field To / Operator LIKE / Value "agent agent@kixdesk.com"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "To" / Operator "LIKE" / Value "agent agent@kixdesk.com"',
         Search   => {
             'AND' => [
                 {
@@ -6721,7 +6820,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field Cc / Operator EQ / Value "external external@external.com"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "Cc" / Operator "EQ" / Value "external external@external.com"',
         Search   => {
             'AND' => [
                 {
@@ -6735,7 +6834,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1,$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field Cc / Operator NE / Value "external external@external.com"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "Cc" / Operator "NE" / Value "external external@external.com"',
         Search   => {
             'AND' => [
                 {
@@ -6749,7 +6848,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID3]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field Cc / Operator IN / Value ["external external@external.com"]',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "Cc" / Operator "IN" / Value ["external external@external.com"]',
         Search   => {
             'AND' => [
                 {
@@ -6763,7 +6862,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1,$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field Cc / Operator !IN / Value ["external external@external.com"]',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "Cc" / Operator "!IN" / Value ["external external@external.com"]',
         Search   => {
             'AND' => [
                 {
@@ -6777,7 +6876,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => []
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field Cc / Operator STARTSWITH / Value "external external@external.com"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "Cc" / Operator "STARTSWITH" / Value "external external@external.com"',
         Search   => {
             'AND' => [
                 {
@@ -6791,7 +6890,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1,$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field Cc / Operator STARTSWITH / Value "external"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "Cc" / Operator "STARTSWITH" / Value "external"',
         Search   => {
             'AND' => [
                 {
@@ -6805,7 +6904,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1,$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field Cc / Operator ENDSWITH / Value "external external@external.com"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "Cc" / Operator "ENDSWITH" / Value "external external@external.com"',
         Search   => {
             'AND' => [
                 {
@@ -6819,7 +6918,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1,$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field Cc / Operator ENDSWITH / Value "external.com"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "Cc" / Operator "ENDSWITH" / Value "external.com"',
         Search   => {
             'AND' => [
                 {
@@ -6833,7 +6932,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1,$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field Cc / Operator CONTAINS / Value "external external@external.com"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "Cc" / Operator "CONTAINS" / Value "external external@external.com"',
         Search   => {
             'AND' => [
                 {
@@ -6847,7 +6946,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1,$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field Cc / Operator CONTAINS / Value "nal@ext"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "Cc" / Operator "CONTAINS" / Value "nal@ext"',
         Search   => {
             'AND' => [
                 {
@@ -6861,7 +6960,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1,$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field Cc / Operator LIKE / Value "external external@external.com"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "Cc" / Operator "LIKE" / Value "external external@external.com"',
         Search   => {
             'AND' => [
                 {
@@ -6875,7 +6974,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1,$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field Cc / Operator EQ / Value "external external@external.com"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "Cc" / Operator "EQ" / Value "external external@external.com"',
         Search   => {
             'AND' => [
                 {
@@ -6889,7 +6988,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field Cc / Operator NE / Value "external external@external.com"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "Cc" / Operator "NE" / Value "external external@external.com"',
         Search   => {
             'AND' => [
                 {
@@ -6903,7 +7002,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1,$TicketID3]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field Cc / Operator IN / Value ["external external@external.com"]',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "Cc" / Operator "IN" / Value ["external external@external.com"]',
         Search   => {
             'AND' => [
                 {
@@ -6917,7 +7016,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field Cc / Operator !IN / Value ["external external@external.com"]',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "Cc" / Operator "!IN" / Value ["external external@external.com"]',
         Search   => {
             'AND' => [
                 {
@@ -6931,7 +7030,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => []
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field Cc / Operator STARTSWITH / Value "external external@external.com"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "Cc" / Operator "STARTSWITH" / Value "external external@external.com"',
         Search   => {
             'AND' => [
                 {
@@ -6945,7 +7044,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field Cc / Operator STARTSWITH / Value "external"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "Cc" / Operator "STARTSWITH" / Value "external"',
         Search   => {
             'AND' => [
                 {
@@ -6959,7 +7058,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field Cc / Operator ENDSWITH / Value "external external@external.com"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "Cc" / Operator "ENDSWITH" / Value "external external@external.com"',
         Search   => {
             'AND' => [
                 {
@@ -6973,7 +7072,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field Cc / Operator ENDSWITH / Value "external.com"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "Cc" / Operator "ENDSWITH" / Value "external.com"',
         Search   => {
             'AND' => [
                 {
@@ -6987,7 +7086,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field Cc / Operator CONTAINS / Value "external external@external.com"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "Cc" / Operator "CONTAINS" / Value "external external@external.com"',
         Search   => {
             'AND' => [
                 {
@@ -7001,7 +7100,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field Cc / Operator CONTAINS / Value "nal@ext"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "Cc" / Operator "CONTAINS" / Value "nal@ext"',
         Search   => {
             'AND' => [
                 {
@@ -7015,7 +7114,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field Cc / Operator LIKE / Value "external external@external.com"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "Cc" / Operator "LIKE" / Value "external external@external.com"',
         Search   => {
             'AND' => [
                 {
@@ -7029,7 +7128,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field Subject / Operator EQ / Value "Test2"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "Subject" / Operator "EQ" / Value "Test2"',
         Search   => {
             'AND' => [
                 {
@@ -7043,7 +7142,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field Subject / Operator NE / Value "Test2"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "Subject" / Operator "NE" / Value "Test2"',
         Search   => {
             'AND' => [
                 {
@@ -7057,7 +7156,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1,$TicketID3]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field Subject / Operator IN / Value ["Test1"]',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "Subject" / Operator "IN" / Value ["Test1"]',
         Search   => {
             'AND' => [
                 {
@@ -7071,7 +7170,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field Subject / Operator !IN / Value ["Test1"]',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "Subject" / Operator "!IN" / Value ["Test1"]',
         Search   => {
             'AND' => [
                 {
@@ -7085,7 +7184,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field Subject / Operator STARTSWITH / Value "Test2"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "Subject" / Operator "STARTSWITH" / Value "Test2"',
         Search   => {
             'AND' => [
                 {
@@ -7099,7 +7198,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field Subject / Operator STARTSWITH / Value "Test"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "Subject" / Operator "STARTSWITH" / Value "Test"',
         Search   => {
             'AND' => [
                 {
@@ -7113,7 +7212,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1,$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field Subject / Operator ENDSWITH / Value "Test2"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "Subject" / Operator "ENDSWITH" / Value "Test2"',
         Search   => {
             'AND' => [
                 {
@@ -7127,7 +7226,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field Subject / Operator ENDSWITH / Value "t2"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "Subject" / Operator "ENDSWITH" / Value "t2"',
         Search   => {
             'AND' => [
                 {
@@ -7141,7 +7240,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field Subject / Operator CONTAINS / Value "Test2"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "Subject" / Operator "CONTAINS" / Value "Test2"',
         Search   => {
             'AND' => [
                 {
@@ -7155,7 +7254,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field Subject / Operator CONTAINS / Value "est"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "Subject" / Operator "CONTAINS" / Value "est"',
         Search   => {
             'AND' => [
                 {
@@ -7169,7 +7268,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1,$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field Subject / Operator LIKE / Value "Test2"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "Subject" / Operator "LIKE" / Value "Test2"',
         Search   => {
             'AND' => [
                 {
@@ -7183,7 +7282,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field Subject / Operator EQ / Value "Test2"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "Subject" / Operator "EQ" / Value "Test2"',
         Search   => {
             'AND' => [
                 {
@@ -7197,7 +7296,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field Subject / Operator NE / Value "Test2"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "Subject" / Operator "NE" / Value "Test2"',
         Search   => {
             'AND' => [
                 {
@@ -7211,7 +7310,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1,$TicketID3]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field Subject / Operator IN / Value ["Test1"]',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "Subject" / Operator "IN" / Value ["Test1"]',
         Search   => {
             'AND' => [
                 {
@@ -7225,7 +7324,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => []
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field Subject / Operator !IN / Value ["Test1"]',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "Subject" / Operator "!IN" / Value ["Test1"]',
         Search   => {
             'AND' => [
                 {
@@ -7239,7 +7338,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field Subject / Operator STARTSWITH / Value "Test2"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "Subject" / Operator "STARTSWITH" / Value "Test2"',
         Search   => {
             'AND' => [
                 {
@@ -7253,7 +7352,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field Subject / Operator STARTSWITH / Value "Test"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "Subject" / Operator "STARTSWITH" / Value "Test"',
         Search   => {
             'AND' => [
                 {
@@ -7267,7 +7366,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field Subject / Operator ENDSWITH / Value "Test2"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "Subject" / Operator "ENDSWITH" / Value "Test2"',
         Search   => {
             'AND' => [
                 {
@@ -7281,7 +7380,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field Subject / Operator ENDSWITH / Value "t2"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "Subject" / Operator "ENDSWITH" / Value "t2"',
         Search   => {
             'AND' => [
                 {
@@ -7295,7 +7394,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field Subject / Operator CONTAINS / Value "Test2"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "Subject" / Operator "CONTAINS" / Value "Test2"',
         Search   => {
             'AND' => [
                 {
@@ -7309,7 +7408,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field Subject / Operator CONTAINS / Value "est"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "Subject" / Operator "CONTAINS" / Value "est"',
         Search   => {
             'AND' => [
                 {
@@ -7323,7 +7422,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field Subject / Operator LIKE / Value "Test2"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "Subject" / Operator "LIKE" / Value "Test2"',
         Search   => {
             'AND' => [
                 {
@@ -7337,7 +7436,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field Body / Operator EQ / Value "Test"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "Body" / Operator "EQ" / Value "Test"',
         Search   => {
             'AND' => [
                 {
@@ -7351,7 +7450,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1,$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field Body / Operator NE / Value "Test"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "Body" / Operator "NE" / Value "Test"',
         Search   => {
             'AND' => [
                 {
@@ -7365,7 +7464,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID3]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field Body / Operator IN / Value ["Test"]',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "Body" / Operator "IN" / Value ["Test"]',
         Search   => {
             'AND' => [
                 {
@@ -7379,7 +7478,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1,$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field Body / Operator !IN / Value ["Test"]',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "Body" / Operator "!IN" / Value ["Test"]',
         Search   => {
             'AND' => [
                 {
@@ -7393,7 +7492,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => []
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field Body / Operator STARTSWITH / Value "Test"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "Body" / Operator "STARTSWITH" / Value "Test"',
         Search   => {
             'AND' => [
                 {
@@ -7407,7 +7506,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1,$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field Body / Operator STARTSWITH / Value "Tes"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "Body" / Operator "STARTSWITH" / Value "Tes"',
         Search   => {
             'AND' => [
                 {
@@ -7421,7 +7520,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1,$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field Body / Operator ENDSWITH / Value "Test"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "Body" / Operator "ENDSWITH" / Value "Test"',
         Search   => {
             'AND' => [
                 {
@@ -7435,7 +7534,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1,$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field Body / Operator ENDSWITH / Value "st"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "Body" / Operator "ENDSWITH" / Value "st"',
         Search   => {
             'AND' => [
                 {
@@ -7449,7 +7548,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1,$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field Body / Operator CONTAINS / Value "Test"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "Body" / Operator "CONTAINS" / Value "Test"',
         Search   => {
             'AND' => [
                 {
@@ -7463,7 +7562,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1,$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field Body / Operator CONTAINS / Value "es"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "Body" / Operator "CONTAINS" / Value "es"',
         Search   => {
             'AND' => [
                 {
@@ -7477,7 +7576,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1,$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field Body / Operator LIKE / Value "Test"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "Body" / Operator "LIKE" / Value "Test"',
         Search   => {
             'AND' => [
                 {
@@ -7491,7 +7590,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1,$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field Body / Operator EQ / Value "Test"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "Body" / Operator "EQ" / Value "Test"',
         Search   => {
             'AND' => [
                 {
@@ -7505,7 +7604,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field Body / Operator NE / Value "Test"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "Body" / Operator "NE" / Value "Test"',
         Search   => {
             'AND' => [
                 {
@@ -7519,7 +7618,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1,$TicketID3]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field Body / Operator IN / Value ["Test"]',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "Body" / Operator "IN" / Value ["Test"]',
         Search   => {
             'AND' => [
                 {
@@ -7533,7 +7632,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field Body / Operator !IN / Value ["Test"]',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "Body" / Operator "!IN" / Value ["Test"]',
         Search   => {
             'AND' => [
                 {
@@ -7547,7 +7646,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => []
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field Body / Operator STARTSWITH / Value "Test"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "Body" / Operator "STARTSWITH" / Value "Test"',
         Search   => {
             'AND' => [
                 {
@@ -7561,7 +7660,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field Body / Operator STARTSWITH / Value "Tes"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "Body" / Operator "STARTSWITH" / Value "Tes"',
         Search   => {
             'AND' => [
                 {
@@ -7575,7 +7674,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field Body / Operator ENDSWITH / Value "Test"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "Body" / Operator "ENDSWITH" / Value "Test"',
         Search   => {
             'AND' => [
                 {
@@ -7589,7 +7688,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field Body / Operator ENDSWITH / Value "st"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "Body" / Operator "ENDSWITH" / Value "st"',
         Search   => {
             'AND' => [
                 {
@@ -7603,7 +7702,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field Body / Operator CONTAINS / Value "Test"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "Body" / Operator "CONTAINS" / Value "Test"',
         Search   => {
             'AND' => [
                 {
@@ -7617,7 +7716,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field Body / Operator CONTAINS / Value "es"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "Body" / Operator "CONTAINS" / Value "es"',
         Search   => {
             'AND' => [
                 {
@@ -7631,7 +7730,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field Body / Operator LIKE / Value "Test"',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "Body" / Operator "LIKE" / Value "Test"',
         Search   => {
             'AND' => [
                 {
@@ -7645,7 +7744,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field ArticleCreateTime / Operator EQ / Value 2014-01-01 12:01:00',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "ArticleCreateTime" / Operator "EQ" / Value 2014-01-01 12:01:00',
         Search   => {
             'AND' => [
                 {
@@ -7659,7 +7758,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field ArticleCreateTime / Operator EQ / Value -1m',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "ArticleCreateTime" / Operator "EQ" / Value -1m',
         Search   => {
             'AND' => [
                 {
@@ -7673,7 +7772,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field ArticleCreateTime / Operator LT / Value 2014-01-01 12:01:00',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "ArticleCreateTime" / Operator "LT" / Value 2014-01-01 12:01:00',
         Search   => {
             'AND' => [
                 {
@@ -7687,7 +7786,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field ArticleCreateTime / Operator LT / Value -1m',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "ArticleCreateTime" / Operator "LT" / Value -1m',
         Search   => {
             'AND' => [
                 {
@@ -7701,7 +7800,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field ArticleCreateTime / Operator GT / Value 2014-01-01 12:01:00',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "ArticleCreateTime" / Operator "GT" / Value 2014-01-01 12:01:00',
         Search   => {
             'AND' => [
                 {
@@ -7715,7 +7814,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => []
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field ArticleCreateTime / Operator GT / Value -1m',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "ArticleCreateTime" / Operator "GT" / Value -1m',
         Search   => {
             'AND' => [
                 {
@@ -7729,7 +7828,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => []
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field ArticleCreateTime / Operator LTE / Value 2014-01-01 12:01:00',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "ArticleCreateTime" / Operator "LTE" / Value 2014-01-01 12:01:00',
         Search   => {
             'AND' => [
                 {
@@ -7743,7 +7842,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1, $TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field ArticleCreateTime / Operator LTE / Value -1m',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "ArticleCreateTime" / Operator "LTE" / Value -1m',
         Search   => {
             'AND' => [
                 {
@@ -7757,7 +7856,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID1, $TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field ArticleCreateTime / Operator GTE / Value2014-01-01 12:01:00',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "ArticleCreateTime" / Operator "GTE" / Value2014-01-01 12:01:00',
         Search   => {
             'AND' => [
                 {
@@ -7771,7 +7870,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Agent / Field ArticleCreateTime / Operator GTE / Value -1m',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Agent" / Field "ArticleCreateTime" / Operator "GTE" / Value -1m',
         Search   => {
             'AND' => [
                 {
@@ -7785,7 +7884,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field ArticleCreateTime / Operator EQ / Value 2014-01-01 12:01:00',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "ArticleCreateTime" / Operator "EQ" / Value 2014-01-01 12:01:00',
         Search   => {
             'AND' => [
                 {
@@ -7799,7 +7898,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field ArticleCreateTime / Operator EQ / Value -1m',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "ArticleCreateTime" / Operator "EQ" / Value -1m',
         Search   => {
             'AND' => [
                 {
@@ -7813,7 +7912,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field ArticleCreateTime / Operator LT / Value 2014-01-01 12:01:00',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "ArticleCreateTime" / Operator "LT" / Value 2014-01-01 12:01:00',
         Search   => {
             'AND' => [
                 {
@@ -7827,7 +7926,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => []
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field ArticleCreateTime / Operator LT / Value -1m',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "ArticleCreateTime" / Operator "LT" / Value -1m',
         Search   => {
             'AND' => [
                 {
@@ -7841,7 +7940,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => []
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field ArticleCreateTime / Operator GT / Value 2014-01-01 12:01:00',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "ArticleCreateTime" / Operator "GT" / Value 2014-01-01 12:01:00',
         Search   => {
             'AND' => [
                 {
@@ -7855,7 +7954,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => []
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field ArticleCreateTime / Operator GT / Value -1m',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "ArticleCreateTime" / Operator "GT" / Value -1m',
         Search   => {
             'AND' => [
                 {
@@ -7869,7 +7968,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => []
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field ArticleCreateTime / Operator LTE / Value 2014-01-01 12:01:00',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "ArticleCreateTime" / Operator "LTE" / Value 2014-01-01 12:01:00',
         Search   => {
             'AND' => [
                 {
@@ -7883,7 +7982,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field ArticleCreateTime / Operator LTE / Value -1m',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "ArticleCreateTime" / Operator "LTE" / Value -1m',
         Search   => {
             'AND' => [
                 {
@@ -7897,7 +7996,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field ArticleCreateTime / Operator GTE / Value2014-01-01 12:01:00',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "ArticleCreateTime" / Operator "GTE" / Value2014-01-01 12:01:00',
         Search   => {
             'AND' => [
                 {
@@ -7911,7 +8010,7 @@ my @IntegrationSearchTestsStaticDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule StaticDB / UserType Customer / Field ArticleCreateTime / Operator GTE / Value -1m',
+        Name     => 'Search: SearchIndexModule StaticDB / UserType "Customer" / Field "ArticleCreateTime" / Operator "GTE" / Value -1m',
         Search   => {
             'AND' => [
                 {
@@ -7954,7 +8053,7 @@ $Kernel::OM->Get('Cache')->CleanUp(
 # test Search for RuntimeDB
 my @IntegrationSearchTestsRuntimeDB = (
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field ArticleID / Operator EQ / Value $ArticleID2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "ArticleID" / Operator "EQ" / Value $ArticleID2',
         Search   => {
             'AND' => [
                 {
@@ -7968,7 +8067,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field ArticleID / Operator NE / Value $ArticleID2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "ArticleID" / Operator "NE" / Value $ArticleID2',
         Search   => {
             'AND' => [
                 {
@@ -7982,7 +8081,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1,$TicketID3]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field ArticleID / Operator IN / Value [$ArticleID1]',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "ArticleID" / Operator "IN" / Value [$ArticleID1]',
         Search   => {
             'AND' => [
                 {
@@ -7996,7 +8095,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field ArticleID / Operator !IN / Value [$ArticleID1]',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "ArticleID" / Operator "!IN" / Value [$ArticleID1]',
         Search   => {
             'AND' => [
                 {
@@ -8010,7 +8109,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field ArticleID / Operator LT / Value $ArticleID2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "ArticleID" / Operator "LT" / Value $ArticleID2',
         Search   => {
             'AND' => [
                 {
@@ -8024,7 +8123,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field ArticleID / Operator LTE / Value $ArticleID2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "ArticleID" / Operator "LTE" / Value $ArticleID2',
         Search   => {
             'AND' => [
                 {
@@ -8038,7 +8137,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1,$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field ArticleID / Operator GT / Value $ArticleID2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "ArticleID" / Operator "GT" / Value $ArticleID2',
         Search   => {
             'AND' => [
                 {
@@ -8052,7 +8151,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => []
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field ArticleID / Operator GTE / Value $ArticleID2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "ArticleID" / Operator "GTE" / Value $ArticleID2',
         Search   => {
             'AND' => [
                 {
@@ -8066,7 +8165,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field ArticleID / Operator EQ / Value $ArticleID2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "ArticleID" / Operator "EQ" / Value $ArticleID2',
         Search   => {
             'AND' => [
                 {
@@ -8080,7 +8179,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field ArticleID / Operator NE / Value $ArticleID2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "ArticleID" / Operator "NE" / Value $ArticleID2',
         Search   => {
             'AND' => [
                 {
@@ -8094,7 +8193,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1,$TicketID3]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field ArticleID / Operator IN / Value [$ArticleID1]',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "ArticleID" / Operator "IN" / Value [$ArticleID1]',
         Search   => {
             'AND' => [
                 {
@@ -8108,7 +8207,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => []
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field ArticleID / Operator !IN / Value [$ArticleID1]',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "ArticleID" / Operator "!IN" / Value [$ArticleID1]',
         Search   => {
             'AND' => [
                 {
@@ -8122,7 +8221,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field ArticleID / Operator LT / Value $ArticleID2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "ArticleID" / Operator "LT" / Value $ArticleID2',
         Search   => {
             'AND' => [
                 {
@@ -8136,7 +8235,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => []
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field ArticleID / Operator LTE / Value $ArticleID2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "ArticleID" / Operator "LTE" / Value $ArticleID2',
         Search   => {
             'AND' => [
                 {
@@ -8150,7 +8249,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field ArticleID / Operator GT / Value $ArticleID2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "ArticleID" / Operator "GT" / Value $ArticleID2',
         Search   => {
             'AND' => [
                 {
@@ -8164,7 +8263,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => []
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field ArticleID / Operator GTE / Value $ArticleID2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "ArticleID" / Operator "GTE" / Value $ArticleID2',
         Search   => {
             'AND' => [
                 {
@@ -8178,7 +8277,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field ChannelID / Operator EQ / Value $ChannelID2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "ChannelID" / Operator "EQ" / Value $ChannelID2',
         Search   => {
             'AND' => [
                 {
@@ -8192,7 +8291,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field ChannelID / Operator NE / Value $ChannelID2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "ChannelID" / Operator "NE" / Value $ChannelID2',
         Search   => {
             'AND' => [
                 {
@@ -8206,7 +8305,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1,$TicketID3]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field ChannelID / Operator IN / Value [$ChannelID1]',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "ChannelID" / Operator "IN" / Value [$ChannelID1]',
         Search   => {
             'AND' => [
                 {
@@ -8220,7 +8319,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field ChannelID / Operator !IN / Value [$ChannelID1]',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "ChannelID" / Operator "!IN" / Value [$ChannelID1]',
         Search   => {
             'AND' => [
                 {
@@ -8234,7 +8333,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field ChannelID / Operator LT / Value $ChannelID2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "ChannelID" / Operator "LT" / Value $ChannelID2',
         Search   => {
             'AND' => [
                 {
@@ -8248,7 +8347,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field ChannelID / Operator LTE / Value $ChannelID2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "ChannelID" / Operator "LTE" / Value $ChannelID2',
         Search   => {
             'AND' => [
                 {
@@ -8262,7 +8361,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1,$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field ChannelID / Operator GT / Value $ChannelID2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "ChannelID" / Operator "GT" / Value $ChannelID2',
         Search   => {
             'AND' => [
                 {
@@ -8276,7 +8375,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => []
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field ChannelID / Operator GTE / Value $ChannelID2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "ChannelID" / Operator "GTE" / Value $ChannelID2',
         Search   => {
             'AND' => [
                 {
@@ -8290,7 +8389,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field ChannelID / Operator EQ / Value $ChannelID2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "ChannelID" / Operator "EQ" / Value $ChannelID2',
         Search   => {
             'AND' => [
                 {
@@ -8304,7 +8403,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field ChannelID / Operator NE / Value $ChannelID2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "ChannelID" / Operator "NE" / Value $ChannelID2',
         Search   => {
             'AND' => [
                 {
@@ -8318,7 +8417,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1,$TicketID3]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field ChannelID / Operator IN / Value [$ChannelID1]',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "ChannelID" / Operator "IN" / Value [$ChannelID1]',
         Search   => {
             'AND' => [
                 {
@@ -8332,7 +8431,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => []
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field ChannelID / Operator !IN / Value [$ChannelID1]',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "ChannelID" / Operator "!IN" / Value [$ChannelID1]',
         Search   => {
             'AND' => [
                 {
@@ -8346,7 +8445,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field ChannelID / Operator LT / Value $ChannelID2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "ChannelID" / Operator "LT" / Value $ChannelID2',
         Search   => {
             'AND' => [
                 {
@@ -8360,7 +8459,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => []
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field ChannelID / Operator LTE / Value $ChannelID2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "ChannelID" / Operator "LTE" / Value $ChannelID2',
         Search   => {
             'AND' => [
                 {
@@ -8374,7 +8473,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field ChannelID / Operator GT / Value $ChannelID2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "ChannelID" / Operator "GT" / Value $ChannelID2',
         Search   => {
             'AND' => [
                 {
@@ -8388,7 +8487,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => []
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field ChannelID / Operator GTE / Value $ChannelID2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "ChannelID" / Operator "GTE" / Value $ChannelID2',
         Search   => {
             'AND' => [
                 {
@@ -8402,7 +8501,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field Channel / Operator EQ / Value $ChannelName2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "Channel" / Operator "EQ" / Value $ChannelName2',
         Search   => {
             'AND' => [
                 {
@@ -8416,7 +8515,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field Channel / Operator NE / Value $ChannelName2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "Channel" / Operator "NE" / Value $ChannelName2',
         Search   => {
             'AND' => [
                 {
@@ -8430,7 +8529,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1,$TicketID3]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field Channel / Operator IN / Value [$ChannelName1]',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "Channel" / Operator "IN" / Value [$ChannelName1]',
         Search   => {
             'AND' => [
                 {
@@ -8444,7 +8543,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field Channel / Operator !IN / Value [$ChannelName1]',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "Channel" / Operator "!IN" / Value [$ChannelName1]',
         Search   => {
             'AND' => [
                 {
@@ -8458,7 +8557,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field Channel / Operator STARTSWITH / Value $ChannelName2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "Channel" / Operator "STARTSWITH" / Value $ChannelName2',
         Search   => {
             'AND' => [
                 {
@@ -8472,7 +8571,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field Channel / Operator STARTSWITH / Value substr($ChannelName2,0,2)',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "Channel" / Operator "STARTSWITH" / Value substr($ChannelName2,0,2)',
         Search   => {
             'AND' => [
                 {
@@ -8486,7 +8585,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field Channel / Operator ENDSWITH / Value $ChannelName2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "Channel" / Operator "ENDSWITH" / Value $ChannelName2',
         Search   => {
             'AND' => [
                 {
@@ -8500,7 +8599,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field Channel / Operator ENDSWITH / Value substr($ChannelName2,-2)',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "Channel" / Operator "ENDSWITH" / Value substr($ChannelName2,-2)',
         Search   => {
             'AND' => [
                 {
@@ -8514,7 +8613,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field Channel / Operator CONTAINS / Value $ChannelName2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "Channel" / Operator "CONTAINS" / Value $ChannelName2',
         Search   => {
             'AND' => [
                 {
@@ -8528,7 +8627,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field Channel / Operator CONTAINS / Value substr($ChannelName2,1,-1)',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "Channel" / Operator "CONTAINS" / Value substr($ChannelName2,1,-1)',
         Search   => {
             'AND' => [
                 {
@@ -8542,7 +8641,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field Channel / Operator LIKE / Value $ChannelName2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "Channel" / Operator "LIKE" / Value $ChannelName2',
         Search   => {
             'AND' => [
                 {
@@ -8556,7 +8655,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field Channel / Operator EQ / Value $ChannelName2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "Channel" / Operator "EQ" / Value $ChannelName2',
         Search   => {
             'AND' => [
                 {
@@ -8570,7 +8669,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field Channel / Operator NE / Value $ChannelName2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "Channel" / Operator "NE" / Value $ChannelName2',
         Search   => {
             'AND' => [
                 {
@@ -8584,7 +8683,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1,$TicketID3]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field Channel / Operator IN / Value [$ChannelName1]',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "Channel" / Operator "IN" / Value [$ChannelName1]',
         Search   => {
             'AND' => [
                 {
@@ -8598,7 +8697,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => []
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field Channel / Operator !IN / Value [$ChannelName1]',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "Channel" / Operator "!IN" / Value [$ChannelName1]',
         Search   => {
             'AND' => [
                 {
@@ -8612,7 +8711,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field Channel / Operator STARTSWITH / Value $ChannelName2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "Channel" / Operator "STARTSWITH" / Value $ChannelName2',
         Search   => {
             'AND' => [
                 {
@@ -8626,7 +8725,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field Channel / Operator STARTSWITH / Value substr($ChannelName2,0,2)',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "Channel" / Operator "STARTSWITH" / Value substr($ChannelName2,0,2)',
         Search   => {
             'AND' => [
                 {
@@ -8640,7 +8739,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field Channel / Operator ENDSWITH / Value $ChannelName2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "Channel" / Operator "ENDSWITH" / Value $ChannelName2',
         Search   => {
             'AND' => [
                 {
@@ -8654,7 +8753,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field Channel / Operator ENDSWITH / Value substr($ChannelName2,-2)',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "Channel" / Operator "ENDSWITH" / Value substr($ChannelName2,-2)',
         Search   => {
             'AND' => [
                 {
@@ -8668,7 +8767,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field Channel / Operator CONTAINS / Value $ChannelName2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "Channel" / Operator "CONTAINS" / Value $ChannelName2',
         Search   => {
             'AND' => [
                 {
@@ -8682,7 +8781,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field Channel / Operator CONTAINS / Value substr($ChannelName2,1,-1)',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "Channel" / Operator "CONTAINS" / Value substr($ChannelName2,1,-1)',
         Search   => {
             'AND' => [
                 {
@@ -8696,7 +8795,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field Channel / Operator LIKE / Value $ChannelName2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "Channel" / Operator "LIKE" / Value $ChannelName2',
         Search   => {
             'AND' => [
                 {
@@ -8710,7 +8809,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field SenderTypeID / Operator EQ / Value $SenderTypeID2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "SenderTypeID" / Operator "EQ" / Value $SenderTypeID2',
         Search   => {
             'AND' => [
                 {
@@ -8724,7 +8823,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field SenderTypeID / Operator NE / Value $SenderTypeID2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "SenderTypeID" / Operator "NE" / Value $SenderTypeID2',
         Search   => {
             'AND' => [
                 {
@@ -8738,7 +8837,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1,$TicketID3]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field SenderTypeID / Operator IN / Value [$SenderTypeID1]',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "SenderTypeID" / Operator "IN" / Value [$SenderTypeID1]',
         Search   => {
             'AND' => [
                 {
@@ -8752,7 +8851,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field SenderTypeID / Operator !IN / Value [$SenderTypeID1]',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "SenderTypeID" / Operator "!IN" / Value [$SenderTypeID1]',
         Search   => {
             'AND' => [
                 {
@@ -8766,7 +8865,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field SenderTypeID / Operator LT / Value $SenderTypeID2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "SenderTypeID" / Operator "LT" / Value $SenderTypeID2',
         Search   => {
             'AND' => [
                 {
@@ -8780,7 +8879,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field SenderTypeID / Operator LTE / Value $SenderTypeID2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "SenderTypeID" / Operator "LTE" / Value $SenderTypeID2',
         Search   => {
             'AND' => [
                 {
@@ -8794,7 +8893,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1,$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field SenderTypeID / Operator GT / Value $SenderTypeID2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "SenderTypeID" / Operator "GT" / Value $SenderTypeID2',
         Search   => {
             'AND' => [
                 {
@@ -8808,7 +8907,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => []
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field SenderTypeID / Operator GTE / Value $SenderTypeID2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "SenderTypeID" / Operator "GTE" / Value $SenderTypeID2',
         Search   => {
             'AND' => [
                 {
@@ -8822,7 +8921,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field SenderTypeID / Operator EQ / Value $SenderTypeID2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "SenderTypeID" / Operator "EQ" / Value $SenderTypeID2',
         Search   => {
             'AND' => [
                 {
@@ -8836,7 +8935,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field SenderTypeID / Operator NE / Value $SenderTypeID2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "SenderTypeID" / Operator "NE" / Value $SenderTypeID2',
         Search   => {
             'AND' => [
                 {
@@ -8850,7 +8949,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1,$TicketID3]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field SenderTypeID / Operator IN / Value [$SenderTypeID1]',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "SenderTypeID" / Operator "IN" / Value [$SenderTypeID1]',
         Search   => {
             'AND' => [
                 {
@@ -8864,7 +8963,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => []
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field SenderTypeID / Operator !IN / Value [$SenderTypeID1]',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "SenderTypeID" / Operator "!IN" / Value [$SenderTypeID1]',
         Search   => {
             'AND' => [
                 {
@@ -8878,7 +8977,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field SenderTypeID / Operator LT / Value $SenderTypeID2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "SenderTypeID" / Operator "LT" / Value $SenderTypeID2',
         Search   => {
             'AND' => [
                 {
@@ -8892,7 +8991,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => []
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field SenderTypeID / Operator LTE / Value $SenderTypeID2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "SenderTypeID" / Operator "LTE" / Value $SenderTypeID2',
         Search   => {
             'AND' => [
                 {
@@ -8906,7 +9005,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field SenderTypeID / Operator GT / Value $SenderTypeID2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "SenderTypeID" / Operator "GT" / Value $SenderTypeID2',
         Search   => {
             'AND' => [
                 {
@@ -8920,7 +9019,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => []
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field SenderTypeID / Operator GTE / Value $SenderTypeID2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "SenderTypeID" / Operator "GTE" / Value $SenderTypeID2',
         Search   => {
             'AND' => [
                 {
@@ -8934,7 +9033,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field SenderType / Operator EQ / Value $SenderTypeName2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "SenderType" / Operator "EQ" / Value $SenderTypeName2',
         Search   => {
             'AND' => [
                 {
@@ -8948,7 +9047,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field SenderType / Operator NE / Value $SenderTypeName2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "SenderType" / Operator "NE" / Value $SenderTypeName2',
         Search   => {
             'AND' => [
                 {
@@ -8962,7 +9061,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1,$TicketID3]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field SenderType / Operator IN / Value [$SenderTypeName1]',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "SenderType" / Operator "IN" / Value [$SenderTypeName1]',
         Search   => {
             'AND' => [
                 {
@@ -8976,7 +9075,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field SenderType / Operator !IN / Value [$SenderTypeName1]',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "SenderType" / Operator "!IN" / Value [$SenderTypeName1]',
         Search   => {
             'AND' => [
                 {
@@ -8990,7 +9089,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field SenderType / Operator STARTSWITH / Value $SenderTypeName2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "SenderType" / Operator "STARTSWITH" / Value $SenderTypeName2',
         Search   => {
             'AND' => [
                 {
@@ -9004,7 +9103,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field SenderType / Operator STARTSWITH / Value substr($SenderTypeName2,0,2)',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "SenderType" / Operator "STARTSWITH" / Value substr($SenderTypeName2,0,2)',
         Search   => {
             'AND' => [
                 {
@@ -9018,7 +9117,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field SenderType / Operator ENDSWITH / Value $SenderTypeName2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "SenderType" / Operator "ENDSWITH" / Value $SenderTypeName2',
         Search   => {
             'AND' => [
                 {
@@ -9032,7 +9131,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field SenderType / Operator ENDSWITH / Value substr($SenderTypeName2,-2)',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "SenderType" / Operator "ENDSWITH" / Value substr($SenderTypeName2,-2)',
         Search   => {
             'AND' => [
                 {
@@ -9046,7 +9145,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field SenderType / Operator CONTAINS / Value $SenderTypeName2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "SenderType" / Operator "CONTAINS" / Value $SenderTypeName2',
         Search   => {
             'AND' => [
                 {
@@ -9060,7 +9159,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field SenderType / Operator CONTAINS / Value substr($SenderTypeName2,1,-1)',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "SenderType" / Operator "CONTAINS" / Value substr($SenderTypeName2,1,-1)',
         Search   => {
             'AND' => [
                 {
@@ -9074,7 +9173,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field SenderType / Operator LIKE / Value $SenderTypeName2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "SenderType" / Operator "LIKE" / Value $SenderTypeName2',
         Search   => {
             'AND' => [
                 {
@@ -9088,7 +9187,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field SenderType / Operator EQ / Value $SenderTypeName2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "SenderType" / Operator "EQ" / Value $SenderTypeName2',
         Search   => {
             'AND' => [
                 {
@@ -9102,7 +9201,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field SenderType / Operator NE / Value $SenderTypeName2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "SenderType" / Operator "NE" / Value $SenderTypeName2',
         Search   => {
             'AND' => [
                 {
@@ -9116,7 +9215,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1,$TicketID3]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field SenderType / Operator IN / Value [$SenderTypeName1]',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "SenderType" / Operator "IN" / Value [$SenderTypeName1]',
         Search   => {
             'AND' => [
                 {
@@ -9130,7 +9229,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => []
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field SenderType / Operator !IN / Value [$SenderTypeName1]',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "SenderType" / Operator "!IN" / Value [$SenderTypeName1]',
         Search   => {
             'AND' => [
                 {
@@ -9144,7 +9243,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field SenderType / Operator STARTSWITH / Value $SenderTypeName2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "SenderType" / Operator "STARTSWITH" / Value $SenderTypeName2',
         Search   => {
             'AND' => [
                 {
@@ -9158,7 +9257,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field SenderType / Operator STARTSWITH / Value substr($SenderTypeName2,0,2)',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "SenderType" / Operator "STARTSWITH" / Value substr($SenderTypeName2,0,2)',
         Search   => {
             'AND' => [
                 {
@@ -9172,7 +9271,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field SenderType / Operator ENDSWITH / Value $SenderTypeName2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "SenderType" / Operator "ENDSWITH" / Value $SenderTypeName2',
         Search   => {
             'AND' => [
                 {
@@ -9186,7 +9285,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field SenderType / Operator ENDSWITH / Value substr($SenderTypeName2,-2)',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "SenderType" / Operator "ENDSWITH" / Value substr($SenderTypeName2,-2)',
         Search   => {
             'AND' => [
                 {
@@ -9200,7 +9299,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field SenderType / Operator CONTAINS / Value $SenderTypeName2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "SenderType" / Operator "CONTAINS" / Value $SenderTypeName2',
         Search   => {
             'AND' => [
                 {
@@ -9214,7 +9313,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field SenderType / Operator CONTAINS / Value substr($SenderTypeName2,1,-1)',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "SenderType" / Operator "CONTAINS" / Value substr($SenderTypeName2,1,-1)',
         Search   => {
             'AND' => [
                 {
@@ -9228,7 +9327,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field SenderType / Operator LIKE / Value $SenderTypeName2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "SenderType" / Operator "LIKE" / Value $SenderTypeName2',
         Search   => {
             'AND' => [
                 {
@@ -9242,7 +9341,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field CustomerVisible / Operator EQ / Value 0',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "CustomerVisible" / Operator "EQ" / Value 0',
         Search   => {
             'AND' => [
                 {
@@ -9256,7 +9355,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1,$TicketID3]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field CustomerVisible / Operator NE / Value 0',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "CustomerVisible" / Operator "NE" / Value 0',
         Search   => {
             'AND' => [
                 {
@@ -9270,7 +9369,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field CustomerVisible / Operator IN / Value [1]',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "CustomerVisible" / Operator "IN" / Value [1]',
         Search   => {
             'AND' => [
                 {
@@ -9284,7 +9383,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field CustomerVisible / Operator !IN / Value [1]',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "CustomerVisible" / Operator "!IN" / Value [1]',
         Search   => {
             'AND' => [
                 {
@@ -9298,7 +9397,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field CustomerVisible / Operator LT / Value 1',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "CustomerVisible" / Operator "LT" / Value 1',
         Search   => {
             'AND' => [
                 {
@@ -9312,7 +9411,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field CustomerVisible / Operator LTE / Value 1',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "CustomerVisible" / Operator "LTE" / Value 1',
         Search   => {
             'AND' => [
                 {
@@ -9326,7 +9425,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1,$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field CustomerVisible / Operator GT / Value 0',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "CustomerVisible" / Operator "GT" / Value 0',
         Search   => {
             'AND' => [
                 {
@@ -9340,7 +9439,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field CustomerVisible / Operator GTE / Value 0',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "CustomerVisible" / Operator "GTE" / Value 0',
         Search   => {
             'AND' => [
                 {
@@ -9354,7 +9453,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1,$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field CustomerVisible / Operator EQ / Value 0',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "CustomerVisible" / Operator "EQ" / Value 0',
         Search   => {
             'AND' => [
                 {
@@ -9368,7 +9467,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1,$TicketID3]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field CustomerVisible / Operator NE / Value 0',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "CustomerVisible" / Operator "NE" / Value 0',
         Search   => {
             'AND' => [
                 {
@@ -9382,7 +9481,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field CustomerVisible / Operator IN / Value [1]',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "CustomerVisible" / Operator "IN" / Value [1]',
         Search   => {
             'AND' => [
                 {
@@ -9396,7 +9495,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field CustomerVisible / Operator !IN / Value [1]',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "CustomerVisible" / Operator "!IN" / Value [1]',
         Search   => {
             'AND' => [
                 {
@@ -9410,7 +9509,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => []
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field CustomerVisible / Operator LT / Value 1',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "CustomerVisible" / Operator "LT" / Value 1',
         Search   => {
             'AND' => [
                 {
@@ -9424,7 +9523,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => []
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field CustomerVisible / Operator LTE / Value 1',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "CustomerVisible" / Operator "LTE" / Value 1',
         Search   => {
             'AND' => [
                 {
@@ -9438,7 +9537,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field CustomerVisible / Operator GT / Value 0',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "CustomerVisible" / Operator "GT" / Value 0',
         Search   => {
             'AND' => [
                 {
@@ -9452,7 +9551,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field CustomerVisible / Operator GTE / Value 0',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "CustomerVisible" / Operator "GTE" / Value 0',
         Search   => {
             'AND' => [
                 {
@@ -9466,7 +9565,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field From / Operator EQ / Value $From2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "From" / Operator "EQ" / Value $From2',
         Search   => {
             'AND' => [
                 {
@@ -9480,7 +9579,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field From / Operator NE / Value $From2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "From" / Operator "NE" / Value $From2',
         Search   => {
             'AND' => [
                 {
@@ -9494,7 +9593,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1,$TicketID3]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field From / Operator IN / Value [$From1]',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "From" / Operator "IN" / Value [$From1]',
         Search   => {
             'AND' => [
                 {
@@ -9508,7 +9607,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field From / Operator !IN / Value [$From1]',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "From" / Operator "!IN" / Value [$From1]',
         Search   => {
             'AND' => [
                 {
@@ -9522,7 +9621,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field From / Operator STARTSWITH / Value $From2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "From" / Operator "STARTSWITH" / Value $From2',
         Search   => {
             'AND' => [
                 {
@@ -9536,7 +9635,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field From / Operator STARTSWITH / Value substr($From2,0,2)',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "From" / Operator "STARTSWITH" / Value substr($From2,0,2)',
         Search   => {
             'AND' => [
                 {
@@ -9550,7 +9649,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field From / Operator ENDSWITH / Value $From2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "From" / Operator "ENDSWITH" / Value $From2',
         Search   => {
             'AND' => [
                 {
@@ -9564,7 +9663,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field From / Operator ENDSWITH / Value substr($From2,-2)',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "From" / Operator "ENDSWITH" / Value substr($From2,-2)',
         Search   => {
             'AND' => [
                 {
@@ -9578,7 +9677,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1,$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field From / Operator CONTAINS / Value $From2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "From" / Operator "CONTAINS" / Value $From2',
         Search   => {
             'AND' => [
                 {
@@ -9592,7 +9691,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field From / Operator CONTAINS / Value substr($From2,1,-1)',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "From" / Operator "CONTAINS" / Value substr($From2,1,-1)',
         Search   => {
             'AND' => [
                 {
@@ -9606,7 +9705,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field From / Operator LIKE / Value $From2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "From" / Operator "LIKE" / Value $From2',
         Search   => {
             'AND' => [
                 {
@@ -9620,7 +9719,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field From / Operator EQ / Value $From2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "From" / Operator "EQ" / Value $From2',
         Search   => {
             'AND' => [
                 {
@@ -9634,7 +9733,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field From / Operator NE / Value $From2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "From" / Operator "NE" / Value $From2',
         Search   => {
             'AND' => [
                 {
@@ -9648,7 +9747,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1,$TicketID3]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field From / Operator IN / Value [$From1]',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "From" / Operator "IN" / Value [$From1]',
         Search   => {
             'AND' => [
                 {
@@ -9662,7 +9761,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => []
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field From / Operator !IN / Value [$From1]',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "From" / Operator "!IN" / Value [$From1]',
         Search   => {
             'AND' => [
                 {
@@ -9676,7 +9775,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field From / Operator STARTSWITH / Value $From2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "From" / Operator "STARTSWITH" / Value $From2',
         Search   => {
             'AND' => [
                 {
@@ -9690,7 +9789,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field From / Operator STARTSWITH / Value substr($From2,0,2)',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "From" / Operator "STARTSWITH" / Value substr($From2,0,2)',
         Search   => {
             'AND' => [
                 {
@@ -9704,7 +9803,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field From / Operator ENDSWITH / Value $From2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "From" / Operator "ENDSWITH" / Value $From2',
         Search   => {
             'AND' => [
                 {
@@ -9718,7 +9817,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field From / Operator ENDSWITH / Value substr($From2,-2)',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "From" / Operator "ENDSWITH" / Value substr($From2,-2)',
         Search   => {
             'AND' => [
                 {
@@ -9732,7 +9831,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field From / Operator CONTAINS / Value $From2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "From" / Operator "CONTAINS" / Value $From2',
         Search   => {
             'AND' => [
                 {
@@ -9746,7 +9845,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field From / Operator CONTAINS / Value substr($From2,1,-1)',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "From" / Operator "CONTAINS" / Value substr($From2,1,-1)',
         Search   => {
             'AND' => [
                 {
@@ -9760,7 +9859,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field From / Operator LIKE / Value $From2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "From" / Operator "LIKE" / Value $From2',
         Search   => {
             'AND' => [
                 {
@@ -9774,7 +9873,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field To / Operator EQ / Value $To2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "To" / Operator "EQ" / Value $To2',
         Search   => {
             'AND' => [
                 {
@@ -9788,7 +9887,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field To / Operator NE / Value $To2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "To" / Operator "NE" / Value $To2',
         Search   => {
             'AND' => [
                 {
@@ -9802,7 +9901,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1,$TicketID3]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field To / Operator IN / Value [$To1]',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "To" / Operator "IN" / Value [$To1]',
         Search   => {
             'AND' => [
                 {
@@ -9816,7 +9915,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field To / Operator !IN / Value [$To1]',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "To" / Operator "!IN" / Value [$To1]',
         Search   => {
             'AND' => [
                 {
@@ -9830,7 +9929,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field To / Operator STARTSWITH / Value $To2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "To" / Operator "STARTSWITH" / Value $To2',
         Search   => {
             'AND' => [
                 {
@@ -9844,7 +9943,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field To / Operator STARTSWITH / Value substr($To2,0,2)',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "To" / Operator "STARTSWITH" / Value substr($To2,0,2)',
         Search   => {
             'AND' => [
                 {
@@ -9858,7 +9957,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field To / Operator ENDSWITH / Value $To2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "To" / Operator "ENDSWITH" / Value $To2',
         Search   => {
             'AND' => [
                 {
@@ -9872,7 +9971,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field To / Operator ENDSWITH / Value substr($To2,-2)',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "To" / Operator "ENDSWITH" / Value substr($To2,-2)',
         Search   => {
             'AND' => [
                 {
@@ -9886,7 +9985,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1,$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field To / Operator CONTAINS / Value $To2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "To" / Operator "CONTAINS" / Value $To2',
         Search   => {
             'AND' => [
                 {
@@ -9900,7 +9999,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field To / Operator CONTAINS / Value substr($To2,1,-1)',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "To" / Operator "CONTAINS" / Value substr($To2,1,-1)',
         Search   => {
             'AND' => [
                 {
@@ -9914,7 +10013,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field To / Operator LIKE / Value $To2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "To" / Operator "LIKE" / Value $To2',
         Search   => {
             'AND' => [
                 {
@@ -9928,7 +10027,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field To / Operator EQ / Value $To2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "To" / Operator "EQ" / Value $To2',
         Search   => {
             'AND' => [
                 {
@@ -9942,7 +10041,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field To / Operator NE / Value $To2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "To" / Operator "NE" / Value $To2',
         Search   => {
             'AND' => [
                 {
@@ -9956,7 +10055,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1,$TicketID3]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field To / Operator IN / Value [$To1]',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "To" / Operator "IN" / Value [$To1]',
         Search   => {
             'AND' => [
                 {
@@ -9970,7 +10069,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => []
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field To / Operator !IN / Value [$To1]',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "To" / Operator "!IN" / Value [$To1]',
         Search   => {
             'AND' => [
                 {
@@ -9984,7 +10083,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field To / Operator STARTSWITH / Value $To2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "To" / Operator "STARTSWITH" / Value $To2',
         Search   => {
             'AND' => [
                 {
@@ -9998,7 +10097,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field To / Operator STARTSWITH / Value substr($To2,0,2)',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "To" / Operator "STARTSWITH" / Value substr($To2,0,2)',
         Search   => {
             'AND' => [
                 {
@@ -10012,7 +10111,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field To / Operator ENDSWITH / Value $To2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "To" / Operator "ENDSWITH" / Value $To2',
         Search   => {
             'AND' => [
                 {
@@ -10026,7 +10125,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field To / Operator ENDSWITH / Value substr($To2,-2)',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "To" / Operator "ENDSWITH" / Value substr($To2,-2)',
         Search   => {
             'AND' => [
                 {
@@ -10040,7 +10139,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field To / Operator CONTAINS / Value $To2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "To" / Operator "CONTAINS" / Value $To2',
         Search   => {
             'AND' => [
                 {
@@ -10054,7 +10153,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field To / Operator CONTAINS / Value substr($To2,1,-1)',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "To" / Operator "CONTAINS" / Value substr($To2,1,-1)',
         Search   => {
             'AND' => [
                 {
@@ -10068,7 +10167,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field To / Operator LIKE / Value $To2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "To" / Operator "LIKE" / Value $To2',
         Search   => {
             'AND' => [
                 {
@@ -10082,7 +10181,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field Cc / Operator EQ / Value $Cc2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "Cc" / Operator "EQ" / Value $Cc2',
         Search   => {
             'AND' => [
                 {
@@ -10096,7 +10195,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1,$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field Cc / Operator NE / Value $Cc2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "Cc" / Operator "NE" / Value $Cc2',
         Search   => {
             'AND' => [
                 {
@@ -10110,7 +10209,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID3]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field Cc / Operator IN / Value [$Cc1]',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "Cc" / Operator "IN" / Value [$Cc1]',
         Search   => {
             'AND' => [
                 {
@@ -10124,7 +10223,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1,$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field Cc / Operator !IN / Value [$Cc1]',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "Cc" / Operator "!IN" / Value [$Cc1]',
         Search   => {
             'AND' => [
                 {
@@ -10138,7 +10237,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => []
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field Cc / Operator STARTSWITH / Value $Cc2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "Cc" / Operator "STARTSWITH" / Value $Cc2',
         Search   => {
             'AND' => [
                 {
@@ -10152,7 +10251,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1,$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field Cc / Operator STARTSWITH / Value substr($Cc2,0,2)',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "Cc" / Operator "STARTSWITH" / Value substr($Cc2,0,2)',
         Search   => {
             'AND' => [
                 {
@@ -10166,7 +10265,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1,$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field Cc / Operator ENDSWITH / Value $Cc2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "Cc" / Operator "ENDSWITH" / Value $Cc2',
         Search   => {
             'AND' => [
                 {
@@ -10180,7 +10279,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1,$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field Cc / Operator ENDSWITH / Value substr($Cc2,-2)',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "Cc" / Operator "ENDSWITH" / Value substr($Cc2,-2)',
         Search   => {
             'AND' => [
                 {
@@ -10194,7 +10293,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1,$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field Cc / Operator CONTAINS / Value $Cc2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "Cc" / Operator "CONTAINS" / Value $Cc2',
         Search   => {
             'AND' => [
                 {
@@ -10208,7 +10307,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1,$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field Cc / Operator CONTAINS / Value substr($Cc2,1,-1)',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "Cc" / Operator "CONTAINS" / Value substr($Cc2,1,-1)',
         Search   => {
             'AND' => [
                 {
@@ -10222,7 +10321,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1,$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field Cc / Operator LIKE / Value $Cc2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "Cc" / Operator "LIKE" / Value $Cc2',
         Search   => {
             'AND' => [
                 {
@@ -10236,7 +10335,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1,$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field Cc / Operator EQ / Value $Cc2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "Cc" / Operator "EQ" / Value $Cc2',
         Search   => {
             'AND' => [
                 {
@@ -10250,7 +10349,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field Cc / Operator NE / Value $Cc2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "Cc" / Operator "NE" / Value $Cc2',
         Search   => {
             'AND' => [
                 {
@@ -10264,7 +10363,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1,$TicketID3]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field Cc / Operator IN / Value [$Cc1]',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "Cc" / Operator "IN" / Value [$Cc1]',
         Search   => {
             'AND' => [
                 {
@@ -10278,7 +10377,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field Cc / Operator !IN / Value [$Cc1]',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "Cc" / Operator "!IN" / Value [$Cc1]',
         Search   => {
             'AND' => [
                 {
@@ -10292,7 +10391,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => []
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field Cc / Operator STARTSWITH / Value $Cc2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "Cc" / Operator "STARTSWITH" / Value $Cc2',
         Search   => {
             'AND' => [
                 {
@@ -10306,7 +10405,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field Cc / Operator STARTSWITH / Value substr($Cc2,0,2)',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "Cc" / Operator "STARTSWITH" / Value substr($Cc2,0,2)',
         Search   => {
             'AND' => [
                 {
@@ -10320,7 +10419,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field Cc / Operator ENDSWITH / Value $Cc2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "Cc" / Operator "ENDSWITH" / Value $Cc2',
         Search   => {
             'AND' => [
                 {
@@ -10334,7 +10433,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field Cc / Operator ENDSWITH / Value substr($Cc2,-2)',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "Cc" / Operator "ENDSWITH" / Value substr($Cc2,-2)',
         Search   => {
             'AND' => [
                 {
@@ -10348,7 +10447,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field Cc / Operator CONTAINS / Value $Cc2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "Cc" / Operator "CONTAINS" / Value $Cc2',
         Search   => {
             'AND' => [
                 {
@@ -10362,7 +10461,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field Cc / Operator CONTAINS / Value substr($Cc2,1,-1)',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "Cc" / Operator "CONTAINS" / Value substr($Cc2,1,-1)',
         Search   => {
             'AND' => [
                 {
@@ -10376,7 +10475,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field Cc / Operator LIKE / Value $Cc2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "Cc" / Operator "LIKE" / Value $Cc2',
         Search   => {
             'AND' => [
                 {
@@ -10390,7 +10489,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field Subject / Operator EQ / Value $Subject2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "Subject" / Operator "EQ" / Value $Subject2',
         Search   => {
             'AND' => [
                 {
@@ -10404,7 +10503,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field Subject / Operator NE / Value $Subject2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "Subject" / Operator "NE" / Value $Subject2',
         Search   => {
             'AND' => [
                 {
@@ -10418,7 +10517,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1,$TicketID3]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field Subject / Operator IN / Value [$Subject1]',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "Subject" / Operator "IN" / Value [$Subject1]',
         Search   => {
             'AND' => [
                 {
@@ -10432,7 +10531,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field Subject / Operator !IN / Value [$Subject1]',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "Subject" / Operator "!IN" / Value [$Subject1]',
         Search   => {
             'AND' => [
                 {
@@ -10446,7 +10545,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field Subject / Operator STARTSWITH / Value $Subject2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "Subject" / Operator "STARTSWITH" / Value $Subject2',
         Search   => {
             'AND' => [
                 {
@@ -10460,7 +10559,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field Subject / Operator STARTSWITH / Value substr($Subject2,0,2)',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "Subject" / Operator "STARTSWITH" / Value substr($Subject2,0,2)',
         Search   => {
             'AND' => [
                 {
@@ -10474,7 +10573,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1,$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field Subject / Operator ENDSWITH / Value $Subject2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "Subject" / Operator "ENDSWITH" / Value $Subject2',
         Search   => {
             'AND' => [
                 {
@@ -10488,7 +10587,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field Subject / Operator ENDSWITH / Value substr($Subject2,-2)',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "Subject" / Operator "ENDSWITH" / Value substr($Subject2,-2)',
         Search   => {
             'AND' => [
                 {
@@ -10502,7 +10601,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field Subject / Operator CONTAINS / Value $Subject2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "Subject" / Operator "CONTAINS" / Value $Subject2',
         Search   => {
             'AND' => [
                 {
@@ -10516,7 +10615,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field Subject / Operator CONTAINS / Value substr($Subject2,1,-1)',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "Subject" / Operator "CONTAINS" / Value substr($Subject2,1,-1)',
         Search   => {
             'AND' => [
                 {
@@ -10530,7 +10629,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1,$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field Subject / Operator LIKE / Value $Subject2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "Subject" / Operator "LIKE" / Value $Subject2',
         Search   => {
             'AND' => [
                 {
@@ -10544,7 +10643,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field Subject / Operator EQ / Value $Subject2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "Subject" / Operator "EQ" / Value $Subject2',
         Search   => {
             'AND' => [
                 {
@@ -10558,7 +10657,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field Subject / Operator NE / Value $Subject2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "Subject" / Operator "NE" / Value $Subject2',
         Search   => {
             'AND' => [
                 {
@@ -10572,7 +10671,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1,$TicketID3]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field Subject / Operator IN / Value [$Subject1]',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "Subject" / Operator "IN" / Value [$Subject1]',
         Search   => {
             'AND' => [
                 {
@@ -10586,7 +10685,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => []
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field Subject / Operator !IN / Value [$Subject1]',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "Subject" / Operator "!IN" / Value [$Subject1]',
         Search   => {
             'AND' => [
                 {
@@ -10600,7 +10699,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field Subject / Operator STARTSWITH / Value $Subject2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "Subject" / Operator "STARTSWITH" / Value $Subject2',
         Search   => {
             'AND' => [
                 {
@@ -10614,7 +10713,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field Subject / Operator STARTSWITH / Value substr($Subject2,0,2)',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "Subject" / Operator "STARTSWITH" / Value substr($Subject2,0,2)',
         Search   => {
             'AND' => [
                 {
@@ -10628,7 +10727,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field Subject / Operator ENDSWITH / Value $Subject2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "Subject" / Operator "ENDSWITH" / Value $Subject2',
         Search   => {
             'AND' => [
                 {
@@ -10642,7 +10741,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field Subject / Operator ENDSWITH / Value substr($Subject2,-2)',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "Subject" / Operator "ENDSWITH" / Value substr($Subject2,-2)',
         Search   => {
             'AND' => [
                 {
@@ -10656,7 +10755,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field Subject / Operator CONTAINS / Value $Subject2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "Subject" / Operator "CONTAINS" / Value $Subject2',
         Search   => {
             'AND' => [
                 {
@@ -10670,7 +10769,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field Subject / Operator CONTAINS / Value substr($Subject2,1,-1)',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "Subject" / Operator "CONTAINS" / Value substr($Subject2,1,-1)',
         Search   => {
             'AND' => [
                 {
@@ -10684,7 +10783,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field Subject / Operator LIKE / Value $Subject2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "Subject" / Operator "LIKE" / Value $Subject2',
         Search   => {
             'AND' => [
                 {
@@ -10698,7 +10797,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field Body / Operator EQ / Value $Body2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "Body" / Operator "EQ" / Value $Body2',
         Search   => {
             'AND' => [
                 {
@@ -10712,7 +10811,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1,$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field Body / Operator NE / Value $Body2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "Body" / Operator "NE" / Value $Body2',
         Search   => {
             'AND' => [
                 {
@@ -10726,7 +10825,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID3]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field Body / Operator IN / Value [$Body1]',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "Body" / Operator "IN" / Value [$Body1]',
         Search   => {
             'AND' => [
                 {
@@ -10740,7 +10839,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1,$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field Body / Operator !IN / Value [$Body1]',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "Body" / Operator "!IN" / Value [$Body1]',
         Search   => {
             'AND' => [
                 {
@@ -10754,7 +10853,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => []
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field Body / Operator STARTSWITH / Value $Body2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "Body" / Operator "STARTSWITH" / Value $Body2',
         Search   => {
             'AND' => [
                 {
@@ -10768,7 +10867,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1,$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field Body / Operator STARTSWITH / Value substr($Body2,0,2)',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "Body" / Operator "STARTSWITH" / Value substr($Body2,0,2)',
         Search   => {
             'AND' => [
                 {
@@ -10782,7 +10881,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1,$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field Body / Operator ENDSWITH / Value $Body2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "Body" / Operator "ENDSWITH" / Value $Body2',
         Search   => {
             'AND' => [
                 {
@@ -10796,7 +10895,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1,$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field Body / Operator ENDSWITH / Value substr($Body2,-2)',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "Body" / Operator "ENDSWITH" / Value substr($Body2,-2)',
         Search   => {
             'AND' => [
                 {
@@ -10810,7 +10909,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1,$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field Body / Operator CONTAINS / Value $Body2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "Body" / Operator "CONTAINS" / Value $Body2',
         Search   => {
             'AND' => [
                 {
@@ -10824,7 +10923,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1,$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field Body / Operator CONTAINS / Value substr($Body2,1,-1)',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "Body" / Operator "CONTAINS" / Value substr($Body2,1,-1)',
         Search   => {
             'AND' => [
                 {
@@ -10838,7 +10937,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1,$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field Body / Operator LIKE / Value $Body2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "Body" / Operator "LIKE" / Value $Body2',
         Search   => {
             'AND' => [
                 {
@@ -10852,7 +10951,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1,$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field Body / Operator EQ / Value $Body2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "Body" / Operator "EQ" / Value $Body2',
         Search   => {
             'AND' => [
                 {
@@ -10866,7 +10965,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field Body / Operator NE / Value $Body2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "Body" / Operator "NE" / Value $Body2',
         Search   => {
             'AND' => [
                 {
@@ -10880,7 +10979,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1,$TicketID3]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field Body / Operator IN / Value [$Body1]',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "Body" / Operator "IN" / Value [$Body1]',
         Search   => {
             'AND' => [
                 {
@@ -10894,7 +10993,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field Body / Operator !IN / Value [$Body1]',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "Body" / Operator "!IN" / Value [$Body1]',
         Search   => {
             'AND' => [
                 {
@@ -10908,7 +11007,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => []
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field Body / Operator STARTSWITH / Value $Body2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "Body" / Operator "STARTSWITH" / Value $Body2',
         Search   => {
             'AND' => [
                 {
@@ -10922,7 +11021,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field Body / Operator STARTSWITH / Value substr($Body2,0,2)',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "Body" / Operator "STARTSWITH" / Value substr($Body2,0,2)',
         Search   => {
             'AND' => [
                 {
@@ -10936,7 +11035,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field Body / Operator ENDSWITH / Value $Body2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "Body" / Operator "ENDSWITH" / Value $Body2',
         Search   => {
             'AND' => [
                 {
@@ -10950,7 +11049,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field Body / Operator ENDSWITH / Value substr($Body2,-2)',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "Body" / Operator "ENDSWITH" / Value substr($Body2,-2)',
         Search   => {
             'AND' => [
                 {
@@ -10964,7 +11063,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field Body / Operator CONTAINS / Value $Body2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "Body" / Operator "CONTAINS" / Value $Body2',
         Search   => {
             'AND' => [
                 {
@@ -10978,7 +11077,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field Body / Operator CONTAINS / Value substr($Body2,1,-1)',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "Body" / Operator "CONTAINS" / Value substr($Body2,1,-1)',
         Search   => {
             'AND' => [
                 {
@@ -10992,7 +11091,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field Body / Operator LIKE / Value $Body2',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "Body" / Operator "LIKE" / Value $Body2',
         Search   => {
             'AND' => [
                 {
@@ -11006,7 +11105,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field ArticleCreateTime / Operator EQ / Value 2014-01-01 12:01:00',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "ArticleCreateTime" / Operator "EQ" / Value 2014-01-01 12:01:00',
         Search   => {
             'AND' => [
                 {
@@ -11020,7 +11119,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field ArticleCreateTime / Operator EQ / Value -1m',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "ArticleCreateTime" / Operator "EQ" / Value -1m',
         Search   => {
             'AND' => [
                 {
@@ -11034,7 +11133,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field ArticleCreateTime / Operator LT / Value 2014-01-01 12:01:00',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "ArticleCreateTime" / Operator "LT" / Value 2014-01-01 12:01:00',
         Search   => {
             'AND' => [
                 {
@@ -11048,7 +11147,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field ArticleCreateTime / Operator LT / Value -1m',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "ArticleCreateTime" / Operator "LT" / Value -1m',
         Search   => {
             'AND' => [
                 {
@@ -11062,7 +11161,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field ArticleCreateTime / Operator GT / Value 2014-01-01 12:01:00',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "ArticleCreateTime" / Operator "GT" / Value 2014-01-01 12:01:00',
         Search   => {
             'AND' => [
                 {
@@ -11076,7 +11175,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => []
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field ArticleCreateTime / Operator GT / Value -1m',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "ArticleCreateTime" / Operator "GT" / Value -1m',
         Search   => {
             'AND' => [
                 {
@@ -11090,7 +11189,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => []
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field ArticleCreateTime / Operator LTE / Value 2014-01-01 12:01:00',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "ArticleCreateTime" / Operator "LTE" / Value 2014-01-01 12:01:00',
         Search   => {
             'AND' => [
                 {
@@ -11104,7 +11203,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1, $TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field ArticleCreateTime / Operator LTE / Value -1m',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "ArticleCreateTime" / Operator "LTE" / Value -1m',
         Search   => {
             'AND' => [
                 {
@@ -11118,7 +11217,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID1, $TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field ArticleCreateTime / Operator GTE / Value2014-01-01 12:01:00',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "ArticleCreateTime" / Operator "GTE" / Value2014-01-01 12:01:00',
         Search   => {
             'AND' => [
                 {
@@ -11132,7 +11231,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Agent / Field ArticleCreateTime / Operator GTE / Value -1m',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Agent" / Field "ArticleCreateTime" / Operator "GTE" / Value -1m',
         Search   => {
             'AND' => [
                 {
@@ -11146,7 +11245,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field ArticleCreateTime / Operator EQ / Value 2014-01-01 12:01:00',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "ArticleCreateTime" / Operator "EQ" / Value 2014-01-01 12:01:00',
         Search   => {
             'AND' => [
                 {
@@ -11160,7 +11259,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field ArticleCreateTime / Operator EQ / Value -1m',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "ArticleCreateTime" / Operator "EQ" / Value -1m',
         Search   => {
             'AND' => [
                 {
@@ -11174,7 +11273,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field ArticleCreateTime / Operator LT / Value 2014-01-01 12:01:00',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "ArticleCreateTime" / Operator "LT" / Value 2014-01-01 12:01:00',
         Search   => {
             'AND' => [
                 {
@@ -11188,7 +11287,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => []
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field ArticleCreateTime / Operator LT / Value -1m',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "ArticleCreateTime" / Operator "LT" / Value -1m',
         Search   => {
             'AND' => [
                 {
@@ -11202,7 +11301,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => []
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field ArticleCreateTime / Operator GT / Value 2014-01-01 12:01:00',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "ArticleCreateTime" / Operator "GT" / Value 2014-01-01 12:01:00',
         Search   => {
             'AND' => [
                 {
@@ -11216,7 +11315,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => []
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field ArticleCreateTime / Operator GT / Value -1m',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "ArticleCreateTime" / Operator "GT" / Value -1m',
         Search   => {
             'AND' => [
                 {
@@ -11230,7 +11329,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => []
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field ArticleCreateTime / Operator LTE / Value 2014-01-01 12:01:00',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "ArticleCreateTime" / Operator "LTE" / Value 2014-01-01 12:01:00',
         Search   => {
             'AND' => [
                 {
@@ -11244,7 +11343,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field ArticleCreateTime / Operator LTE / Value -1m',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "ArticleCreateTime" / Operator "LTE" / Value -1m',
         Search   => {
             'AND' => [
                 {
@@ -11258,7 +11357,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field ArticleCreateTime / Operator GTE / Value2014-01-01 12:01:00',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "ArticleCreateTime" / Operator "GTE" / Value2014-01-01 12:01:00',
         Search   => {
             'AND' => [
                 {
@@ -11272,7 +11371,7 @@ my @IntegrationSearchTestsRuntimeDB = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: SearchIndexModule RuntimeDB / UserType Customer / Field ArticleCreateTime / Operator GTE / Value -1m',
+        Name     => 'Search: SearchIndexModule RuntimeDB / UserType "Customer" / Field "ArticleCreateTime" / Operator "GTE" / Value -1m',
         Search   => {
             'AND' => [
                 {
