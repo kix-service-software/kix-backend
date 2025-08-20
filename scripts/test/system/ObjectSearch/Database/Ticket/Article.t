@@ -139,105 +139,131 @@ $Self->IsDeeply(
     'GetSupportedAttributes provides expected data'
 );
 
+# Quoting ESCAPE character backslash
+my $QuoteBack = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteBack');
+my $Escape = "\\";
+if ( $QuoteBack ) {
+    $Escape =~ s/\\/$QuoteBack\\/g;
+}
+
+# Quoting single quote character
+my $QuoteSingle = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteSingle');
+
+# Quoting semicolon character
+my $QuoteSemicolon = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteSemicolon');
+
+# check if database is casesensitive
+my $CaseSensitive = $Kernel::OM->Get('DB')->GetDatabaseFunction('CaseSensitive');
+
 # check AttributePrepare
-my @AttributePrepareTests = (
-    {
-        Name      => 'AttributePrepare: Attribute "ArticleID"',
-        Parameter => {
-            Attribute => 'ArticleID'
-        },
-        Expected  => {
-            Column => 'ta.id',
-            SQLDef => {
-                Join => ['LEFT OUTER JOIN article ta ON ta.ticket_id = st.id'],
-            }
-        }
-    },
-    {
-        Name      => 'AttributePrepare: Attribute "ArticleID" / PrepareType "Select"',
-        Parameter => {
-            Attribute   => 'ArticleID',
-            PrepareType => 'Select'
-        },
-        Expected  => {
-            Column => 'ta.id',
-            SQLDef => {
-                Join => ['LEFT OUTER JOIN article ta ON ta.ticket_id = st.id'],
-            }
-        }
-    },
-    {
-        Name      => 'AttributePrepare: Attribute "ArticleID" / PrepareType "Condition"',
-        Parameter => {
-            Attribute   => 'ArticleID',
-            PrepareType => 'Condition'
-        },
-        Expected  => {
-            Column       => 'ta.id',
-            SQLDef       => {
-                Join => ['LEFT OUTER JOIN article ta ON ta.ticket_id = st.id'],
-            },
-            ConditionDef => {
-                ValueType => 'NUMERIC',
-                NULLValue => 1
-            }
-        }
-    },
-    {
-        Name      => 'AttributePrepare: Attribute "ArticleID" / PrepareType "Condition" / UserType "Customer"',
-        Parameter => {
-            Attribute   => 'ArticleID',
-            PrepareType => 'Condition',
-            UserType    => 'Customer'
-        },
-        Expected  => {
-            Column       => 'ta.id',
-            SQLDef       => {
-                Join => ['LEFT OUTER JOIN article ta ON ta.ticket_id = st.id AND ta.customer_visible = 1'],
-            },
-            ConditionDef => {
-                ValueType => 'NUMERIC',
-                NULLValue => 1
-            }
-        }
-    },
-    {
-        Name      => 'AttributePrepare: Attribute "ArticleID" / PrepareType "Sort"',
-        Parameter => {
-            Attribute   => 'ArticleID',
-            PrepareType => 'Sort'
-        },
-        Expected  => {
-            Column => 'ta.id',
-            SQLDef => {
-                Join => ['LEFT OUTER JOIN article ta ON ta.ticket_id = st.id'],
-            }
-        }
-    },
-    {
-        Name      => 'AttributePrepare: Attribute "ArticleID" / PrepareType "Fulltext"',
-        Parameter => {
-            Attribute   => 'ArticleID',
-            PrepareType => 'Fulltext'
-        },
-        Expected  => {
-            Column => 'ta.id',
-            SQLDef => {
-                Join => ['LEFT OUTER JOIN article ta ON ta.ticket_id = st.id'],
-            }
-        }
-    },
-);
-for my $Test ( @AttributePrepareTests ) {
-    my $Result = $AttributeObject->AttributePrepare(
-        %{ $Test->{Parameter} },
-        Silent => defined( $Test->{Expected} ) ? 0 : 1
+# run tests for SearchIndexModule 'RuntimeDB' and 'StaticDB'
+for my $SearchIndexModule ( qw(RuntimeDB StaticDB) ) {
+    $Kernel::OM->Get('Config')->Set(
+        Key   => 'Ticket::SearchIndexModule',
+        Value => 'Kernel::System::Ticket::ArticleSearchIndex::' . $SearchIndexModule
     );
-    $Self->IsDeeply(
-        $Result,
-        $Test->{Expected},
-        $Test->{Name}
-    );
+    my $AliasPrefix = '';
+    if ( $SearchIndexModule eq 'StaticDB' ) {
+        $AliasPrefix = 's_';
+    }
+
+    # run tests for UserType 'Agent' and 'Customer'
+    for my $UserType ( qw(Agent Customer) ) {
+        # prepare suffix for article join
+        my $JoinArticleSuffix = '';
+        if ( $UserType eq 'Customer' ) {
+            $JoinArticleSuffix = ' AND ' . $AliasPrefix . 'ta.customer_visible = 1'
+        }
+
+        my $ArticleJoinString = 'LEFT OUTER JOIN article ' . $AliasPrefix . 'ta ON ' . $AliasPrefix . 'ta.ticket_id = st.id' . $JoinArticleSuffix;
+
+        my @AttributePrepareTests = (
+            {
+                Name      => 'AttributePrepare: SearchIndexModule "' . $SearchIndexModule . '" / UserType "' . $UserType . '" / Attribute "ArticleID"',
+                Parameter => {
+                    Attribute => 'ArticleID',
+                    UserType  => $UserType
+                },
+                Expected  => {
+                    Column => 'ta.id',
+                    SQLDef => {
+                        Join => [ $ArticleJoinString ],
+                    }
+                }
+            },
+            {
+                Name      => 'AttributePrepare: SearchIndexModule "' . $SearchIndexModule . '" / UserType "' . $UserType . '" / Attribute "ArticleID" / PrepareType "Select"',
+                Parameter => {
+                    Attribute   => 'ArticleID',
+                    PrepareType => 'Select',
+                    UserType    => $UserType
+                },
+                Expected  => {
+                    Column => 'ta.id',
+                    SQLDef => {
+                        Join => [ $ArticleJoinString ],
+                    }
+                }
+            },
+            {
+                Name      => 'AttributePrepare: SearchIndexModule "' . $SearchIndexModule . '" / UserType "' . $UserType . '" / Attribute "ArticleID" / PrepareType "Condition"',
+                Parameter => {
+                    Attribute   => 'ArticleID',
+                    PrepareType => 'Condition',
+                    UserType    => $UserType
+                },
+                Expected  => {
+                    Column       => 'ta.id',
+                    SQLDef       => {
+                        Join => [ $ArticleJoinString ],
+                    },
+                    ConditionDef => {
+                        ValueType => 'NUMERIC',
+                        NULLValue => 1
+                    }
+                }
+            },
+            {
+                Name      => 'AttributePrepare: SearchIndexModule "' . $SearchIndexModule . '" / UserType "' . $UserType . '" / Attribute "ArticleID" / PrepareType "Sort"',
+                Parameter => {
+                    Attribute   => 'ArticleID',
+                    PrepareType => 'Sort',
+                    UserType    => $UserType
+                },
+                Expected  => {
+                    Column => 'ta.id',
+                    SQLDef => {
+                        Join => [ $ArticleJoinString ],
+                    }
+                }
+            },
+            {
+                Name      => 'AttributePrepare: SearchIndexModule "' . $SearchIndexModule . '" / UserType "' . $UserType . '" / Attribute "ArticleID" / PrepareType "Fulltext"',
+                Parameter => {
+                    Attribute   => 'ArticleID',
+                    PrepareType => 'Fulltext',
+                    UserType    => $UserType
+                },
+                Expected  => {
+                    Column => 'ta.id',
+                    SQLDef => {
+                        Join => [ $ArticleJoinString ],
+                    }
+                }
+            },
+        );
+        for my $Test ( @AttributePrepareTests ) {
+            my $Result = $AttributeObject->AttributePrepare(
+                %{ $Test->{Parameter} },
+                Silent => defined( $Test->{Expected} ) ? 0 : 1
+            );
+            $Self->IsDeeply(
+                $Result,
+                $Test->{Expected},
+                $Test->{Name}
+            );
+        }
+    }
 }
 
 # check Select
@@ -352,22 +378,6 @@ for my $Test ( @SelectTests ) {
         $Test->{Name}
     );
 }
-
-# Quoting ESCAPE character backslash
-my $QuoteBack = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteBack');
-my $Escape = "\\";
-if ( $QuoteBack ) {
-    $Escape =~ s/\\/$QuoteBack\\/g;
-}
-
-# Quoting single quote character
-my $QuoteSingle = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteSingle');
-
-# Quoting semicolon character
-my $QuoteSemicolon = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteSemicolon');
-
-# check if database is casesensitive
-my $CaseSensitive = $Kernel::OM->Get('DB')->GetDatabaseFunction('CaseSensitive');
 
 # check Search
 # set config 'Ticket::SearchIndexModule' to RuntimeDB
