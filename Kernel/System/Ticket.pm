@@ -503,11 +503,6 @@ sub TicketCreate {
         return;
     }
 
-    # create ticket number if none is given
-    if ( !$Param{TN} ) {
-        $Param{TN} = $Self->TicketCreateNumber();
-    }
-
     # check ticket title
     if ( !$Param{Title} ) {
 
@@ -631,29 +626,76 @@ sub TicketCreate {
         $ExistingOrganisationID = undef;
     }
 
-    # create db record
-    return if !$Kernel::OM->Get('DB')->Do(
-        SQL => '
-            INSERT INTO ticket (
-                tn, title, create_time_unix, type_id, queue_id, ticket_lock_id, user_id,
-                responsible_user_id, ticket_priority_id, ticket_state_id, timeout,
-                until_time, archive_flag, create_time, create_by, change_time, change_by,
-                contact_id, organisation_id)
-            VALUES (?, ?, ?, ?, ?, ?, ?,
-                    ?, ?, ?, 0,
-                    0, ?, current_timestamp, ?, current_timestamp, ?,
-                    ?, ?)',
-        Bind => [
-            \$Param{TN}, \$Param{Title}, \$Age, \$Param{TypeID}, \$Param{QueueID}, \$Param{LockID},
-            \$Param{OwnerID}, \$Param{ResponsibleID}, \$Param{PriorityID}, \$Param{StateID},
-            \$ArchiveFlag, \$Param{UserID}, \$Param{UserID},
-            \$Param{ContactID}, \$ExistingOrganisationID,
-        ],
-    );
+    my $Success;
+    my $TicketNumber;
+    do {
+        # prepare ticket number
+        if ( $Param{TN} ) {
+            $TicketNumber = $Param{TN};
+        }
+        else {
+            $TicketNumber = $Self->TicketCreateNumber();
+        }
+
+        # create db record
+        $Success = $Kernel::OM->Get('DB')->Do(
+            SQL    => '
+                INSERT INTO ticket (
+                    tn, title, create_time_unix, type_id, queue_id, ticket_lock_id, user_id,
+                    responsible_user_id, ticket_priority_id, ticket_state_id, timeout,
+                    until_time, archive_flag, create_time, create_by, change_time, change_by,
+                    contact_id, organisation_id)
+                VALUES (?, ?, ?, ?, ?, ?, ?,
+                        ?, ?, ?, 0,
+                        0, ?, current_timestamp, ?, current_timestamp, ?,
+                        ?, ?)',
+            Bind   => [
+                \$TicketNumber, \$Param{Title}, \$Age, \$Param{TypeID}, \$Param{QueueID}, \$Param{LockID},
+                \$Param{OwnerID}, \$Param{ResponsibleID}, \$Param{PriorityID}, \$Param{StateID},
+                \$ArchiveFlag, \$Param{UserID}, \$Param{UserID},
+                \$Param{ContactID}, \$ExistingOrganisationID,
+            ],
+            Silent => 1,
+        );
+
+        # db insert failed
+        if ( !$Success ) {
+            # check for existing ticket with ticket number
+            my $TicketID = $Self->TicketIDLookup(
+                TicketNumber => $TicketNumber,
+                UserID       => $Param{UserID},
+            );
+
+            # no existing ticket => other db error
+            if ( !$TicketID ) {
+                my $LogMessage = $Kernel::OM->Get('Log')->GetLogEntry(
+                    Type => 'error',
+                    What => 'Message',
+                );
+
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => $LogMessage,
+                    Silent   => $Param{Silent},
+                );
+
+                return;
+            }
+            elsif ( $Param{TN} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => 'Ticket with ticket number ' . $Param{TN} . ' already exists!',
+                    Silent   => $Param{Silent},
+                );
+
+                return;
+            }
+        }
+    } while ( !$Success );
 
     # get ticket id
     my $TicketID = $Self->TicketIDLookup(
-        TicketNumber => $Param{TN},
+        TicketNumber => $TicketNumber,
         UserID       => $Param{UserID},
     );
 
@@ -662,14 +704,14 @@ sub TicketCreate {
         TicketID     => $TicketID,
         QueueID      => $Param{QueueID},
         HistoryType  => 'NewTicket',
-        Name         => "\%\%$Param{TN}\%\%$Param{Queue}\%\%$Param{Priority}\%\%$Param{State}\%\%$TicketID",
+        Name         => "\%\%$TicketNumber\%\%$Param{Queue}\%\%$Param{Priority}\%\%$Param{State}\%\%$TicketID",
         CreateUserID => $Param{UserID},
     );
 
     # log ticket creation
     $Kernel::OM->Get('Log')->Log(
         Priority => 'info',
-        Message  => "New Ticket [$Param{TN}/" . substr( $Param{Title}, 0, 15 ) . "] created "
+        Message  => "New Ticket [$TicketNumber/" . substr( $Param{Title}, 0, 15 ) . "] created "
             . "(TicketID=$TicketID,Queue=$Param{Queue},Priority=$Param{Priority},State=$Param{State})",
     );
 

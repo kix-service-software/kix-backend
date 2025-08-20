@@ -518,6 +518,7 @@ sub Do {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need SQL!',
+            Silent   => $Param{Silent},
         );
         return;
     }
@@ -544,6 +545,7 @@ sub Do {
                     Caller   => 1,
                     Priority => 'Error',
                     Message  => 'No SCALAR param in Bind!' . ( $Self->{Debug} ? ( ' Bind: ' . Data::Dumper::Dumper( $Param{Bind} ) ) : q{} ),
+                    Silent   => $Param{Silent},
                 );
                 return;
             }
@@ -577,6 +579,7 @@ sub Do {
             Caller   => 1,
             Priority => 'error',
             Message  => "$DBI::errstr, SQL: '$Param{SQL}'",
+            Silent   => $Param{Silent},
         );
         return;
     }
