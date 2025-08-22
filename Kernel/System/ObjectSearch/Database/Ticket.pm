@@ -89,7 +89,7 @@ sub GetPermissionDef {
         %Param,
         Types        => ['Base::Ticket'],
         UsageContext => $Param{UserType},
-        Permission   => 'READ',
+        Permission   => $Param{Permission} || 'READ',
     );
     # user has no base permission in this context, nothing to prepare
     if(

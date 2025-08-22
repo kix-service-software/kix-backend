@@ -83,6 +83,7 @@ search for objects
         Language   => 'de',                 # Optional. Default: en; Language used for sorting of several attributes
         UserType   => 'Agent',              # type of requesting user. Used for permission checks. Agent or Customer
         UserID     => 1,                    # ID of requesting user. Used for permission checks
+        Permission => 'READ',               # Optional. Default: READ; Required Permission for BasePermissions
     );
 
 SearchParams:
@@ -185,6 +186,9 @@ sub Search {
     if ( !defined( $Param{Language} ) ) {
         $Param{Language} = '';
     }
+    if ( !defined( $Param{Permission} ) ) {
+        $Param{Permission} = 'READ';
+    }
 
     # prepare result ref map
     my %ResultRefMap = (
@@ -261,20 +265,29 @@ sub Search {
         );
         return;
     }
+    if ( $Param{Permission} !~ m/^(?:READ|CREATE|UPDATE|DELETE)$/ ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Invalid Permission!",
+            Silent   => $Param{Silent},
+        );
+        return;
+    }
 
     # only use unique select values
     @{ $Param{Select} } = $Kernel::OM->Get('Main')->GetUnique( @{ $Param{Select} } );
 
     # prepare cache key data
     my $CacheKeyData = {
-        Result   => $Param{Result},
-        Select   => $Param{Select},
-        Search   => $Param{Search},
-        Sort     => $Param{Sort},
-        Limit    => $Param{Limit},
-        Language => $Param{Language},
-        UserType => $Param{UserType},
-        UserID   => $Param{UserID},
+        Result     => $Param{Result},
+        Select     => $Param{Select},
+        Search     => $Param{Search},
+        Sort       => $Param{Sort},
+        Limit      => $Param{Limit},
+        Language   => $Param{Language},
+        UserType   => $Param{UserType},
+        UserID     => $Param{UserID},
+        Permission => $Param{Permission},
     };
 
     # prepare cache key

@@ -3193,7 +3193,8 @@ sub _CheckBasePermission {
     if ( $Self->can('ExecuteBasePermissionModules') ) {
         $Self->ExecuteBasePermissionModules(
             %Param,
-            Filter => \%Filter
+            Filter     => \%Filter,
+            Permission => $PermissionName,
         );
     }
 
