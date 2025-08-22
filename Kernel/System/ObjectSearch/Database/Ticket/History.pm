@@ -33,7 +33,7 @@ sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
     return {
-        ChangeTime        => {
+        ChangeTime         => {
             IsSelectable   => 0,
             IsSearchable   => 1,
             IsSortable     => 0,
@@ -41,7 +41,7 @@ sub GetSupportedAttributes {
             Operators      => ['EQ','LT','LTE','GT','GTE'],
             ValueType      => 'DATETIME'
         },
-        CloseTime         => {
+        CloseTime          => {
             IsSelectable   => 1,
             IsSearchable   => 1,
             IsSortable     => 0,
@@ -49,7 +49,7 @@ sub GetSupportedAttributes {
             Operators      => ['EQ','LT','LTE','GT','GTE'],
             ValueType      => 'DATETIME'
         },
-        CreatedPriorityID => {
+        CreatedPriorityID  => {
             IsSelectable   => 1,
             IsSearchable   => 1,
             IsSortable     => 0,
@@ -57,7 +57,7 @@ sub GetSupportedAttributes {
             Operators      => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE'],
             ValueType      => 'NUMERIC'
         },
-        CreatedQueueID    => {
+        CreatedQueueID     => {
             IsSelectable   => 1,
             IsSearchable   => 1,
             IsSortable     => 0,
@@ -65,7 +65,7 @@ sub GetSupportedAttributes {
             Operators      => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE'],
             ValueType      => 'NUMERIC'
         },
-        CreatedStateID    => {
+        CreatedStateID     => {
             IsSelectable   => 1,
             IsSearchable   => 1,
             IsSortable     => 0,
@@ -73,8 +73,48 @@ sub GetSupportedAttributes {
             Operators      => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE'],
             ValueType      => 'NUMERIC'
         },
-        CreatedTypeID     => {
+        CreatedTypeID      => {
             IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE'],
+            ValueType      => 'NUMERIC'
+        },
+        HistoricOwnerID     => {
+            IsSelectable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE'],
+            ValueType      => 'NUMERIC'
+        },
+        HistoricPriorityID => {
+            IsSelectable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE'],
+            ValueType      => 'NUMERIC'
+        },
+        HistoricQueueID    => {
+            IsSelectable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE'],
+            ValueType      => 'NUMERIC'
+        },
+        HistoricStateID    => {
+            IsSelectable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE'],
+            ValueType      => 'NUMERIC'
+        },
+        HistoricTypeID     => {
+            IsSelectable   => 0,
             IsSearchable   => 1,
             IsSortable     => 0,
             IsFulltextable => 0,
@@ -89,34 +129,64 @@ sub AttributePrepare {
 
     # init mapping
     my %AttributeDefinition = (
-        ChangeTime        => {
+        ChangeTime         => {
             Column       => 'th.create_time',
             ConditionDef => {}
         },
-        CloseTime         => {
+        CloseTime          => {
             Column       => 'thcl.create_time',
             ConditionDef => {}
         },
-        CreatedPriorityID => {
+        CreatedPriorityID  => {
             Column       => 'thcr.priority_id',
             ConditionDef => {
                 ValueType => 'NUMERIC'
             }
         },
-        CreatedQueueID    => {
+        CreatedQueueID     => {
             Column       => 'thcr.queue_id',
             ConditionDef => {
                 ValueType => 'NUMERIC'
             }
         },
-        CreatedStateID    => {
+        CreatedStateID     => {
             Column       => 'thcr.state_id',
             ConditionDef => {
                 ValueType => 'NUMERIC'
             }
         },
-        CreatedTypeID     => {
+        CreatedTypeID      => {
             Column       => 'thcr.type_id',
+            ConditionDef => {
+                ValueType => 'NUMERIC'
+            }
+        },
+        HistoricOwnerID => {
+            Column       => 'th.owner_id',
+            ConditionDef => {
+                ValueType => 'NUMERIC'
+            }
+        },
+        HistoricPriorityID => {
+            Column       => 'th.priority_id',
+            ConditionDef => {
+                ValueType => 'NUMERIC'
+            }
+        },
+        HistoricQueueID    => {
+            Column       => 'th.queue_id',
+            ConditionDef => {
+                ValueType => 'NUMERIC'
+            }
+        },
+        HistoricStateID    => {
+            Column       => 'th.state_id',
+            ConditionDef => {
+                ValueType => 'NUMERIC'
+            }
+        },
+        HistoricTypeID     => {
+            Column       => 'th.type_id',
             ConditionDef => {
                 ValueType => 'NUMERIC'
             }
@@ -125,8 +195,11 @@ sub AttributePrepare {
 
     # handle joins
     my @SQLJoin = ();
-    # handle joins for ChangeTime attribute
-    if ( $Param{Attribute} eq 'ChangeTime' ) {
+    # handle joins for ChangeTime and Historic* attributes
+    if (
+        $Param{Attribute} eq 'ChangeTime'
+        || $Param{Attribute} =~ /^Historic.+$/
+    ) {
         if ( !$Param{Flags}->{JoinMap}->{TicketHistoryChanged} ) {
             push( @SQLJoin, 'INNER JOIN ticket_history th ON th.ticket_id = st.id' );
 
