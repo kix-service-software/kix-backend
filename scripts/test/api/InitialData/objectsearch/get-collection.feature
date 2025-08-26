@@ -8,7 +8,8 @@
   Scenario: get the list of existing objectsearch ticket SupportedAttributes
     When I query the collection of objectsearch ticket SupportedAttributes
     Then the response code is 200
-    And the response contains 79 items of type "SupportedAttributes"
+    Then the response content is
+    And the response contains 85 items of type "SupportedAttributes"
     And the response contains the following items of type SupportedAttributes
       | IsSearchable | IsSortable | ObjectSpecifics | ObjectType | Property                                  | ValueType |
       | 1            | 1          |                 | Ticket     | AccountedTime                             | NUMERIC   |
@@ -51,6 +52,12 @@
       | 1            | 1          |                 | Ticket     | DynamicField_WorkOrder                    | TEXTUAL   |
       | 1            | 0          |                 | Ticket     | From                                      | TEXTUAL   |
       | 1            | 0          |                 | Ticket     | Fulltext                                  | TEXTUAL   |
+      | 1            | 0          |                 | Ticket     | HistoricMyQueues                          | NUMERIC   |
+      | 1            | 0          |                 | Ticket     | HistoricOwnerID                           | NUMERIC   |
+      | 1            | 0          |                 | Ticket     | HistoricPriorityID                        | NUMERIC   |
+      | 1            | 0          |                 | Ticket     | HistoricQueueID                           | NUMERIC   |
+      | 1            | 0          |                 | Ticket     | HistoricStateID                           | NUMERIC   |
+      | 1            | 0          |                 | Ticket     | HistoricTypeID                            | NUMERIC   |
       | 1            | 1          |                 | Ticket     | ID                                        | NUMERIC   |
       | 1            | 1          |                 | Ticket     | LastChangeTime                            | DATETIME  |
       | 1            | 1          |                 | Ticket     | Lock                                      | TEXTUAL   |
