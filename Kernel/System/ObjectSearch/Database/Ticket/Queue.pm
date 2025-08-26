@@ -57,6 +57,14 @@ sub GetSupportedAttributes {
             IsFulltextable => 0,
             Operators      => ['EQ'],
             ValueType      => 'NUMERIC'
+        },
+        HistoricMyQueues => {
+            IsSelectable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 0,
+            Operators      => ['EQ'],
+            ValueType      => 'NUMERIC'
         }
     };
 }
@@ -127,10 +135,25 @@ sub Search {
     if (
         ref( $Param{Search} ) eq 'HASH'
         && $Param{Search}->{Field}
-        && $Param{Search}->{Field} eq 'MyQueues'
+        && (
+            $Param{Search}->{Field} eq 'MyQueues'
+            || $Param{Search}->{Field} eq 'HistoricMyQueues'
+        )
     ) {
         # check params
         return if ( !$Self->_CheckSearchParams( %Param ) );
+
+        my $TableAlias = 'st';
+        my @SQLJoin = ();
+        if ( $Param{Search}->{Field} eq 'HistoricMyQueues' ) {
+            if ( !$Param{Flags}->{JoinMap}->{TicketHistoryChanged} ) {
+                push( @SQLJoin, 'INNER JOIN ticket_history th ON th.ticket_id = st.id' );
+
+                $Param{Flags}->{JoinMap}->{TicketHistoryChanged} = 1;
+            }
+
+            $TableAlias = 'th';
+        }
 
         # get user preferences
         my %UserPreferences = $Kernel::OM->Get('User')->GetPreferences(
@@ -159,7 +182,7 @@ sub Search {
             if ( $SearchValue ) {
                 my $SearchCondition = $Self->_GetCondition(
                     Operator  => 'IN',
-                    Column    => 'st.queue_id',
+                    Column    => $TableAlias . '.queue_id',
                     ValueType => 'NUMERIC',
                     Value     => $ConditionValues,
                     Silent    => $Param{Silent}
@@ -173,7 +196,7 @@ sub Search {
             else {
                 my $SearchCondition = $Self->_GetCondition(
                     Operator  => '!IN',
-                    Column    => 'st.queue_id',
+                    Column    => $TableAlias . '.queue_id',
                     ValueType => 'NUMERIC',
                     Value     => $ConditionValues,
                     Silent    => $Param{Silent}
@@ -198,6 +221,7 @@ sub Search {
         # return search def
         return {
             Where => [ $Condition ],
+            Join  => \@SQLJoin,
         };
     }
     else {

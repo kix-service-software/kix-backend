@@ -82,7 +82,7 @@ sub _PrepareData {
     my $OtherUserID = $UserObject->UserLookup(
         UserLogin => $OtherLogin,
     );
-    my %OtherContact = $ContactObject->ContactGet(UserID => $OtherLogin);
+    my %OtherContact = $ContactObject->ContactGet(UserID => $OtherUserID);
 
     # create tickets
     # 1) create a ticket with ContactID, OrgansiationID of CustomerContact

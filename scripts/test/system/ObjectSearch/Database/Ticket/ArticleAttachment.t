@@ -181,7 +181,40 @@ for my $Test ( @AttributePrepareTests ) {
 }
 
 # check Select
-# attributes of this backend are not selectable
+my @SelectTests = (
+    {
+        Name      => 'Select: Attribute undef',
+        Parameter => {
+            Attribute => undef
+        },
+        Expected  => undef
+    },
+    {
+        Name      => 'Select: Attribute invalid',
+        Parameter => {
+            Attribute => 'Test'
+        },
+        Expected  => undef
+    },
+    {
+        Name      => 'Select: Attribute "AttachmentName"',
+        Parameter => {
+            Attribute => 'AttachmentName'
+        },
+        Expected  => undef
+    }
+);
+for my $Test ( @SelectTests ) {
+    my $Result = $AttributeObject->Select(
+        %{ $Test->{Parameter} },
+        Silent => defined( $Test->{Expected} ) ? 0 : 1
+    );
+    $Self->IsDeeply(
+        $Result,
+        $Test->{Expected},
+        $Test->{Name}
+    );
+}
 
 # Quoting ESCAPE character backslash
 my $QuoteBack = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteBack');

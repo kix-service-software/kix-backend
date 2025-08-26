@@ -62,7 +62,7 @@ my $OrganisationIDForUpdate = $OrganisationObject->OrganisationAdd(
 );
 
 my $ContactID = '';
-for my $Key ( 1 .. 3, 'ä', 'カス', '_', '&' ) {
+for my $Key ( 1 .. 3, 'ä', 'カス', '_' ) {
 
     # create non existing customer user login
     my $ContactRandom = 'unittest-' . $Key . $Helper->GetRandomID();

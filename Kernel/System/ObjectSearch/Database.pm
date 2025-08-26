@@ -98,6 +98,7 @@ search for objects in backend
         Language   => 'de',                 # Optional. Default: en; Language used for sorting of several attributes
         UserType   => 'Agent',              # type of requesting user. Used for permission checks. Agent or Customer
         UserID     => 1,                    # ID of requesting user. Used for permission checks
+        Permission => 'READ',               # Optional. Default: READ; Required Permission for BasePermissions
     );
 
 SearchParams:
@@ -163,14 +164,15 @@ sub Search {
 
     # prepare sql defintion
     my $SQLDef = $Self->_PrepareSQLDef(
-        Backend  => $ObjectTypeBackend,
-        Select   => $Param{Select},
-        Search   => $Param{Search},
-        Sort     => $Param{Sort},
-        Language => $Param{Language},
-        UserType => $Param{UserType},
-        UserID   => $Param{UserID},
-        Silent   => $Param{Silent}
+        Backend    => $ObjectTypeBackend,
+        Select     => $Param{Select},
+        Search     => $Param{Search},
+        Sort       => $Param{Sort},
+        Language   => $Param{Language},
+        UserType   => $Param{UserType},
+        UserID     => $Param{UserID},
+        Permission => $Param{Permission},
+        Silent     => $Param{Silent}
     );
     return if ( ref( $SQLDef ) ne 'HASH' );
 

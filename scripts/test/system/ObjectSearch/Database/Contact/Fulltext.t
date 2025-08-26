@@ -20,11 +20,6 @@ my $AttributeModule = 'Kernel::System::ObjectSearch::Database::Contact::Fulltext
 # require module
 return if ( !$Kernel::OM->Get('Main')->Require( $AttributeModule ) );
 
-$Self->True(
-    0,
-    'ToDo: Needs to be rewritten because the functionality of the full text has changed.'
-);
-
 # create backend object
 my $AttributeObject = $AttributeModule->new( %{ $Self } );
 $Self->Is(
@@ -46,6 +41,7 @@ my $AttributeList = $AttributeObject->GetSupportedAttributes();
 $Self->IsDeeply(
     $AttributeList, {
         Fulltext => {
+            IsSelectable   => 0,
             IsSearchable   => 1,
             IsSortable     => 0,
             IsFulltextable => 0,
@@ -203,9 +199,10 @@ my $ObjectSearch = $Kernel::OM->Get('ObjectSearch');
 $Helper->BeginWork();
 
 ## prepare test contact ##
-my $TestData1 = 'Somewhere';
-my $TestData2 = 'unittest|Somecountry';
-my $TestData3 = '02687+23456|musterstadt';
+my $TestData1 = '123456789';
+my $TestData2 = 'unittest|subtests';
+my $TestData3 = '846+23456|Mustermann';
+my $TestData4 = '"108 34567 18"';
 
 # first contact
 my $ContactID1 = $Kernel::OM->Get('Contact')->ContactAdd(
@@ -252,9 +249,9 @@ my $ContactID3 = $Kernel::OM->Get('Contact')->ContactAdd(
     Firstname             => 'Ablert',
     Lastname              => 'Round',
     Email                 => 'albert.round@subtests.com',
-    Phone                 => '846 84 218 3',
-    Fax                   => '108 60615 18',
-    Mobile                => '578 7849',
+    Phone                 => '846 23456 3',
+    Fax                   => '578 7849',
+    Mobile                => '108 34567 18',
     Zip                   => '02687',
     City                  => 'Somewhere',
     Country               => 'Somecountry',
@@ -298,7 +295,7 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => [$ContactID1,$ContactID3]
+        Expected => [$ContactID1]
     },
     {
         Name     => "Search: Field Fulltext / Operator LIKE / Value \$TestData2",
@@ -324,7 +321,20 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => [$ContactID2]
+        Expected => [$ContactID2,$ContactID3]
+    },
+    {
+        Name     => "Search: Field Fulltext / Operator LIKE / Value \$TestData4",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Fulltext',
+                    Operator => 'LIKE',
+                    Value    => $TestData4
+                }
+            ]
+        },
+        Expected => [$ContactID3]
     }
 );
 for my $Test ( @IntegrationSearchTests ) {

@@ -76,15 +76,18 @@ $Self->IsDeeply(
 # check AttributePrepare
 my @AttributePrepareTests = (
     {
-        Name      => 'AttributePrepare: empty parameter',
-        Parameter => {},
+        Name      => 'AttributePrepare: Attribute "Archived"',
+        Parameter => {
+            Attribute => 'Archived'
+        },
         Expected  => {
             Column => 'st.archive_flag',
         }
     },
     {
-        Name      => 'AttributePrepare: PrepareType "Select"',
+        Name      => 'AttributePrepare: Attribute "Archived" / PrepareType "Select"',
         Parameter => {
+            Attribute   => 'Archived',
             PrepareType => 'Select'
         },
         Expected  => {
@@ -92,8 +95,9 @@ my @AttributePrepareTests = (
         }
     },
     {
-        Name      => 'AttributePrepare: PrepareType "Condition"',
+        Name      => 'AttributePrepare: Attribute "Archived" / PrepareType "Condition"',
         Parameter => {
+            Attribute   => 'Archived',
             PrepareType => 'Condition'
         },
         Expected  => {
@@ -104,8 +108,9 @@ my @AttributePrepareTests = (
         }
     },
     {
-        Name      => 'AttributePrepare: PrepareType "Sort"',
+        Name      => 'AttributePrepare: Attribute "Archived" / PrepareType "Sort"',
         Parameter => {
+            Attribute   => 'Archived',
             PrepareType => 'Sort'
         },
         Expected  => {
@@ -113,8 +118,9 @@ my @AttributePrepareTests = (
         }
     },
     {
-        Name      => 'AttributePrepare: PrepareType "Fulltext"',
+        Name      => 'AttributePrepare: Attribute "Archived" / PrepareType "Fulltext"',
         Parameter => {
+            Attribute   => 'Archived',
             PrepareType => 'Fulltext'
         },
         Expected  => {
@@ -151,7 +157,7 @@ my @SelectTests = (
         Expected  => undef
     },
     {
-        Name      => 'Select: Attribute Archived',
+        Name      => 'Select: Attribute "Archived"',
         Parameter => {
             Attribute => 'Archived'
         },
@@ -180,7 +186,7 @@ my @SearchTests = (
         Expected => undef
     },
     {
-        Name     => 'Search: Value undef',
+        Name     => 'Search: Field "Archived" / Operator "EQ" / Value undef',
         Search   => {
             Field    => 'Archived',
             Operator => 'EQ',
@@ -190,7 +196,7 @@ my @SearchTests = (
         Expected => undef
     },
     {
-        Name     => 'Search: Value invalid',
+        Name     => 'Search: Field "Archived" / Operator "EQ" / Value invalid',
         Search   => {
             Field    => 'Archived',
             Operator => 'EQ',
@@ -199,7 +205,7 @@ my @SearchTests = (
         Expected => undef
     },
     {
-        Name     => 'Search: Value empty',
+        Name     => 'Search: Field "Archived" / Operator "EQ" / Value empty',
         Search   => {
             Field    => 'Archived',
             Operator => 'EQ',
@@ -208,7 +214,7 @@ my @SearchTests = (
         Expected => undef
     },
     {
-        Name     => 'Search: Value invalid array',
+        Name     => 'Search: Field "Archived" / Operator "EQ" / Value invalid array',
         Search   => {
             Field    => 'Archived',
             Operator => 'EQ',
@@ -217,7 +223,7 @@ my @SearchTests = (
         Expected => undef
     },
     {
-        Name     => 'Search: Field undef',
+        Name     => 'Search: Field undef / Operator "EQ" / Value 1',
         Search   => {
             Field    => undef,
             Operator => 'EQ',
@@ -226,7 +232,7 @@ my @SearchTests = (
         Expected => undef
     },
     {
-        Name     => 'Search: Field invalid',
+        Name     => 'Search: Field invalid / Operator "EQ" / Value 1',
         Search   => {
             Field    => 'Test',
             Operator => 'EQ',
@@ -235,7 +241,7 @@ my @SearchTests = (
         Expected => undef
     },
     {
-        Name     => 'Search: Operator undef',
+        Name     => 'Search: Field "Archived" / Operator undef / Value 1',
         Search   => {
             Field    => 'Archived',
             Operator => undef,
@@ -244,7 +250,7 @@ my @SearchTests = (
         Expected => undef
     },
     {
-        Name     => 'Search: Operator invalid',
+        Name     => 'Search: Field "Archived" / Operator invalid / Value 1',
         Search   => {
             Field    => 'Archived',
             Operator => 'Test',
@@ -253,7 +259,7 @@ my @SearchTests = (
         Expected => undef
     },
     {
-        Name     => 'Search: valid search / Operator EQ / Value 1',
+        Name     => 'Search: Field "Archived" / Operator "EQ" / Value 1',
         Search   => {
             Field    => 'Archived',
             Operator => 'EQ',
@@ -264,7 +270,7 @@ my @SearchTests = (
         }
     },
     {
-        Name     => 'Search: valid search / Operator EQ / Value 0',
+        Name     => 'Search: Field "Archived" / Operator "EQ" / Value 0',
         Search   => {
             Field    => 'Archived',
             Operator => 'EQ',
@@ -275,7 +281,7 @@ my @SearchTests = (
         }
     },
     {
-        Name     => 'Search: valid search / Operator NE / Value 1',
+        Name     => 'Search: Field "Archived" / Operator "NE" / Value 1',
         Search   => {
             Field    => 'Archived',
             Operator => 'NE',
@@ -286,7 +292,7 @@ my @SearchTests = (
         }
     },
     {
-        Name     => 'Search: valid search / Operator NE / Value 0',
+        Name     => 'Search: Field "Archived" / Operator "NE" / Value 0',
         Search   => {
             Field    => 'Archived',
             Operator => 'NE',
@@ -297,7 +303,7 @@ my @SearchTests = (
         }
     },
     {
-        Name     => 'Search: valid search / Operator IN / Value array empty',
+        Name     => 'Search: Field "Archived" / Operator "IN" / Value []',
         Search   => {
             Field    => 'Archived',
             Operator => 'IN',
@@ -308,7 +314,7 @@ my @SearchTests = (
         }
     },
     {
-        Name     => 'Search: valid search / Operator IN / Value array 1',
+        Name     => 'Search: Field "Archived" / Operator "IN" / Value [1]',
         Search   => {
             Field    => 'Archived',
             Operator => 'IN',
@@ -319,7 +325,7 @@ my @SearchTests = (
         }
     },
     {
-        Name     => 'Search: valid search / Operator IN / Value array 0',
+        Name     => 'Search: Field "Archived" / Operator "IN" / Value [0]',
         Search   => {
             Field    => 'Archived',
             Operator => 'IN',
@@ -330,7 +336,7 @@ my @SearchTests = (
         }
     },
     {
-        Name     => 'Search: valid search / Operator IN / Value array 1 and 0',
+        Name     => 'Search: Field "Archived" / Operator "IN" / Value [1,0]',
         Search   => {
             Field    => 'Archived',
             Operator => 'IN',
@@ -341,7 +347,7 @@ my @SearchTests = (
         }
     },
     {
-        Name     => 'Search: valid search / Operator !IN / Value array empty',
+        Name     => 'Search: Field "Archived" / Operator "!IN" / Value []',
         Search   => {
             Field    => 'Archived',
             Operator => '!IN',
@@ -352,7 +358,7 @@ my @SearchTests = (
         }
     },
     {
-        Name     => 'Search: valid search / Operator !IN / Value array 1',
+        Name     => 'Search: Field "Archived" / Operator "!IN" / Value [1]',
         Search   => {
             Field    => 'Archived',
             Operator => '!IN',
@@ -363,7 +369,7 @@ my @SearchTests = (
         }
     },
     {
-        Name     => 'Search: valid search / Operator !IN / Value array 0',
+        Name     => 'Search: Field "Archived" / Operator "!IN" / Value [0]',
         Search   => {
             Field    => 'Archived',
             Operator => '!IN',
@@ -374,7 +380,7 @@ my @SearchTests = (
         }
     },
     {
-        Name     => 'Search: valid search / Operator !IN / Value array 1 and 0',
+        Name     => 'Search: Field "Archived" / Operator "!IN" / Value [1,0]',
         Search   => {
             Field    => 'Archived',
             Operator => '!IN',
@@ -546,7 +552,7 @@ $Kernel::OM->ObjectsDiscard(
 # test Search
 my @IntegrationSearchTests = (
     {
-        Name     => 'Search: Field Archived / Operator EQ / Value 1',
+        Name     => 'Search: Field "Archived" / Operator "EQ" / Value 1',
         Search   => {
             'AND' => [
                 {
@@ -559,7 +565,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID1]
     },
     {
-        Name     => 'Search: Field Archived / Operator NE / Value 1',
+        Name     => 'Search: Field "Archived" / Operator "NE" / Value 1',
         Search   => {
             'AND' => [
                 {
@@ -572,7 +578,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID2,$TicketID3]
     },
     {
-        Name     => 'Search: Field Archived / Operator IN / Value 1',
+        Name     => 'Search: Field "Archived" / Operator "IN" / Value [1]',
         Search   => {
             'AND' => [
                 {
@@ -585,7 +591,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID1]
     },
     {
-        Name     => 'Search: Field Archived / Operator !IN / Value 1',
+        Name     => 'Search: Field "Archived" / Operator "!IN" / Value [1]',
         Search   => {
             'AND' => [
                 {
@@ -616,7 +622,7 @@ for my $Test ( @IntegrationSearchTests ) {
 # test Sort
 my @IntegrationSortTests = (
     {
-        Name     => 'Sort: Field Archived',
+        Name     => 'Sort: Field "Archived"',
         Sort     => [
             {
                 Field => 'Archived'
@@ -625,7 +631,7 @@ my @IntegrationSortTests = (
         Expected => [$TicketID2,$TicketID3,$TicketID1]
     },
     {
-        Name     => 'Sort: Field Archived / Direction ascending',
+        Name     => 'Sort: Field "Archived" / Direction "ascending"',
         Sort     => [
             {
                 Field     => 'Archived',
@@ -635,7 +641,7 @@ my @IntegrationSortTests = (
         Expected => [$TicketID2,$TicketID3,$TicketID1]
     },
     {
-        Name     => 'Sort: Field Archived / Direction descending',
+        Name     => 'Sort: Field "Archived" / Direction "descending"',
         Sort     => [
             {
                 Field     => 'Archived',

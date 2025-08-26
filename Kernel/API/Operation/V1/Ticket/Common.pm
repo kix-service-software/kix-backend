@@ -149,7 +149,7 @@ sub GetBasePermissionObjectIDs {
     my $QueueIDs = $Kernel::OM->Get('Ticket')->BasePermissionRelevantObjectIDList(
         %Param,
     );
-    return if !$QueueIDs;
+    return if ( !defined( $QueueIDs ) );
     return 1 if !IsArrayRef($QueueIDs);
 
     return { Object => 'Ticket', Attribute => 'QueueID', ObjectIDs => $QueueIDs };
@@ -196,7 +196,9 @@ sub ExecuteBasePermissionModules {
             BasePermissionQueueIDs => $BasePermissionQueueIDs,
             TicketID               => $Param{Data}->{TicketID},
             UserID                 => $Self->{Authorization}->{UserID},
-            ReturnType             => 'APIFilter'
+            UserType               => $Self->{Authorization}->{UserType},
+            ReturnType             => 'APIFilter',
+            RequestMethod          => $Self->{RequestMethod}
         );
         next PERMISSION_MODULE if ( !IsHashRefWithData($Result) );
 

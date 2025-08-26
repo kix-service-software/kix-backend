@@ -55,7 +55,7 @@ $Self->IsDeeply(
 # check AttributePrepare
 my @AttributePrepareTests = (
     {
-        Name      => 'AttributePrepare: Attribute ArticleFlag.Seen / UserID 1',
+        Name      => 'AttributePrepare: Attribute "ArticleFlag.Seen" / UserID 1',
         Parameter => {
             Attribute => 'ArticleFlag.Seen',
             UserID    => 1
@@ -74,7 +74,7 @@ my @AttributePrepareTests = (
         }
     },
     {
-        Name      => 'AttributePrepare: Attribute ArticleFlag.Seen / PrepareType "Select" / UserID 1',
+        Name      => 'AttributePrepare: Attribute "ArticleFlag.Seen" / PrepareType "Select" / UserID 1',
         Parameter => {
             Attribute   => 'ArticleFlag.Seen',
             PrepareType => 'Select',
@@ -94,7 +94,7 @@ my @AttributePrepareTests = (
         }
     },
     {
-        Name      => 'AttributePrepare: Attribute ArticleFlag.Seen / PrepareType "Condition" / UserID 1',
+        Name      => 'AttributePrepare: Attribute "ArticleFlag.Seen" / PrepareType "Condition" / UserID 1',
         Parameter => {
             Attribute   => 'ArticleFlag.Seen',
             PrepareType => 'Condition',
@@ -114,7 +114,7 @@ my @AttributePrepareTests = (
         }
     },
     {
-        Name      => 'AttributePrepare: Attribute ArticleFlag.Seen / PrepareType "Condition" / UserType "Customer" / UserID 1',
+        Name      => 'AttributePrepare: Attribute "ArticleFlag.Seen" / PrepareType "Condition" / UserType "Customer" / UserID 1',
         Parameter => {
             Attribute   => 'ArticleFlag.Seen',
             PrepareType => 'Condition',
@@ -135,7 +135,7 @@ my @AttributePrepareTests = (
         }
     },
     {
-        Name      => 'AttributePrepare: Attribute ArticleFlag.Seen / PrepareType "Sort" / UserID 1',
+        Name      => 'AttributePrepare: Attribute "ArticleFlag.Seen" / PrepareType "Sort" / UserID 1',
         Parameter => {
             Attribute   => 'ArticleFlag.Seen',
             PrepareType => 'Sort',
@@ -155,7 +155,7 @@ my @AttributePrepareTests = (
         }
     },
     {
-        Name      => 'AttributePrepare: Attribute ArticleFlag.Seen / PrepareType "Fulltext" / UserID 1',
+        Name      => 'AttributePrepare: Attribute "ArticleFlag.Seen" / PrepareType "Fulltext" / UserID 1',
         Parameter => {
             Attribute   => 'ArticleFlag.Seen',
             PrepareType => 'Fulltext',
@@ -188,7 +188,40 @@ for my $Test ( @AttributePrepareTests ) {
 }
 
 # check Select
-# attributes of this backend are not selectable
+my @SelectTests = (
+    {
+        Name      => 'Select: Attribute undef',
+        Parameter => {
+            Attribute => undef
+        },
+        Expected  => undef
+    },
+    {
+        Name      => 'Select: Attribute invalid',
+        Parameter => {
+            Attribute => 'Test'
+        },
+        Expected  => undef
+    },
+    {
+        Name      => 'Select: Attribute "ArticleFlag.Seen"',
+        Parameter => {
+            Attribute => 'ArticleFlag.Seen'
+        },
+        Expected  => undef
+    }
+);
+for my $Test ( @SelectTests ) {
+    my $Result = $AttributeObject->Select(
+        %{ $Test->{Parameter} },
+        Silent => defined( $Test->{Expected} ) ? 0 : 1
+    );
+    $Self->IsDeeply(
+        $Result,
+        $Test->{Expected},
+        $Test->{Name}
+    );
+}
 
 # check Search
 my @SearchTests = (
