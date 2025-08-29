@@ -52,6 +52,7 @@ _Autostart();
 
 my $App = CGI::Emulate::PSGI->handler(
     sub {
+        my $StartTime = Time::HiRes::time();
 
         # Cleanup values from previous requests.
         CGI::initialize_globals();
@@ -64,11 +65,11 @@ my $App = CGI::Emulate::PSGI->handler(
             DB::enable_profile()
         }
 
-        my $StartTime = time();
-
         # run the request
         eval {
-            my $Provider = Kernel::API::Provider->new();
+            my $Provider = Kernel::API::Provider->new(
+                ExecutionStartTime => $StartTime
+            );
             $Provider->Run();
             $Kernel::OM->CleanUp();
 #            do "$Bin/$ENV{SCRIPT_NAME}";
