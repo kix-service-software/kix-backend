@@ -6086,16 +6086,16 @@ sub TicketAttachmentCountCalculate {
         }
     }
 
-    my $AttachmentCount = 0;
-
-    my @Articles = $Self->ArticleGet(
-        TicketID => $Param{TicketID},
-        UserID   => 1
+    return if !$Kernel::OM->Get('DB')->Prepare(
+        SQL   => 'SELECT SUM(attachment_count) FROM article WHERE ticket_id = ?',
+        Bind  => [
+            \$Param{TicketID}
+        ],
     );
-    if (@Articles) {
-        for my $Article (@Articles) {
-            $AttachmentCount += $Article->{AttachmentCount} || 0;
-        }
+
+    my $AttachmentCount;
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
+        $AttachmentCount  = $Row[0];
     }
 
     return $AttachmentCount;
