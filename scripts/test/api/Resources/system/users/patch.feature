@@ -12,12 +12,13 @@ Feature: PATCH request to the /system/users/:UserID resource
     And the response object is UserPostPatchResponse
 #    When I delete this user
 #    Then the response code is 204
+
   Scenario: changed password with policy
     Given a user
-    Then the response content is
     When I update this user pw
     Then the response code is 200
-    Then the response content is
     When I update this user pw with incorrect pw
-    Then the response code is 401
-    Then the response content is
+    Then the response code is 400
+    And the error code is "Validator.Failed"
+    And the error message is "Password has to be at least 6 characters long. It needs at least 2 upper case, 2 lower case and 1 digit."
+

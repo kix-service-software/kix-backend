@@ -54,7 +54,7 @@ When qr/I update this user pw$/, sub {
         Token   => S->{Token},
         Content => {
             User => {
-                UserPw => "start123",
+                UserPw => "STart123",
                 ValidID => 2
             }
         }
