@@ -140,12 +140,16 @@ sub ValueValidate {
 sub SQLParameterGet {
     my ( $Self, %Param ) = @_;
 
-    return {
-        Column       => "$Param{TableAlias}.value_text",
-        ConditionDef => {
-            CaseInsensitive => 1
-        }
-    };
+    my $SQLParameter = $Self->SUPER::SQLParameterGet( %Param );
+
+    if (
+        $Param{ParameterType}
+        && $Param{ParameterType} eq 'Condition'
+    ) {
+        $SQLParameter->{ConditionDef}->{CaseInsensitive} = 1;
+    }
+
+    return $SQLParameter;
 }
 
 sub DisplayValueRender {

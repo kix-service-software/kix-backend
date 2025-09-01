@@ -42,7 +42,7 @@ sub GetSupportedAttributes {
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 0,
-            Operators      => ['EQ','NE','IN','!IN'],
+            Operators      => ['EMPTY','EQ','NE','IN','!IN'],
             ValueType      => 'NUMERIC'
         },
         OrganisationIDs => {
@@ -50,7 +50,7 @@ sub GetSupportedAttributes {
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 0,
-            Operators      => ['EQ','NE','IN','!IN'],
+            Operators      => ['EMPTY','EQ','NE','IN','!IN'],
             ValueType      => 'NUMERIC'
         },
         Organisation => {
@@ -58,21 +58,21 @@ sub GetSupportedAttributes {
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 1,
-            Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            Operators      => ['EMPTY','EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         OrganisationNumber => {
             IsSelectable   => 0,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 1,
-            Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            Operators      => ['EMPTY','EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         PrimaryOrganisationID => {
             IsSelectable   => 1,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 0,
-            Operators      => ['EQ','NE','IN','!IN'],
+            Operators      => ['EMPTY','EQ','NE','IN','!IN'],
             ValueType      => 'NUMERIC'
         },
         PrimaryOrganisation => {
@@ -80,14 +80,14 @@ sub GetSupportedAttributes {
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 1,
-            Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            Operators      => ['EMPTY','EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         PrimaryOrganisationNumber => {
             IsSelectable   => 1,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 1,
-            Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            Operators      => ['EMPTY','EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         }
     };
 }

@@ -194,10 +194,10 @@ sub _XMLAttributeGet {
                     || $Attr->{Input}->{Type} eq 'DateTime'
                 ) {
                     $ValueType = uc( $Attr->{Input}->{Type} );
-                    $Operators = ['EQ','NE','LT','LTE','GT','GTE'];
+                    $Operators = ['EMPTY','EQ','NE','LT','LTE','GT','GTE'];
                 }
                 else {
-                    $Operators = ['EQ','NE','IN','!IN','LT','LTE','GT','GTE','ENDSWITH','STARTSWITH','CONTAINS','LIKE'];
+                    $Operators = ['EMPTY','EQ','NE','IN','!IN','LT','LTE','GT','GTE','ENDSWITH','STARTSWITH','CONTAINS','LIKE'];
                 }
 
                 $Param{AttributesRef}->{ $Key } = {

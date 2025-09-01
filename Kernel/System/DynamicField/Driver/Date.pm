@@ -63,7 +63,7 @@ sub new {
         'IsSearchable'    => 1,
         'IsSortable'      => 1,
         'IsFulltextable'  => 0,
-        'SearchOperators' => ['EQ','NE','GT','GTE','LT','LTE'],
+        'SearchOperators' => ['EMPTY','EQ','NE','GT','GTE','LT','LTE'],
         'SearchValueType' => 'DATE'
     };
 

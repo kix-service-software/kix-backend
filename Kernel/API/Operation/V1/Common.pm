@@ -1801,6 +1801,7 @@ sub _ValidateFilter {
     }
 
     my %OperatorTypeMapping = (
+        'EMPTY'      => { 'NUMERIC' => 1, 'STRING' => 1, 'DATE'     => 1, 'DATETIME' => 1 },
         'EQ'         => { 'NUMERIC' => 1, 'STRING' => 1, 'DATE'     => 1, 'DATETIME' => 1 },
         'NE'         => { 'NUMERIC' => 1, 'STRING' => 1, 'DATE'     => 1, 'DATETIME' => 1 },
         'LT'         => { 'NUMERIC' => 1, 'DATE'   => 1, 'DATETIME' => 1 },
@@ -1957,27 +1958,29 @@ sub _ValidateFilter {
                     );
                 }
 
-                # check DATE value
-                if (
-                    $Filter->{Type} eq 'DATE'
-                    && $Filter->{Value} !~ /^(\d{4}-\d{2}-\d{2}(\s*([-+]\d+\w\s*)*)|\s*([-+]\d+\w\s*?)*)$/
-                    && $Filter->{Value} !~ /^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(\s*([-+]\d+\w\s*)*)|\s*([-+]\d+\w\s*?)*)$/
-                ) {
-                    return $Self->_Error(
-                        Code    => 'BadRequest',
-                        Message => "Invalid date value $Filter->{Value} in $Object.$Filter->{Field}!",
-                    );
-                }
+                if ( $Filter->{Operator} ne 'EMPTY' ) {
+                    # check DATE value
+                    if (
+                        $Filter->{Type} eq 'DATE'
+                        && $Filter->{Value} !~ /^(\d{4}-\d{2}-\d{2}(\s*([-+]\d+\w\s*)*)|\s*([-+]\d+\w\s*?)*)$/
+                        && $Filter->{Value} !~ /^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(\s*([-+]\d+\w\s*)*)|\s*([-+]\d+\w\s*?)*)$/
+                    ) {
+                        return $Self->_Error(
+                            Code    => 'BadRequest',
+                            Message => "Invalid date value $Filter->{Value} in $Object.$Filter->{Field}!",
+                        );
+                    }
 
-                # check DATETIME value
-                if (
-                    $Filter->{Type} eq 'DATETIME'
-                    && $Filter->{Value} !~ /^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(\s*([-+]\d+\w\s*)*)|\s*([-+]\d+\w\s*?)*)$/
-                ) {
-                    return $Self->_Error(
-                        Code    => 'BadRequest',
-                        Message => "Invalid datetime value $Filter->{Value} in $Object.$Filter->{Field}!",
-                    );
+                    # check DATETIME value
+                    if (
+                        $Filter->{Type} eq 'DATETIME'
+                        && $Filter->{Value} !~ /^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(\s*([-+]\d+\w\s*)*)|\s*([-+]\d+\w\s*?)*)$/
+                    ) {
+                        return $Self->_Error(
+                            Code    => 'BadRequest',
+                            Message => "Invalid datetime value $Filter->{Value} in $Object.$Filter->{Field}!",
+                        );
+                    }
                 }
             }
         }

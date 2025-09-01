@@ -63,7 +63,7 @@ sub new {
         'IsSearchable'    => 1,
         'IsSortable'      => 0,
         'IsFulltextable'  => 0,
-        'SearchOperators' => ['EQ','NE','IN','!IN'],
+        'SearchOperators' => ['EMPTY','EQ','NE','IN','!IN'],
         'SearchValueType' => 'NUMERIC'
     };
 
