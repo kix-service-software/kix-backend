@@ -103,7 +103,7 @@ sub Run {
     my $UserLogin;
     for my $ResultUserID ( keys( %UserSearchResult ) ) {
         $UserID = $ResultUserID;
-        $UserID = $UserSearchResult{ $ResultUserID };
+        $UserLogin = $UserSearchResult{ $ResultUserID };
     }
     return if (
         !$UserID
@@ -169,6 +169,14 @@ sub Run {
         Body       => $Notification{Body},
         Loop       => 1,
         Attachment => $Param{Data}->{Attachments} || [],
+    );
+
+    # write history
+    $Kernel::OM->Get('Ticket')->HistoryAdd(
+        TicketID     => $Param{Data}->{TicketID},
+        HistoryType  => 'Misc',
+        Name         => "Sent substitute email to '$SubstituteUserContact{Email}' for agent '$UserLogin'",
+        CreateUserID => $Param{UserID},
     );
 
     return 1;

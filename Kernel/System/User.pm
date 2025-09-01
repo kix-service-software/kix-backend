@@ -659,6 +659,7 @@ sub UserSearch {
         && !$Param{ValidID}
         && !$Param{SearchUserID}
         && !IsArrayRefWithData($Param{UserIDs})
+        && !IsArrayRefWithData($Param{NotUserIDs})
         && !IsHashRefWithData($Param{HasPermission})
         && !IsArrayRefWithData($Param{RoleIDs})
         && !IsArrayRefWithData($Param{NotRoleIDs})
@@ -666,7 +667,7 @@ sub UserSearch {
         if ( !$Param{Silent} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => 'Need Search or UserLogin or UserLoginEquals or IsAgent or IsCustomer or IsOutOfOffice or ValidID or SearchUserID or HasPermission or RoleIDs or NotRoleIDs - else use UserList!',
+                Message  => 'Need Search or UserLogin or UserLoginEquals or IsAgent or IsCustomer or IsOutOfOffice or ValidID or SearchUserID or UserIDs or NotUserIDs or HasPermission or RoleIDs or NotRoleIDs - else use UserList!',
             );
         }
         return;
@@ -681,6 +682,7 @@ sub UserSearch {
         . ( $Param{Valid} || '' ) . '::'
         . ( $Param{ValidID} || '' ) . '::'
         . ( IsArrayRefWithData($Param{UserIDs}) ? join(',', @{ $Param{UserIDs} }) : '' ) . '::'
+        . ( IsArrayRefWithData($Param{NotUserIDs}) ? join(',', @{ $Param{NotUserIDs} }) : '' ) . '::'
         . ( $Param{Limit} || '' ) . '::'
         . ( $Param{SearchUserID} || '') . '::'
         . ( IsHashRefWithData($Param{HasPermission}) ? $Kernel::OM->Get('Main')->Dump($Param{HasPermission}, 'ascii+noindent') : '' ) . '::'
@@ -791,6 +793,10 @@ END
 
     if ( IsArrayRefWithData($Param{UserIDs}) ) {
         push(@Where,"u.id IN (" . join( ', ', @{ $Param{UserIDs} } ) . ")");
+    }
+
+    if ( IsArrayRefWithData($Param{NotUserIDs}) ) {
+        push(@Where,"u.id NOT IN (" . join( ', ', @{ $Param{NotUserIDs} } ) . ")");
     }
 
     if ( $Param{SearchUserID} ) {

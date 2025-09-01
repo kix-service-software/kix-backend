@@ -65,6 +65,13 @@ sub GetSupportedAttributes {
             Operators      => ['EQ'],
             ValueType      => 'NUMERIC'
         },
+        OwnerOutOfOfficeSubstitute => {
+            IsSelectable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 0,
+            Operators      => ['EMPTY','EQ','NE','IN','!IN','GT','GTE','LT','LTE']
+        },
         ResponsibleID => {
             IsSelectable   => 1,
             IsSearchable   => 1,
@@ -94,6 +101,20 @@ sub GetSupportedAttributes {
             IsFulltextable => 0,
             Operators      => ['EQ'],
             ValueType      => 'NUMERIC'
+        },
+        ResponsibleOutOfOfficeSubstitute => {
+            IsSelectable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 0,
+            Operators      => ['EMPTY','EQ','NE','IN','!IN','GT','GTE','LT','LTE']
+        },
+        TicketOutOfOfficeSubstitute => {
+            IsSelectable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 0,
+            Operators      => ['EMPTY','EQ','NE','IN','!IN','GT','GTE','LT','LTE']
         }
     };
 }
@@ -121,6 +142,12 @@ sub AttributePrepare {
                 CaseInsensitive => 1
             }
         },
+        OwnerOutOfOfficeSubstitute => {
+            # column is set while preparing join
+            ConditionDef => {
+                NULLValue => 1
+            }
+        },
         ResponsibleID => {
             Column       => 'st.responsible_user_id',
             ConditionDef => {
@@ -137,6 +164,12 @@ sub AttributePrepare {
             SortColumn   => ['LOWER(truc.lastname)','LOWER(truc.firstname)'],
             ConditionDef => {
                 CaseInsensitive => 1
+            }
+        },
+        ResponsibleOutOfOfficeSubstitute => {
+            # column is set while preparing join
+            ConditionDef => {
+                NULLValue => 1
             }
         }
     );
@@ -184,6 +217,38 @@ sub AttributePrepare {
 
             $Param{Flags}->{JoinMap}->{TicketResponsibleContact} = 1;
         }
+    }
+    elsif ( $Param{Attribute} eq 'OwnerOutOfOfficeSubstitute' ) {
+        # get user preferences config
+        my $GeneratorModule = $Kernel::OM->Get('Config')->Get('User::PreferencesModule')
+            || 'Kernel::System::User::Preferences::DB';
+
+        # get generator preferences module
+        my $PreferencesObject = $Kernel::OM->Get($GeneratorModule);
+
+        if ( !$Param{Flags}->{JoinMap}->{TicketOwnerOutOfOfficeSubstitute} ) {
+            push( @SQLJoin, "LEFT OUTER JOIN $PreferencesObject->{PreferencesTable} toupooosub ON toupooosub.$PreferencesObject->{PreferencesTableUserID} = st.user_id AND toupooosub.$PreferencesObject->{PreferencesTableKey} = 'OutOfOfficeSubstitute'" );
+
+            $Param{Flags}->{JoinMap}->{TicketOwnerOutOfOfficeSubstitute} = 1;
+        }
+
+        $AttributeDefinition{ $Param{Attribute} }->{Column} = 'toupooosub.' . $PreferencesObject->{PreferencesTableValue}
+    }
+    elsif ( $Param{Attribute} eq 'ResponsibleOutOfOfficeSubstitute' ) {
+        # get user preferences config
+        my $GeneratorModule = $Kernel::OM->Get('Config')->Get('User::PreferencesModule')
+            || 'Kernel::System::User::Preferences::DB';
+
+        # get generator preferences module
+        my $PreferencesObject = $Kernel::OM->Get($GeneratorModule);
+
+        if ( !$Param{Flags}->{JoinMap}->{TicketResponsibleOutOfOfficeSubstitute} ) {
+            push( @SQLJoin, "LEFT OUTER JOIN $PreferencesObject->{PreferencesTable} trupooosub ON trupooosub.$PreferencesObject->{PreferencesTableUserID} = st.user_id AND trupooosub.$PreferencesObject->{PreferencesTableKey} = 'OutOfOfficeSubstitute'" );
+
+            $Param{Flags}->{JoinMap}->{TicketResponsibleOutOfOfficeSubstitute} = 1;
+        }
+
+        $AttributeDefinition{ $Param{Attribute} }->{Column} = 'trupooosub.' . $PreferencesObject->{PreferencesTableValue}
     }
 
     my %Attribute = (
@@ -256,13 +321,12 @@ sub Search {
                 push( @SQLJoin, "LEFT OUTER JOIN $PreferencesObject->{PreferencesTable} $AttributeMapping{AliasStart} ON $AttributeMapping{AliasStart}.$PreferencesObject->{PreferencesTableUserID} = st.user_id AND $AttributeMapping{AliasStart}.$PreferencesObject->{PreferencesTableKey} = 'OutOfOfficeStart'" );
                 push( @SQLJoin, "LEFT OUTER JOIN $PreferencesObject->{PreferencesTable} $AttributeMapping{AliasEnd} ON $AttributeMapping{AliasEnd}.$PreferencesObject->{PreferencesTableUserID} = st.user_id AND $AttributeMapping{AliasEnd}.$PreferencesObject->{PreferencesTableKey} = 'OutOfOfficeEnd'" );
 
-                $Param{Flags}->{JoinMap}->{TicketResponsibleOutOfOffice} = $PreferencesObject->{PreferencesTableUserID};
+                $Param{Flags}->{JoinMap}->{TicketResponsibleOutOfOffice} = 1;
             }
         }
 
         # prepare condition
         my $Condition;
-        my $IsRelative;
 
         # prepare column for start and end date
         my $StartColumn = $AttributeMapping{AliasStart} . '.' . $AttributeMapping{ColumnName};
@@ -337,16 +401,88 @@ sub Search {
             $Condition = $Conditions[0];
         }
 
-        # this kind of search is always relative
-        $IsRelative = 1;
-
         return if ( !$Condition );
 
         # return search def
         return {
             Join       => \@SQLJoin,
             Where      => [ $Condition ],
-            IsRelative => $IsRelative
+            IsRelative => 1
+        };
+    }
+    elsif (
+        ref( $Param{Search} ) eq 'HASH'
+        && $Param{Search}->{Field}
+        && $Param{Search}->{Field} eq 'TicketOutOfOfficeSubstitute'
+    ) {
+        my @SQLJoin = ();
+
+        my $OwnerOutOfOfficeCondition = $Self->Search(
+            %Param,
+            Search => {
+                Field    => 'OwnerOutOfOffice',
+                Operator => 'EQ',
+                Value    => [1]
+            }
+        );
+        return if ( !$OwnerOutOfOfficeCondition );
+        if ( IsArrayRefWithData( $OwnerOutOfOfficeCondition->{Join} ) ) {
+            push( @SQLJoin, @{ $OwnerOutOfOfficeCondition->{Join} } );
+        }
+
+        my $OwnerOutOfOfficeSubstituteCondition = $Self->Search(
+            %Param,
+            Search => {
+                Field    => 'OwnerOutOfOfficeSubstitute',
+                Operator => $Param{Search}->{Operator},
+                Value    => $Param{Search}->{Value}
+            }
+        );
+        return if ( !$OwnerOutOfOfficeSubstituteCondition );
+        if ( IsArrayRefWithData( $OwnerOutOfOfficeSubstituteCondition->{Join} ) ) {
+            push( @SQLJoin, @{ $OwnerOutOfOfficeSubstituteCondition->{Join} } );
+        }
+
+        my $ResponsibleOutOfOfficeCondition = $Self->Search(
+            %Param,
+            Search => {
+                Field    => 'ResponsibleOutOfOffice',
+                Operator => 'EQ',
+                Value    => [1]
+            }
+        );
+        return if ( !$ResponsibleOutOfOfficeCondition );
+        if ( IsArrayRefWithData( $ResponsibleOutOfOfficeCondition->{Join} ) ) {
+            push( @SQLJoin, @{ $ResponsibleOutOfOfficeCondition->{Join} } );
+        }
+
+        my $ResponsibleOutOfOfficeSubstituteCondition = $Self->Search(
+            %Param,
+            Search => {
+                Field    => 'ResponsibleOutOfOfficeSubstitute',
+                Operator => $Param{Search}->{Operator},
+                Value    => $Param{Search}->{Value}
+            }
+        );
+        return if ( !$ResponsibleOutOfOfficeSubstituteCondition );
+        if ( IsArrayRefWithData( $ResponsibleOutOfOfficeSubstituteCondition->{Join} ) ) {
+            push( @SQLJoin, @{ $ResponsibleOutOfOfficeSubstituteCondition->{Join} } );
+        }
+
+        
+
+        # return search def
+        return {
+            Join       => \@SQLJoin,
+            Where      => [
+                '(('
+                . $OwnerOutOfOfficeCondition->{Where}[0]
+                . ' AND ' . $OwnerOutOfOfficeSubstituteCondition->{Where}[0]
+                . ') OR (' . $ResponsibleOutOfOfficeCondition->{Where}[0]
+                . ' AND ' . $ResponsibleOutOfOfficeSubstituteCondition->{Where}[0]
+                . '))'
+            ],
+            IsRelative => 1
         };
     }
     else {

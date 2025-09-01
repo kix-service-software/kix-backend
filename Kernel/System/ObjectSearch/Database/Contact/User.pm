@@ -40,7 +40,7 @@ sub GetSupportedAttributes {
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 0,
-            Operators      => ['EQ','NE','IN','!IN'],
+            Operators      => ['EMPTY','EQ','NE','IN','!IN'],
             ValueType      => 'NUMERIC'
         },
         AssignedUserID => {
@@ -48,7 +48,7 @@ sub GetSupportedAttributes {
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 0,
-            Operators      => ['EQ','NE','IN','!IN'],
+            Operators      => ['EMPTY','EQ','NE','IN','!IN'],
             ValueType      => 'NUMERIC'
         },
         Login => {
@@ -56,14 +56,14 @@ sub GetSupportedAttributes {
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 1,
-            Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            Operators      => ['EMPTY','EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         UserLogin => {
             IsSelectable   => 1,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 1,
-            Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            Operators      => ['EMPTY','EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         }
     };
 }
