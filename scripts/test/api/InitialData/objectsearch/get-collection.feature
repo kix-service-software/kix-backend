@@ -9,7 +9,7 @@
     When I query the collection of objectsearch ticket SupportedAttributes
     Then the response code is 200
     Then the response content is
-    And the response contains 85 items of type "SupportedAttributes"
+    And the response contains 88 items of type "SupportedAttributes"
     And the response contains the following items of type SupportedAttributes
       | IsSearchable | IsSortable | ObjectSpecifics | ObjectType | Property                                  | ValueType |
       | 1            | 1          |                 | Ticket     | AccountedTime                             | NUMERIC   |
@@ -38,8 +38,8 @@
       | 1            | 1          |                 | Ticket     | CreateTime                                | DATETIME  |
       | 1            | 0          |                 | Ticket     | CustomerVisible                           | NUMERIC   |
       | 1            | 0          |                 | Ticket     | DynamicField_AffectedAsset                | NUMERIC   |
-      | 0            | 0          |                 | Ticket     | DynamicField_MobileProcessingChecklist010 | TEXTUAL   |
-      | 0            | 0          |                 | Ticket     | DynamicField_MobileProcessingChecklist020 | TEXTUAL   |
+      | 1            | 0          |                 | Ticket     | DynamicField_MobileProcessingChecklist010 | TEXTUAL   |
+      | 1            | 0          |                 | Ticket     | DynamicField_MobileProcessingChecklist020 | TEXTUAL   |
       | 1            | 1          |                 | Ticket     | DynamicField_MobileProcessingState        | TEXTUAL   |
       | 1            | 1          |                 | Ticket     | DynamicField_PlanBegin                    | DATETIME  |
       | 1            | 1          |                 | Ticket     | DynamicField_PlanEnd                      | DATETIME  |
@@ -72,6 +72,7 @@
       | 1            | 1          |                 | Ticket     | OwnerID                                   | NUMERIC   |
       | 1            | 1          |                 | Ticket     | OwnerName                                 | TEXTUAL   |
       | 1            | 0          |                 | Ticket     | OwnerOutOfOffice                          | NUMERIC   |
+      | 1            | 0          |                 | Ticket     | OwnerOutOfOfficeSubstitute                | TEXTUAL   |
       | 1            | 1          |                 | Ticket     | PendingTime                               | DATETIME  |
       | 1            | 1          |                 | Ticket     | Priority                                  | TEXTUAL   |
       | 1            | 1          |                 | Ticket     | PriorityID                                | NUMERIC   |
@@ -82,6 +83,7 @@
       | 1            | 1          |                 | Ticket     | ResponsibleID                             | NUMERIC   |
       | 1            | 1          |                 | Ticket     | ResponsibleName                           | TEXTUAL   |
       | 1            | 0          |                 | Ticket     | ResponsibleOutOfOffice                    | NUMERIC   |
+      | 1            | 0          |                 | Ticket     | ResponsibleOutOfOfficeSubstitute          | TEXTUAL   |
       | 1            | 0          |                 | Ticket     | SenderType                                | TEXTUAL   |
       | 1            | 0          |                 | Ticket     | SenderTypeID                              | NUMERIC   |
       | 1            | 1          |                 | Ticket     | State                                     | TEXTUAL   |
@@ -92,6 +94,7 @@
       | 1            | 0          |                 | Ticket     | TicketFlag.Seen                           | TEXTUAL   |
       | 1            | 1          |                 | Ticket     | TicketID                                  | NUMERIC   |
       | 1            | 1          |                 | Ticket     | TicketNumber                              | TEXTUAL   |
+      | 1            | 0          |                 | Ticket     | TicketOutOfOfficeSubstitute               | TEXTUAL   |
       | 1            | 1          |                 | Ticket     | Title                                     | TEXTUAL   |
       | 1            | 0          |                 | Ticket     | To                                        | TEXTUAL   |
       | 1            | 1          |                 | Ticket     | Type                                      | TEXTUAL   |
