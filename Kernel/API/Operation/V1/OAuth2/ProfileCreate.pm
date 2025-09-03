@@ -77,8 +77,7 @@ sub ParameterDefinition {
             Required => 1
         },
         'Profile::PKCE' => {
-            DataType            => 'NUMERIC',
-            RequiresValueIfUsed => 1,
+            DataType => 'NUMERIC',
         },
     }
 }
