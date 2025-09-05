@@ -115,7 +115,7 @@
                 <Item Key="Module">Kernel::API::Validator::EmailAddressValidator</Item>
                 <Item Key="Validates">From,Cc,Bcc,To,Email</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
-                <Item Key="IgnoreOperationRegEx"></Item>
+                <Item Key="IgnoreOperationRegEx">DynamicFieldCreate|DynamicFieldUpdate|DynamicFieldConfigUpdate</Item>
             </Hash>
         </Setting>
     </ConfigItem>
