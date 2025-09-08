@@ -7,7 +7,7 @@
         <Setting>
             <Hash>
                 <Item Key="Module">Kernel::System::Installation::Migration::KIX17</Item>
-                <Item Key="Options"><![CDATA[URL=<URL to the migration.pl>[,PSK=<PSK>][,AutoDeps=1][,Limit=<Limit>][,SkipTicketAttachments=1]]></Item>
+                <Item Key="Options"><![CDATA[URL=<URL to the migration.pl>[,PSK=<PSK>][,AutoDeps=1][,Limit=<Limit>][,SkipTicketAttachments=1][,TicketNotesTargetDF=<Name of DF to use>]]></Item>
             </Hash>
         </Setting>
     </ConfigItem>
