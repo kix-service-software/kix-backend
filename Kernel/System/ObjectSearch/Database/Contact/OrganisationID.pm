@@ -103,49 +103,56 @@ sub AttributePrepare {
     # map search attributes to table attributes
     my %AttributeDefinition = (
         OrganisationID => {
-            Column    => "$JoinData{OCAlias}.org_id",
+            Column       => "$JoinData{OCAlias}.org_id",
             ConditionDef => {
-                ValueType => 'NUMERIC'
+                ValueType => 'NUMERIC',
+                NULLValue => 1
             }
         },
         OrganisationIDs => {
-            Column    => "$JoinData{OCAlias}.org_id",
-                ConditionDef => {
-                ValueType => 'NUMERIC'
+            Column       => "$JoinData{OCAlias}.org_id",
+            ConditionDef => {
+                ValueType => 'NUMERIC',
+                NULLValue => 1
             }
         },
         Organisation => {
-            Column          =>"$JoinData{OAlias}.name",
+            Column       =>"$JoinData{OAlias}.name",
             ConditionDef => {
                 ValueType       => 'STRING',
-                CaseInsensitive => 1
+                CaseInsensitive => 1,
+                NULLValue       => 1
             }
         },
         OrganisationNumber => {
-            Column          => "$JoinData{OAlias}.number",
+            Column       => "$JoinData{OAlias}.number",
             ConditionDef => {
                 ValueType       => 'STRING',
-                CaseInsensitive => 1
+                CaseInsensitive => 1,
+                NULLValue       => 1
             }
         },
         PrimaryOrganisationID => {
-            Column    => "$JoinData{POCAlias}.org_id",
-                ConditionDef => {
-                ValueType => 'NUMERIC'
+            Column       => "$JoinData{POCAlias}.org_id",
+            ConditionDef => {
+                ValueType => 'NUMERIC',
+                NULLValue => 1
             }
         },
         PrimaryOrganisation => {
-            Column          => "$JoinData{POAlias}.name",
+            Column       => "$JoinData{POAlias}.name",
             ConditionDef => {
                 ValueType       => 'STRING',
-                CaseInsensitive => 1
+                CaseInsensitive => 1,
+                NULLValue       => 1
             }
         },
         PrimaryOrganisationNumber => {
-            Column          => "$JoinData{POAlias}.number",
+            Column       => "$JoinData{POAlias}.number",
             ConditionDef => {
                 ValueType       => 'STRING',
-                CaseInsensitive => 1
+                CaseInsensitive => 1,
+                NULLValue       => 1
             }
         }
     );
