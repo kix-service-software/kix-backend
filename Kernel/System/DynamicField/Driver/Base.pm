@@ -221,6 +221,14 @@ sub SQLParameterGet {
         $SQLParameter->{ConditionDef}->{ValueType} = $Self->{Properties}->{'SearchValueType'};
     }
 
+    if (
+        $SQLParameter->{ConditionDef}->{ValueType}
+        && $SQLParameter->{ConditionDef}->{ValueType} eq 'NUMERIC'
+        && $SQLParameter->{Column} =~ m/\.value_text$/
+    ) {
+        $SQLParameter->{ConditionDef}->{ValueType} = 'STRING';
+    }
+
     return $SQLParameter;
 }
 
