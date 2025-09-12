@@ -4264,6 +4264,7 @@ filters ids for current customer user if necessary
     @FilteredObjectIDList = $Self->_FilterCustomerUserVisibleObjectIds(
         ObjectType   => 'Ticket'
         ObjectIDList => \@ObjectIDList,
+        LogFiltered  => 1                   # optional, default 0
         ...                                 # optional additional params
     )
 
@@ -4292,16 +4293,32 @@ sub _FilterCustomerUserVisibleObjectIds {
             my %ItemIDsHash = map { $_ => 1 } @{$ItemIDs};
             my @Result;
             for my $ObjectID ( @ObjectIDList ) {
-                push(@Result, 0 + $ObjectID) if $ItemIDsHash{$ObjectID};
+                if ($ItemIDsHash{$ObjectID}) {
+                    push(@Result, 0 + $ObjectID);
+                } elsif ($Param{LogFiltered}) {
+                    $Kernel::OM->Get('Log')->Log(
+                        Priority => 'notice',
+                        Message  => "No access for $Param{ObjectType} with id $ObjectID" 
+                    );
+                }
             }
             @ObjectIDList = @Result;
         } else {
             @ObjectIDList = ();
+            if ($Param{LogFiltered}) {
+                for my $ObjectID ( @ObjectIDList ) {
+                    $Kernel::OM->Get('Log')->Log(
+                        Priority => 'notice',
+                        Message  => "No access for $Param{ObjectType} with id $ObjectID" 
+                    );
+                }
+            }
         }
     }
 
     return @ObjectIDList;
 }
+
 =item _GetCustomerUserVisibleObjectIds()
 
 returns object ids for current customer user if necessary
