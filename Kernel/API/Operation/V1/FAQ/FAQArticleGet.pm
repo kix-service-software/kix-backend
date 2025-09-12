@@ -60,6 +60,54 @@ sub ParameterDefinition {
     }
 }
 
+=item PreRun()
+
+some code to run before actual execution
+
+    my $Success = $CommonObject->PreRun(
+        ...
+    );
+
+    returns:
+
+    $Success = {
+        Success => 1,                     # if everything is OK
+    }
+
+    $Success = {
+        Code    => 'Forbidden',           # if error
+        Message => 'Error description',
+    }
+
+=cut
+
+sub PreRun {
+    my ( $Self, %Param ) = @_;
+
+    # filter faq article ids for customer
+    if ($Param{Data}->{FAQArticleID}) {
+        my @FAQArticleIDs = $Self->_FilterCustomerUserVisibleObjectIds(
+            ObjectType             => 'FAQArticle',
+            ObjectIDList           => $Param{Data}->{FAQArticleID},
+            RelevantOrganisationID => $Param{Data}->{RelevantOrganisationID},
+            LogFiltered => 1
+        );
+        if (@FAQArticleIDs) {
+            $Param{Data}->{FAQArticleID} = \@FAQArticleIDs;
+        } else {
+            return $Self->_Error(
+                Code => 'Forbidden',
+                Message => @{$Param{Data}->{FAQArticleID}} == 1 ?
+                "Could not access FAQArticle with id $Param{Data}->{FAQArticleID}->[0]" :
+                "Could not access any FAQArticle"
+            );
+        }
+    }
+
+    return $Self->_Success();
+}
+
+
 =item Run()
 
 perform FAQArticleGet Operation. This function is able to return
