@@ -34,7 +34,7 @@ Kernel::System::ObjectSearch::Database::Contact::DynamicField - attribute module
 sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
-    # get all valid dynamic fields for object type ticket
+    # get all valid dynamic fields for object type Contact
     my $DynamicFieldList = $Kernel::OM->Get('DynamicField')->DynamicFieldListGet(
         ObjectType => 'Contact',
         Valid      => 1

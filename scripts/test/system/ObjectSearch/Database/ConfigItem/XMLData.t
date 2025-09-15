@@ -98,7 +98,7 @@ $Self->IsDeeply(
     {
         IsSearchable => 1,
         IsSortable   => 0,
-        Operators    => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE','ENDSWITH','STARTSWITH','CONTAINS','LIKE'],
+        Operators    => ['EMPTY','EQ','NE','IN','!IN','LT','LTE','GT','GTE','ENDSWITH','STARTSWITH','CONTAINS','LIKE'],
         Class        => [ $Class ],
         ClassID      => [ $ClassID ]
     },
@@ -450,6 +450,40 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
             }
         },
         {
+            Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator EMPTY / Value 1',
+            Search       => {
+                Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
+                Operator => 'EMPTY',
+                Value    => 1
+            },
+            Expected     => {
+                'IsRelative' => undef,
+                'Join'       => [
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\')'
+                ],
+                'Where'      => [
+                    '(xst_left0.xml_content_value = \'\' OR xst_left0.xml_content_value IS NULL)'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator EMPTY / Value 0',
+            Search       => {
+                Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
+                Operator => 'EMPTY',
+                Value    => 0
+            },
+            Expected     => {
+                'IsRelative' => undef,
+                'Join'       => [
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\')'
+                ],
+                'Where'      => [
+                    '(xst_left0.xml_content_value != \'\' AND xst_left0.xml_content_value IS NOT NULL)'
+                ]
+            }
+        },
+        {
             Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator EQ / PreviousVersionSearch',
             Search       => {
                 Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
@@ -726,6 +760,48 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
                 ],
                 'Where' => [
                     'xst_left0.xml_content_value LIKE \'Test\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator EMPTY / PreviousVersionSearch / Value 1',
+            Search       => {
+                Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
+                Operator => 'EMPTY',
+                Value    => 1
+            },
+            Flags        => {
+                PreviousVersionSearch => 1
+            },
+            Expected     => {
+                'IsRelative' => undef,
+                'Join'       => [
+                    'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\',\'ITSM::ConfigItem::Archiv::' . $ClassID . '\')'
+                ],
+                'Where'      => [
+                    '(xst_left0.xml_content_value = \'\' OR xst_left0.xml_content_value IS NULL)'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: valid search / Field CurrentVersion.Data.NotSearchable.UnitTest / Operator EMPTY / PreviousVersionSearch / Value 1',
+            Search       => {
+                Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
+                Operator => 'EMPTY',
+                Value    => 0
+            },
+            Flags        => {
+                PreviousVersionSearch => 1
+            },
+            Expected     => {
+                'IsRelative' => undef,
+                'Join'       => [
+                    'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'NotSearchable' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'UnitTest' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\',\'ITSM::ConfigItem::Archiv::' . $ClassID . '\')'
+                ],
+                'Where'      => [
+                    '(xst_left0.xml_content_value != \'\' AND xst_left0.xml_content_value IS NOT NULL)'
                 ]
             }
         }
@@ -1171,6 +1247,32 @@ my @IntegrationSearchTests = (
         Expected => [$ConfigItemID2]
     },
     {
+        Name     => 'Search: Field CurrentVersion.Data.NotSearchable.UnitTest / Operator EMPTY / Value 1',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
+                    Operator => 'EMPTY',
+                    Value    => 1
+                }
+            ]
+        },
+        Expected => [$ConfigItemID3]
+    },
+    {
+        Name     => 'Search: Field CurrentVersion.Data.NotSearchable.UnitTest / Operator EMPTY / Value 0',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
+                    Operator => 'EMPTY',
+                    Value    => 0
+                }
+            ]
+        },
+        Expected => [$ConfigItemID1,$ConfigItemID2]
+    },
+    {
         Name     => 'Search: Field CurrentVersion.Data.NotSearchable.UnitTest / Operator EQ / Value $TestData2 / PreviousVersionSearch',
         Search   => {
             'AND' => [
@@ -1458,6 +1560,40 @@ my @IntegrationSearchTests = (
             ]
         },
         Expected => [$ConfigItemID2]
+    },
+    {
+        Name     => 'Search: Field CurrentVersion.Data.NotSearchable.UnitTest / Operator EMPTY / Value 1 / PreviousVersionSearch',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'PreviousVersionSearch',
+                    Value    => 1
+                },
+                {
+                    Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
+                    Operator => 'EMPTY',
+                    Value    => 1
+                }
+            ]
+        },
+        Expected => [$ConfigItemID3]
+    },
+    {
+        Name     => 'Search: Field CurrentVersion.Data.NotSearchable.UnitTest / Operator EMPTY / Value 0 / PreviousVersionSearch',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'PreviousVersionSearch',
+                    Value    => 1
+                },
+                {
+                    Field    => 'CurrentVersion.Data.NotSearchable.UnitTest',
+                    Operator => 'EMPTY',
+                    Value    => 0
+                }
+            ]
+        },
+        Expected => [$ConfigItemID1,$ConfigItemID2]
     }
 );
 for my $Test ( @IntegrationSearchTests ) {

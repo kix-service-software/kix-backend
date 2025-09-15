@@ -71,7 +71,7 @@ $Self->IsDeeply(
         IsSearchable   => 1,
         IsSortable     => 1,
         IsFulltextable => 0,
-        Operators      => ['EQ','NE','GT','GTE','LT','LTE'],
+        Operators      => ['EMPTY','EQ','NE','GT','GTE','LT','LTE'],
         ValueType      => 'DATE'
     },
     'GetSupportedAttributes provides expected data'
@@ -144,6 +144,40 @@ my @SearchTests = (
             Value    => '1'
         },
         Expected     => undef
+    },
+    {
+        Name         => 'Search: valid search / Field DynamicField_UnitTest / Operator EMPTY / date value',
+        Search       => {
+            Field    => 'DynamicField_UnitTest',
+            Operator => 'EMPTY',
+            Value    => '2014-01-01'
+        },
+        Expected     => {
+            'IsRelative' => undef,
+            'Join'       => [
+                'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = c.id AND dfv_left0.field_id = ' . $DynamicFieldID
+            ],
+            'Where'      => [
+                'dfv_left0.value_date IS NULL'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field DynamicField_UnitTest / Operator EMPTY / empty value',
+        Search       => {
+            Field    => 'DynamicField_UnitTest',
+            Operator => 'EMPTY',
+            Value    => ''
+        },
+        Expected     => {
+            'IsRelative' => undef,
+            'Join'       => [
+                'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = c.id AND dfv_left0.field_id = ' . $DynamicFieldID
+            ],
+            'Where'      => [
+                'dfv_left0.value_date IS NOT NULL'
+            ]
+        }
     },
     {
         Name         => 'Search: valid search / Field DynamicField_UnitTest / Operator EQ',
@@ -575,6 +609,32 @@ $Kernel::OM->ObjectsDiscard(
 # test Search
 my @IntegrationSearchTests = (
     {
+        Name     => 'Search: Field DynamicField_UnitTest / Operator EMPTY / Value 1',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DynamicField_UnitTest',
+                    Operator => 'EMPTY',
+                    Value    => 1
+                }
+            ]
+        },
+        Expected => [1,$ContactID3]
+    },
+    {
+        Name     => 'Search: Field DynamicField_UnitTest / Operator EMPTY / Value 0',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DynamicField_UnitTest',
+                    Operator => 'EMPTY',
+                    Value    => 0
+                }
+            ]
+        },
+        Expected => [$ContactID1,$ContactID2]
+    },
+    {
         Name     => 'Search: Field DynamicField_UnitTest / Operator EQ / Value 2014-01-02',
         Search   => {
             'AND' => [
@@ -823,6 +883,7 @@ my @IntegrationSearchTests = (
     }
 );
 for my $Test ( @IntegrationSearchTests ) {
+
     my @Result = $ObjectSearch->Search(
         ObjectType => 'Contact',
         Result     => 'ARRAY',

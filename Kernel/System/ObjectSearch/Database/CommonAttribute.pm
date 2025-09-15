@@ -376,15 +376,25 @@ sub _OperationEMPTY {
                 }
             }
             else {
+                my $Condition = q{};
                 if (
                     !$Param{ValueType}
                     || $Param{ValueType} eq 'STRING'
                 ) {
-                    push( @Conditions, ( $Column . ' != \'\'' ) );
+                    $Condition .= $Column . ' != \'\'';
                 }
 
                 if ( $Param{NULLValue} ) {
-                    push( @Conditions, ( $Column . ' IS NOT NULL' ) );
+                    if ( $Condition ) {
+                        $Condition = "($Condition AND $Column IS NOT NULL)";
+                    }
+                    else {
+                        $Condition = $Column . ' IS NOT NULL';
+                    }
+                }
+
+                if ( $Condition ) {
+                    push( @Conditions, ( $Condition ) );
                 }
             }
         }

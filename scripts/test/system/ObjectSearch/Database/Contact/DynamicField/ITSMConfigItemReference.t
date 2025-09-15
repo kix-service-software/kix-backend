@@ -68,7 +68,7 @@ $Self->IsDeeply(
         IsSearchable   => 1,
         IsSortable     => 0,
         IsFulltextable => 0,
-        Operators      => ['EQ','NE','IN','!IN'],
+        Operators      => ['EMPTY','EQ','NE','IN','!IN'],
         ValueType      => 'NUMERIC'
     },
     'GetSupportedAttributes provides expected data'
@@ -232,6 +232,38 @@ my @SearchTests = (
                 'dfv_left0.value_text NOT IN (\'1\')'
             ]
         }
+    },
+    {
+        Name         => 'Search: valid search / Field DynamicField_UnitTest / Operator EMPTY / Value 1',
+        Search       => {
+            Field    => 'DynamicField_UnitTest',
+            Operator => 'EMPTY',
+            Value    => 1
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = c.id AND dfv_left0.field_id = ' . $DynamicFieldID
+            ],
+            'Where' => [
+                '(dfv_left0.value_text = \'\' OR dfv_left0.value_text IS NULL)'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field DynamicField_UnitTest / Operator EMPTY / Value 0',
+        Search       => {
+            Field    => 'DynamicField_UnitTest',
+            Operator => 'EMPTY',
+            Value    => 0
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = c.id AND dfv_left0.field_id = ' . $DynamicFieldID
+            ],
+            'Where' => [
+                '(dfv_left0.value_text != \'\' AND dfv_left0.value_text IS NOT NULL)'
+            ]
+        }
     }
 );
 for my $Test ( @SearchTests ) {
@@ -390,6 +422,32 @@ $Kernel::OM->ObjectsDiscard(
 
 # test Search
 my @IntegrationSearchTests = (
+    {
+        Name     => 'Search: Field DynamicField_UnitTest / Operator EMPTY / Value 1',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DynamicField_UnitTest',
+                    Operator => 'EMPTY',
+                    Value    => 1
+                }
+            ]
+        },
+        Expected => [1,$ContactID3]
+    },
+    {
+        Name     => 'Search: Field DynamicField_UnitTest / Operator EMPTY / Value zero',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DynamicField_UnitTest',
+                    Operator => 'EMPTY',
+                    Value    => 0
+                }
+            ]
+        },
+        Expected => [$ContactID1,$ContactID2]
+    },
     {
         Name     => 'Search: Field DynamicField_UnitTest / Operator EQ / Value $ConfigItemID2',
         Search   => {

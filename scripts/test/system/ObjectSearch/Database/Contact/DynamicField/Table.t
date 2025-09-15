@@ -55,6 +55,9 @@ $Self->True(
     $DynamicFieldID,
     'Created dynamic field for UnitTest'
 );
+my $DynamicFieldConfig = $Kernel::OM->Get('DynamicField')->DynamicFieldGet(
+    ID => $DynamicFieldID
+);
 
 # check GetSupportedAttributes
 my $AttributeList = $AttributeObject->GetSupportedAttributes();
@@ -62,10 +65,10 @@ $Self->IsDeeply(
     $AttributeList->{'DynamicField_UnitTest'},
     {
         IsSelectable   => 0,
-        IsSearchable   => 0,
+        IsSearchable   => 1,
         IsSortable     => 0,
         IsFulltextable => 0,
-        Operators      => [],
+        Operators      => ['EMPTY'],
         ValueType      => ''
     },
     'GetSupportedAttributes provides expected data'
@@ -133,6 +136,40 @@ my @SearchTests = (
             Value    => '1'
         },
         Expected => undef
+    },
+    {
+        Name         => 'Search: valid search / Field DynamicField_UnitTest / Operator EMPTY / Value 0',
+        Search       => {
+            Field    => 'DynamicField_UnitTest',
+            Operator => 'EMPTY',
+            Value    => 0
+        },
+        Expected     => {
+            'IsRelative' => undef,
+            'Join'       => [
+                'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = c.id AND dfv_left0.field_id = ' . $DynamicFieldID
+            ],
+            'Where'      => [
+                '(dfv_left0.value_text != \'\' AND dfv_left0.value_text IS NOT NULL)'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field DynamicField_UnitTest / Operator EMPTY / Value 1',
+        Search       => {
+            Field    => 'DynamicField_UnitTest',
+            Operator => 'EMPTY',
+            Value    => 1
+        },
+        Expected     => {
+            'IsRelative' => undef,
+            'Join'       => [
+                'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = c.id AND dfv_left0.field_id = ' . $DynamicFieldID
+            ],
+            'Where'      => [
+                '(dfv_left0.value_text = \'\' OR dfv_left0.value_text IS NULL)'
+            ]
+        }
     }
 );
 for my $Test ( @SearchTests ) {
@@ -181,8 +218,128 @@ for my $Test ( @SortTests ) {
 }
 
 ### Integration Test ###
+# discard current object search object
+$Kernel::OM->ObjectsDiscard(
+    Objects => ['ObjectSearch'],
+);
+
+# make sure config 'ObjectSearch::Backend' is set to Module 'ObjectSearch::Database'
+$Kernel::OM->Get('Config')->Set(
+    Key   => 'ObjectSearch::Backend',
+    Value => {
+        Module => 'ObjectSearch::Database',
+    }
+);
+
+# get objectsearch object
+my $ObjectSearch = $Kernel::OM->Get('ObjectSearch');
+
+# begin transaction on database
+$Helper->BeginWork();
+
+## prepare test contacts ##
+# first contact
+my $ContactID1   = $Kernel::OM->Get('Contact')->ContactAdd(
+    Firstname => $Helper->GetRandomID(),
+    Lastname  => $Helper->GetRandomID(),
+    ValidID   => 1,
+    UserID    => 1
+);
+$Self->True(
+    $ContactID1,
+    'Created first organisation'
+);
+my $ValueSet1 = $Kernel::OM->Get('DynamicField::Backend')->ValueSet(
+    DynamicFieldConfig => $DynamicFieldConfig,
+    ObjectID           => $ContactID1,
+    Value              => 'Test1',
+    UserID             => 1,
+);
+$Self->True(
+    $ValueSet1,
+    'Dynamic field value set for first organisation'
+);
+# second contact
+my $ContactID2   = $Kernel::OM->Get('Contact')->ContactAdd(
+    Firstname => $Helper->GetRandomID(),
+    Lastname  => $Helper->GetRandomID(),
+    ValidID   => 1,
+    UserID    => 1
+);
+$Self->True(
+    $ContactID2,
+    'Created second organisation'
+);
+my $ValueSet2 = $Kernel::OM->Get('DynamicField::Backend')->ValueSet(
+    DynamicFieldConfig => $DynamicFieldConfig,
+    ObjectID           => $ContactID2,
+    Value              => 'Test2',
+    UserID             => 1,
+);
+$Self->True(
+    $ValueSet2,
+    'Dynamic field value set for first organisation'
+);
+# third contact
+my $ContactID3   = $Kernel::OM->Get('Contact')->ContactAdd(
+    Firstname => $Helper->GetRandomID(),
+    Lastname  => $Helper->GetRandomID(),
+    ValidID   => 1,
+    UserID    => 1
+);
+$Self->True(
+    $ContactID3,
+    'Created third organisation without df value'
+);
+
+# discard contact object to process events
+$Kernel::OM->ObjectsDiscard(
+    Objects => ['Contact'],
+);
+
 # test Search
-# attributes of this backend are not searchable
+my @IntegrationSearchTests = (
+    {
+        Name     => 'Search: Field DynamicField_UnitTest / Operator EMPTY / Value 1',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DynamicField_UnitTest',
+                    Operator => 'EMPTY',
+                    Value    => 1
+                }
+            ]
+        },
+        Expected => [1,$ContactID3]
+    },
+    {
+        Name     => 'Search: Field DynamicField_UnitTest / Operator EMPTY / Value 0',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DynamicField_UnitTest',
+                    Operator => 'EMPTY',
+                    Value    => 0
+                }
+            ]
+        },
+        Expected => [$ContactID1,$ContactID2]
+    }
+);
+for my $Test ( @IntegrationSearchTests ) {
+    my @Result = $ObjectSearch->Search(
+        ObjectType => 'Contact',
+        Result     => 'ARRAY',
+        Search     => $Test->{Search},
+        UserType   => 'Agent',
+        UserID     => 1,
+    );
+    $Self->IsDeeply(
+        \@Result,
+        $Test->{Expected},
+        $Test->{Name}
+    );
+}
 
 # test Sort
 # attributes of this backend are not sortable
