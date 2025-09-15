@@ -6013,7 +6013,7 @@ END
 updates the number of attachments of an ticket
 
     my $Result = $TicketObject->TicketAttachmentCountUpdate(
-        TicketID => 123,
+        TicketID => 123,       # optional - do all tickets if not given
         Notify   => 1 | 0      # optional - notify clients (default 0)
     );
 
@@ -6022,37 +6022,40 @@ updates the number of attachments of an ticket
 sub TicketAttachmentCountUpdate {
     my ( $Self, %Param ) = @_;
 
-    for my $Needed (qw(TicketID)) {
-        if ( !$Param{$Needed} ) {
+    my @TicketIDs = $Param{TicketID} ? ( $Param{TicketID} ) : ();
+    if ( !$Param{TicketID} ) {
+        # use all tickets
+        @TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+            ObjectType => 'Ticket',
+            Result     => 'ARRAY',
+            UserID     => 1,
+        );
+    }
+
+    foreach my $TicketID ( @TicketIDs ) {
+        my $AttachmentCount = $Self->TicketAttachmentCountCalculate(
+            TicketID => $TicketID
+        );
+
+        my $Success = $Kernel::OM->Get('DB')->Do(
+            SQL => "UPDATE ticket SET attachment_count = ? WHERE id = ?",
+            Bind => [ \$AttachmentCount, \$TicketID ],
+        );
+        if (!$Success) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "Need $Needed!"
+                Message  => "Couldn't update ticket attachment count for ticket ($TicketID)!",
             );
             return;
         }
-    }
 
-    my $AttachmentCount = $Self->TicketAttachmentCountCalculate(
-        TicketID => $Param{TicketID}
-    );
-
-    my $Success = $Kernel::OM->Get('DB')->Do(
-        SQL => "UPDATE ticket SET attachment_count = ? WHERE id = ?",
-        Bind => [ \$AttachmentCount, \$Param{TicketID} ],
-    );
-    if (!$Success) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Couldn't update ticket attachment count for ticket ($Param{TicketID})!",
+        $Self->_TicketCacheClear(
+            TicketID => $TicketID
         );
-        return;
     }
-
-    $Self->_TicketCacheClear(
-        TicketID => $Param{TicketID}
-    );
 
     if ($Param{Notify}) {
+        # in case Param{TicketID} is not given, the frontend will handle it accordingly
         $Kernel::OM->Get('ClientNotification')->NotifyClients(
             Event     => 'UPDATE',
             Namespace => 'Ticket',
