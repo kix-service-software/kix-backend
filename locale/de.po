@@ -1124,8 +1124,7 @@ msgstr "Wenn"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/Conditional.pm
 msgid "The macro to execute if the logical expression is true."
-msgstr ""
-"Das auszuführende Makro, wenn der logischen Ausdrucks \"true\" ist."
+msgstr "Das auszuführende Makro, wenn der logischen Ausdrucks \"true\" ist."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/Conditional.pm
 msgid "Else"
@@ -1133,8 +1132,7 @@ msgstr "Ansonsten"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/Conditional.pm
 msgid "The macro to execute if the logical expression is false."
-msgstr ""
-"Das auszuführende Makro, wenn der logischen Ausdrucks \"false\" ist."
+msgstr "Das auszuführende Makro, wenn der logischen Ausdrucks \"false\" ist."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/Conditional.pm
 msgid "The logical expression to evaluate."
