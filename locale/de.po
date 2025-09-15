@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-6-10 14:08+0000\n"
+"POT-Creation-Date: 2025-9-15 09:54+0000\n"
 "PO-Revision-Date: 2025-06-10 14:08+0000\n"
 "Last-Translator: jbrueckner <Joerg.Brueckner@kixdesk.com>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
@@ -938,6 +938,10 @@ msgstr "gültig"
 msgid "warning"
 msgstr "Warnung"
 
+#. Perl Module: Kernel/API/Validator/UserPasswordValidator.pm
+msgid "%s must not contain \"%s\"!"
+msgstr ""
+
 #. Perl Module: Kernel/Language.pm
 msgid "Apr"
 msgstr "Apr"
@@ -1115,6 +1119,10 @@ msgstr ""
 "Definition fest."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/Conditional.pm
+msgid "Else"
+msgstr "Ansonsten"
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/Conditional.pm
 msgid "Execute the depending macro if the logical expression is true."
 msgstr "Führe das Macro aus, wenn der logische Ausdruck \"true\" ist."
 
@@ -1123,22 +1131,22 @@ msgid "If"
 msgstr "Wenn"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/Conditional.pm
-msgid "The macro to execute if the logical expression is true."
-msgstr "Das auszuführende Makro, wenn der logischen Ausdrucks \"true\" ist."
-
-#. Perl Module: Kernel/System/Automation/MacroAction/Common/Conditional.pm
-msgid "Else"
-msgstr "Ansonsten"
+msgid "The logical expression to evaluate."
+msgstr ""
+"Fügen Sie einen logischen Ausdruck ein. Wenn dieser zutrifft, werden die "
+"folgenden Macro-Actions ausgeführt."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/Conditional.pm
 msgid "The macro to execute if the logical expression is false."
 msgstr "Das auszuführende Makro, wenn der logischen Ausdrucks \"false\" ist."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/Conditional.pm
-msgid "The logical expression to evaluate."
+msgid "The macro to execute if the logical expression is true."
+msgstr "Das auszuführende Makro, wenn der logischen Ausdrucks \"true\" ist."
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/Conditional.pm
+msgid "Then"
 msgstr ""
-"Fügen Sie einen logischen Ausdruck ein. Wenn dieser zutrifft, werden die "
-"folgenden Macro-Actions ausgeführt."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/CreateReport.pm
 msgid "Create a report from a report definition."
@@ -1190,12 +1198,12 @@ msgid "ObjectID"
 msgstr "ObjectID"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/ExecuteMacro.pm
-msgid "The macro to execute."
-msgstr "Das auszuführende Makro."
-
-#. Perl Module: Kernel/System/Automation/MacroAction/Common/ExecuteMacro.pm
 msgid "The ID of the object to run the macro for."
 msgstr "Die ID des Objektes, für das das Macro ausgeführt werden soll."
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/ExecuteMacro.pm
+msgid "The macro to execute."
+msgstr "Das auszuführende Makro."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/ExtractText.pm
 msgid "Capture Group Names"
@@ -1264,8 +1272,8 @@ msgid "Loop Variable"
 msgstr "Schleifenvariable"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/Loop.pm
-msgid "MacroID"
-msgstr "MacroID"
+msgid "Macro"
+msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/Loop.pm
 msgid "The macro to execute for each value."
@@ -2338,6 +2346,22 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/API.xml
 msgid ""
+"Enable strict filtering in API. When enabled, filter expressions with non-"
+"existing properties will result in a Bad Request (HTTP 400) error. Keep in "
+"mind, that enabling this may cause applications such as KIX Field Agent to "
+"produce errors and stop working."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/API.xml
+msgid ""
+"Enable strict searching in API. When enabled, search expressions with non-"
+"existing properties will result in a Bad Request (HTTP 400) error. Keep in "
+"mind, that enabling this may cause applications such as KIX Field Agent to "
+"produce errors and stop working."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/API.xml
+msgid ""
 "Max allowed request size in bytes (overwrites default value (50MB) from "
 "provider config)."
 msgstr ""
@@ -2584,6 +2608,10 @@ msgstr ""
 #. SysConfig: Kernel/Config/Files/FAQ.xml
 msgid "Cache Time To Leave for FAQ items."
 msgstr ""
+
+#. SysConfig: Kernel/Config/Files/FAQ.xml
+msgid "Comment"
+msgstr "Kommentar"
 
 #. SysConfig: Kernel/Config/Files/FAQ.xml
 msgid "Decimal places of the voting result."
@@ -2888,10 +2916,6 @@ msgid "CSV"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Change password"
-msgstr "Passwort ändern"
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Checklist"
 msgstr "Checkliste"
 
@@ -2942,10 +2966,6 @@ msgid "Christmas Eve"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Comment"
-msgstr "Kommentar"
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Company name which will be included in outgoing emails as an X-Header."
 msgstr "Der Name Ihres Unternehmens für die Verwendung im KIX-Mail-Header."
 
@@ -2988,14 +3008,6 @@ msgid ""
 "without translations are written to STDERR. This can be helpful when you are "
 "creating a new translation file. Otherwise, this option should remain set to "
 "\"No\"."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Default spelling dictionary"
-msgstr "Standard-Rechtschreibwörterbuch"
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Default value for NameX"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -3120,38 +3132,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Defines the column to store the keys for the preferences table."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid ""
-"Defines the config parameters of this item, to allow multiple selected "
-"options and be shown in the preferences view."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid ""
-"Defines the config parameters of this item, to be shown in the preferences "
-"view."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid ""
-"Defines the config parameters of this item, to be shown in the preferences "
-"view. 'PasswordRegExp' allows to match passwords against a regular "
-"expression. Define the minimum number of characters using 'PasswordMinSize'. "
-"Define if at least 2 lowercase and 2 uppercase letter characters are needed "
-"by setting the appropriate option to '1'. 'PasswordMin2Characters' defines "
-"if the password needs to contain at least 2 letter characters (set to 0 or "
-"1). 'PasswordNeedDigit' controls the need of at least 1 digit (set to 0 or 1 "
-"to control). 'PasswordMaxLoginFailed' allows to set an agent to invalid-"
-"temporarily if max failed logins reached."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid ""
-"Defines the config parameters of this item, to be shown in the preferences "
-"view. Take care to maintain the dictionaries installed in the system in the "
-"data section."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -3443,23 +3423,7 @@ msgid ""
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid ""
-"Defines the use preference to select article flags which could be removed "
-"after ticket close."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Defines the username to access the SOAP handle (bin/cgi-bin/rpc.pl)."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Defines user preference to decide how pending time should be displayed."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid ""
-"Defines user preference to decide if merged tickets should be shown in "
-"linked objects table."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -3548,10 +3512,6 @@ msgid ""
 "Disable HTTP header \"X-Frame-Options: SAMEORIGIN\" to allow KIX to be "
 "included as an IFrame in other websites. Disabling this HTTP header can be a "
 "security issue! Only disable it, if you know what you are doing!"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Display of pending time"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -4003,18 +3963,6 @@ msgid "Monthly"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Multiple Selection"
-msgstr "Mehrfachauswahl"
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "My Removable Article Flags"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "NameX"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Never"
 msgstr ""
 
@@ -4053,15 +4001,6 @@ msgid "Option"
 msgstr "Option"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Out Of Office Substitute"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid ""
-"Parameters for the Out Of Office Substitute object in the preference view."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Parent"
 msgstr "Eltern"
 
@@ -4078,10 +4017,6 @@ msgstr ""
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Print"
 msgstr "Drucken"
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "PrintBehaviour"
-msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Process pending tickets."
@@ -4147,14 +4082,6 @@ msgid "Second Christmas Day"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Select article flags which should be removed after ticket close."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Select your out of office substitute."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Selection"
 msgstr ""
 
@@ -4194,6 +4121,12 @@ msgid ""
 "Set this config parameter to \"Yes\", if you want to add a suffix with the "
 "actual year and month to the SysConfig logfile. A logfile for every month "
 "will be created."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid ""
+"Sets a user invalid-temporarily, when the given amount of logins failed "
+"without a successful login."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -4305,23 +4238,6 @@ msgid "Should the cache data be stored in the selected cache backend?"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Show Merged Tickets in Linked Objects"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Show merged tickets in linked objects table."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Show pending time as"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid ""
-"Show pending time as remaining time or as point of time with date and time."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
 "Shows all the customer identifiers in a multi-select field (not useful if "
 "you have a lot of customer identifiers)."
@@ -4385,10 +4301,6 @@ msgid "Specify the username to authenticate for the first mirror database."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Spelling Dictionary"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
 "Start number for statistics counting. Every new stat increments this number."
 msgstr ""
@@ -4406,10 +4318,6 @@ msgstr "Tabelle"
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Textarea"
 msgstr "Textfeld"
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Textarea input"
-msgstr "Textarea-Eingabe"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "The daemon registration for the scheduler client notification worker."
@@ -4584,10 +4492,6 @@ msgid "Unlock tickets that are past their unlock timeout."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-msgid "Use the kind of behaviour for printing ticket content."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
 "Used ticket state, if \"_PREVIOUS_\" ticket state could not be determined. "
 "As key you have to define the ticket type + \":::\" + current state OR the "
@@ -4602,12 +4506,6 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Weekly"
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid ""
-"You have the possibility to be ask every time which print module you want to "
-"take or to fix the using of one special print module."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
@@ -5113,6 +5011,10 @@ msgid "Article ID %s - %s deleted."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
+msgid "Article send. To: %s / Cc: %s / Bcc: %s"
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid ""
 "Automatically sets the owner of a ticket as the responsible for it (if "
 "ticket responsible feature is enabled). This will only work by manually "
@@ -5172,11 +5074,6 @@ msgstr ""
 msgid ""
 "Checks the SystemID in ticket number detection for follow-ups (use \"No\" if "
 "SystemID has been changed after using the system)."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid ""
-"Choose for which kind of ticket changes you want to receive notifications."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
@@ -6003,10 +5900,6 @@ msgstr ""
 "Ticket verschoben nach Team/Queue \"%s\" (%s) von Team/Queue \"%s\" (%s)."
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Ticket notifications"
-msgstr "Ticketbenachrichtigungen"
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid ""
 "Time in seconds that gets added to the actual time if setting a pending-"
 "state (default: 86400 = 1 day)."
@@ -6017,10 +5910,6 @@ msgstr ""
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Title updated: Old: \"%s\", New: \"%s\""
 msgstr "Titel aktualisiert: Alt: \"%s\", Neu: \"%s\""
-
-#. SysConfig: Kernel/Config/Files/Ticket.xml
-msgid "Transport selection for ticket notifications."
-msgstr "Transport-Auswahl für Ticketbenachrichtigungen."
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Unlocked ticket."
@@ -6607,6 +6496,27 @@ msgstr "Ausgesetzt"
 #. manual entry from templates.pot.manual
 msgid "yes"
 msgstr "ja"
+
+#~ msgid "MacroID"
+#~ msgstr "MacroID"
+
+#~ msgid "Change password"
+#~ msgstr "Passwort ändern"
+
+#~ msgid "Default spelling dictionary"
+#~ msgstr "Standard-Rechtschreibwörterbuch"
+
+#~ msgid "Multiple Selection"
+#~ msgstr "Mehrfachauswahl"
+
+#~ msgid "Textarea input"
+#~ msgstr "Textarea-Eingabe"
+
+#~ msgid "Ticket notifications"
+#~ msgstr "Ticketbenachrichtigungen"
+
+#~ msgid "Transport selection for ticket notifications."
+#~ msgstr "Transport-Auswahl für Ticketbenachrichtigungen."
 
 #~ msgid "Default ticket queue"
 #~ msgstr "Standard-Ticket-Team"
