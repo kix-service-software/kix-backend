@@ -34,53 +34,37 @@ sub GetSupportedAttributes {
 
     return {
         TicketID => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE'],
+            ValueType      => 'NUMERIC'
         },
         ID => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE'],
+            ValueType      => 'NUMERIC'
         }
     };
 }
 
-sub Search {
+sub AttributePrepare {
     my ( $Self, %Param ) = @_;
 
-    # check params
-    return if ( !$Self->_CheckSearchParams( %Param ) );
-
-    # prepare condition
-    my $Condition = $Self->_GetCondition(
-        Operator  => $Param{Search}->{Operator},
-        Column    => 'st.id',
-        Value     => $Param{Search}->{Value},
-        ValueType => 'NUMERIC',
-        Silent    => $Param{Silent}
+    my %Attribute = (
+        Column => 'st.id'
     );
-    return if ( !$Condition );
+    if ( $Param{PrepareType} eq 'Condition' ) {
+        $Attribute{ConditionDef} = {
+            ValueType => 'NUMERIC'
+        };
+    }
 
-    # return search def
-    return {
-        Where => [ $Condition ]
-    };
-}
-
-sub Sort {
-    my ( $Self, %Param ) = @_;
-
-    # check params
-    return if ( !$Self->_CheckSortParams(%Param) );
-
-    # return sort def
-    return {
-        Select  => ['st.id'],
-        OrderBy => ['st.id']
-    };
+    return \%Attribute;
 }
 
 1;

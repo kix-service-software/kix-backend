@@ -1123,9 +1123,18 @@ msgid "If"
 msgstr "Wenn"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/Conditional.pm
-msgid "The ID of the macro to execute if the logical expression is true."
+msgid "The macro to execute if the logical expression is true."
 msgstr ""
-"Die ID des auszuführenden Makros, wenn der logischen Ausdrucks \"true\" ist."
+"Das auszuführende Makro, wenn der logischen Ausdrucks \"true\" ist."
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/Conditional.pm
+msgid "Else"
+msgstr "Ansonsten"
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/Conditional.pm
+msgid "The macro to execute if the logical expression is false."
+msgstr ""
+"Das auszuführende Makro, wenn der logischen Ausdrucks \"false\" ist."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/Conditional.pm
 msgid "The logical expression to evaluate."
@@ -1183,8 +1192,8 @@ msgid "ObjectID"
 msgstr "ObjectID"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/ExecuteMacro.pm
-msgid "The ID of the macro to execute."
-msgstr "ID des auszuführenden Makros."
+msgid "The macro to execute."
+msgstr "Das auszuführende Makro."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/ExecuteMacro.pm
 msgid "The ID of the object to run the macro for."
@@ -1261,8 +1270,8 @@ msgid "MacroID"
 msgstr "MacroID"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/Loop.pm
-msgid "The ID of the macro to execute for each value."
-msgstr "Die ID des für jeden Wert auszuführenden Makros."
+msgid "The macro to execute for each value."
+msgstr "Das für jeden Wert auszuführende Makro."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/Loop.pm
 msgid ""

@@ -67,3 +67,41 @@ When qr/I create a link$/, sub {
    );
 };
 
+When qr/I create a link with no (.*?)$/, sub {
+    my $To;
+    my $Type;
+    my $Sk;
+
+    if ( $1 eq "targetobject" ){
+       $To = "",
+       $Sk = "2",
+       $Type = "ParentChild"
+    }
+    elsif ($1 eq "sourcekey") {
+        $To = "Ticket",
+        $Sk = '',
+        $Type = "ParentChild"
+    }
+    elsif ($1 eq "type"){
+        $To = "Ticket",
+        $Sk = "2",
+        $Type = ""
+    }
+    ( S->{Response}, S->{ResponseContent} ) = _Post(
+        URL     => S->{API_URL}.'/links',
+        Token   => S->{Token},
+        Content => {
+            Link => {
+                SourceObject => "Ticket",
+                SourceKey => $Sk,
+                TargetObject => $To,
+                TargetKey => "35674",
+                Type => $Type
+            }
+        }
+    );
+};
+
+
+
+

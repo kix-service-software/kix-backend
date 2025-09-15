@@ -1249,10 +1249,7 @@ sub Verify {
                     Content => $Content
                 }
             }
-            elsif (
-                $Verified{Type} eq 'Unverified'
-                && $SignerSenderMatch
-            ) {
+            else{
                 # create email entity with old content
                 my $Mail = Mail::Internet->new( $Content );
 
@@ -1279,29 +1276,29 @@ sub Verify {
                 $Mail->body($EMail->body());
                 my @NewContent = map { "$_\n" } split( /\n/, $Mail->as_string() );
 
-                return {
-                    Flags   => [
-                        {
-                            Key   => 'SMIMESigned',
-                            Value => 1
-                        },
+                my @Flags = (
+                    {
+                        Key   => 'SMIMESigned',
+                        Value => 1
+                    }
+                );
+
+                if (
+                    $Verified{Type} eq 'Unverified'
+                    && $SignerSenderMatch
+                ) {
+                    push (
+                        @Flags,
                         {
                             Key   => 'SMIMESignedError',
                             Value => $Verified{Error}
                         }
-                    ],
-                    Content => \@NewContent
+                    );
                 }
-            }
-            else{
+
                 return {
-                    Flags   => [
-                        {
-                            Key   => 'SMIMESigned',
-                            Value => 1
-                        }
-                    ],
-                    Content => $Content
+                    Flags   => \@Flags,
+                    Content => \@NewContent
                 }
             }
         }

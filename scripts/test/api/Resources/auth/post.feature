@@ -48,4 +48,3 @@ Feature: POST request to the /auth resource
 
 
 
-

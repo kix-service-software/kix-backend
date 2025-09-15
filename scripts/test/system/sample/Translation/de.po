@@ -1,0 +1,28 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-4-4 12:08+0000\n"
+"PO-Revision-Date: 2025-03-28 10:24+0000\n"
+"Last-Translator: jbrueckner <Joerg.Brueckner@kixdesk.com>\n"
+"Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
+"backend-app/de/>\n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.6.2\n"
+
+#. testitem 1
+msgid "testitem 1"
+msgstr "TestItem Eins"
+
+#. testitem 2
+msgid "testitem 2"
+msgstr "TestItem Zwei"
+
+#. testitem 3
+msgid "testitem 3"
+msgstr "TestItem Drei"
+

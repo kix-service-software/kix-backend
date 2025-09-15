@@ -98,6 +98,7 @@ search for objects in backend
         Language   => 'de',                 # Optional. Default: en; Language used for sorting of several attributes
         UserType   => 'Agent',              # type of requesting user. Used for permission checks. Agent or Customer
         UserID     => 1,                    # ID of requesting user. Used for permission checks
+        Permission => 'READ',               # Optional. Default: READ; Required Permission for BasePermissions
     );
 
 SearchParams:
@@ -163,13 +164,15 @@ sub Search {
 
     # prepare sql defintion
     my $SQLDef = $Self->_PrepareSQLDef(
-        Backend  => $ObjectTypeBackend,
-        Search   => $Param{Search},
-        Sort     => $Param{Sort},
-        Language => $Param{Language},
-        UserType => $Param{UserType},
-        UserID   => $Param{UserID},
-        Silent   => $Param{Silent}
+        Backend    => $ObjectTypeBackend,
+        Select     => $Param{Select},
+        Search     => $Param{Search},
+        Sort       => $Param{Sort},
+        Language   => $Param{Language},
+        UserType   => $Param{UserType},
+        UserID     => $Param{UserID},
+        Permission => $Param{Permission},
+        Silent     => $Param{Silent}
     );
     return if ( ref( $SQLDef ) ne 'HASH' );
 
@@ -196,12 +199,40 @@ END
         SQL => $SQL
     );
 
+    # preparations for Select handling
+    my @ColumnNames;
+    my %SelectColumns;
+    if ( IsArrayRefWithData( $Param{Select} ) ) {
+        @ColumnNames = $Kernel::OM->Get('DB')->GetColumnNames();
+
+        for my $SelectColumn ( @{ $Param{Select} } ) {
+            $SelectColumns{ $SelectColumn } = 1;
+        }
+    }
+
     my %Objects;
     my @ObjectIDs;
     while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         next if $Objects{ $Row[0] };
         push( @ObjectIDs, $Row[0] );
-        $Objects{ $Row[0] } = $Row[1];
+
+        if ( %SelectColumns ) {
+            my $ID = $Row[0];
+
+            my %Entry = ();
+            for my $Column ( @ColumnNames ) {
+                my $Value = shift( @Row );
+
+                next if ( !$SelectColumns{ $Column } );
+
+                $Entry{ $Column } = $Value;
+            }
+
+            $Objects{ $ID } = \%Entry;
+        }
+        else {
+            $Objects{ $Row[0] } = $Row[1];
+        }
 
         last if (
             $Param{Limit}
@@ -291,7 +322,8 @@ sub _GetObjectTypeBackend {
     # create backend object
     $Self->{ObjectTypeBackends}->{ $Param{ObjectType} } = $ObjectTypeModule->new(
         %{ $Self },
-        ObjectType => $Param{ObjectType}
+        ObjectType         => $Param{ObjectType},
+        FulltextAttributes => $Self->{ObjectTypeModules}->{ $Param{ObjectType} }->{FulltextAttributes} || []
     );
 
     # return object type backend
@@ -360,6 +392,20 @@ sub _PrepareSQLDef {
         }
     }
     return if ( !$Success );
+
+    # get select def from backend
+    if ( IsArrayRefWithData( $Param{Select} ) ) {
+        my $SelectDef = $Param{Backend}->GetSelectDef(
+            %Param,
+            Flags => \%Flags
+        );
+        return if ( ref( $SelectDef ) ne 'HASH' );
+
+        # add select def to sql def
+        for my $Key ( keys %{ $SelectDef } ) {
+            push( @{ $SQLDef{ $Key } }, @{ $SelectDef->{ $Key } } );
+        }
+    }
 
     # check permission if UserID given and prepare relevant part of SQL statement (not needed for user with id 1)
     if ( $Param{UserID} != 1 ) {

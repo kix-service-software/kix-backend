@@ -186,7 +186,7 @@ sub DeletePreferences {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(UserID Key)) {
+    for (qw(UserID)) {
         if ( !$Param{$_} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
@@ -198,13 +198,20 @@ sub DeletePreferences {
 
     my $DBObject = $Kernel::OM->Get('DB');
 
+    my $SQL = "DELETE FROM $Self->{PreferencesTable} WHERE $Self->{PreferencesTableUserID} = ?";
+    my @Bind = (
+        \$Param{UserID}
+    );
+
+    if ( $Param{Key} ) {
+        push @Bind, \$Param{Key};
+        $SQL .= " AND $Self->{PreferencesTableKey} = ?";
+    }
+
     # delete old data
     return if !$DBObject->Do(
-        SQL => "
-            DELETE FROM $Self->{PreferencesTable}
-            WHERE $Self->{PreferencesTableUserID} = ?
-                AND $Self->{PreferencesTableKey} = ?",
-        Bind => [ \$Param{UserID}, \$Param{Key} ],
+        SQL  => $SQL,
+        Bind => \@Bind,
     );
 
     # delete cache
@@ -235,7 +242,7 @@ sub SearchPreferences {
     my ( $Self, %Param ) = @_;
 
     my $Key   = $Param{Key}   || '';
-    my $Value = $Param{Value} || '';
+    my $Value = $Param{Value} // '';
 
     my $DBObject = $Kernel::OM->Get('DB');
 
@@ -250,7 +257,7 @@ sub SearchPreferences {
         WHERE $Self->{PreferencesTableKey} = ?";
     my @Bind = ( \$Key );
 
-    if ($Value) {
+    if ( $Value ne '' ) {
         $SQL .= " AND $Lower($Self->{PreferencesTableValue}) LIKE $Lower(?)";
         push @Bind, \$Value;
     }

@@ -60,9 +60,15 @@ sub Describe {
     );
     $Self->AddOption(
         Name        => 'MacroID',
-        Label       => Kernel::Language::Translatable('MacroID'),
-        Description => Kernel::Language::Translatable('The ID of the macro to execute if the logical expression is true.'),
+        Label       => Kernel::Language::Translatable('Then'),
+        Description => Kernel::Language::Translatable('The macro to execute if the logical expression is true.'),
         Required    => 1,
+    );
+    $Self->AddOption(
+        Name        => 'ElseMacroID',
+        Label       => Kernel::Language::Translatable('Else'),
+        Description => Kernel::Language::Translatable('The macro to execute if the logical expression is false.'),
+        Required    => 0,
     );
 
     return;
@@ -76,8 +82,9 @@ Example:
     my $Success = $Object->Run(
         ObjectID => 123,
         Config   => {
-            If  => 'a && !b || c',
-            MacroID => 123,
+            If          => 'a && !b || c',
+            MacroID     => 123,
+            ElseMacroID => 124,             # optional
         },
         UserID   => 123,
     );
@@ -96,6 +103,14 @@ sub Run {
 
     # evaluate expression - we use a simple Safe string reval atm - better than nothing
     my $EvalResult = $Compartment->reval($Param{Config}->{If}, 1);
+    if ( $@ ) {
+        $Kernel::OM->Get('Automation')->LogError(
+            Referrer => $Self,
+            Message  => "An error occured while evaluating the logical expression ($@)!",
+            UserID   => $Param{UserID}
+        );
+        return;
+    }
     if ( $EvalResult ) {
 
         # FIXME: use given instance
@@ -114,13 +129,23 @@ sub Run {
             RootMacroType => $Self->{RootMacroType} || $Param{MacroType},
         );
     }
-    if ( $@ ) {
-        $Kernel::OM->Get('Automation')->LogError(
-            Referrer => $Self,
-            Message  => "An error occured while evaluating the logical expression ($@)!",
-            UserID   => $Param{UserID}
+    elsif ( $Param{Config}->{ElseMacroID} ) {
+
+        # FIXME: use given instance
+        my $AutomationObject = $Param{AutomationInstance} || $Kernel::OM->Get('Automation');
+
+        my $Result = $AutomationObject->MacroExecute(
+            ID       => $Param{Config}->{ElseMacroID},
+            ObjectID => $Param{ObjectID},
+            UserID   => $Param{UserID},
+
+            # keep event data if given
+            EventData => $Self->{EventData} || $Param{EventData},
+
+            # keep root object id and type
+            RootObjectID  => $Self->{RootObjectID} || $Param{ObjectID},
+            RootMacroType => $Self->{RootMacroType} || $Param{MacroType},
         );
-        return;
     }
 
     return 1;

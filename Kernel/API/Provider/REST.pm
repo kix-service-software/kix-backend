@@ -556,6 +556,7 @@ sub GenerateResponse {
     }
     $AddHeader->{'KIX-Worker-PID'} = $$;
     $AddHeader->{'KIX-Request-Duration'} = (Time::HiRes::time() - $Self->{Metric}->{StartTime});
+    $AddHeader->{'KIX-Request-TTE'} = $Self->{Metric}->{RequestTTE};
 
     # do we have to return an http error code
     if ( IsStringWithData( $Param{Code} ) && !IsInteger($Param{Code}) ) {

@@ -29,7 +29,7 @@ $Self->Is(
 );
 
 # check supported methods
-for my $Method ( qw(GetSupportedAttributes Search Sort) ) {
+for my $Method ( qw(GetSupportedAttributes AttributePrepare Select Search Sort) ) {
     $Self->True(
         $AttributeObject->can($Method),
         'Attribute object can "' . $Method . q{"}
@@ -42,48 +42,64 @@ $Self->IsDeeply(
     $AttributeList,
     {
         OwnerID => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','GT','GTE','LT','LTE'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN','GT','GTE','LT','LTE'],
+            ValueType      => 'NUMERIC'
         },
         Owner => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
         OwnerName => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
         OwnerOutOfOffice => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EQ'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 0,
+            Operators      => ['EQ'],
+            ValueType      => 'NUMERIC'
         },
         ResponsibleID => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','GT','GTE','LT','LTE'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN','GT','GTE','LT','LTE'],
+            ValueType      => 'NUMERIC'
         },
         Responsible => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
         ResponsibleName => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
         ResponsibleOutOfOffice => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EQ'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 0,
+            Operators      => ['EQ'],
+            ValueType      => 'NUMERIC'
         }
     },
     'GetSupportedAttributes provides expected data'
@@ -1117,10 +1133,10 @@ my @SortTests = (
         Expected  => {
             'Join'    => [],
             'OrderBy' => [
-                'st.user_id'
+                'SortAttr0'
             ],
             'Select'  => [
-                'st.user_id'
+                'st.user_id AS SortAttr0'
             ]
         }
     },
@@ -1133,14 +1149,14 @@ my @SortTests = (
                 'LEFT OUTER JOIN contact touc ON touc.user_id = tou.id'
             ],
             'OrderBy' => [
-                'LOWER(touc.lastname)',
-                'LOWER(touc.firstname)',
-                'LOWER(tou.login)'
+                'SortAttr0',
+                'SortAttr1',
+                'SortAttr2'
             ],
             'Select' => [
-                'touc.lastname',
-                'touc.firstname',
-                'tou.login'
+                'LOWER(touc.lastname) AS SortAttr0',
+                'LOWER(touc.firstname) AS SortAttr1',
+                'LOWER(tou.login) AS SortAttr2'
             ]
         }
     },
@@ -1153,12 +1169,12 @@ my @SortTests = (
                 'LEFT OUTER JOIN contact touc ON touc.user_id = tou.id'
             ],
             'OrderBy' => [
-                'LOWER(touc.lastname)',
-                'LOWER(touc.firstname)'
+                'SortAttr0',
+                'SortAttr1'
             ],
             'Select' => [
-                'touc.lastname',
-                'touc.firstname'
+                'LOWER(touc.lastname) AS SortAttr0',
+                'LOWER(touc.firstname) AS SortAttr1'
             ]
         }
     },
@@ -1168,10 +1184,10 @@ my @SortTests = (
         Expected  => {
             'Join'    => [],
             'OrderBy' => [
-                'st.responsible_user_id'
+                'SortAttr0'
             ],
             'Select'  => [
-                'st.responsible_user_id'
+                'st.responsible_user_id AS SortAttr0'
             ]
         }
     },
@@ -1184,14 +1200,14 @@ my @SortTests = (
                 'LEFT OUTER JOIN contact truc ON truc.user_id = tru.id'
             ],
             'OrderBy' => [
-                'LOWER(truc.lastname)',
-                'LOWER(truc.firstname)',
-                'LOWER(tru.login)'
+                'SortAttr0',
+                'SortAttr1',
+                'SortAttr2'
             ],
             'Select' => [
-                'truc.lastname',
-                'truc.firstname',
-                'tru.login'
+                'LOWER(truc.lastname) AS SortAttr0',
+                'LOWER(truc.firstname) AS SortAttr1',
+                'LOWER(tru.login) AS SortAttr2'
             ]
         }
     },
@@ -1204,12 +1220,12 @@ my @SortTests = (
                 'LEFT OUTER JOIN contact truc ON truc.user_id = tru.id'
             ],
             'OrderBy' => [
-                'LOWER(truc.lastname)',
-                'LOWER(truc.firstname)'
+                'SortAttr0',
+                'SortAttr1'
             ],
             'Select' => [
-                'truc.lastname',
-                'truc.firstname'
+                'LOWER(truc.lastname) AS SortAttr0',
+                'LOWER(truc.firstname) AS SortAttr1'
             ]
         }
     },

@@ -29,7 +29,7 @@ $Self->Is(
 );
 
 # check supported methods
-for my $Method ( qw(GetSupportedAttributes Search Sort) ) {
+for my $Method ( qw(GetSupportedAttributes AttributePrepare Select Search Sort) ) {
     $Self->True(
         $AttributeObject->can($Method),
         'Attribute object can "' . $Method . q{"}
@@ -42,26 +42,34 @@ $Self->IsDeeply(
     $AttributeList,
     {
         UserID => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN'],
+            ValueType      => 'NUMERIC'
         },
         AssignedUserID => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN'],
+            ValueType      => 'NUMERIC'
         },
         Login => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         UserLogin => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         }
     },
     'GetSupportedAttributes provides expected data'
@@ -540,10 +548,10 @@ my @SortTests = (
         Expected  => {
             'Join' => [],
             'OrderBy' => [
-                'c.user_id'
+                'SortAttr0'
             ],
             'Select' => [
-                'c.user_id'
+                'c.user_id AS SortAttr0'
             ]
         }
     },
@@ -553,10 +561,10 @@ my @SortTests = (
         Expected  => {
             'Join' => [],
             'OrderBy' => [
-                'c.user_id'
+                'SortAttr0'
             ],
             'Select' => [
-                'c.user_id'
+                'c.user_id AS SortAttr0'
             ]
         }
     },
@@ -568,10 +576,10 @@ my @SortTests = (
                 'LEFT JOIN users u0 ON c.user_id = u0.id'
             ],
             'OrderBy' => [
-                'u0.login'
+                'SortAttr0'
             ],
             'Select' => [
-                'u0.login'
+                'u0.login AS SortAttr0'
             ]
         }
     },
@@ -583,10 +591,10 @@ my @SortTests = (
                 'LEFT JOIN users u0 ON c.user_id = u0.id'
             ],
             'OrderBy' => [
-                'u0.login'
+                'SortAttr0'
             ],
             'Select' => [
-                'u0.login'
+                'u0.login AS SortAttr0'
             ]
         }
     }

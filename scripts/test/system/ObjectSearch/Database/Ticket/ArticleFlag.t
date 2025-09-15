@@ -29,7 +29,7 @@ $Self->Is(
 );
 
 # check supported methods
-for my $Method ( qw(GetSupportedAttributes Search Sort) ) {
+for my $Method ( qw(GetSupportedAttributes AttributePrepare Select Search Sort) ) {
     $Self->True(
         $AttributeObject->can($Method),
         'Attribute object can "' . $Method . '"'
@@ -42,13 +42,186 @@ $Self->IsDeeply(
     $AttributeList,
     {
         'ArticleFlag.Seen' => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EQ','NE']
+            IsSelectable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE']
         }
     },
     'GetSupportedAttributes provides expected data'
 );
+
+# check AttributePrepare
+my @AttributePrepareTests = (
+    {
+        Name      => 'AttributePrepare: Attribute "ArticleFlag.Seen" / UserID 1',
+        Parameter => {
+            Attribute => 'ArticleFlag.Seen',
+            UserID    => 1
+        },
+        Expected  => {
+            Column       => 'af_left0.article_value',
+            ConditionDef => {
+                NULLValue => 1,
+            },
+            SQLDef       => {
+                Join => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id',
+                    'LEFT OUTER JOIN article_flag af_left0 ON af_left0.article_id = ta.id AND af_left0.article_key = \'Seen\' AND af_left0.create_by = 1'
+                ]
+            }
+        }
+    },
+    {
+        Name      => 'AttributePrepare: Attribute "ArticleFlag.Seen" / PrepareType "Select" / UserID 1',
+        Parameter => {
+            Attribute   => 'ArticleFlag.Seen',
+            PrepareType => 'Select',
+            UserID      => 1
+        },
+        Expected  => {
+            Column => 'af_left0.article_value',
+            ConditionDef => {
+                NULLValue => 1,
+            },
+            SQLDef       => {
+                Join => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id',
+                    'LEFT OUTER JOIN article_flag af_left0 ON af_left0.article_id = ta.id AND af_left0.article_key = \'Seen\' AND af_left0.create_by = 1'
+                ]
+            }
+        }
+    },
+    {
+        Name      => 'AttributePrepare: Attribute "ArticleFlag.Seen" / PrepareType "Condition" / UserID 1',
+        Parameter => {
+            Attribute   => 'ArticleFlag.Seen',
+            PrepareType => 'Condition',
+            UserID      => 1
+        },
+        Expected  => {
+            Column       => 'af_left0.article_value',
+            ConditionDef => {
+                NULLValue => 1,
+            },
+            SQLDef       => {
+                Join => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id',
+                    'LEFT OUTER JOIN article_flag af_left0 ON af_left0.article_id = ta.id AND af_left0.article_key = \'Seen\' AND af_left0.create_by = 1'
+                ]
+            }
+        }
+    },
+    {
+        Name      => 'AttributePrepare: Attribute "ArticleFlag.Seen" / PrepareType "Condition" / UserType "Customer" / UserID 1',
+        Parameter => {
+            Attribute   => 'ArticleFlag.Seen',
+            PrepareType => 'Condition',
+            UserType    => 'Customer',
+            UserID      => 1
+        },
+        Expected  => {
+            Column       => 'af_left0.article_value',
+            ConditionDef => {
+                NULLValue => 1,
+            },
+            SQLDef       => {
+                Join => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id AND ta.customer_visible = 1',
+                    'LEFT OUTER JOIN article_flag af_left0 ON af_left0.article_id = ta.id AND af_left0.article_key = \'Seen\' AND af_left0.create_by = 1'
+                ]
+            }
+        }
+    },
+    {
+        Name      => 'AttributePrepare: Attribute "ArticleFlag.Seen" / PrepareType "Sort" / UserID 1',
+        Parameter => {
+            Attribute   => 'ArticleFlag.Seen',
+            PrepareType => 'Sort',
+            UserID      => 1
+        },
+        Expected  => {
+            Column       => 'af_left0.article_value',
+            ConditionDef => {
+                NULLValue => 1,
+            },
+            SQLDef       => {
+                Join => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id',
+                    'LEFT OUTER JOIN article_flag af_left0 ON af_left0.article_id = ta.id AND af_left0.article_key = \'Seen\' AND af_left0.create_by = 1'
+                ]
+            }
+        }
+    },
+    {
+        Name      => 'AttributePrepare: Attribute "ArticleFlag.Seen" / PrepareType "Fulltext" / UserID 1',
+        Parameter => {
+            Attribute   => 'ArticleFlag.Seen',
+            PrepareType => 'Fulltext',
+            UserID      => 1
+        },
+        Expected  => {
+            Column       => 'af_left0.article_value',
+            ConditionDef => {
+                NULLValue => 1,
+            },
+            SQLDef       => {
+                Join => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id',
+                    'LEFT OUTER JOIN article_flag af_left0 ON af_left0.article_id = ta.id AND af_left0.article_key = \'Seen\' AND af_left0.create_by = 1'
+                ]
+            }
+        }
+    }
+);
+for my $Test ( @AttributePrepareTests ) {
+    my $Result = $AttributeObject->AttributePrepare(
+        %{ $Test->{Parameter} },
+        Silent => defined( $Test->{Expected} ) ? 0 : 1
+    );
+    $Self->IsDeeply(
+        $Result,
+        $Test->{Expected},
+        $Test->{Name}
+    );
+}
+
+# check Select
+my @SelectTests = (
+    {
+        Name      => 'Select: Attribute undef',
+        Parameter => {
+            Attribute => undef
+        },
+        Expected  => undef
+    },
+    {
+        Name      => 'Select: Attribute invalid',
+        Parameter => {
+            Attribute => 'Test'
+        },
+        Expected  => undef
+    },
+    {
+        Name      => 'Select: Attribute "ArticleFlag.Seen"',
+        Parameter => {
+            Attribute => 'ArticleFlag.Seen'
+        },
+        Expected  => undef
+    }
+);
+for my $Test ( @SelectTests ) {
+    my $Result = $AttributeObject->Select(
+        %{ $Test->{Parameter} },
+        Silent => defined( $Test->{Expected} ) ? 0 : 1
+    );
+    $Self->IsDeeply(
+        $Result,
+        $Test->{Expected},
+        $Test->{Name}
+    );
+}
 
 # check Search
 my @SearchTests = (

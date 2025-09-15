@@ -18,6 +18,8 @@ use Digest::SHA;
 use Data::Dumper;
 use Time::HiRes;
 
+use base qw(Kernel::System::EventHandler);
+
 use Kernel::System::Role;
 use Kernel::System::VariableCheck qw(:all);
 use Kernel::System::PerfLog qw(TimeDiff);
@@ -85,6 +87,11 @@ sub new {
     }
 
     $Self->{PermissionDebug} = $Kernel::OM->Get('Config')->Get('Permission::Debug');
+
+    # init of event handler
+    $Self->EventHandlerInit(
+        Config => 'User::EventModulePost',
+    );
 
     return $Self;
 }
@@ -262,23 +269,6 @@ sub GetUserData {
             );
         }
 
-        # add preferences defaults
-        my $Config = $Kernel::OM->Get('Config')->Get('PreferencesGroups');
-        if ( ref( $Config ) eq 'HASH' ) {
-
-            KEY:
-            for my $Key ( keys( %{ $Config } ) ) {
-
-                next KEY if ( !defined(  $Config->{ $Key }->{DataSelected} ) );
-
-                # check if data is defined
-                next KEY if ( defined( $Preferences{ $Config->{ $Key }->{PrefKey} } ) );
-
-                # set default data
-                $Preferences{ $Config->{ $Key }->{PrefKey} } = $Config->{ $Key }->{DataSelected};
-            }
-        }
-
         # add preferences to data hash
         $Data{Preferences} = \%Preferences;
     }
@@ -411,6 +401,20 @@ sub UserAdd {
         UserID => $UserID
     );
 
+    # get user data for UserAdd event
+    my %User = $Self->GetUserData(
+        UserID => $UserID,
+    );
+
+    # trigger event
+    $Self->EventHandler(
+        Event  => 'UserAdd',
+        Data   => {
+            NewUser => \%User,
+        },
+        UserID => $Param{ChangeUserID},
+    );
+
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
@@ -454,8 +458,8 @@ sub UserUpdate {
         }
     }
 
-    # store old user login for later use
-    my $OldUserLogin = $Self->UserLookup(
+    # get old user data for UserUpdate event
+    my %OldUser = $Self->GetUserData(
         UserID => $Param{UserID},
     );
 
@@ -516,9 +520,89 @@ sub UserUpdate {
         UserID => $Param{UserID}
     );
 
+    # get new user data for UserUpdate event
+    my %NewUser = $Self->GetUserData(
+        UserID => $Param{UserID},
+    );
+
+    # trigger event
+    $Self->EventHandler(
+        Event  => 'UserUpdate',
+        Data   => {
+            NewUser => \%NewUser,
+            OldUser => \%OldUser,
+        },
+        UserID => $Param{ChangeUserID},
+    );
+
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
+        Namespace => 'User',
+        ObjectID  => $Param{UserID},
+    );
+
+    return 1;
+}
+
+=item DeleteNewlyCreatedUser()
+
+delete a user which was newly created (currently used to delete a user created in a create contact API request)
+
+    my $Success = $ContactObject->DeleteNewlyCreatedUser(
+        UserID => 123,
+        ChangeUserID  => 123,
+    );
+
+=cut
+
+sub DeleteNewlyCreatedUser {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(UserID ChangeUserID)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
+
+    # cleanup preferences
+    $Self->DeletePreferences(
+        UserID => $Param{UserID}
+    );
+
+    # delete role assignments
+    $Kernel::OM->Get('Role')->RoleUserDelete(
+        UserID => $Param{UserID}
+    );
+
+    # delete user
+    return if !$Kernel::OM->Get('DB')->Prepare(
+        SQL  => 'DELETE FROM users WHERE id = ?',
+        Bind => [ \$Param{UserID} ],
+    );
+
+    # delete cache
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{CacheType}
+    );
+
+    # trigger event
+    $Self->EventHandler(
+        Event  => 'UserDelete',
+        Data   => {
+            ID => $Param{UserID},
+        },
+        UserID => $Param{ChangeUserID},
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
+        Event     => 'DELETE',
         Namespace => 'User',
         ObjectID  => $Param{UserID},
     );
@@ -575,6 +659,7 @@ sub UserSearch {
         && !$Param{ValidID}
         && !$Param{SearchUserID}
         && !IsArrayRefWithData($Param{UserIDs})
+        && !IsArrayRefWithData($Param{NotUserIDs})
         && !IsHashRefWithData($Param{HasPermission})
         && !IsArrayRefWithData($Param{RoleIDs})
         && !IsArrayRefWithData($Param{NotRoleIDs})
@@ -582,7 +667,7 @@ sub UserSearch {
         if ( !$Param{Silent} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => 'Need Search or UserLogin or UserLoginEquals or IsAgent or IsCustomer or IsOutOfOffice or ValidID or SearchUserID or HasPermission or RoleIDs or NotRoleIDs - else use UserList!',
+                Message  => 'Need Search or UserLogin or UserLoginEquals or IsAgent or IsCustomer or IsOutOfOffice or ValidID or SearchUserID or UserIDs or NotUserIDs or HasPermission or RoleIDs or NotRoleIDs - else use UserList!',
             );
         }
         return;
@@ -597,6 +682,7 @@ sub UserSearch {
         . ( $Param{Valid} || '' ) . '::'
         . ( $Param{ValidID} || '' ) . '::'
         . ( IsArrayRefWithData($Param{UserIDs}) ? join(',', @{ $Param{UserIDs} }) : '' ) . '::'
+        . ( IsArrayRefWithData($Param{NotUserIDs}) ? join(',', @{ $Param{NotUserIDs} }) : '' ) . '::'
         . ( $Param{Limit} || '' ) . '::'
         . ( $Param{SearchUserID} || '') . '::'
         . ( IsHashRefWithData($Param{HasPermission}) ? $Kernel::OM->Get('Main')->Dump($Param{HasPermission}, 'ascii+noindent') : '' ) . '::'
@@ -707,6 +793,10 @@ END
 
     if ( IsArrayRefWithData($Param{UserIDs}) ) {
         push(@Where,"u.id IN (" . join( ', ', @{ $Param{UserIDs} } ) . ")");
+    }
+
+    if ( IsArrayRefWithData($Param{NotUserIDs}) ) {
+        push(@Where,"u.id NOT IN (" . join( ', ', @{ $Param{NotUserIDs} } ) . ")");
     }
 
     if ( $Param{SearchUserID} ) {
@@ -1339,7 +1429,22 @@ sub CheckResourcePermission {
     return ( 1, Kernel::System::Role::Permission::PERMISSION_CRUD )
         if ( !$Kernel::OM->Get('Config')->Get('SecureMode') && $Param{UserID} == 1 );
 
-    my $StartTime;
+    # check usage context of user
+    my %User = $Self->GetUserData(
+        UserID        => $Param{UserID},
+        Valid         => 1,
+        NoPreferences => 1,
+    );
+    if (
+        !%User
+        || !$User{ 'Is' . $Param{UsageContext} }
+    ) {
+        if ( $Self->{PermissionDebug} ) {
+            $Self->_PermissionDebug($Self->{LevelIndent}, "User ID $Param{UserID} is invalid or does not have UsageContext \"$Param{UsageContext}\"");
+        }
+
+        return 0;
+    }
 
     if ( !IsHashRefWithData($Self->{Cache}->{PermissionCheckRoleList}) ) {
         # get list of all roles to resolve names
@@ -1360,14 +1465,11 @@ sub CheckResourcePermission {
         $Self->{Cache}->{PermissionCheckUserRoleList}->{"$Param{UsageContext}::$Param{UserID}"} = \@UserRoleList;
 
         if ( $Self->{PermissionDebug} ) {
-            my $UserLogin = $Self->UserLookup(
-                UserID => $Param{UserID},
-                Silent => 1,
-            );
-            $Self->_PermissionDebug($Self->{LevelIndent}, "active roles assigned to user \"$UserLogin\" (ID $Param{UserID}) as \"$Param{UsageContext}\": " . join(', ', map { '"'.($Self->{Cache}->{PermissionCheckRoleList}->{$_} || '')."\" (ID $_)" } sort @{$Self->{Cache}->{PermissionCheckUserRoleList}->{"$Param{UsageContext}::$Param{UserID}"}}));
+            $Self->_PermissionDebug($Self->{LevelIndent}, "active roles assigned to user \"$User{UserLogin}\" (ID $Param{UserID}) as \"$Param{UsageContext}\": " . join(', ', map { '"'.($Self->{Cache}->{PermissionCheckRoleList}->{$_} || '')."\" (ID $_)" } sort @{$Self->{Cache}->{PermissionCheckUserRoleList}->{"$Param{UsageContext}::$Param{UserID}"}}));
         }
     }
 
+    my $StartTime;
     if ( $Self->{PermissionDebug} ) {
         $StartTime = Time::HiRes::time();
         $Self->_PermissionDebug($Self->{LevelIndent}, "checking $Param{RequestedPermission} permission for target $Param{Target}");
@@ -1786,7 +1888,7 @@ delete a user preference
 
     my $Succes = $UserObject->DeletePreferences(
         UserID => 123,
-        Key    => 'some pref key',
+        Key    => 'some pref key',          # optional
     );
 
 =cut
@@ -1807,7 +1909,7 @@ sub DeletePreferences {
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'User.UserPreference',
-        ObjectID  => $Param{UserID} . '::' . $Param{Key},
+        ObjectID  => $Param{UserID} . '::' . ($Param{Key}||''),
     );
 
     return $Result;
@@ -2215,6 +2317,40 @@ sub DeleteUserCounterObject {
         }
     }
 
+    # prepare user ids to notify of update
+    my @NotifyUserIDs = ();
+    if ( !$Param{UserID} ) {
+        # prepare sql and binds
+        my $SQL = 'SELECT user_id FROM user_counter WHERE object_id = ?';
+        my @Bind = (
+            \$Param{ObjectID},
+        );
+        if ( $Param{Counter} ) {
+            $Param{Counter} =~ s/\*/%/g;
+            $SQL .= ' AND counter LIKE ?';
+            push @Bind, \$Param{Counter};
+        }
+        if ( $Param{Category} ) {
+            $SQL .= ' AND category = ?';
+            push @Bind, \$Param{Category};
+        }
+
+        # prepare sql handle
+        return if !$Kernel::OM->Get('DB')->Prepare(
+            SQL  => $SQL,
+            Bind => \@Bind,
+        );
+
+        # fetch relevant user ids
+        while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
+            push( @NotifyUserIDs, $Row[0] );
+        }
+    }
+    else {
+        push( @NotifyUserIDs, $Param{UserID} );
+    }
+
+    # prepare sql and binds for counter deletion
     my $SQL = 'DELETE FROM user_counter WHERE object_id = ?';
     my @Bind = (
         \$Param{ObjectID},
@@ -2233,19 +2369,22 @@ sub DeleteUserCounterObject {
         push @Bind, \$Param{Category};
     }
 
-    # sql
+    # execute sql
     return if !$Kernel::OM->Get('DB')->Do(
         SQL  => $SQL,
         Bind => \@Bind,
     );
 
-    # push client callback event
-    $Kernel::OM->Get('ClientNotification')->NotifyClients(
-        Event     => 'UPDATE',
-        Namespace => 'User.Counters',
-        UserID    => ($Param{UserID} || '*'),
-        ObjectID  => ( $Param{Category} || '*').'.'.($Param{Counter} || '*'),
-    );
+    # notify all relevant users
+    for my $UserID ( @NotifyUserIDs ) {
+        # push client callback event
+        $Kernel::OM->Get('ClientNotification')->NotifyClients(
+            Event     => 'UPDATE',
+            Namespace => 'User.Counters',
+            UserID    => $UserID,
+            ObjectID  => ( $Param{Category} || '*').'.'.($Param{Counter} || '*'),
+        );
+    }
 
     return 1
 }
@@ -2394,6 +2533,15 @@ sub _PermissionDebug {
 =end Internal:
 
 =cut
+
+sub DESTROY {
+    my $Self = shift;
+
+    # execute all transaction events
+    $Self->EventHandlerTransaction();
+
+    return 1;
+}
 
 1;
 

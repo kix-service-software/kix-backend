@@ -34,20 +34,17 @@ sub GetSupportedAttributes {
 
     return {
         AttachmentName => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            IsSelectable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         }
     };
-
-    return {};
 }
 
-sub Search {
+sub AttributePrepare {
     my ( $Self, %Param ) = @_;
-
-    # check params
-    return if ( !$Self->_CheckSearchParams( %Param ) );
 
     # check for needed joins
     my @SQLJoin = ();
@@ -68,21 +65,15 @@ sub Search {
         $Param{Flags}->{JoinMap}->{ArticleAttachment} = 1;
     }
 
-    # prepare condition
-    my $Condition = $Self->_GetCondition(
-        Operator        => $Param{Search}->{Operator},
-        Column          => 'att.filename',
-        Value           => $Param{Search}->{Value},
-        CaseInsensitive => 1,
-        NULLValue       => 1,
-        Silent          => $Param{Silent}
-    );
-    return if ( !$Condition );
-
-    # return search def
     return {
-        Join  => \@SQLJoin,
-        Where => [ $Condition ]
+        Column       => 'att.filename',
+        ConditionDef => {
+            CaseInsensitive => 1,
+            NULLValue       => 1,
+        },
+        SQLDef => {
+            Join => \@SQLJoin
+        }
     };
 }
 

@@ -29,7 +29,7 @@ $Self->Is(
 );
 
 # check supported methods
-for my $Method ( qw(GetSupportedAttributes Search Sort) ) {
+for my $Method ( qw(GetSupportedAttributes AttributePrepare Select Search Sort) ) {
     $Self->True(
         $AttributeObject->can($Method),
         'Attribute object can "' . $Method . q{"}
@@ -42,59 +42,81 @@ $Self->IsDeeply(
     $AttributeList,
     {
         Title => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         Firstname => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         Lastname => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         Phone => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         Fax => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         Mobile => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         Street => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         City => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         Zip => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         Country => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         Comment => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         }
     },
     'GetSupportedAttributes provides expected data'
@@ -1348,10 +1370,10 @@ my @SortTests = (
         Attribute => 'Title',
         Expected  => {
             'OrderBy' => [
-                'LOWER(c.title)'
+                'SortAttr0'
             ],
             'Select' => [
-                'LOWER(c.title)'
+                'LOWER(c.title) AS SortAttr0'
             ]
         }
     },
@@ -1360,10 +1382,10 @@ my @SortTests = (
         Attribute => 'Firstname',
         Expected  => {
             'OrderBy' => [
-                'LOWER(c.firstname)'
+                'SortAttr0'
             ],
             'Select' => [
-                'LOWER(c.firstname)'
+                'LOWER(c.firstname) AS SortAttr0'
             ]
         }
     },
@@ -1372,10 +1394,10 @@ my @SortTests = (
         Attribute => 'Lastname',
         Expected  => {
             'OrderBy' => [
-                'LOWER(c.lastname)'
+                'SortAttr0'
             ],
             'Select' => [
-                'LOWER(c.lastname)'
+                'LOWER(c.lastname) AS SortAttr0'
             ]
         }
     },
@@ -1384,10 +1406,10 @@ my @SortTests = (
         Attribute => 'Phone',
         Expected  => {
             'OrderBy' => [
-                'LOWER(COALESCE(c.phone,\'\'))'
+                'SortAttr0'
             ],
             'Select' => [
-                'LOWER(COALESCE(c.phone,\'\'))'
+                'LOWER(COALESCE(c.phone,\'\')) AS SortAttr0'
             ]
         }
     },
@@ -1396,10 +1418,10 @@ my @SortTests = (
         Attribute => 'Fax',
         Expected  => {
             'OrderBy' => [
-                'LOWER(COALESCE(c.fax,\'\'))'
+                'SortAttr0'
             ],
             'Select' => [
-                'LOWER(COALESCE(c.fax,\'\'))'
+                'LOWER(COALESCE(c.fax,\'\')) AS SortAttr0'
             ]
         }
     },
@@ -1408,10 +1430,10 @@ my @SortTests = (
         Attribute => 'Mobile',
         Expected  => {
             'OrderBy' => [
-                'LOWER(COALESCE(c.mobile,\'\'))'
+                'SortAttr0'
             ],
             'Select' => [
-                'LOWER(COALESCE(c.mobile,\'\'))'
+                'LOWER(COALESCE(c.mobile,\'\')) AS SortAttr0'
             ]
         }
     },
@@ -1420,10 +1442,10 @@ my @SortTests = (
         Attribute => 'Street',
         Expected  => {
             'OrderBy' => [
-                'LOWER(COALESCE(c.street,\'\'))'
+                'SortAttr0'
             ],
             'Select' => [
-                'LOWER(COALESCE(c.street,\'\'))'
+                'LOWER(COALESCE(c.street,\'\')) AS SortAttr0'
             ]
         }
     },
@@ -1432,10 +1454,10 @@ my @SortTests = (
         Attribute => 'City',
         Expected  => {
             'OrderBy' => [
-                'LOWER(COALESCE(c.city,\'\'))'
+                'SortAttr0'
             ],
             'Select' => [
-                'LOWER(COALESCE(c.city,\'\'))'
+                'LOWER(COALESCE(c.city,\'\')) AS SortAttr0'
             ]
         }
     },
@@ -1444,10 +1466,10 @@ my @SortTests = (
         Attribute => 'Zip',
         Expected  => {
             'OrderBy' => [
-                'LOWER(COALESCE(c.zip,\'\'))'
+                'SortAttr0'
             ],
             'Select' => [
-                'LOWER(COALESCE(c.zip,\'\'))'
+                'LOWER(COALESCE(c.zip,\'\')) AS SortAttr0'
             ]
         }
     },
@@ -1456,10 +1478,10 @@ my @SortTests = (
         Attribute => 'Country',
         Expected  => {
             'OrderBy' => [
-                'LOWER(COALESCE(c.country,\'\'))'
+                'SortAttr0'
             ],
             'Select' => [
-                'LOWER(COALESCE(c.country,\'\'))'
+                'LOWER(COALESCE(c.country,\'\')) AS SortAttr0'
             ]
         }
     },
@@ -1468,10 +1490,10 @@ my @SortTests = (
         Attribute => 'Comment',
         Expected  => {
             'OrderBy' => [
-                'LOWER(COALESCE(c.comments,\'\'))'
+                'SortAttr0'
             ],
             'Select' => [
-                'LOWER(COALESCE(c.comments,\'\'))'
+                'LOWER(COALESCE(c.comments,\'\')) AS SortAttr0'
             ]
         }
     }

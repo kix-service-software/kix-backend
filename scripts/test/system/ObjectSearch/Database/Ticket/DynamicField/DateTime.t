@@ -67,10 +67,12 @@ my $AttributeList = $AttributeObject->GetSupportedAttributes();
 $Self->IsDeeply(
     $AttributeList->{'DynamicField_UnitTest'},
     {
-        IsSearchable => 1,
-        IsSortable   => 1,
-        Operators    => ['EQ','NE','GT','GTE','LT','LTE'],
-        ValueType    => 'DATETIME'
+        IsSelectable   => 1,
+        IsSearchable   => 1,
+        IsSortable     => 1,
+        IsFulltextable => 0,
+        Operators      => ['EQ','NE','GT','GTE','LT','LTE'],
+        ValueType      => 'DATETIME'
     },
     'GetSupportedAttributes provides expected data'
 );
@@ -376,8 +378,8 @@ my @SortTests = (
             Join    => [
                 "LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = st.id AND dfv_left0.field_id = $DynamicFieldID AND dfv_left0.first_value = 1"
             ],
-            Select  => [ 'dfv_left0.value_date' ],
-            OrderBy => [ 'dfv_left0.value_date' ]
+            Select  => [ 'dfv_left0.value_date AS SortAttr0' ],
+            OrderBy => [ 'SortAttr0' ]
         }
     }
 );

@@ -29,7 +29,7 @@ $Self->Is(
 );
 
 # check supported methods
-for my $Method ( qw(GetSupportedAttributes Search Sort) ) {
+for my $Method ( qw(GetSupportedAttributes AttributePrepare Select Search Sort) ) {
     $Self->True(
         $AttributeObject->can($Method),
         'Attribute object can "' . $Method . '"'
@@ -42,14 +42,122 @@ $Self->IsDeeply(
     $AttributeList,
     {
         AccountedTime => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
+            ValueType      => 'NUMERIC'
         }
     },
     'GetSupportedAttributes provides expected data'
 );
+
+# check AttributePrepare
+my @AttributePrepareTests = (
+    {
+        Name      => 'AttributePrepare: Attribute "AccountedTime"',
+        Parameter => {
+            Attribute => 'AccountedTime'
+        },
+        Expected  => {
+            Column => 'st.accounted_time',
+        }
+    },
+    {
+        Name      => 'AttributePrepare: Attribute "AccountedTime" / PrepareType "Select"',
+        Parameter => {
+            Attribute   => 'AccountedTime',
+            PrepareType => 'Select'
+        },
+        Expected  => {
+            Column => 'st.accounted_time',
+        }
+    },
+    {
+        Name      => 'AttributePrepare: Attribute "AccountedTime" / PrepareType "Condition"',
+        Parameter => {
+            Attribute   => 'AccountedTime',
+            PrepareType => 'Condition'
+        },
+        Expected  => {
+            Column       => 'st.accounted_time',
+            ConditionDef => {
+                ValueType => 'NUMERIC',
+                NULLValue => 1
+            }
+        }
+    },
+    {
+        Name      => 'AttributePrepare: Attribute "AccountedTime" / PrepareType "Sort"',
+        Parameter => {
+            Attribute   => 'AccountedTime',
+            PrepareType => 'Sort'
+        },
+        Expected  => {
+            Column => 'st.accounted_time',
+        }
+    },
+    {
+        Name      => 'AttributePrepare: Attribute "AccountedTime" / PrepareType "Fulltext"',
+        Parameter => {
+            Attribute   => 'AccountedTime',
+            PrepareType => 'Fulltext'
+        },
+        Expected  => {
+            Column => 'st.accounted_time',
+        }
+    },
+);
+for my $Test ( @AttributePrepareTests ) {
+    my $Result = $AttributeObject->AttributePrepare(
+        %{ $Test->{Parameter} },
+        Silent => defined( $Test->{Expected} ) ? 0 : 1
+    );
+    $Self->IsDeeply(
+        $Result,
+        $Test->{Expected},
+        $Test->{Name}
+    );
+}
+
+# check Select
+my @SelectTests = (
+    {
+        Name      => 'Select: Attribute undef',
+        Parameter => {
+            Attribute => undef
+        },
+        Expected  => undef
+    },
+    {
+        Name      => 'Select: Attribute invalid',
+        Parameter => {
+            Attribute => 'Test'
+        },
+        Expected  => undef
+    },
+    {
+        Name      => 'Select: Attribute "AccountedTime"',
+        Parameter => {
+            Attribute => 'AccountedTime'
+        },
+        Expected  => {
+            Select => ['st.accounted_time AS "AccountedTime"']
+        }
+    }
+);
+for my $Test ( @SelectTests ) {
+    my $Result = $AttributeObject->Select(
+        %{ $Test->{Parameter} },
+        Silent => defined( $Test->{Expected} ) ? 0 : 1
+    );
+    $Self->IsDeeply(
+        $Result,
+        $Test->{Expected},
+        $Test->{Name}
+    );
+}
 
 # check Search
 my @SearchTests = (
@@ -59,7 +167,7 @@ my @SearchTests = (
         Expected => undef
     },
     {
-        Name     => 'Search: Value undef',
+        Name     => 'Search: Field "AccountedTime" / Operator "EQ" / Value undef',
         Search   => {
             Field    => 'AccountedTime',
             Operator => 'EQ',
@@ -69,7 +177,7 @@ my @SearchTests = (
         Expected => undef
     },
     {
-        Name     => 'Search: Value invalid',
+        Name     => 'Search: Field "AccountedTime" / Operator "EQ" / Value invalid',
         Search   => {
             Field    => 'AccountedTime',
             Operator => 'EQ',
@@ -78,7 +186,7 @@ my @SearchTests = (
         Expected => undef
     },
     {
-        Name     => 'Search: Field undef',
+        Name     => 'Search: Field undef / Operator "EQ" / Value "1"',
         Search   => {
             Field    => undef,
             Operator => 'EQ',
@@ -87,7 +195,7 @@ my @SearchTests = (
         Expected => undef
     },
     {
-        Name     => 'Search: Field invalid',
+        Name     => 'Search: Field invalid / Operator "EQ" / Value "1"',
         Search   => {
             Field    => 'Test',
             Operator => 'EQ',
@@ -96,7 +204,7 @@ my @SearchTests = (
         Expected => undef
     },
     {
-        Name     => 'Search: Operator undef',
+        Name     => 'Search: Field "AccountedTime" / Operator undef / Value "1"',
         Search   => {
             Field    => 'AccountedTime',
             Operator => undef,
@@ -105,7 +213,7 @@ my @SearchTests = (
         Expected => undef
     },
     {
-        Name     => 'Search: Operator invalid',
+        Name     => 'Search: Field "AccountedTime" / Operator invalid / Value "1"',
         Search   => {
             Field    => 'AccountedTime',
             Operator => 'Test',
@@ -114,7 +222,7 @@ my @SearchTests = (
         Expected => undef
     },
     {
-        Name     => 'Search: valid search / Operator EQ',
+        Name     => 'Search: Field "AccountedTime" / Operator "EQ" / Value "1"',
         Search   => {
             Field    => 'AccountedTime',
             Operator => 'EQ',
@@ -125,7 +233,7 @@ my @SearchTests = (
         }
     },
     {
-        Name     => 'Search: valid search / Operator EQ / negative integer',
+        Name     => 'Search: Field "AccountedTime" / Operator "EQ" / Value "-1"',
         Search   => {
             Field    => 'AccountedTime',
             Operator => 'EQ',
@@ -136,7 +244,7 @@ my @SearchTests = (
         }
     },
     {
-        Name     => 'Search: valid search / Operator NE',
+        Name     => 'Search: Field "AccountedTime" / Operator "NE" / Value "1"',
         Search   => {
             Field    => 'AccountedTime',
             Operator => 'NE',
@@ -147,7 +255,7 @@ my @SearchTests = (
         }
     },
     {
-        Name     => 'Search: valid search / Operator IN',
+        Name     => 'Search: Field "AccountedTime" / Operator "IN" / Value ["1"]',
         Search   => {
             Field    => 'AccountedTime',
             Operator => 'IN',
@@ -158,7 +266,7 @@ my @SearchTests = (
         }
     },
     {
-        Name     => 'Search: valid search / Operator !IN',
+        Name     => 'Search: Field "AccountedTime" / Operator "!IN" / Value ["1"]',
         Search   => {
             Field    => 'AccountedTime',
             Operator => '!IN',
@@ -169,7 +277,7 @@ my @SearchTests = (
         }
     },
     {
-        Name     => 'Search: valid search / Operator LT',
+        Name     => 'Search: Field "AccountedTime" / Operator "LT" / Value "1"',
         Search   => {
             Field    => 'AccountedTime',
             Operator => 'LT',
@@ -180,7 +288,7 @@ my @SearchTests = (
         }
     },
     {
-        Name     => 'Search: valid search / Operator GT',
+        Name     => 'Search: Field "AccountedTime" / Operator "GT" / Value "1"',
         Search   => {
             Field    => 'AccountedTime',
             Operator => 'GT',
@@ -191,7 +299,7 @@ my @SearchTests = (
         }
     },
     {
-        Name     => 'Search: valid search / Operator LTE',
+        Name     => 'Search: Field "AccountedTime" / Operator "LTE" / Value "1"',
         Search   => {
             Field    => 'AccountedTime',
             Operator => 'LTE',
@@ -202,7 +310,7 @@ my @SearchTests = (
         }
     },
     {
-        Name     => 'Search: valid search / Operator GTE',
+        Name     => 'Search: Field "AccountedTime" / Operator "GTE" / Value "1"',
         Search   => {
             Field    => 'AccountedTime',
             Operator => 'GTE',
@@ -243,8 +351,8 @@ my @SortTests = (
         Name      => 'Sort: Attribute "AccountedTime"',
         Attribute => 'AccountedTime',
         Expected  => {
-            Select  => [ 'st.accounted_time' ],
-            OrderBy => [ 'st.accounted_time' ]
+            Select  => [ 'st.accounted_time AS SortAttr0' ],
+            OrderBy => [ 'SortAttr0' ]
         }
     }
 );
@@ -372,7 +480,7 @@ $Kernel::OM->ObjectsDiscard(
 # test Search
 my @IntegrationSearchTests = (
     {
-        Name     => 'Search: Field AccountedTime / Operator EQ / Value 2',
+        Name     => 'Search: Field "AccountedTime" / Operator "EQ" / Value "2"',
         Search   => {
             'AND' => [
                 {
@@ -385,7 +493,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID2]
     },
     {
-        Name     => 'Search: Field AccountedTime / Operator EQ / Value 2',
+        Name     => 'Search: Field "AccountedTime" / Operator "EQ" / Value "2"',
         Search   => {
             'AND' => [
                 {
@@ -398,7 +506,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID1, $TicketID3]
     },
     {
-        Name     => 'Search: Field AccountedTime / Operator LT / Value 2',
+        Name     => 'Search: Field "AccountedTime" / Operator "LT" / Value "2"',
         Search   => {
             'AND' => [
                 {
@@ -411,7 +519,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID1]
     },
     {
-        Name     => 'Search: Field AccountedTime / Operator GT / Value 2',
+        Name     => 'Search: Field "AccountedTime" / Operator "GT" / Value "2"',
         Search   => {
             'AND' => [
                 {
@@ -424,7 +532,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID3]
     },
     {
-        Name     => 'Search: Field AccountedTime / Operator LTE / Value 2',
+        Name     => 'Search: Field "AccountedTime" / Operator "LTE" / Value "2"',
         Search   => {
             'AND' => [
                 {
@@ -437,7 +545,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID1, $TicketID2]
     },
     {
-        Name     => 'Search: Field AccountedTime / Operator GTE / Value 2',
+        Name     => 'Search: Field "AccountedTime" / Operator "GTE" / Value "2"',
         Search   => {
             'AND' => [
                 {
@@ -468,7 +576,7 @@ for my $Test ( @IntegrationSearchTests ) {
 # test Sort
 my @IntegrationSortTests = (
     {
-        Name     => 'Sort: Field AccountedTime',
+        Name     => 'Sort: Field "AccountedTime"',
         Sort     => [
             {
                 Field => 'AccountedTime'
@@ -477,7 +585,7 @@ my @IntegrationSortTests = (
         Expected => [$TicketID1, $TicketID2, $TicketID3]
     },
     {
-        Name     => 'Sort: Field AccountedTime / Direction ascending',
+        Name     => 'Sort: Field "AccountedTime" / Direction "ascending"',
         Sort     => [
             {
                 Field     => 'AccountedTime',
@@ -487,7 +595,7 @@ my @IntegrationSortTests = (
         Expected => [$TicketID1, $TicketID2, $TicketID3]
     },
     {
-        Name     => 'Sort: Field AccountedTime / Direction descending',
+        Name     => 'Sort: Field "AccountedTime" / Direction "descending"',
         Sort     => [
             {
                 Field     => 'AccountedTime',

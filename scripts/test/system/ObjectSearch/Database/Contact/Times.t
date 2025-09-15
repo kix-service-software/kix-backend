@@ -29,7 +29,7 @@ $Self->Is(
 );
 
 # check supported methods
-for my $Method ( qw(GetSupportedAttributes Search Sort) ) {
+for my $Method ( qw(GetSupportedAttributes AttributePrepare Select Search Sort) ) {
     $Self->True(
         $AttributeObject->can($Method),
         'Attribute object can "' . $Method . q{"}
@@ -42,16 +42,20 @@ $Self->IsDeeply(
     $AttributeList,
     {
         CreateTime => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','LT','GT','LTE','GTE'],
-            ValueType    => 'DATETIME'
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','LT','GT','LTE','GTE'],
+            ValueType      => 'DATETIME'
         },
         ChangeTime => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','LT','GT','LTE','GTE'],
-            ValueType    => 'DATETIME'
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','LT','GT','LTE','GTE'],
+            ValueType      => 'DATETIME'
         }
     },
     'GetSupportedAttributes provides expected data'
@@ -481,16 +485,16 @@ my @SortTests = (
         Name      => 'Sort: Attribute "CreateTime"',
         Attribute => 'CreateTime',
         Expected  => {
-            Select        => [ 'c.create_time' ],
-            OrderBy       => [ 'c.create_time' ]
+            Select        => [ 'c.create_time AS SortAttr0' ],
+            OrderBy       => [ 'SortAttr0' ]
         }
     },
     {
         Name      => 'Sort: Attribute "ChangeTime"',
         Attribute => 'ChangeTime',
         Expected  => {
-            Select  => [ 'c.change_time' ],
-            OrderBy => [ 'c.change_time' ]
+            Select  => [ 'c.change_time AS SortAttr0' ],
+            OrderBy => [ 'SortAttr0' ]
         }
     }
 );

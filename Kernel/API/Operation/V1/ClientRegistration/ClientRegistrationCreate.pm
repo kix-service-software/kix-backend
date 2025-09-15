@@ -221,23 +221,19 @@ sub Run {
     # import translations if given
     if ( IsArrayRefWithData($ClientRegistration->{Translations}) ) {
         foreach my $Item ( @{$ClientRegistration->{Translations}} ) {
-            my $Content = MIME::Base64::decode_base64($Item->{Content});
+            $Item->{Content} = MIME::Base64::decode_base64($Item->{Content});
+        }
 
-            # fire & forget, not result handling at the moment
-            my $CountTotal = $Kernel::OM->Get('Translation')->ImportPO(
-                Language => $Item->{Language},
-                Content  => $Content,
-                UserID   => $Self->{Authorization}->{UserID},
-                Async    => 1,
-                PerfLog  => $Self,
+        # fire & forget, not result handling at the moment
+        my $CountTotal = $Kernel::OM->Get('Translation')->ImportPOMultiAsync(
+            Data   => $ClientRegistration->{Translations},
+            UserID => $Self->{Authorization}->{UserID},
+        );
+        if ( defined $CountTotal ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'info',
+                Message  => "Started background import of $CountTotal translations from client \"$ClientRegistration->{ClientID}\".",
             );
-            if ( defined $CountTotal ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'info',
-                    Message  => "Started background import of $CountTotal \"$Item->{Language}\" ".($Item->{plugin} ? "($Item->{plugin}) " : "")
-                        ."translations from client \"$ClientRegistration->{ClientID}\".",
-                );
-            }
         }
     }
 

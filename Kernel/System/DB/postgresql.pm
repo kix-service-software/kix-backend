@@ -319,7 +319,7 @@ sub TableCreate {
     $SQL .= "\n";
     push @Return, $SQLStart . $SQL . $SQLEnd;
 
-    # add indexs
+    # add indexes
     for my $Name ( sort keys %Index ) {
         push(
             @Return,
@@ -492,10 +492,7 @@ sub TableAlter {
             # if there is an AutoIncrement column no other changes are needed
             next TAG if $Tag->{AutoIncrement} && $Tag->{AutoIncrement} =~ /^true$/i;
 
-            # remove possible default
-            push @SQL, "ALTER TABLE $Table ALTER $Tag->{NameNew} DROP DEFAULT";
-
-            # remove required
+            # set default as null
             push @SQL, "ALTER TABLE $Table ALTER $Tag->{NameNew} DROP NOT NULL";
 
             # investigate the default value

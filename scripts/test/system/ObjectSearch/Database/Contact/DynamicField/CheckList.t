@@ -61,10 +61,12 @@ my $AttributeList = $AttributeObject->GetSupportedAttributes();
 $Self->IsDeeply(
     $AttributeList->{'DynamicField_UnitTest'},
     {
-        IsSearchable => 0,
-        IsSortable   => 0,
-        Operators    => [],
-        ValueType    => ''
+        IsSelectable   => 0,
+        IsSearchable   => 0,
+        IsSortable     => 0,
+        IsFulltextable => 0,
+        Operators      => [],
+        ValueType      => ''
     },
     'GetSupportedAttributes provides expected data'
 );

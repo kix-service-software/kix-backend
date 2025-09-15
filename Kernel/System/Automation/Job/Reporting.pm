@@ -74,11 +74,11 @@ sub _Run {
     if ( IsArrayRefWithData($Filters) ) {
         for my $Filter ( @{ $Filters } ) {
             if ( IsHashRefWithData($Filter) ) {
-                my @FilterDefinitions = $Kernel::OM->Get('Main')->FilterObjectList(
+                my $FilterDefinitions = $Kernel::OM->Get('Main')->FilterObjectList(
                     Data   => \@Definitions,
                     Filter => $Filter
                 );
-                push(@DefinitionList,@FilterDefinitions);
+                push(@DefinitionList,@{$FilterDefinitions||[]});
             }
         }
     } else {

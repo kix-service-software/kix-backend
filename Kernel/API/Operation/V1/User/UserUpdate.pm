@@ -156,6 +156,79 @@ sub Run {
         );
     }
 
+    # add preferences
+    if ( IsArrayRefWithData( $User->{Preferences} ) ) {
+
+        foreach my $Pref ( @{ $User->{Preferences} } ) {
+            my $Result;
+            if ( exists $UserData{Preferences}->{$Pref->{ID}} ) {
+                $Result = $Self->ExecOperation(
+                    OperationType => 'V1::User::UserPreferenceUpdate',
+                    Data          => {
+                        UserID           => $Param{Data}->{UserID},
+                        UserPreferenceID => $Pref->{ID},
+                        UserPreference   => $Pref
+                    }
+                );
+            }
+            else {
+                $Result = $Self->ExecOperation(
+                    OperationType => 'V1::User::UserPreferenceCreate',
+                    Data          => {
+                        UserID         => $Param{Data}->{UserID},
+                        UserPreference => $Pref
+                    }
+                );
+            }
+
+            if ( !$Result->{Success} ) {
+                return $Self->_Error(
+                    %{$Result},
+                )
+            }
+        }
+    }
+
+    # assign roles
+    if ( IsArrayRefWithData( $User->{RoleIDs} ) ) {
+
+        my %UserRoleList = map { $_ => 1 } $Kernel::OM->Get('Role')->UserRoleList(
+            UserID =>  $Param{Data}->{UserID}
+        );
+
+        my %RolesToDelete = %UserRoleList;
+
+        ROLEID:
+        foreach my $RoleID ( @{ $User->{RoleIDs} } ) {
+            delete $RolesToDelete{$RoleID};
+
+            # check if this RoleID is already assigned to the user
+            next ROLEID if $UserRoleList{$RoleID};
+
+            my $Result = $Self->ExecOperation(
+                OperationType => 'V1::User::UserRoleIDCreate',
+                Data          => {
+                    UserID =>  $Param{Data}->{UserID},
+                    RoleID => $RoleID,
+                }
+            );
+
+            if ( !$Result->{Success} ) {
+                return $Self->_Error(
+                    %{$Result},
+                )
+            }
+        }
+
+        # cleanup roles
+        foreach my $RoleID ( keys %RolesToDelete ) {
+            my $Success = $Kernel::OM->Get('Role')->RoleUserDelete(
+                RoleID => $RoleID,
+                UserID => $Param{Data}->{UserID},
+            );
+        }
+    }
+
     # create access token
     if ( $User->{ExecGenerateToken} ) {
         my $Success = $Kernel::OM->Get('User')->TokenGenerate(

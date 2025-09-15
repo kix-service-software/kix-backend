@@ -53,6 +53,9 @@ sub Init {
     # init sla criterion join counter with 0
     $Param{Flags}->{SLACriterionJoinCounter} = 0;
 
+    # init sort attribute counter with 0
+    $Param{Flags}->{SortAttributeCounter} = 0;
+
     return 1;
 }
 
@@ -86,7 +89,7 @@ sub GetPermissionDef {
         %Param,
         Types        => ['Base::Ticket'],
         UsageContext => $Param{UserType},
-        Permission   => 'READ',
+        Permission   => $Param{Permission} || 'READ',
     );
     # user has no base permission in this context, nothing to prepare
     if(

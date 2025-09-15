@@ -29,7 +29,7 @@ $Self->Is(
 );
 
 # check supported methods
-for my $Method ( qw(GetSupportedAttributes Search Sort) ) {
+for my $Method ( qw(GetSupportedAttributes AttributePrepare Select Search Sort) ) {
     $Self->True(
         $AttributeObject->can($Method),
         'Attribute object can "' . $Method . q{"}
@@ -42,42 +42,56 @@ $Self->IsDeeply(
     $AttributeList,
     {
         OrganisationID => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN'],
+            ValueType      => 'NUMERIC'
         },
         OrganisationIDs => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN'],
+            ValueType      => 'NUMERIC'
         },
         Organisation => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            IsSelectable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         OrganisationNumber => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            IsSelectable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         PrimaryOrganisationID => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN'],
+            ValueType      => 'NUMERIC'
         },
         PrimaryOrganisation => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         PrimaryOrganisationNumber => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         }
     },
     'GetSupportedAttributes provides expected data'
@@ -358,7 +372,7 @@ my @SearchTests = (
         Expected     => {
             'Join' => [
                 'LEFT JOIN contact_organisation co ON co.contact_id = c.id',
-                'INNER JOIN organisation o ON co.org_id = o.id'
+                'LEFT JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(o.name) = \'test\'' : 'o.name = \'test\''
@@ -375,7 +389,7 @@ my @SearchTests = (
         Expected     => {
             'Join' => [
                 'LEFT JOIN contact_organisation co ON co.contact_id = c.id',
-                'INNER JOIN organisation o ON co.org_id = o.id'
+                'LEFT JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(o.name) != \'test\'' : 'o.name != \'test\''
@@ -392,7 +406,7 @@ my @SearchTests = (
         Expected     => {
             'Join' => [
                 'LEFT JOIN contact_organisation co ON co.contact_id = c.id',
-                'INNER JOIN organisation o ON co.org_id = o.id'
+                'LEFT JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(o.name) IN (\'test\')' : 'o.name IN (\'test\')'
@@ -409,7 +423,7 @@ my @SearchTests = (
         Expected     => {
             'Join' => [
                 'LEFT JOIN contact_organisation co ON co.contact_id = c.id',
-                'INNER JOIN organisation o ON co.org_id = o.id'
+                'LEFT JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(o.name) NOT IN (\'test\')' : 'o.name NOT IN (\'test\')'
@@ -426,7 +440,7 @@ my @SearchTests = (
         Expected     => {
             'Join' => [
                 'LEFT JOIN contact_organisation co ON co.contact_id = c.id',
-                'INNER JOIN organisation o ON co.org_id = o.id'
+                'LEFT JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(o.name) LIKE \'test%\'' : 'o.name LIKE \'test%\''
@@ -443,7 +457,7 @@ my @SearchTests = (
         Expected     => {
             'Join' => [
                 'LEFT JOIN contact_organisation co ON co.contact_id = c.id',
-                'INNER JOIN organisation o ON co.org_id = o.id'
+                'LEFT JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(o.name) LIKE \'%test\'' : 'o.name LIKE \'%test\''
@@ -460,7 +474,7 @@ my @SearchTests = (
         Expected     => {
             'Join' => [
                 'LEFT JOIN contact_organisation co ON co.contact_id = c.id',
-                'INNER JOIN organisation o ON co.org_id = o.id'
+                'LEFT JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(o.name) LIKE \'%test%\'' : 'o.name LIKE \'%test%\''
@@ -477,7 +491,7 @@ my @SearchTests = (
         Expected     => {
             'Join' => [
                 'LEFT JOIN contact_organisation co ON co.contact_id = c.id',
-                'INNER JOIN organisation o ON co.org_id = o.id'
+                'LEFT JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(o.name) LIKE \'test\'' : 'o.name LIKE \'test\''
@@ -494,7 +508,7 @@ my @SearchTests = (
         Expected     => {
             'Join' => [
                 'LEFT JOIN contact_organisation co ON co.contact_id = c.id',
-                'INNER JOIN organisation o ON co.org_id = o.id'
+                'LEFT JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(o.number) = \'test\'' : 'o.number = \'test\''
@@ -511,7 +525,7 @@ my @SearchTests = (
         Expected     => {
             'Join' => [
                 'LEFT JOIN contact_organisation co ON co.contact_id = c.id',
-                'INNER JOIN organisation o ON co.org_id = o.id'
+                'LEFT JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(o.number) != \'test\'' : 'o.number != \'test\''
@@ -528,7 +542,7 @@ my @SearchTests = (
         Expected     => {
             'Join' => [
                 'LEFT JOIN contact_organisation co ON co.contact_id = c.id',
-                'INNER JOIN organisation o ON co.org_id = o.id'
+                'LEFT JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(o.number) IN (\'test\')' : 'o.number IN (\'test\')'
@@ -545,7 +559,7 @@ my @SearchTests = (
         Expected     => {
             'Join' => [
                 'LEFT JOIN contact_organisation co ON co.contact_id = c.id',
-                'INNER JOIN organisation o ON co.org_id = o.id'
+                'LEFT JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(o.number) NOT IN (\'test\')' : 'o.number NOT IN (\'test\')'
@@ -562,7 +576,7 @@ my @SearchTests = (
         Expected     => {
             'Join' => [
                 'LEFT JOIN contact_organisation co ON co.contact_id = c.id',
-                'INNER JOIN organisation o ON co.org_id = o.id'
+                'LEFT JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(o.number) LIKE \'test%\'' : 'o.number LIKE \'test%\''
@@ -579,7 +593,7 @@ my @SearchTests = (
         Expected     => {
             'Join' => [
                 'LEFT JOIN contact_organisation co ON co.contact_id = c.id',
-                'INNER JOIN organisation o ON co.org_id = o.id'
+                'LEFT JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(o.number) LIKE \'%test\'' : 'o.number LIKE \'%test\''
@@ -596,7 +610,7 @@ my @SearchTests = (
         Expected     => {
             'Join' => [
                 'LEFT JOIN contact_organisation co ON co.contact_id = c.id',
-                'INNER JOIN organisation o ON co.org_id = o.id'
+                'LEFT JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(o.number) LIKE \'%test%\'' : 'o.number LIKE \'%test%\''
@@ -613,7 +627,7 @@ my @SearchTests = (
         Expected     => {
             'Join' => [
                 'LEFT JOIN contact_organisation co ON co.contact_id = c.id',
-                'INNER JOIN organisation o ON co.org_id = o.id'
+                'LEFT JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(o.number) LIKE \'test\'' : 'o.number LIKE \'test\''
@@ -631,7 +645,7 @@ my @SearchTests = (
             'Join' => [
                 'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
                 'AND cpo.is_primary = 1',
-                'INNER JOIN organisation po ON cpo.org_id = po.id'
+                'LEFT JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(po.name) = \'test\'' : 'po.name = \'test\''
@@ -649,7 +663,7 @@ my @SearchTests = (
             'Join' => [
                 'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
                 'AND cpo.is_primary = 1',
-                'INNER JOIN organisation po ON cpo.org_id = po.id'
+                'LEFT JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(po.name) != \'test\'' : 'po.name != \'test\''
@@ -667,7 +681,7 @@ my @SearchTests = (
             'Join' => [
                 'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
                 'AND cpo.is_primary = 1',
-                'INNER JOIN organisation po ON cpo.org_id = po.id'
+                'LEFT JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(po.name) IN (\'test\')' : 'po.name IN (\'test\')'
@@ -685,7 +699,7 @@ my @SearchTests = (
             'Join' => [
                 'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
                 'AND cpo.is_primary = 1',
-                'INNER JOIN organisation po ON cpo.org_id = po.id'
+                'LEFT JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(po.name) NOT IN (\'test\')' : 'po.name NOT IN (\'test\')'
@@ -703,7 +717,7 @@ my @SearchTests = (
             'Join' => [
                 'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
                 'AND cpo.is_primary = 1',
-                'INNER JOIN organisation po ON cpo.org_id = po.id'
+                'LEFT JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(po.name) LIKE \'test%\'' : 'po.name LIKE \'test%\''
@@ -721,7 +735,7 @@ my @SearchTests = (
             'Join' => [
                 'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
                 'AND cpo.is_primary = 1',
-                'INNER JOIN organisation po ON cpo.org_id = po.id'
+                'LEFT JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(po.name) LIKE \'%test\'' : 'po.name LIKE \'%test\''
@@ -740,7 +754,7 @@ my @SearchTests = (
             'Join' => [
                 'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
                 'AND cpo.is_primary = 1',
-                'INNER JOIN organisation po ON cpo.org_id = po.id'
+                'LEFT JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(po.name) LIKE \'%test%\'' : 'po.name LIKE \'%test%\''
@@ -758,7 +772,7 @@ my @SearchTests = (
             'Join' => [
                 'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
                 'AND cpo.is_primary = 1',
-                'INNER JOIN organisation po ON cpo.org_id = po.id'
+                'LEFT JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(po.name) LIKE \'test\'' : 'po.name LIKE \'test\''
@@ -776,7 +790,7 @@ my @SearchTests = (
             'Join' => [
                 'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
                 'AND cpo.is_primary = 1',
-                'INNER JOIN organisation po ON cpo.org_id = po.id'
+                'LEFT JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(po.number) = \'test\'' : 'po.number = \'test\''
@@ -794,7 +808,7 @@ my @SearchTests = (
             'Join' => [
                 'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
                 'AND cpo.is_primary = 1',
-                'INNER JOIN organisation po ON cpo.org_id = po.id'
+                'LEFT JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(po.number) != \'test\'' : 'po.number != \'test\''
@@ -812,7 +826,7 @@ my @SearchTests = (
             'Join' => [
                 'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
                 'AND cpo.is_primary = 1',
-                'INNER JOIN organisation po ON cpo.org_id = po.id'
+                'LEFT JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(po.number) IN (\'test\')' : 'po.number IN (\'test\')'
@@ -830,7 +844,7 @@ my @SearchTests = (
             'Join' => [
                 'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
                 'AND cpo.is_primary = 1',
-                'INNER JOIN organisation po ON cpo.org_id = po.id'
+                'LEFT JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(po.number) NOT IN (\'test\')' : 'po.number NOT IN (\'test\')'
@@ -848,7 +862,7 @@ my @SearchTests = (
             'Join' => [
                 'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
                 'AND cpo.is_primary = 1',
-                'INNER JOIN organisation po ON cpo.org_id = po.id'
+                'LEFT JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(po.number) LIKE \'test%\'' : 'po.number LIKE \'test%\''
@@ -866,7 +880,7 @@ my @SearchTests = (
             'Join' => [
                 'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
                 'AND cpo.is_primary = 1',
-                'INNER JOIN organisation po ON cpo.org_id = po.id'
+                'LEFT JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(po.number) LIKE \'%test\'' : 'po.number LIKE \'%test\''
@@ -884,7 +898,7 @@ my @SearchTests = (
             'Join' => [
                 'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
                 'AND cpo.is_primary = 1',
-                'INNER JOIN organisation po ON cpo.org_id = po.id'
+                'LEFT JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(po.number) LIKE \'%test%\'' : 'po.number LIKE \'%test%\''
@@ -902,7 +916,7 @@ my @SearchTests = (
             'Join' => [
                 'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
                 'AND cpo.is_primary = 1',
-                'INNER JOIN organisation po ON cpo.org_id = po.id'
+                'LEFT JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(po.number) LIKE \'test\'' : 'po.number LIKE \'test\''
@@ -944,10 +958,10 @@ my @SortTests = (
                 'LEFT JOIN contact_organisation co ON co.contact_id = c.id'
             ],
             'OrderBy' => [
-                'co.org_id'
+                'SortAttr0'
             ],
             'Select' => [
-                'co.org_id'
+                'co.org_id AS SortAttr0'
             ]
         }
     },
@@ -959,10 +973,10 @@ my @SortTests = (
                 'LEFT JOIN contact_organisation co ON co.contact_id = c.id'
             ],
             'OrderBy' => [
-                'co.org_id'
+                'SortAttr0'
             ],
             'Select' => [
-                'co.org_id'
+                'co.org_id AS SortAttr0'
             ]
         }
     },
@@ -972,13 +986,13 @@ my @SortTests = (
         Expected  => {
             'Join' => [
                 'LEFT JOIN contact_organisation co ON co.contact_id = c.id',
-                'INNER JOIN organisation o ON co.org_id = o.id'
+                'LEFT JOIN organisation o ON co.org_id = o.id'
             ],
             'OrderBy' => [
-                'o.name'
+                'SortAttr0'
             ],
             'Select' => [
-                'o.name'
+                'o.name AS SortAttr0'
             ]
         }
     },
@@ -988,13 +1002,13 @@ my @SortTests = (
         Expected  => {
             'Join' => [
                 'LEFT JOIN contact_organisation co ON co.contact_id = c.id',
-                'INNER JOIN organisation o ON co.org_id = o.id'
+                'LEFT JOIN organisation o ON co.org_id = o.id'
             ],
             'OrderBy' => [
-                'o.number'
+                'SortAttr0'
             ],
             'Select' => [
-                'o.number'
+                'o.number AS SortAttr0'
             ]
         }
     },
@@ -1007,10 +1021,10 @@ my @SortTests = (
                 'AND cpo.is_primary = 1'
             ],
             'OrderBy' => [
-                'cpo.org_id'
+                'SortAttr0'
             ],
             'Select' => [
-                'cpo.org_id'
+                'cpo.org_id AS SortAttr0'
             ]
         }
     },
@@ -1021,13 +1035,13 @@ my @SortTests = (
            'Join' => [
                 'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
                 'AND cpo.is_primary = 1',
-                'INNER JOIN organisation po ON cpo.org_id = po.id'
+                'LEFT JOIN organisation po ON cpo.org_id = po.id'
             ],
             'OrderBy' => [
-                'po.name'
+                'SortAttr0'
             ],
             'Select' => [
-                'po.name'
+                'po.name AS SortAttr0'
             ]
         }
     },
@@ -1038,13 +1052,13 @@ my @SortTests = (
             'Join' => [
                 'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
                 'AND cpo.is_primary = 1',
-                'INNER JOIN organisation po ON cpo.org_id = po.id'
+                'LEFT JOIN organisation po ON cpo.org_id = po.id'
             ],
             'OrderBy' => [
-                'po.number'
+                'SortAttr0'
             ],
             'Select' => [
-                'po.number'
+                'po.number AS SortAttr0'
             ]
         }
     }

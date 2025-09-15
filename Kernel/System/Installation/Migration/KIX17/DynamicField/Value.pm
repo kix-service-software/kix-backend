@@ -11,6 +11,8 @@ package Kernel::System::Installation::Migration::KIX17::DynamicField::Value;
 use strict;
 use warnings;
 
+use MIME::Base64;
+
 use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
@@ -190,17 +192,6 @@ sub _Run {
         SourceObjectID => $Item->{field_id}
     );
 
-    # # check if this item already exists (i.e. some initial data)
-    # my $ID = $Self->Lookup(
-    #     Table        => 'dynamic_field_value',
-    #     PrimaryKey   => 'id',
-    #     Item         => $Item,
-    #     RelevantAttr => [
-    #         'field_id',
-    #         'object_id',
-    #     ]
-    # );
-
     # special handling for value if needed
     if ( $Self->{DynamicFieldTypesSrc}->{$FieldIDSrc} eq 'Checkbox' ) {
         $Item->{value_text} = $Item->{value_int};
@@ -219,6 +210,28 @@ sub _Run {
         $Item->{value_text} = $Kernel::OM->Get('Organisation')->OrganisationLookup(
             Number => $Item->{value_text},
         );
+    }
+    elsif ( $Self->{DynamicFieldTypes}->{$Item->{field_id}} eq 'Attachment' ) {
+        # get virtual fs data
+        my $VirtualFSData = $Self->GetSourceData(
+            Type       => 'virtual_fs',
+            ObjectID   => $Item->{value_text},
+            NoProgress => 1,
+        );
+        return 'Error' if ( !IsHashRefWithData( $VirtualFSData ) );
+
+        my $FileID = $Self->_FileWrite(
+            FieldID  => $Item->{field_id},
+            ObjectID => $Item->{object_id},
+            File     => {
+                Filename    => $VirtualFSData->{Preferences}->{Filename},
+                ContentType => $VirtualFSData->{Preferences}->{ContentType},
+                Content     => $VirtualFSData->{Content},
+            }
+        );
+        return 'Error' if ( !$FileID );
+
+        $Item->{value_text} = $FileID;
     }
     elsif ( $FieldTypeReferenceMapping{$Self->{DynamicFieldTypes}->{$Item->{field_id}}} ) {
         # map the value to the new object
@@ -262,6 +275,70 @@ sub _PrepareFirstValue {
     }
 
     return 1;
+}
+
+sub _FileWrite {
+    my ( $Self, %Param ) = @_;
+
+    my $File = $Param{File};
+
+    # get already existing files
+    my $FileList = $Self->_FileList(
+        FieldID  => $Param{FieldID},
+        ObjectID => $Param{ObjectID},
+        Filename => $File->{Filename}
+    );
+    my $Index = scalar(@{$FileList}) || 0;
+
+    my $Try = 0;
+    my $FileID;
+    while (
+        !$FileID
+        && $Try <= 10
+    ) {
+        my $FilePath = 'DynamicFieldAttachment/'
+            . $Param{FieldID}
+            . q{/}
+            . $Param{ObjectID}
+            . q{/}
+            . $Index
+            . q{/}
+            . $File->{Filename};
+
+        $FileID = $Kernel::OM->Get('VirtualFS')->Write(
+            Content  => \$File->{Content},
+            Filename => $FilePath,
+            Mode     => 'binary',
+            Silent   => 1,
+            Preferences    => {
+                Filename    => $File->{Filename},
+                ContentType => $File->{ContentType},
+            },
+        );
+
+        $Index++;
+        $Try++;
+    };
+
+    return $FileID;
+}
+
+sub _FileList {
+    my ( $Self, %Param ) = @_;
+
+    my $Filename = 'DynamicFieldAttachment/'
+        . $Param{FieldID}
+        . q{/}
+        . $Param{ObjectID}
+        . q{/*/}
+        . $Param{Filename};
+
+    my @FileList = $Kernel::OM->Get('VirtualFS')->Find(
+        Filename  => $Filename,
+        ReturnIDs => 0
+    );
+
+    return \@FileList;
 }
 
 1;

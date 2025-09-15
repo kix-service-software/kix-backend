@@ -29,7 +29,7 @@ $Self->Is(
 );
 
 # check supported methods
-for my $Method ( qw(GetSupportedAttributes Search Sort) ) {
+for my $Method ( qw(GetSupportedAttributes AttributePrepare Select Search Sort) ) {
     $Self->True(
         $AttributeObject->can($Method),
         'Attribute object can "' . $Method . '"'
@@ -42,21 +42,27 @@ $Self->IsDeeply(
     $AttributeList,
     {
         QueueID => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','GT','GTE','LT','LTE'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN','GT','GTE','LT','LTE'],
+            ValueType      => 'NUMERIC'
         },
         Queue => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
         MyQueues => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EQ'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 0,
+            Operators      => ['EQ'],
+            ValueType      => 'NUMERIC'
         }
     },
     'GetSupportedAttributes provides expected data'
@@ -387,7 +393,6 @@ my @SearchTests = (
             Value    => '1'
         },
         Expected     => {
-            'Join'  => [],
             'Where' => [
                 'st.queue_id IN (1)'
             ]
@@ -401,7 +406,6 @@ my @SearchTests = (
             Value    => '0'
         },
         Expected     => {
-            'Join'  => [],
             'Where' => [
                 'st.queue_id NOT IN (1)'
             ]
@@ -415,7 +419,6 @@ my @SearchTests = (
             Value    => ['0','1']
         },
         Expected     => {
-            'Join'  => [],
             'Where' => [
                 '(st.queue_id NOT IN (1) OR st.queue_id IN (1))'
             ]
@@ -446,7 +449,6 @@ my @SearchTestsSpecial = (
             Value    => '1'
         },
         Expected     => {
-            'Join'  => [],
             'Where' => [
                 '1=0'
             ]
@@ -460,7 +462,6 @@ my @SearchTestsSpecial = (
             Value    => '0'
         },
         Expected     => {
-            'Join'  => [],
             'Where' => [
                 '1=1'
             ]
@@ -474,7 +475,6 @@ my @SearchTestsSpecial = (
             Value    => ['0','1']
         },
         Expected     => {
-            'Join'  => [],
             'Where' => [
                 '(1=1 OR 1=0)'
             ]
@@ -513,10 +513,10 @@ my @SortTests = (
         Expected  => {
             'Join'    => [],
             'OrderBy' => [
-                'st.queue_id'
+                'SortAttr0'
             ],
             'Select'  => [
-                'st.queue_id'
+                'st.queue_id AS SortAttr0'
             ]
         }
     },
@@ -530,10 +530,10 @@ my @SortTests = (
                 'LEFT OUTER JOIN translation_language tl0 ON tl0.pattern_id = tlp0.id AND tl0.language = \'en\''
             ],
             'OrderBy' => [
-                'TranslateQueue'
+                'SortAttr0'
             ],
             'Select'  => [
-                'LOWER(COALESCE(tl0.value, tq.name)) AS TranslateQueue'
+                'LOWER(COALESCE(tl0.value, tq.name)) AS SortAttr0'
             ]
         }
     },

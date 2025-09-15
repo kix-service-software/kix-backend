@@ -1022,6 +1022,15 @@
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
+    <Insert Table="ticket_history_type">
+        <Data Key="id" Type="AutoIncrement">39</Data>
+        <Data Key="name" Type="Quote">ArticleSend</Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
 
 <!-- channel -->
     <Insert Table="channel">
@@ -5046,12 +5055,14 @@ DefaultValue:
         <Data Key="filter" Type="Quote"><![CDATA[
 [{"AND":[
 {"Field":"OwnerOutOfOffice","Value":1,"Operator":"EQ","Type":"NUMERIC"},
+{"Field":"OwnerOutOfOfficeSubstitute","Value":"1","Operator":"EMPTY","Type":"NUMERIC"},
 {"Field":"LockID","Value":2,"Operator":"EQ","Type":"NUMERIC"},
 {"Field":"StateTypeID","Value":[4],"Operator":"IN","Type":"NUMERIC"},
 {"Field":"PendingTime","Operator":"LT","Type":"DATETIME","Value":"-0m"}
 ]},
 {"AND":[
 {"Field":"OwnerOutOfOffice","Value":1,"Operator":"EQ","Type":"NUMERIC"},
+{"Field":"OwnerOutOfOfficeSubstitute","Value":"1","Operator":"EMPTY","Type":"NUMERIC"},
 {"Field":"LockID","Value":2,"Operator":"EQ","Type":"NUMERIC"},
 {"Field":"StateTypeID","Value":[1,2],"Operator":"IN","Type":"NUMERIC"}
 ]}]

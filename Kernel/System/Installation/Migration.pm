@@ -645,7 +645,7 @@ sub CreateOIDMapping {
 
     # save the mapping
     my $Result = $Kernel::OM->Get('DB')->Do(
-        SQL  => 'INSERT INTO migration (source, source_id, object_type, object_id, source_object_id, additional_data) VALUES (?,?,?,?,?,?)',
+        SQL  => 'INSERT INTO migration (source, source_id, object_type, object_id, source_object_id, additional_data, create_time) VALUES (?,?,?,?,?,?, current_timestamp)',
         Bind => [
             \$Param{Source}, \$Param{SourceID}, \$Param{ObjectType}, \$Param{ObjectID}, \$Param{SourceObjectID}, \$AdditionalData
         ]
@@ -691,7 +691,7 @@ sub ReplaceOIDMapping {
 
     # save the mapping
     my $Result = $Kernel::OM->Get('DB')->Do(
-        SQL  => 'UPDATE migration SET object_id = ?, additional_data = ? WHERE source = ? AND source_id = ? AND object_type = ? AND source_object_id = ?',
+        SQL  => 'UPDATE migration SET object_id = ?, additional_data = ?, change_time = current_timestamp WHERE source = ? AND source_id = ? AND object_type = ? AND source_object_id = ?',
         Bind => [
             \$Param{ObjectID}, \$AdditionalData, \$Param{Source}, \$Param{SourceID}, 
             \$Param{ObjectType}, \$Param{SourceObjectID},

@@ -997,6 +997,9 @@
     <Index Name="time_accounting_ticket_id">
         <IndexColumn Name="ticket_id"/>
     </Index>
+    <Index Name="time_accounting_article_id">
+        <IndexColumn Name="article_id"/>
+    </Index>
     <ForeignKey ForeignTable="ticket">
         <Reference Local="ticket_id" Foreign="id"/>
     </ForeignKey>
@@ -1182,6 +1185,7 @@
     <Column Name="client_id"     Required="true" Type="VARCHAR" Size="1800000"/>
     <Column Name="client_secret" Required="true" Type="VARCHAR" Size="1800000"/>
     <Column Name="scope"         Required="true" Type="VARCHAR" Size="1800000"/>
+    <Column Name="pkce"          Required="true" Type="SMALLINT"/>
     <Column Name="valid_id"      Required="true" Type="SMALLINT"/>
     <Column Name="create_time"   Required="true" Type="DATE"/>
     <Column Name="create_by"     Required="true" Type="INTEGER"/>
@@ -2615,6 +2619,8 @@
     <Column Name="object_id" Required="false" Size="255" Type="VARCHAR"/>
     <Column Name="source_object_id" Required="false" Size="255" Type="VARCHAR"/>
     <Column Name="additional_data" Required="false" Size="1800000" Type="VARCHAR"/>
+    <Column Name="create_time" Required="true" Type="DATE"/>
+    <Column Name="change_time" Required="false" Type="DATE"/>
     <Index Name="migration_sourceid_otype_soid">
         <IndexColumn Name="source_id"/>
         <IndexColumn Name="object_type"/>

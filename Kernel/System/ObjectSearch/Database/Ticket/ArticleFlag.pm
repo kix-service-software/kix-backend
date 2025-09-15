@@ -34,21 +34,20 @@ sub GetSupportedAttributes {
 
     return {
         'ArticleFlag.Seen' => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EQ','NE']
+            IsSelectable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE']
         },
     };
 }
 
-sub Search {
+sub AttributePrepare {
     my ( $Self, %Param ) = @_;
 
-    # check params
-    return if ( !$Self->_CheckSearchParams( %Param ) );
-
     # get requested flag
-    my $Flag = $Param{Search}->{Field};
+    my $Flag = $Param{Attribute};
     $Flag =~ s/^ArticleFlag\.//;
 
     # check for needed joins
@@ -68,25 +67,19 @@ sub Search {
     if ( !defined( $Param{Flags}->{JoinMap}->{ 'ArticleFlag_' . $Flag } ) ) {
         my $Count = $Param{Flags}->{ArticleFlagJoinCounter}++;
         $TableAlias .= $Count;
-        push( @SQLJoin, "LEFT OUTER JOIN article_flag $TableAlias ON $TableAlias.article_id = ta.id AND $TableAlias.article_key = \'$Flag\' AND af_left0.create_by = $Param{UserID}" );
+        push( @SQLJoin, "LEFT OUTER JOIN article_flag $TableAlias ON $TableAlias.article_id = ta.id AND $TableAlias.article_key = \'$Flag\' AND $TableAlias.create_by = $Param{UserID}" );
 
         $Param{Flags}->{JoinMap}->{ 'ArticleFlag_' . $Flag } = $Count;
     }
 
-    # prepare condition
-    my $Condition = $Self->_GetCondition(
-        Operator   => $Param{Search}->{Operator},
-        Column     => "$TableAlias.article_value",
-        Value      => $Param{Search}->{Value},
-        NULLValue  => 1,
-        Silent     => $Param{Silent}
-    );
-    return if ( !$Condition );
-
-    # return search def
     return {
-        Join  => \@SQLJoin,
-        Where => [ $Condition ]
+        Column       => "$TableAlias.article_value",
+        ConditionDef => {
+            NULLValue => 1,
+        },
+        SQLDef => {
+            Join => \@SQLJoin
+        }
     };
 }
 
