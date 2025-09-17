@@ -36,97 +36,105 @@ sub GetSupportedAttributes {
 
     return {
         CustomerVisible   => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
+            ValueType      => 'NUMERIC'
         },
         From              => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EMPTY','EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 1,
+            Operators      => ['EMPTY','EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
         To                => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EMPTY','EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 1,
+            Operators      => ['EMPTY','EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
         Cc                => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EMPTY','EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 1,
+            Operators      => ['EMPTY','EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
         Subject           => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
         Body              => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         }
     };
 }
 
-sub Search {
+sub AttributePrepare {
     my ( $Self, %Param ) = @_;
 
-    # check params
-    return if ( !$Self->_CheckSearchParams( %Param ) );
-
     # init mapping
-    my %AttributeMapping = (
+    my %AttributeDefinition = (
         CustomerVisible   => {
-            Column          => 'a.customer_visible',
-            ValueType       => 'NUMERIC'
+            Column       => 'a.customer_visible',
+            ConditionDef => {
+                ValueType => 'NUMERIC'
+            }
         },
         From              => {
-            Column          => 'a.a_from',
-            CaseInsensitive => 1
+            Column       => 'a.a_from',
+            ConditionDef => {
+                CaseInsensitive => 1,
+                NULLValue       => 1
+            }
         },
         To                => {
-            Column          => 'a.a_to',
-            CaseInsensitive => 1
+            Column       => 'a.a_to',
+            ConditionDef => {
+                CaseInsensitive => 1,
+                NULLValue       => 1
+            }
         },
         Cc                => {
-            Column          => 'a.a_cc',
-            CaseInsensitive => 1
+            Column       => 'a.a_cc',
+            ConditionDef => {
+                CaseInsensitive => 1,
+                NULLValue       => 1
+            }
         },
         Subject           => {
-            Column          => 'a.a_subject',
-            CaseInsensitive => 1
+            Column       => 'a.a_subject',
+            ConditionDef => {
+                CaseInsensitive => 1
+            }
         },
         Body              => {
-            Column          => 'a.a_body',
-            CaseInsensitive => 1
+            Column       => 'a.a_body',
+            ConditionDef => {
+                CaseInsensitive => 1
+            }
         }
     );
 
-    # prepare given values as array ref and convert if required
-    my $Values = [];
-    if ( !IsArrayRef( $Param{Search}->{Value} ) ) {
-        push( @{ $Values },  $Param{Search}->{Value}  );
-    }
-    else {
-        $Values =  $Param{Search}->{Value} ;
-    }
-
-    # prepare condition
-    my $Condition = $Self->_GetCondition(
-        Operator        => $Param{Search}->{Operator},
-        Column          => $AttributeMapping{ $Param{Search}->{Field} }->{Column},
-        ValueType       => $AttributeMapping{ $Param{Search}->{Field} }->{ValueType},
-        CaseInsensitive => $AttributeMapping{ $Param{Search}->{Field} }->{CaseInsensitive},
-        Value           => $Values,
-        NULLValue       => 1,
-        Silent          => $Param{Silent}
+    my %Attribute = (
+        Column => $AttributeDefinition{ $Param{Attribute} }->{Column}
     );
-    return if ( !$Condition );
+    if ( $Param{PrepareType} eq 'Condition' ) {
+        $Attribute{ConditionDef} = $AttributeDefinition{ $Param{Attribute} }->{ConditionDef};
+    }
 
-    return {
-        Where => [ $Condition ]
-    };
+    return \%Attribute;
 }
 
 1;

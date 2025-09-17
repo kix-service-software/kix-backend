@@ -36,92 +36,63 @@ sub GetSupportedAttributes {
 
     return {
         SenderTypeID => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
+            ValueType      => 'NUMERIC'
         },
         SenderType   => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         }
     };
 }
 
-sub Search {
+sub AttributePrepare {
     my ( $Self, %Param ) = @_;
 
-    # check params
-    return if ( !$Self->_CheckSearchParams( %Param ) );
+    # check for needed joins
+    my @SQLJoin = ();
+    if ( $Param{Attribute} eq 'SenderType' ) {
+        if ( !$Param{Flags}->{JoinMap}->{ArticleSenderType} ) {
+            push( @SQLJoin, 'INNER JOIN article_sender_type ast ON ast.id = a.article_sender_type_id' );
 
-    my @Join;
-    if (
-        $Param{Search}->{Field} eq 'SenderType'
-        && !$Param{Flags}->{JoinMap}->{ArticleSenderType}
-    ) {
-        push( @Join, 'LEFT OUTER JOIN article_sender_type ast ON ast.id = a.article_sender_type_id' );
-
-        $Param{Flags}->{JoinMap}->{ArticleSenderType} = 1;
+            $Param{Flags}->{JoinMap}->{ArticleSenderType} = 1;
+        }
     }
 
     # init mapping
-    my %AttributeMapping = (
-        SenderTypeID => {
-            Column          => 'a.article_sender_type_id',
-            ValueType       => 'NUMERIC'
+    my %AttributeDefinition = (
+        SenderTypeID      => {
+            Column       => 'a.article_sender_type_id',
+            ConditionDef => {
+                ValueType => 'NUMERIC'
+            }
         },
-        SenderType   => {
-            Column          => 'ast.name',
-            CaseInsensitive => 1
+        SenderType        => {
+            Column       => 'ast.name',
+            ConditionDef => {
+                CaseInsensitive => 1
+            }
         }
     );
 
-    # prepare condition
-    my $Condition = $Self->_GetCondition(
-        Operator        => $Param{Search}->{Operator},
-        Column          => $AttributeMapping{ $Param{Search}->{Field} }->{Column},
-        ValueType       => $AttributeMapping{ $Param{Search}->{Field} }->{ValueType},
-        CaseInsensitive => $AttributeMapping{ $Param{Search}->{Field} }->{CaseInsensitive},
-        Value           => $Param{Search}->{Value},
-        Silent          => $Param{Silent}
+    my %Attribute = (
+        Column => $AttributeDefinition{ $Param{Attribute} }->{Column},
+        SQLDef => {
+            Join => \@SQLJoin,
+        }
     );
-    return if ( !$Condition );
-
-    return {
-        Join  => \@Join,
-        Where => [ $Condition ]
-    };
-}
-
-sub Sort {
-    my ( $Self, %Param ) = @_;
-
-    # check params
-    return if !$Self->_CheckSortParams( %Param );
-
-    # check for needed joins
-    my @Join;
-    if (
-        $Param{Attribute} eq 'SenderType'
-        && !$Param{Flags}->{JoinMap}->{ArticleSenderType}
-    ) {
-        push( @Join, 'LEFT OUTER JOIN article_sender_type ast ON ast.id = a.article_sender_type_id' );
-
-        $Param{Flags}->{JoinMap}->{ArticleSenderType} = 1;
+    if ( $Param{PrepareType} eq 'Condition' ) {
+        $Attribute{ConditionDef} = $AttributeDefinition{ $Param{Attribute} }->{ConditionDef};
     }
 
-    # map search attributes to table attributes
-    my %AttributeMapping = (
-        SenderTypeID => 'a.article_sender_type_id',
-        SenderType   => 'ast.name'
-    );
-
-    return {
-        Select  => [ $AttributeMapping{ $Param{Attribute} } ],
-        OrderBy => [ $AttributeMapping{ $Param{Attribute} } ],
-        Join    => \@Join
-    };
+    return \%Attribute;
 }
 
 1;
