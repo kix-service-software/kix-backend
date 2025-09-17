@@ -13,6 +13,7 @@ use warnings;
 use File::Basename;
 use FindBin qw($Bin);
 use lib dirname($Bin);
+use lib dirname($Bin) . '/plugins';
 use lib dirname($Bin) . '/Kernel/cpan-lib';
 
 use Kernel::System::ObjectManager;
@@ -47,9 +48,13 @@ sub _UpdateUnlockJob {
 
         my $UpdateNeeded = 0;
         for my $Filter ( @{ $JobData{Filter} } ) {
+            next if (
+                !IsHashRefWithData( $Filter )
+                || !IsArrayRefWithData( $Filter->{AND} )
+            );
             my $HasOwnerOutOfOffice = 0;
             my $HasOwnerOutOfOfficeSubstitute = 0;
-            for my $FilterElement ( @{ $Filter } ) {
+            for my $FilterElement ( @{ $Filter->{AND} } ) {
                 if (
                     $FilterElement->{Field} eq 'OwnerOutOfOffice'
                     && $FilterElement->{Operator} eq 'EQ'
@@ -71,7 +76,7 @@ sub _UpdateUnlockJob {
                 && !$HasOwnerOutOfOfficeSubstitute
             ) {
                 push(
-                    @{ $Filter },
+                    @{ $Filter->{AND} },
                     {
                         "Field"    => "OwnerOutOfOfficeSubstitute",
                         "Value"    => "1",

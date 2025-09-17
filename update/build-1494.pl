@@ -12,8 +12,9 @@ use warnings;
 
 use File::Basename;
 use FindBin qw($Bin);
-use lib dirname($Bin).'/';
-use lib dirname($Bin).'/Kernel/cpan-lib';
+use lib dirname($Bin);
+use lib dirname($Bin) . '/plugins';
+use lib dirname($Bin) . '/Kernel/cpan-lib';
 
 use Getopt::Std;
 use File::Path qw(mkpath);
