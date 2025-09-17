@@ -143,7 +143,7 @@ my @SearchTests = (
         Expected     => {
             'IsRelative' => undef,
             'Join'       => [
-                'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = a.id AND dfv_left0.field_id = ' . $DynamicFieldID
+                'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = c.id AND dfv_left0.field_id = ' . $DynamicFieldID
             ],
             'Where'      => [
                 '(dfv_left0.value_text = \'\' OR dfv_left0.value_text IS NULL)'
@@ -160,7 +160,7 @@ my @SearchTests = (
         Expected     => {
             'IsRelative' => undef,
             'Join'       => [
-                'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = a.id AND dfv_left0.field_id = ' . $DynamicFieldID
+                'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = c.id AND dfv_left0.field_id = ' . $DynamicFieldID
             ],
             'Where'      => [
                 '(dfv_left0.value_text != \'\' AND dfv_left0.value_text IS NOT NULL)'

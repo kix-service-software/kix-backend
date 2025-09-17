@@ -329,8 +329,8 @@ my @SortTests = (
             Join    => [
                 "LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = a.id AND dfv_left0.field_id = $DynamicFieldID AND dfv_left0.first_value = 1"
             ],
-            Select  => [ 'dfv_left0.value_text' ],
-            OrderBy => [ 'dfv_left0.value_text' ]
+            Select  => [ 'dfv_left0.value_text AS SortAttr0' ],
+            OrderBy => [ 'SortAttr0' ]
         }
     }
 );

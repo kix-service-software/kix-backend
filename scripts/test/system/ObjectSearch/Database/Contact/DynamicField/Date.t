@@ -546,8 +546,8 @@ my $ObjectSearch = $Kernel::OM->Get('ObjectSearch');
 # begin transaction on database
 $Helper->BeginWork();
 
-## prepare test organisations ##
-# first ticket
+## prepare test contacts ##
+# first contact
 my $ContactID1   = $Kernel::OM->Get('Contact')->ContactAdd(
     Firstname => $Helper->GetRandomID(),
     Lastname  => $Helper->GetRandomID(),
@@ -556,7 +556,7 @@ my $ContactID1   = $Kernel::OM->Get('Contact')->ContactAdd(
 );
 $Self->True(
     $ContactID1,
-    'Created first organisation'
+    'Created first contact'
 );
 my $ValueSet1 = $Kernel::OM->Get('DynamicField::Backend')->ValueSet(
     DynamicFieldConfig => $DynamicFieldConfig,
@@ -566,9 +566,9 @@ my $ValueSet1 = $Kernel::OM->Get('DynamicField::Backend')->ValueSet(
 );
 $Self->True(
     $ValueSet1,
-    'Dynamic field value set for first organisation'
+    'Dynamic field value set for first contact'
 );
-# second ticket
+# second contact
 my $ContactID2   = $Kernel::OM->Get('Contact')->ContactAdd(
     Firstname => $Helper->GetRandomID(),
     Lastname  => $Helper->GetRandomID(),
@@ -577,7 +577,7 @@ my $ContactID2   = $Kernel::OM->Get('Contact')->ContactAdd(
 );
 $Self->True(
     $ContactID2,
-    'Created second organisation'
+    'Created second contact'
 );
 my $ValueSet2 = $Kernel::OM->Get('DynamicField::Backend')->ValueSet(
     DynamicFieldConfig => $DynamicFieldConfig,
@@ -589,7 +589,7 @@ $Self->True(
     $ValueSet2,
     'Dynamic field value set for second organisation'
 );
-# third ticket
+# third contact
 my $ContactID3   = $Kernel::OM->Get('Contact')->ContactAdd(
     Firstname => $Helper->GetRandomID(),
     Lastname  => $Helper->GetRandomID(),
@@ -598,7 +598,7 @@ my $ContactID3   = $Kernel::OM->Get('Contact')->ContactAdd(
 );
 $Self->True(
     $ContactID3,
-    'Created third organisation without df value'
+    'Created third contact without df value'
 );
 
 # discard contact object to process events

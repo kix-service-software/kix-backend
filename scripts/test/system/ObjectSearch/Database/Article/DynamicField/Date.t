@@ -507,8 +507,8 @@ my @SortTests = (
             Join    => [
                 "LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = a.id AND dfv_left0.field_id = $DynamicFieldID AND dfv_left0.first_value = 1"
             ],
-            Select  => [ 'dfv_left0.value_date' ],
-            OrderBy => [ 'dfv_left0.value_date' ]
+            Select  => [ 'dfv_left0.value_date AS SortAttr0' ],
+            OrderBy => [ 'SortAttr0' ]
         }
     }
 );
@@ -931,7 +931,6 @@ for my $Test ( @IntegrationSearchTests ) {
         $Test->{Name}
     );
 }
-
 # test Sort
 my @IntegrationSortTests = (
     {
