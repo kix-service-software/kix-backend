@@ -38,7 +38,7 @@ sub GetSupportedAttributes {
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 0,
-            Operators      => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
+            Operators      => ['EMPTY','EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
             ValueType      => 'NUMERIC'
         }
     };

@@ -345,6 +345,63 @@ sub _GetCondition {
     );
 }
 
+sub _OperationEMPTY {
+    my ( $Self, %Param ) = @_;
+
+    # prepare columns and values
+    my $Columns = [];
+    my $Values  = [];
+    my $Success = $Self->_PrepareColumnAndValue(
+        %Param,
+        ColumnRef    => $Columns,
+        ValueRef     => $Values,
+        OperatorType => 'EMPTY',
+    );
+    return if ( !$Success );
+
+    # prepare conditions
+    my @Conditions;
+    for my $Column ( @{ $Columns } ) {
+        for my $Value ( @{ $Values } ) {
+            if ( $Value ) {
+                if (
+                    !$Param{ValueType}
+                    || $Param{ValueType} eq 'STRING'
+                ) {
+                    push( @Conditions, ( $Column . ' = \'\'' ) );
+                }
+
+                if ( $Param{NULLValue} ) {
+                    push( @Conditions, ( $Column . ' IS NULL' ) );
+                }
+            }
+            else {
+                if (
+                    !$Param{ValueType}
+                    || $Param{ValueType} eq 'STRING'
+                ) {
+                    push( @Conditions, ( $Column . ' != \'\'' ) );
+                }
+
+                if ( $Param{NULLValue} ) {
+                    push( @Conditions, ( $Column . ' IS NOT NULL' ) );
+                }
+            }
+        }
+    }
+
+    # join conditions
+    my $Condition = $Self->_JoinConditions(
+        Conditions => \@Conditions
+    );
+
+    # add supplement to condition
+    return $Self->_AddSupplement(
+        %Param,
+        Condition => $Condition
+    );
+}
+
 sub _OperationEQ {
     my ( $Self, %Param ) = @_;
 
@@ -869,6 +926,12 @@ sub _PrepareColumnAndValue {
         push( @{ $Param{ColumnRef} }, $Param{Column} );
     }
     for my $Column ( @{ $Param{ColumnRef} } ) {
+        # column preparations for empty-operations
+        last if (
+            $Param{OperatorType}
+            && $Param{OperatorType} eq 'EMPTY'
+        );
+
         # cast numeric to varchar for like-operations
         if (
             $Param{OperatorType}
@@ -914,6 +977,12 @@ sub _PrepareColumnAndValue {
         push( @{ $Param{ValueRef} }, $Param{Value} );
     }
     for my $Value ( @{ $Param{ValueRef} } ) {
+        # no value preparation for empty-operations
+        last if (
+            $Param{OperatorType}
+            && $Param{OperatorType} eq 'EMPTY'
+        );
+
         # make value lower case for IsStaticSearch or CaseInsensitive
         if (
             $Param{IsStaticSearch}
@@ -1120,6 +1189,14 @@ sub _CheckSearchParams {
         return;
     }
 
+    # check for required attributes
+    if ( defined( $AttributeList->{ $Param{Search}->{Field} }->{Requires} ) ) {
+        $Param{Search}->{Requires} = $AttributeList->{ $Param{Search}->{Field} }->{Requires};
+    }
+
+    # no value check for operator EMPTY
+    return 1 if ( $Param{Search}->{Operator} eq 'EMPTY' );
+
     # check value type
     my $IsRelative;
     if ( IsArrayRef( $Param{Search}->{Value} ) ) {
@@ -1149,11 +1226,6 @@ sub _CheckSearchParams {
         if ( $IsRelative ) {
             $Param{Search}->{IsRelative} = 1;
         }
-    }
-
-    # check for required attributes
-    if ( defined( $AttributeList->{ $Param{Search}->{Field} }->{Requires} ) ) {
-        $Param{Search}->{Requires} = $AttributeList->{ $Param{Search}->{Field} }->{Requires};
     }
 
     return 1;

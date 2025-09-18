@@ -177,9 +177,11 @@ sub ValueValidate {
 sub SQLParameterGet {
     my ( $Self, %Param ) = @_;
 
-    return {
-        Column => "$Param{TableAlias}.value_date"
-    };
+    my $SQLParameter = $Self->SUPER::SQLParameterGet( %Param );
+
+    $SQLParameter->{Column} = $Param{TableAlias} . '.value_date';
+
+    return $SQLParameter;
 }
 
 sub DisplayValueRender {

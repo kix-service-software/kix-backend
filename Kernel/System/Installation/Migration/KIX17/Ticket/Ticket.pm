@@ -204,6 +204,13 @@ sub _Run {
             SourceTicketID => $Item->{id},
         );
 
+        if ( $Self->{Options}->{TicketNotesTargetDF} ) {
+            $Self->_MigrateTicketNotes(
+                TicketID       => $ID,
+                SourceTicketID => $Item->{id},
+            );
+        }
+
         $Result = 'OK';
     }
     else {
@@ -969,6 +976,105 @@ sub _MigrateChecklist {
         value_text => $Kernel::OM->Get('JSON')->Encode(
             Data => \@CheckList
         ),
+    );
+
+    my $ID = $Self->Lookup(
+        Table          => 'dynamic_field_value',
+        PrimaryKey     => 'id',
+        Item           => \%InsertItem,
+        RelevantAttr => [
+            'object_id',
+            'field_id'
+        ],
+        NoCache => 1,
+    );
+
+    if ( !$ID ) {
+        $ID = $Self->Insert(
+            Table          => 'dynamic_field_value',
+            PrimaryKey     => 'id',
+            Item           => \%InsertItem,
+            AutoPrimaryKey => 1,
+            NoOIDMapping   => 1,
+        );
+    }
+    else {
+        $ID = $Self->Update(
+            Table          => 'dynamic_field_value',
+            PrimaryKey     => 'id',
+            Item           => {
+                id => $ID,
+                %InsertItem,
+            },
+            AutoPrimaryKey => 1,
+            NoOIDMapping   => 1,
+        );
+    }
+
+    if ( $ID ) {
+        $Result{OK}++;
+    }
+    else {
+        $Result{Error}++;
+    }
+
+    return %Result;
+}
+
+sub _MigrateTicketNotes {
+    my ( $Self, %Param ) = @_;
+    my %Result;
+
+    # check needed params
+    for my $Needed (qw(TicketID SourceTicketID)) {
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!"
+            );
+            return;
+        }
+    }
+
+    if ( !$Self->{TicketNotesTargetDF} ) {
+        $Self->{TicketNotesTargetDF} = $Kernel::OM->Get('DynamicField')->DynamicFieldGet(
+            Name => $Self->{Options}->{TicketNotesTargetDF}
+        );
+        if ( !$Self->{TicketNotesTargetDF} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Given TicketNotesTargetDF doesn't exist!"
+            );
+            return;
+        }
+    }
+
+    # get source data
+    my $SourceData = $Self->GetSourceData(
+        Type       => 'kix_ticket_notes',
+        Where      => "ticket_id = $Param{SourceTicketID}",
+        NoProgress => 1,
+    );
+
+    # bail out if we don't have something to todo
+    return %Result if !IsArrayRefWithData($SourceData);
+
+    my $Value;
+    foreach my $Item ( @{$SourceData} ) {
+
+        # check if this object is already mapped
+        my $MappedID = $Self->GetOIDMapping(
+            ObjectType     => 'kix_ticket_notes',
+            SourceObjectID => $Param{SourceTicketID},
+        );
+
+        $Value = $Item->{note};
+    }
+
+    my %InsertItem = (
+        field_id   => $Self->{TicketNotesTargetDF}->{ID},
+        object_id  => $Param{TicketID},
+        value_text => $Value
     );
 
     my $ID = $Self->Lookup(

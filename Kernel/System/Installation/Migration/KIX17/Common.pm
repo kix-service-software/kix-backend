@@ -127,7 +127,7 @@ sub GetSourceData {
         push @URLExt, 'Type='.$Param{Type};
     }
     if ( $Param{ObjectID} ) {
-        push @URLExt, 'ObjectID='.$Param{ObjectID};
+        push @URLExt, 'ObjectID='.URI::Escape::uri_escape_utf8($Param{ObjectID});
     }
     if ( $Param{OrderBy} ) {
         push @URLExt, 'OrderBy='.URI::Escape::uri_escape_utf8($Param{OrderBy});

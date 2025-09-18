@@ -63,6 +63,8 @@ sub new {
     $Self->{LogResponseContent} = $Kernel::OM->Get('Config')->Get('API::Debug::LogResponseContent');
     $Self->{LogRequestHeaders}  = $Kernel::OM->Get('Config')->Get('API::Debug::LogRequestHeaders');
 
+    $Self->{ExecutionStartTime} = $Param{ExecutionStartTime};
+
     return $Self;
 }
 
@@ -101,6 +103,13 @@ sub Run {
     $Self->{Metric} = $Kernel::OM->Get('Metric')->MetricInit(
         Type => 'API',
     );
+    # "application init time" = time between plack executes the KIX app and the KIX provider comes into play (which is here ;))
+    $Self->{Metric}->{AppInitTime} = $Self->{Metric}->{StartTime} - $Self->{ExecutionStartTime};
+
+    if ( $ENV{HTTP_KIX_REQUEST_TIMESTAMP} ) {
+        # "request time till execution" = time between request timestamp (FE) until plack executes the KIX app
+        $Self->{Metric}->{RequestTTE} = $Self->{Metric}->{StartTime} - $ENV{HTTP_KIX_REQUEST_TIMESTAMP};
+    }
 
     #
     # First, we need to locate the desired webservice and load its configuration data.
@@ -190,7 +199,7 @@ sub Run {
     $Self->{ProcessedRequest} = $ProcessedRequest;
     $Self->{RequestMethod}    = $Self->{ProcessedRequest}->{RequestMethod};
     $Self->{RequestURI}       = $Self->{ProcessedRequest}->{RequestURI};
-
+    
     if ( $Self->{Debug} && $Self->{LogRequestHeaders} ) {
         use Data::Dumper;
         $Self->_Debug('', "Request Headers: ".Data::Dumper::Dumper($ProcessedRequest->{Headers}));

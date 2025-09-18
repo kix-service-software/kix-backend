@@ -61,6 +61,53 @@ sub ParameterDefinition {
     }
 }
 
+=item PreRun()
+
+some code to run before actual execution
+
+    my $Success = $CommonObject->PreRun(
+        ...
+    );
+
+    returns:
+
+    $Success = {
+        Success => 1,                     # if everything is OK
+    }
+
+    $Success = {
+        Code    => 'Forbidden',           # if error
+        Message => 'Error description',
+    }
+
+=cut
+
+sub PreRun {
+    my ( $Self, %Param ) = @_;
+
+    # filter config item ids for customer
+    if ($Param{Data}->{ConfigItemID}) {
+        my @ConfigItemIDs = $Self->_FilterCustomerUserVisibleObjectIds(
+            ObjectType             => 'ConfigItem',
+            ObjectIDList           => $Param{Data}->{ConfigItemID},
+            RelevantOrganisationID => $Param{Data}->{RelevantOrganisationID},
+            LogFiltered => 1
+        );
+        if (@ConfigItemIDs) {
+            $Param{Data}->{ConfigItemID} = \@ConfigItemIDs;
+        } else {
+            return $Self->_Error(
+                Code => 'Forbidden',
+                Message => @{$Param{Data}->{ConfigItemID}} == 1 ?
+                "Could not access ConfigItem with id $Param{Data}->{ConfigItemID}->[0]" :
+                "Could not access any ConfigItem"
+            );
+        }
+    }
+
+    return $Self->_Success();
+}
+
 =item Run()
 
 perform ConfigItemGet Operation.

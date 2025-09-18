@@ -40,15 +40,15 @@ our %FieldTypeMigration = (
         }
     },
     'Attachment' => {
-        Type         => 'Text',
+        Type         => 'Attachment',
         Deactivate   => 1,
-        Warning      => 1,
         ConfigChange => {
             Add => {
-                CountMin     => 0,
-                CountMax     => 1,
-                CountDefault => 0,
-                RegExList    => [],
+                CountMin            => 0,
+                CountMax            => 1,
+                CountDefault        => 0,
+                AllowedExtensions   => [],
+                ForbiddenExtensions => [],
             },
             Remove => [
                 'AllowedFileExtensions',

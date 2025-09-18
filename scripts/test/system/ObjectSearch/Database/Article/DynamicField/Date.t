@@ -69,7 +69,7 @@ $Self->IsDeeply(
     {
         IsSearchable => 1,
         IsSortable   => 1,
-        Operators    => ['EQ','NE','GT','GTE','LT','LTE'],
+        Operators    => ['EMPTY','EQ','NE','GT','GTE','LT','LTE'],
         ValueType    => 'DATE'
     },
     'GetSupportedAttributes provides expected data'

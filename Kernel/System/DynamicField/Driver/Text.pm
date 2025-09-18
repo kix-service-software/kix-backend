@@ -58,7 +58,7 @@ sub new {
         'IsSearchable'    => 1,
         'IsSortable'      => 1,
         'IsFulltextable'  => 1,
-        'SearchOperators' => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+        'SearchOperators' => ['EMPTY','EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
     };
 
     # get the Dynamic Field Backend custom extensions

@@ -209,9 +209,27 @@ sub ImportConfigPrepare {
 sub SQLParameterGet {
     my ( $Self, %Param ) = @_;
 
-    return {
-        Column => "$Param{TableAlias}.value_text",
+    my $SQLParameter = {
+        Column => $Param{TableAlias} . '.value_text'
     };
+
+    if (
+        $Param{ParameterType}
+        && $Param{ParameterType} eq 'Condition'
+        && $Self->{Properties}->{'SearchValueType'}
+    ) {
+        $SQLParameter->{ConditionDef}->{ValueType} = $Self->{Properties}->{'SearchValueType'};
+    }
+
+    if (
+        $SQLParameter->{ConditionDef}->{ValueType}
+        && $SQLParameter->{ConditionDef}->{ValueType} eq 'NUMERIC'
+        && $SQLParameter->{Column} =~ m/\.value_text$/
+    ) {
+        $SQLParameter->{ConditionDef}->{ValueType} = 'STRING';
+    }
+
+    return $SQLParameter;
 }
 
 sub SearchSQLSearchFieldGet {

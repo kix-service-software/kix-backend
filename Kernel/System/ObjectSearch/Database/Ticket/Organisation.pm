@@ -38,7 +38,7 @@ sub GetSupportedAttributes {
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 0,
-            Operators      => ['EQ','NE','IN','!IN','GT','GTE','LT','LTE'],
+            Operators      => ['EMPTY','EQ','NE','IN','!IN','GT','GTE','LT','LTE'],
             ValueType      => 'NUMERIC'
         },
         Organisation => {
@@ -46,14 +46,14 @@ sub GetSupportedAttributes {
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 1,
-            Operators      => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            Operators      => ['EMPTY','EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
         OrganisationNumber => {
             IsSelectable   => 1,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 1,
-            Operators      => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            Operators      => ['EMPTY','EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         }
     };
 }

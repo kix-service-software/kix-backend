@@ -162,7 +162,7 @@ sub _PreferenceAttributeGet {
                 IsSearchable => 1,
                 IsSortable   => 1,
                 Class        => [ $Attr->{Class} ],
-                Operators    => ['EQ','NE','IN','!IN','ENDSWITH','STARTSWITH','CONTAINS','LIKE']
+                Operators    => ['EMPTY','EQ','NE','IN','!IN','ENDSWITH','STARTSWITH','CONTAINS','LIKE']
             };
         }
     }

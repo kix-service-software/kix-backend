@@ -61,12 +61,14 @@ sub Export {
             );
         }
 
-        $Output .= sprintf "%s\t%i\t%s\t%s\t%s\t%i\t%i\t%s\t%i\t%s\t%s\n", 
+        $Output .= sprintf "%s\t%i\t%s\t%s\t%s\t%s\t%i\t%i\t%i\t%s\t%i\t%s\t%s\n", 
             $DateTime, 
             $Metric->{ProcessID}, 
             $Metric->{RequestID} || '-', 
             $Metric->{UserID} || '-',
             $Metric->{UserType} || '-',
+            exists $Metric->{RequestTTE} ? int($Metric->{RequestTTE}*1000 + 0.99) : '-',
+            $Metric->{AppInitTime}*1000,
             $Metric->{Duration}*1000, 
             $Metric->{OutBytes} || 0, 
             $Metric->{RequestMethod}, 

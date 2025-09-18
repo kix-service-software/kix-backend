@@ -46,7 +46,7 @@ sub GetSupportedAttributes {
         Keywords => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            Operators    => ['EMPTY','EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         Language => {
             IsSearchable => 1,

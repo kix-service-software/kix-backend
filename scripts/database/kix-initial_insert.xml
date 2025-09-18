@@ -5055,12 +5055,14 @@ DefaultValue:
         <Data Key="filter" Type="Quote"><![CDATA[
 [{"AND":[
 {"Field":"OwnerOutOfOffice","Value":1,"Operator":"EQ","Type":"NUMERIC"},
+{"Field":"OwnerOutOfOfficeSubstitute","Value":"1","Operator":"EMPTY","Type":"NUMERIC"},
 {"Field":"LockID","Value":2,"Operator":"EQ","Type":"NUMERIC"},
 {"Field":"StateTypeID","Value":[4],"Operator":"IN","Type":"NUMERIC"},
 {"Field":"PendingTime","Operator":"LT","Type":"DATETIME","Value":"-0m"}
 ]},
 {"AND":[
 {"Field":"OwnerOutOfOffice","Value":1,"Operator":"EQ","Type":"NUMERIC"},
+{"Field":"OwnerOutOfOfficeSubstitute","Value":"1","Operator":"EMPTY","Type":"NUMERIC"},
 {"Field":"LockID","Value":2,"Operator":"EQ","Type":"NUMERIC"},
 {"Field":"StateTypeID","Value":[1,2],"Operator":"IN","Type":"NUMERIC"}
 ]}]

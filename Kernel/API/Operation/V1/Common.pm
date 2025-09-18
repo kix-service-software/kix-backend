@@ -1801,6 +1801,7 @@ sub _ValidateFilter {
     }
 
     my %OperatorTypeMapping = (
+        'EMPTY'      => { 'NUMERIC' => 1, 'STRING' => 1, 'DATE'     => 1, 'DATETIME' => 1 },
         'EQ'         => { 'NUMERIC' => 1, 'STRING' => 1, 'DATE'     => 1, 'DATETIME' => 1 },
         'NE'         => { 'NUMERIC' => 1, 'STRING' => 1, 'DATE'     => 1, 'DATETIME' => 1 },
         'LT'         => { 'NUMERIC' => 1, 'DATE'   => 1, 'DATETIME' => 1 },
@@ -1957,27 +1958,29 @@ sub _ValidateFilter {
                     );
                 }
 
-                # check DATE value
-                if (
-                    $Filter->{Type} eq 'DATE'
-                    && $Filter->{Value} !~ /^(\d{4}-\d{2}-\d{2}(\s*([-+]\d+\w\s*)*)|\s*([-+]\d+\w\s*?)*)$/
-                    && $Filter->{Value} !~ /^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(\s*([-+]\d+\w\s*)*)|\s*([-+]\d+\w\s*?)*)$/
-                ) {
-                    return $Self->_Error(
-                        Code    => 'BadRequest',
-                        Message => "Invalid date value $Filter->{Value} in $Object.$Filter->{Field}!",
-                    );
-                }
+                if ( $Filter->{Operator} ne 'EMPTY' ) {
+                    # check DATE value
+                    if (
+                        $Filter->{Type} eq 'DATE'
+                        && $Filter->{Value} !~ /^(\d{4}-\d{2}-\d{2}(\s*([-+]\d+\w\s*)*)|\s*([-+]\d+\w\s*?)*)$/
+                        && $Filter->{Value} !~ /^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(\s*([-+]\d+\w\s*)*)|\s*([-+]\d+\w\s*?)*)$/
+                    ) {
+                        return $Self->_Error(
+                            Code    => 'BadRequest',
+                            Message => "Invalid date value $Filter->{Value} in $Object.$Filter->{Field}!",
+                        );
+                    }
 
-                # check DATETIME value
-                if (
-                    $Filter->{Type} eq 'DATETIME'
-                    && $Filter->{Value} !~ /^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(\s*([-+]\d+\w\s*)*)|\s*([-+]\d+\w\s*?)*)$/
-                ) {
-                    return $Self->_Error(
-                        Code    => 'BadRequest',
-                        Message => "Invalid datetime value $Filter->{Value} in $Object.$Filter->{Field}!",
-                    );
+                    # check DATETIME value
+                    if (
+                        $Filter->{Type} eq 'DATETIME'
+                        && $Filter->{Value} !~ /^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(\s*([-+]\d+\w\s*)*)|\s*([-+]\d+\w\s*?)*)$/
+                    ) {
+                        return $Self->_Error(
+                            Code    => 'BadRequest',
+                            Message => "Invalid datetime value $Filter->{Value} in $Object.$Filter->{Field}!",
+                        );
+                    }
                 }
             }
         }
@@ -4261,6 +4264,7 @@ filters ids for current customer user if necessary
     @FilteredObjectIDList = $Self->_FilterCustomerUserVisibleObjectIds(
         ObjectType   => 'Ticket'
         ObjectIDList => \@ObjectIDList,
+        LogFiltered  => 1                   # optional, default 0
         ...                                 # optional additional params
     )
 
@@ -4289,16 +4293,32 @@ sub _FilterCustomerUserVisibleObjectIds {
             my %ItemIDsHash = map { $_ => 1 } @{$ItemIDs};
             my @Result;
             for my $ObjectID ( @ObjectIDList ) {
-                push(@Result, 0 + $ObjectID) if $ItemIDsHash{$ObjectID};
+                if ($ItemIDsHash{$ObjectID}) {
+                    push(@Result, 0 + $ObjectID);
+                } elsif ($Param{LogFiltered}) {
+                    $Kernel::OM->Get('Log')->Log(
+                        Priority => 'notice',
+                        Message  => "No access for $Param{ObjectType} with id $ObjectID" 
+                    );
+                }
             }
             @ObjectIDList = @Result;
         } else {
             @ObjectIDList = ();
+            if ($Param{LogFiltered}) {
+                for my $ObjectID ( @ObjectIDList ) {
+                    $Kernel::OM->Get('Log')->Log(
+                        Priority => 'notice',
+                        Message  => "No access for $Param{ObjectType} with id $ObjectID" 
+                    );
+                }
+            }
         }
     }
 
     return @ObjectIDList;
 }
+
 =item _GetCustomerUserVisibleObjectIds()
 
 returns object ids for current customer user if necessary

@@ -242,7 +242,7 @@ sub SearchPreferences {
     my ( $Self, %Param ) = @_;
 
     my $Key   = $Param{Key}   || '';
-    my $Value = $Param{Value} || '';
+    my $Value = $Param{Value} // '';
 
     my $DBObject = $Kernel::OM->Get('DB');
 
@@ -257,7 +257,7 @@ sub SearchPreferences {
         WHERE $Self->{PreferencesTableKey} = ?";
     my @Bind = ( \$Key );
 
-    if ($Value) {
+    if ( $Value ne '' ) {
         $SQL .= " AND $Lower($Self->{PreferencesTableValue}) LIKE $Lower(?)";
         push @Bind, \$Value;
     }

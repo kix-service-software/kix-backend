@@ -66,7 +66,7 @@ $Self->IsDeeply(
     {
         IsSearchable => 1,
         IsSortable   => 0,
-        Operators    => ['EQ','NE','IN','!IN'],
+        Operators    => ['EMPTY','EQ','NE','IN','!IN'],
         ValueType    => 'NUMERIC'
     },
     'GetSupportedAttributes provides expected data'

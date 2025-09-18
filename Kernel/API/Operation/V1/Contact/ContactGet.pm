@@ -61,6 +61,53 @@ sub ParameterDefinition {
     }
 }
 
+=item PreRun()
+
+some code to run before actual execution
+
+    my $Success = $CommonObject->PreRun(
+        ...
+    );
+
+    returns:
+
+    $Success = {
+        Success => 1,                     # if everything is OK
+    }
+
+    $Success = {
+        Code    => 'Forbidden',           # if error
+        Message => 'Error description',
+    }
+
+=cut
+
+sub PreRun {
+    my ( $Self, %Param ) = @_;
+
+    # filter contact ids for customer
+    if ($Param{Data}->{ContactID}) {
+        my @ContactIDs = $Self->_FilterCustomerUserVisibleObjectIds(
+            ObjectType             => 'Contact',
+            ObjectIDList           => $Param{Data}->{ContactID},
+            RelevantOrganisationID => $Param{Data}->{RelevantOrganisationID},
+            LogFiltered => 1
+        );
+        if (@ContactIDs) {
+            $Param{Data}->{ContactID} = \@ContactIDs;
+        } else {
+            return $Self->_Error(
+                Code => 'Forbidden',
+                Message => @{$Param{Data}->{ContactID}} == 1 ?
+                "Could not access Contact with id $Param{Data}->{ContactID}->[0]" :
+                "Could not access any Contact"
+            );
+        }
+    }
+
+    return $Self->_Success();
+}
+
 =item Run()
 
 perform ContactGet Operation. This function is able to return

@@ -44,17 +44,17 @@ sub GetSupportedAttributes {
         From              => {
             IsSearchable => 1,
             IsSortable   => 0,
-            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            Operators    => ['EMPTY','EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
         To                => {
             IsSearchable => 1,
             IsSortable   => 0,
-            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            Operators    => ['EMPTY','EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
         Cc                => {
             IsSearchable => 1,
             IsSortable   => 0,
-            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            Operators    => ['EMPTY','EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
         Subject           => {
             IsSearchable => 1,
