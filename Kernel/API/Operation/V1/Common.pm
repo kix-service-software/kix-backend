@@ -238,8 +238,9 @@ sub RunOperation {
 
     # prepare data
     $Result = $Self->PrepareData(
-        Data       => $Param{Data},
-        Parameters => $Parameters,
+        Data                => $Param{Data},
+        Parameters          => $Parameters,
+        PermissionCheckOnly => $Param{PermissionCheckOnly},
     );
 
     # check result
@@ -664,40 +665,46 @@ sub PrepareData {
 
         foreach my $Parameter ( sort keys %Parameters ) {
 
-            # check requirement
-            if ( $Parameters{$Parameter}->{Required} && !defined( $Data{$Parameter} ) ) {
-                $Result->{Success} = 0;
-                $Result->{Message} = "Required parameter $Parameter is missing or undefined!";
-                last;
-            }
-            elsif ( $Parameters{$Parameter}->{RequiredIfNot} && ref( $Parameters{$Parameter}->{RequiredIfNot} ) eq 'ARRAY' ) {
-                my $AltParameterHasValue = 0;
-                foreach my $AltParameter ( @{ $Parameters{$Parameter}->{RequiredIfNot} } ) {
-                    if ( exists( $Data{$AltParameter} ) && defined( $Data{$AltParameter} ) ) {
-                        $AltParameterHasValue = 1;
+            # skip requirement check for query parameter on permission check
+            if (
+                !$Param{PermissionCheckOnly}
+                || !$Parameters{$Parameter}->{QueryParameter}
+            ) {
+                # check requirement
+                if ( $Parameters{$Parameter}->{Required} && !defined( $Data{$Parameter} ) ) {
+                    $Result->{Success} = 0;
+                    $Result->{Message} = "Required parameter $Parameter is missing or undefined!";
+                    last;
+                }
+                elsif ( $Parameters{$Parameter}->{RequiredIfNot} && ref( $Parameters{$Parameter}->{RequiredIfNot} ) eq 'ARRAY' ) {
+                    my $AltParameterHasValue = 0;
+                    foreach my $AltParameter ( @{ $Parameters{$Parameter}->{RequiredIfNot} } ) {
+                        if ( exists( $Data{$AltParameter} ) && defined( $Data{$AltParameter} ) ) {
+                            $AltParameterHasValue = 1;
+                            last;
+                        }
+                    }
+                    if ( !exists( $Data{$Parameter} ) && !$AltParameterHasValue ) {
+                        $Result->{Success} = 0;
+                        $Result->{Message} = "Required parameter $Parameter or " . ( join( " or ", @{ $Parameters{$Parameter}->{RequiredIfNot} } ) ) . " is missing or undefined!";
                         last;
                     }
                 }
-                if ( !exists( $Data{$Parameter} ) && !$AltParameterHasValue ) {
-                    $Result->{Success} = 0;
-                    $Result->{Message} = "Required parameter $Parameter or " . ( join( " or ", @{ $Parameters{$Parameter}->{RequiredIfNot} } ) ) . " is missing or undefined!";
-                    last;
-                }
-            }
 
-            # check complex requirement (required if another parameter has value)
-            if ( $Parameters{$Parameter}->{RequiredIf} && ref( $Parameters{$Parameter}->{RequiredIf} ) eq 'ARRAY' ) {
-                my $OtherParameterHasValue = 0;
-                foreach my $OtherParameter ( @{ $Parameters{$Parameter}->{RequiredIf} } ) {
-                    if ( exists( $Data{$OtherParameter} ) && defined( $Data{$OtherParameter} ) ) {
-                        $OtherParameterHasValue = 1;
+                # check complex requirement (required if another parameter has value)
+                if ( $Parameters{$Parameter}->{RequiredIf} && ref( $Parameters{$Parameter}->{RequiredIf} ) eq 'ARRAY' ) {
+                    my $OtherParameterHasValue = 0;
+                    foreach my $OtherParameter ( @{ $Parameters{$Parameter}->{RequiredIf} } ) {
+                        if ( exists( $Data{$OtherParameter} ) && defined( $Data{$OtherParameter} ) ) {
+                            $OtherParameterHasValue = 1;
+                            last;
+                        }
+                    }
+                    if ( !exists( $Data{$Parameter} ) && $OtherParameterHasValue ) {
+                        $Result->{Success} = 0;
+                        $Result->{Message} = "Required parameter $Parameter is missing!";
                         last;
                     }
-                }
-                if ( !exists( $Data{$Parameter} ) && $OtherParameterHasValue ) {
-                    $Result->{Success} = 0;
-                    $Result->{Message} = "Required parameter $Parameter is missing!";
-                    last;
                 }
             }
 
