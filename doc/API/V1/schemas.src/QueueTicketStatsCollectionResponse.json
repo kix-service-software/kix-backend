@@ -1,0 +1,37 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "QueueTicketStatsCollectionResponse.json",
+    "type": "object",
+    "description": "The ticket stats for all queues.",
+    "properties": {
+        "TicketStats": {
+            "type": "array",
+            "readOnly": true,
+            "items": {
+                "type": "object",
+                "properties": {
+                    "EscalatedCount": {
+                        "type": "integer",
+                        "readOnly": true,
+                        "description": "added by KIXPro"
+                    },
+                    "LockCount": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "QueueID": {
+                        "type": "integer",
+                        "readOnly": true
+                    },
+                    "TotalCount": {
+                        "type": "integer",
+                        "readOnly": true
+                    }
+                }
+            }
+        }
+    },
+    "required": [
+        "TicketStats"
+    ]
+}

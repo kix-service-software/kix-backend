@@ -134,6 +134,7 @@ sub Run {
             SuppressPermissionErrors => 1,
             Data                     => {
                 QueueID => join( q{,}, sort { $a <=> $b } keys %QueueList ),
+                QueueList => \%QueueList,
             }
         );
         if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {

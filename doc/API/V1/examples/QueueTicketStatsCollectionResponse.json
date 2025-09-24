@@ -1,0 +1,10 @@
+{
+    "TicketStats": [
+        {
+            "EscalatedCount": 0,
+            "QueueID": 123,
+            "LockCount": 3,
+            "TotalCount": 20
+        }
+    ]
+}
