@@ -889,9 +889,10 @@ sub QueueUpdate {
 
 get all queues
 
-    my %Queues = $QueueObject->QueueList();
-
-    my %Queues = $QueueObject->QueueList( Valid => 1 );
+    my %Queues = $QueueObject->QueueList(
+        IDs   => [...],             # optional, only get given IDs
+        Valid => 1,                 # optional, only valid queues
+    );
 
 =cut
 
@@ -908,7 +909,7 @@ sub QueueList {
     }
 
     # check cache
-    my $CacheKey = 'QueueList::' . $Valid;
+    my $CacheKey = 'QueueList::' . $Valid . '::' . (join('::', @{$Param{IDs}||[]}));
     my $Cache    = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
@@ -918,18 +919,27 @@ sub QueueList {
     # get database object
     my $DBObject = $Kernel::OM->Get('DB');
 
+    my @Where;
+    my @Bind;
+
     # sql query
     if ($Valid) {
-        return if !$DBObject->Prepare(
-            SQL => "SELECT id, name FROM queue WHERE valid_id IN "
-                . "( ${\(join ', ', $Kernel::OM->Get('Valid')->ValidIDsGet())} )",
-        );
+        push @Where, "valid_id IN ( ${\(join ', ', $Kernel::OM->Get('Valid')->ValidIDsGet())} )";
     }
-    else {
-        return if !$DBObject->Prepare(
-            SQL => 'SELECT id, name FROM queue',
-        );
+    if ( IsArrayRefWithData($Param{IDs}) ) {
+        push @Where, 'id IN ('.(join( ',', map { '?' } @{$Param{IDs}})) . ')';
+        push @Bind, map { \$_ } @{$Param{IDs}};
     }
+
+    my $SQL = 'SELECT id, name FROM queue';
+    if ( @Where ) {
+        $SQL .= ' WHERE ' . join(' AND ', @Where);
+    }
+
+    return if !$DBObject->Prepare(
+        SQL  => $SQL,
+        Bind => \@Bind
+    );
 
     # fetch the result
     my %Queues;
