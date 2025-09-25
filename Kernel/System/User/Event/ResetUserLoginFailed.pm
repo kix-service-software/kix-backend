@@ -51,6 +51,13 @@ sub Run {
         }
     }
 
+    # check for existing user
+    my $UserLogin = $Kernel::OM->Get('User')->UserLookup(
+        UserID => $Param{Data}->{NewUser}->{UserID},
+        Silent => 1,
+    );
+    return 1 if ( !$UserLogin );
+
     return 1 if (
         $Param{Data}->{NewUser}->{ValidID} != 1
         || $Param{Data}->{OldUser}->{ValidID} == 1
