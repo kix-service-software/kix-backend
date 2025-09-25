@@ -608,20 +608,28 @@ sub Send {
         );
     }
 
-    # send email to backend
-    my $Sent = $Self->{Backend}->Send(
-        From    => $RealFrom,
-        ToArray => \@ToArray,
-        Header  => \$Param{Header},
-        Body    => \$Param{Body},
-    );
-
-    if ( !$Sent ) {
-        $Kernel::OM->Get('Log')->Log(
-            Message  => "Error sending message",
-            Priority => 'info',
+    if ( @ToArray ) {
+        # send email to backend
+        my $Sent = $Self->{Backend}->Send(
+            From    => $RealFrom,
+            ToArray => \@ToArray,
+            Header  => \$Param{Header},
+            Body    => \$Param{Body},
         );
-        return;
+
+        if ( !$Sent ) {
+            $Kernel::OM->Get('Log')->Log(
+                Message  => "Error sending message",
+                Priority => 'info',
+            );
+            return;
+        }
+    }
+    else {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'info',
+            Message  => "Email was not send. All recipients were ignored due to SysConfig 'IgnoreEmailAddressesAsRecipients'",
+        );
     }
 
     return {
