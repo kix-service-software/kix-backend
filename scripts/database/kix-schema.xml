@@ -1167,6 +1167,16 @@
     <Column Name="contact_id" Required="true" Type="INTEGER"/>
     <Column Name="org_id" Required="true" Type="INTEGER"/>
     <Column Name="is_primary" Required="true" Default="0" Type="SMALLINT"/>
+    <Index Name="contact_organisation_contact_id">
+        <IndexColumn Name="contact_id"/>
+    </Index>
+    <Index Name="contact_organisation_org_id">
+        <IndexColumn Name="org_id"/>
+    </Index>
+    <Index Name="contact_organisation_contact_primary">
+        <IndexColumn Name="contact_id"/>
+        <IndexColumn Name="is_primary"/>
+    </Index>
     <ForeignKey ForeignTable="contact">
         <Reference Local="contact_id" Foreign="id"/>
     </ForeignKey>
