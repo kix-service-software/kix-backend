@@ -1,5 +1,5 @@
 "Object";"Parent";"Value";"IconFile";"ContentType"
-"GeneralCatalogItem";"ITSM::ConfigItem::DeploymentState";"Expired";"postproductive_02.svg";"image/svg+xml"
+"GeneralCatalogItem";"ITSM::ConfigItem::DeploymentState";"Expired";"productive_02.svg";"image/svg+xml"
 "GeneralCatalogItem";"ITSM::ConfigItem::DeploymentState";"Inactive";"postproductive_02.svg";"image/svg+xml"
 "GeneralCatalogItem";"ITSM::ConfigItem::DeploymentState";"Maintenance";"productive_02.svg";"image/svg+xml"
 "GeneralCatalogItem";"ITSM::ConfigItem::DeploymentState";"Pilot";"preproductive_02.svg";"image/svg+xml"
