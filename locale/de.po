@@ -3,8 +3,8 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-9-26 10:02+0000\n"
-"PO-Revision-Date: 2025-06-10 14:08+0000\n"
-"Last-Translator: jbrueckner <Joerg.Brueckner@kixdesk.com>\n"
+"PO-Revision-Date: 2025-10-07 08:16+0000\n"
+"Last-Translator: rkaiser <Ricky.Kaiser@kixdesk.com>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/de/>\n"
 "Language: de\n"
@@ -1146,7 +1146,7 @@ msgstr "Das auszuführende Makro, wenn der logischen Ausdrucks \"true\" ist."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/Conditional.pm
 msgid "Then"
-msgstr ""
+msgstr "Dann"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/CreateReport.pm
 msgid "Create a report from a report definition."
