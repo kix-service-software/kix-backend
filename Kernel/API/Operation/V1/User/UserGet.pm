@@ -140,11 +140,26 @@ sub _GetUserData {
     # get the user data
     my %UserData = $Kernel::OM->Get('User')->GetUserData(
         UserID        => $UserID,
-        NoPreferences => 1
+        NoPreferences => $Param{Data}->{include}->{Preferences} ? 0 : 1
     );
 
     if ( !IsHashRefWithData(\%UserData) ) {
         return;
+    }
+
+    # add flags array if included
+    if ( $Param{Data}->{include}->{Preferences} ) {
+        my @PrefList = ();
+        foreach my $Pref ( sort keys %{$UserData{Preferences}} ) {
+            push(@PrefList, {
+                UserID => $Param{Data}->{UserID},
+                ID     => $Pref,
+                Value  => $UserData{Preferences}->{$Pref}
+            });
+        }
+        delete($UserData{Preferences});
+        $UserData{UserPreference} = \@PrefList;
+        $Self->SuppressSubResourceInclude(SubResource => 'preferences');
     }
 
     # filter valid attributes
