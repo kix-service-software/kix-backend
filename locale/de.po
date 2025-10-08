@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-10-7 16:40+0000\n"
-"PO-Revision-Date: 2025-10-07 08:16+0000\n"
+"PO-Revision-Date: 2025-10-08 07:16+0000\n"
 "Last-Translator: rkaiser <Ricky.Kaiser@kixdesk.com>\n"
 "Language-Team: German <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/de/>\n"
@@ -1076,7 +1076,7 @@ msgstr "Wochentag"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common.pm
 msgid "Debug"
-msgstr ""
+msgstr "Debug"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common.pm
 msgid "Output debug data."
@@ -1437,7 +1437,7 @@ msgstr "Wert"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleAttachmentsDelete.pm
 msgid "Delete Rules"
-msgstr ""
+msgstr "Regeln fürs Löschen"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleAttachmentsDelete.pm
 msgid ""
@@ -1445,22 +1445,30 @@ msgid ""
 "to match. Any keep rule has to match to ignore file for deletion. Any delete "
 "rule has to match for a file to be deleted."
 msgstr ""
+"Löscht Anhänge aller Artikel eines Tickets. Alle Angaben einer Regel müssen "
+"passen. Nur eine der Regeln fürs Behalten muss passen, um jede Löschung zu "
+"verhindern. Nur eine der Regeln zum Löschen muss passen, um einen Anhang zu "
+"entfernen."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleAttachmentsDelete.pm
 msgid "Keep Rules"
-msgstr ""
+msgstr "Regeln fürs Behalten"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleAttachmentsDelete.pm
 msgid ""
 "Rules for keeping a file. Pattern are in the order Filename, ContentType and "
 "Disposition."
 msgstr ""
+"Regelns fürs Behalten eines Anhangs. Angaben sind Dateiname, Inhaltstyp und "
+"Disposition."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleAttachmentsDelete.pm
 msgid ""
 "Rules to delete a file. Pattern are in the order Filename, ContentType and "
 "Disposition."
 msgstr ""
+"Regelns fürs Löschen eines Anhangs. Angaben sind Dateiname, Inhaltstyp und "
+"Disposition."
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Ticket/ArticleCreate.pm
 msgid "(Optional) A message id the new article is a reply to."
