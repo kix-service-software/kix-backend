@@ -55,6 +55,9 @@ $Self->True(
     $DynamicFieldID,
     'Created dynamic field for UnitTest'
 );
+my $DynamicFieldConfig = $Kernel::OM->Get('DynamicField')->DynamicFieldGet(
+    ID => $DynamicFieldID
+);
 
 # check GetSupportedAttributes
 my $AttributeList = $AttributeObject->GetSupportedAttributes();
@@ -62,10 +65,10 @@ $Self->IsDeeply(
     $AttributeList->{'DynamicField_UnitTest'},
     {
         IsSelectable   => 0,
-        IsSearchable   => 0,
+        IsSearchable   => 1,
         IsSortable     => 0,
         IsFulltextable => 0,
-        Operators      => [],
+        Operators      => ['EMPTY'],
         ValueType      => ''
     },
     'GetSupportedAttributes provides expected data'
@@ -134,11 +137,62 @@ my @SearchTests = (
         Expected => undef
     }
 );
+
+for my $UserType ( qw(Agent Customer) ) {
+
+    # prepare suffix for article join
+    my $JoinArticleSuffix = '';
+    if ( $UserType eq 'Customer' ) {
+        $JoinArticleSuffix = ' AND ta.customer_visible = 1'
+    }
+    push (
+        @SearchTests,
+        {
+            Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator EMPTY / date value',
+            Search       => {
+                Field    => 'DynamicField_UnitTest',
+                Operator => 'EMPTY',
+                Value    => 1
+            },
+            UserType     => $UserType,
+            Expected     => {
+                'IsRelative' => undef,
+                'Join'       => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
+                    'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = ta.id AND dfv_left0.field_id = ' . $DynamicFieldID
+                ],
+                'Where'      => [
+                    '(dfv_left0.value_text = \'\' OR dfv_left0.value_text IS NULL)'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator EMPTY / empty value',
+            Search       => {
+                Field    => 'DynamicField_UnitTest',
+                Operator => 'EMPTY',
+                Value    => 0
+            },
+            UserType     => $UserType,
+            Expected     => {
+                'IsRelative' => undef,
+                'Join'       => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
+                    'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = ta.id AND dfv_left0.field_id = ' . $DynamicFieldID
+                ],
+                'Where'      => [
+                    '(dfv_left0.value_text != \'\' AND dfv_left0.value_text IS NOT NULL)'
+                ]
+            }
+        }
+    );
+}
 for my $Test ( @SearchTests ) {
     my $Result = $AttributeObject->Search(
         Search       => $Test->{Search},
         BoolOperator => 'AND',
         UserID       => 1,
+        UserType     => $Test->{UserType},
         Silent       => defined( $Test->{Expected} ) ? 0 : 1
     );
     $Self->IsDeeply(
@@ -180,8 +234,228 @@ for my $Test ( @SortTests ) {
 }
 
 ### Integration Test ###
+
+# get objectsearch object
+my $ObjectSearch = $Kernel::OM->Get('ObjectSearch');
+
+# begin transaction on database
+$Helper->BeginWork();
+
+### prepare test tickets ##
+# first ticket
+my $TicketID1   = $Kernel::OM->Get('Ticket')->TicketCreate(
+    Title          => $Helper->GetRandomID(),
+    QueueID        => 1,
+    Lock           => 'unlock',
+    PriorityID     => 1,
+    StateID        => 1,
+    TypeID         => 1,
+    OrganisationID => 1,
+    ContactID      => 1,
+    OwnerID        => 1,
+    ResponsibleID  => 1,
+    UserID         => 1
+);
+$Self->True(
+    $TicketID1,
+    'Created first ticket'
+);
+# first article of first ticket (customer visible)
+my $ArticleID1 = $Kernel::OM->Get('Ticket')->ArticleCreate(
+    TicketID         => $TicketID1,
+    ChannelID        => 1,
+    CustomerVisible  => 1,
+    SenderType       => 'agent',
+    Subject          => 'first article of first ticket',
+    Body             => 'object search dynamic field',
+    Charset          => 'utf-8',
+    MimeType         => 'text/plain',
+    HistoryType      => 'AddNote',
+    HistoryComment   => 'object search dynamic field',
+    UserID           => 1
+);
+$Self->True(
+    $ArticleID1,
+    'Created first article of first ticket'
+);
+my $ValueSet1 = $Kernel::OM->Get('DynamicField::Backend')->ValueSet(
+    DynamicFieldConfig => $DynamicFieldConfig,
+    ObjectID           => $ArticleID1,
+    Value              => 'Test1',
+    UserID             => 1,
+);
+$Self->True(
+    $ValueSet1,
+    'Dynamic field value set for first article of first ticket'
+);
+# second ticket
+my $TicketID2   = $Kernel::OM->Get('Ticket')->TicketCreate(
+    Title          => $Helper->GetRandomID(),
+    QueueID        => 1,
+    Lock           => 'unlock',
+    PriorityID     => 1,
+    StateID        => 1,
+    TypeID         => 1,
+    OrganisationID => 1,
+    ContactID      => 1,
+    OwnerID        => 1,
+    ResponsibleID  => 1,
+    UserID         => 1
+);
+$Self->True(
+    $TicketID2,
+    'Created second ticket'
+);
+# first article of second ticket (customer NOT visible)
+my $ArticleID2 = $Kernel::OM->Get('Ticket')->ArticleCreate(
+    TicketID         => $TicketID2,
+    ChannelID        => 1,
+    SenderType       => 'agent',
+    Subject          => 'first article of second ticket',
+    Body             => 'object search dynamic field',
+    Charset          => 'utf-8',
+    MimeType         => 'text/plain',
+    HistoryType      => 'AddNote',
+    HistoryComment   => 'object search dynamic field',
+    UserID           => 1
+);
+$Self->True(
+    $ArticleID2,
+    'Created first article of second ticket'
+);
+my $ValueSet2 = $Kernel::OM->Get('DynamicField::Backend')->ValueSet(
+    DynamicFieldConfig => $DynamicFieldConfig,
+    ObjectID           => $ArticleID2,
+    Value              => 'Test2',
+    UserID             => 1,
+);
+$Self->True(
+    $ValueSet2,
+    'Dynamic field value set for first artciel of second ticket'
+);
+# third ticket without article
+my $TicketID3   = $Kernel::OM->Get('Ticket')->TicketCreate(
+    Title          => $Helper->GetRandomID(),
+    QueueID        => 1,
+    Lock           => 'unlock',
+    PriorityID     => 1,
+    StateID        => 1,
+    TypeID         => 1,
+    OrganisationID => 1,
+    ContactID      => 1,
+    OwnerID        => 1,
+    ResponsibleID  => 1,
+    UserID         => 1
+);
+$Self->True(
+    $TicketID3,
+    'Created third ticket without article'
+);
+
+# discard ticket object to process events
+$Kernel::OM->ObjectsDiscard(
+    Objects => ['Ticket'],
+);
+
 # test Search
-# attributes of this backend are not searchable
+my @IntegrationSearchTests = (
+    {
+        Name     => 'Search: UserType Customer / Field DynamicField_UnitTest / Operator EMPTY / Value 1',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DynamicField_UnitTest',
+                    Operator => 'EMPTY',
+                    Value    => 1
+                }
+            ]
+        },
+        UserType => 'Customer',
+        Expected => [$TicketID2,$TicketID3]
+    },
+    {
+        Name     => 'Search: UserType Customer / Field DynamicField_UnitTest / Operator EMPTY / Value 0',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DynamicField_UnitTest',
+                    Operator => 'EMPTY',
+                    Value    => 0
+                }
+            ]
+        },
+        UserType => 'Customer',
+        Expected => [$TicketID1]
+    },
+    {
+        Name     => 'Search: UserType Agent / Field DynamicField_UnitTest / Operator EMPTY / Value 1',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DynamicField_UnitTest',
+                    Operator => 'EMPTY',
+                    Value    => 1
+                }
+            ]
+        },
+        UserType => 'Agent',
+        Expected => [$TicketID3]
+    },
+    {
+        Name     => 'Search: UserType Agent / Field DynamicField_UnitTest / Operator EMPTY / Value 0',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DynamicField_UnitTest',
+                    Operator => 'EMPTY',
+                    Value    => 0
+                }
+            ]
+        },
+        UserType => 'Agent',
+        Expected => [$TicketID1,$TicketID2]
+    },
+    {
+        Name     => 'Search: Field DynamicField_UnitTest / Operator EMPTY / Value 1',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DynamicField_UnitTest',
+                    Operator => 'EMPTY',
+                    Value    => 1
+                }
+            ]
+        },
+        Expected => [$TicketID3]
+    },
+    {
+        Name     => 'Search: Field DynamicField_UnitTest / Operator EMPTY / Value 0',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DynamicField_UnitTest',
+                    Operator => 'EMPTY',
+                    Value    => 0
+                }
+            ]
+        },
+        Expected => [$TicketID1,$TicketID2]
+    }
+);
+for my $Test ( @IntegrationSearchTests ) {
+    my @Result = $ObjectSearch->Search(
+        ObjectType => 'Ticket',
+        Result     => 'ARRAY',
+        Search     => $Test->{Search},
+        UserType   => $Test->{UserType} || 'Agent',
+        UserID     => 1,
+    );
+    $Self->IsDeeply(
+        \@Result,
+        $Test->{Expected},
+        $Test->{Name}
+    );
+}
 
 # test Sort
 # attributes of this backend are not sortable

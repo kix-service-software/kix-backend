@@ -76,7 +76,7 @@ $Self->IsDeeply(
         IsSearchable   => 1,
         IsSortable     => 1,
         IsFulltextable => 1,
-        Operators      => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE','STARTSWITH','ENDSWITH','CONTAINS','LIKE'],
+        Operators      => ['EMPTY','EQ','NE','IN','!IN','LT','LTE','GT','GTE','STARTSWITH','ENDSWITH','CONTAINS','LIKE'],
         ValueType      => ''
     },
     'GetSupportedAttributes provides expected data'
@@ -356,6 +356,40 @@ my @SearchTests = (
             ],
             'Where' => [
                 'dfv_left0.value_text LIKE \'Test\''
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field DynamicField_UnitTest / Operator EMPTY / Value 0',
+        Search       => {
+            Field    => 'DynamicField_UnitTest',
+            Operator => 'EMPTY',
+            Value    => 0
+        },
+        Expected     => {
+            'IsRelative' => undef,
+            'Join'       => [
+                'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = st.id AND dfv_left0.field_id = ' . $DynamicFieldID
+            ],
+            'Where'      => [
+                '(dfv_left0.value_text != \'\' AND dfv_left0.value_text IS NOT NULL)'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field DynamicField_UnitTest / Operator EMPTY / Value 1',
+        Search       => {
+            Field    => 'DynamicField_UnitTest',
+            Operator => 'EMPTY',
+            Value    => 1
+        },
+        Expected     => {
+            'IsRelative' => undef,
+            'Join'       => [
+                'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = st.id AND dfv_left0.field_id = ' . $DynamicFieldID
+            ],
+            'Where'      => [
+                '(dfv_left0.value_text = \'\' OR dfv_left0.value_text IS NULL)'
             ]
         }
     }
@@ -692,6 +726,32 @@ my @IntegrationSearchTests = (
                     Field    => 'DynamicField_UnitTest',
                     Operator => 'LIKE',
                     Value    => 'Test*'
+                }
+            ]
+        },
+        Expected => [$TicketID1,$TicketID2]
+    },
+    {
+        Name     => 'Search: Field DynamicField_UnitTest / Operator EMPTY / Value 1',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DynamicField_UnitTest',
+                    Operator => 'EMPTY',
+                    Value    => 1
+                }
+            ]
+        },
+        Expected => [$TicketID3]
+    },
+    {
+        Name     => 'Search: Field DynamicField_UnitTest / Operator EMPTY / Value 0',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DynamicField_UnitTest',
+                    Operator => 'EMPTY',
+                    Value    => 0
                 }
             ]
         },
