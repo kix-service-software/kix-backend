@@ -70,7 +70,7 @@ sub Search {
 
         if ( $Param{Search}->{Field} eq 'DeplState' ) {
             if ( !$Param{Flags}->{JoinMap}->{ConfigItemVersionDeplState} ) {
-                push( @SQLJoin, 'INNER JOIN general_catalog civds ON civds.id = civ.depl_state_id AND general_catalog_class = \'ITSM::ConfigItem::DeploymentState\'' );
+                push( @SQLJoin, 'INNER JOIN general_catalog civds ON civds.id = civ.depl_state_id AND civds.general_catalog_class = \'ITSM::ConfigItem::DeploymentState\'' );
 
                 $Param{Flags}->{JoinMap}->{ConfigItemVersionDeplState} = 1;
             }
@@ -78,7 +78,7 @@ sub Search {
     }
     elsif ( $Param{Search}->{Field} eq 'DeplState' ) {
         if ( !$Param{Flags}->{JoinMap}->{ConfigItemDeplState} ) {
-            push( @SQLJoin, 'INNER JOIN general_catalog cids ON cids.id = ci.cur_depl_state_id AND general_catalog_class = \'ITSM::ConfigItem::DeploymentState\'' );
+            push( @SQLJoin, 'INNER JOIN general_catalog cids ON cids.id = ci.cur_depl_state_id AND cids.general_catalog_class = \'ITSM::ConfigItem::DeploymentState\'' );
 
             $Param{Flags}->{JoinMap}->{ConfigItemDeplState} = 1;
         }
@@ -128,7 +128,7 @@ sub Sort {
     my @SQLJoin = ();
     if ( $Param{Attribute} eq 'DeplState' ) {
         if ( !$Param{Flags}->{JoinMap}->{ConfigItemDeplStateSort} ) {
-            push( @SQLJoin, 'LEFT OUTER JOIN general_catalog cids ON cids.id = ci.cur_depl_state_id AND general_catalog_class = \'ITSM::ConfigItem::DeploymentState\'' );
+            push( @SQLJoin, 'LEFT OUTER JOIN general_catalog cids ON cids.id = ci.cur_depl_state_id AND cids.general_catalog_class = \'ITSM::ConfigItem::DeploymentState\'' );
 
             $Param{Flags}->{JoinMap}->{ConfigItemDeplStateSort} = 1;
         }
