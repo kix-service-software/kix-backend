@@ -357,7 +357,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'INNER JOIN general_catalog cic ON cic.id = ci.class_id AND general_catalog_class = \'ITSM::ConfigItem::Class\''
+                'INNER JOIN general_catalog cic ON cic.id = ci.class_id AND cic.general_catalog_class = \'ITSM::ConfigItem::Class\''
             ],
             'Where' => [
                 'cic.name = \'Test\''
@@ -373,7 +373,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'INNER JOIN general_catalog cic ON cic.id = ci.class_id AND general_catalog_class = \'ITSM::ConfigItem::Class\''
+                'INNER JOIN general_catalog cic ON cic.id = ci.class_id AND cic.general_catalog_class = \'ITSM::ConfigItem::Class\''
             ],
             'Where' => [
                 'cic.name != \'Test\''
@@ -389,7 +389,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'INNER JOIN general_catalog cic ON cic.id = ci.class_id AND general_catalog_class = \'ITSM::ConfigItem::Class\''
+                'INNER JOIN general_catalog cic ON cic.id = ci.class_id AND cic.general_catalog_class = \'ITSM::ConfigItem::Class\''
             ],
             'Where' => [
                 'cic.name IN (\'Test\')'
@@ -405,7 +405,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'INNER JOIN general_catalog cic ON cic.id = ci.class_id AND general_catalog_class = \'ITSM::ConfigItem::Class\''
+                'INNER JOIN general_catalog cic ON cic.id = ci.class_id AND cic.general_catalog_class = \'ITSM::ConfigItem::Class\''
             ],
             'Where' => [
                 'cic.name NOT IN (\'Test\')'
@@ -421,7 +421,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'INNER JOIN general_catalog cic ON cic.id = ci.class_id AND general_catalog_class = \'ITSM::ConfigItem::Class\''
+                'INNER JOIN general_catalog cic ON cic.id = ci.class_id AND cic.general_catalog_class = \'ITSM::ConfigItem::Class\''
             ],
             'Where' => [
                 'cic.name LIKE \'Test%\''
@@ -437,7 +437,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'INNER JOIN general_catalog cic ON cic.id = ci.class_id AND general_catalog_class = \'ITSM::ConfigItem::Class\''
+                'INNER JOIN general_catalog cic ON cic.id = ci.class_id AND cic.general_catalog_class = \'ITSM::ConfigItem::Class\''
             ],
             'Where' => [
                 'cic.name LIKE \'%Test\''
@@ -453,7 +453,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'INNER JOIN general_catalog cic ON cic.id = ci.class_id AND general_catalog_class = \'ITSM::ConfigItem::Class\''
+                'INNER JOIN general_catalog cic ON cic.id = ci.class_id AND cic.general_catalog_class = \'ITSM::ConfigItem::Class\''
             ],
             'Where' => [
                 'cic.name LIKE \'%Test%\''
@@ -469,7 +469,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'INNER JOIN general_catalog cic ON cic.id = ci.class_id AND general_catalog_class = \'ITSM::ConfigItem::Class\''
+                'INNER JOIN general_catalog cic ON cic.id = ci.class_id AND cic.general_catalog_class = \'ITSM::ConfigItem::Class\''
             ],
             'Where' => [
                 'cic.name LIKE \'Test\''
@@ -534,7 +534,7 @@ my @SortTests = (
         Attribute => 'Class',
         Expected  => {
             'Join'    => [
-                'INNER JOIN general_catalog cic ON cic.id = ci.class_id AND general_catalog_class = \'ITSM::ConfigItem::Class\'',
+                'INNER JOIN general_catalog cic ON cic.id = ci.class_id AND cic.general_catalog_class = \'ITSM::ConfigItem::Class\'',
                 'LEFT OUTER JOIN translation_pattern tlp0 ON tlp0.value = cic.name',
                 'LEFT OUTER JOIN translation_language tl0 ON tl0.pattern_id = tlp0.id AND tl0.language = \'en\''
             ],
