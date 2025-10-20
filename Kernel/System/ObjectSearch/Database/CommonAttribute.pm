@@ -282,6 +282,9 @@ Returns SQL of the requested attributes
 sub AttributePrepare {
     my ( $Self, %Param ) = @_;
 
+    # check params
+    return if ( !$Self->_CheckAttributeParams( %Param ) );
+
     return {};
 }
 
@@ -1086,6 +1089,24 @@ sub _AddSupplement {
     }
 
     return $Condition;
+}
+
+sub _CheckAttributeParams {
+    my ($Self, %Param) = @_;
+
+    for my $Needed ( qw(PrepareType) ) {
+        if ( !$Param{ $Needed } ) {
+            if ( !$Param{Silent} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => 'Need ' . $Needed . '!',
+                );
+            }
+            return;
+        }
+    }
+
+    return 1;
 }
 
 sub _CheckSelectParams {

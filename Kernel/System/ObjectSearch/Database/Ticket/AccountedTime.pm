@@ -50,7 +50,10 @@ sub AttributePrepare {
     my %Attribute = (
         Column => 'st.accounted_time',
     );
-    if ( $Param{PrepareType} eq 'Condition' ) {
+    if (
+        defined $Param{PrepareType}
+        && $Param{PrepareType} eq 'Condition'
+    ) {
         $Attribute{ConditionDef} = {
             ValueType => 'NUMERIC',
             NULLValue => 1

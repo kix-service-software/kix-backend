@@ -46,7 +46,7 @@ $Self->IsDeeply(
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 0,
-            Operators      => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
+            Operators      => ['EMPTY','EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
             ValueType      => 'NUMERIC'
         }
     },
@@ -319,6 +319,28 @@ my @SearchTests = (
         Expected => {
             Where => ['st.accounted_time >= 1']
         }
+    },
+    {
+        Name     => 'Search: Field "AccountedTime" / Operator "EMPTY" / Value 1',
+        Search   => {
+            Field    => 'AccountedTime',
+            Operator => 'EMPTY',
+            Value    => 1
+        },
+        Expected => {
+            Where => ['st.accounted_time IS NULL']
+        }
+    },
+    {
+        Name     => 'Search: Field "AccountedTime" / Operator "EMPTY" / Value 0',
+        Search   => {
+            Field    => 'AccountedTime',
+            Operator => 'EMPTY',
+            Value    => 0
+        },
+        Expected => {
+            Where => ['st.accounted_time IS NOT NULL']
+        }
     }
 );
 for my $Test ( @SearchTests ) {
@@ -556,6 +578,32 @@ my @IntegrationSearchTests = (
             ]
         },
         Expected => [$TicketID2, $TicketID3]
+    },
+    {
+        Name     => 'Search: Field "AccountedTime" / Operator "EMPTY" / Value 1',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'AccountedTime',
+                    Operator => 'EMPTY',
+                    Value    => 1
+                }
+            ]
+        },
+        Expected => []
+    },
+    {
+        Name     => 'Search: Field "AccountedTime" / Operator "EMPTY" / Value 0',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'AccountedTime',
+                    Operator => 'EMPTY',
+                    Value    => 0
+                }
+            ]
+        },
+        Expected => [$TicketID1, $TicketID2, $TicketID3]
     }
 );
 for my $Test ( @IntegrationSearchTests ) {

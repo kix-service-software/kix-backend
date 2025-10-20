@@ -132,7 +132,8 @@ sub AttributePrepare {
     # check if search for ArticleID is used
     my $HasArticleIDSearch = 0;
     if (
-        $Param{PrepareType} eq 'Condition'
+        defined $Param{PrepareType}
+        && $Param{PrepareType} eq 'Condition'
         && IsArrayRefWithData( $Param{WholeSearch} )
     ) {
         for my $SearchEntry ( @{ $Param{WholeSearch} } ) {
@@ -147,7 +148,8 @@ sub AttributePrepare {
     # check if static search should be used. Only if search for ArticleID is NOT used and static search index is active
     my $IsStaticSearch = 0;
     if (
-        $Param{PrepareType} eq 'Condition'
+        defined $Param{PrepareType}
+        && $Param{PrepareType} eq 'Condition'
         && !$HasArticleIDSearch
     ) {
         my $SearchIndexModule = $Kernel::OM->Get('Config')->Get('Ticket::SearchIndexModule');
@@ -314,7 +316,10 @@ sub AttributePrepare {
             Join => \@SQLJoin,
         }
     );
-    if ( $Param{PrepareType} eq 'Condition' ) {
+    if (
+        defined $Param{PrepareType}
+        && $Param{PrepareType} eq 'Condition'
+    ) {
         $Attribute{ConditionDef} = $AttributeDefinition{ $Param{Attribute} }->{ConditionDef};
     }
 

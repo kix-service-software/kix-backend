@@ -162,96 +162,70 @@ for my $SearchIndexModule ( qw(RuntimeDB StaticDB) ) {
         Key   => 'Ticket::SearchIndexModule',
         Value => 'Kernel::System::Ticket::ArticleSearchIndex::' . $SearchIndexModule
     );
-    my $AliasPrefix = '';
-    if ( $SearchIndexModule eq 'StaticDB' ) {
-        $AliasPrefix = 's_';
-    }
 
     # run tests for UserType 'Agent' and 'Customer'
     for my $UserType ( qw(Agent Customer) ) {
-        # prepare suffix for article join
-        my $JoinArticleSuffix = '';
-        if ( $UserType eq 'Customer' ) {
-            $JoinArticleSuffix = ' AND ' . $AliasPrefix . 'ta.customer_visible = 1'
-        }
 
-        my $ArticleJoinString = 'LEFT OUTER JOIN article ' . $AliasPrefix . 'ta ON ' . $AliasPrefix . 'ta.ticket_id = st.id' . $JoinArticleSuffix;
+        my @AttributePrepareTests = ();
 
-        my @AttributePrepareTests = (
-            {
-                Name      => 'AttributePrepare: SearchIndexModule "' . $SearchIndexModule . '" / UserType "' . $UserType . '" / Attribute "ArticleID"',
-                Parameter => {
-                    Attribute => 'ArticleID',
-                    UserType  => $UserType
-                },
-                Expected  => {
-                    Column => 'ta.id',
-                    SQLDef => {
-                        Join => [ $ArticleJoinString ],
-                    }
-                }
-            },
-            {
-                Name      => 'AttributePrepare: SearchIndexModule "' . $SearchIndexModule . '" / UserType "' . $UserType . '" / Attribute "ArticleID" / PrepareType "Select"',
-                Parameter => {
-                    Attribute   => 'ArticleID',
-                    PrepareType => 'Select',
-                    UserType    => $UserType
-                },
-                Expected  => {
-                    Column => 'ta.id',
-                    SQLDef => {
-                        Join => [ $ArticleJoinString ],
-                    }
-                }
-            },
-            {
-                Name      => 'AttributePrepare: SearchIndexModule "' . $SearchIndexModule . '" / UserType "' . $UserType . '" / Attribute "ArticleID" / PrepareType "Condition"',
-                Parameter => {
-                    Attribute   => 'ArticleID',
-                    PrepareType => 'Condition',
-                    UserType    => $UserType
-                },
-                Expected  => {
-                    Column       => 'ta.id',
-                    SQLDef       => {
-                        Join => [ $ArticleJoinString ],
-                    },
+        for my $PrepareType ( qw( none Select Condition Sort Fulltext ) ) {
+
+            my $AliasPrefix = q{};
+            my $TableSuffix = q{};
+            # prepare suffix for static article
+            if (
+                $SearchIndexModule eq 'StaticDB'
+                && $PrepareType eq 'Condition'
+            ) {
+                $AliasPrefix = 's_';
+                $TableSuffix = '_search';
+            }
+
+            my $JoinArticleSuffix = q{};
+            # prepare suffix for article join
+            if ( $UserType eq 'Customer' ) {
+                $JoinArticleSuffix = ' AND ' . $AliasPrefix . 'ta.customer_visible = 1'
+            }
+
+            my %SpecExpected = ();
+            if ( $PrepareType eq 'Condition' ) {
+                %SpecExpected = (
                     ConditionDef => {
                         ValueType => 'NUMERIC',
                         NULLValue => 1
                     }
-                }
-            },
-            {
-                Name      => 'AttributePrepare: SearchIndexModule "' . $SearchIndexModule . '" / UserType "' . $UserType . '" / Attribute "ArticleID" / PrepareType "Sort"',
-                Parameter => {
-                    Attribute   => 'ArticleID',
-                    PrepareType => 'Sort',
-                    UserType    => $UserType
-                },
-                Expected  => {
-                    Column => 'ta.id',
-                    SQLDef => {
-                        Join => [ $ArticleJoinString ],
+                );
+            }
+
+            my $ArticleJoinString = 'LEFT OUTER JOIN article'
+                . $TableSuffix
+                . q{ }
+                . $AliasPrefix
+                . 'ta ON '
+                . $AliasPrefix
+                . 'ta.ticket_id = st.id'
+                . $JoinArticleSuffix;
+
+            push (
+                @AttributePrepareTests,
+                {
+                    Name      => 'AttributePrepare: SearchIndexModule "' . $SearchIndexModule . '" / UserType "' . $UserType . '" / PrepareType "' . $PrepareType . '" / Attribute "ArticleID"',
+                    Parameter => {
+                        Attribute   => 'ArticleID',
+                        UserType    => $UserType,
+                        PrepareType => $PrepareType
+                    },
+                    Expected  => {
+                        Column => $AliasPrefix . 'ta.id',
+                        SQLDef => {
+                            Join => [ $ArticleJoinString ]
+                        },
+                        %SpecExpected
                     }
                 }
-            },
-            {
-                Name      => 'AttributePrepare: SearchIndexModule "' . $SearchIndexModule . '" / UserType "' . $UserType . '" / Attribute "ArticleID" / PrepareType "Fulltext"',
-                Parameter => {
-                    Attribute   => 'ArticleID',
-                    PrepareType => 'Fulltext',
-                    UserType    => $UserType
-                },
-                Expected  => {
-                    Column => 'ta.id',
-                    SQLDef => {
-                        Join => [ $ArticleJoinString ],
-                    }
-                }
-            },
-        );
+            );
+        }
+
         for my $Test ( @AttributePrepareTests ) {
             my $Result = $AttributeObject->AttributePrepare(
                 %{ $Test->{Parameter} },
