@@ -94,8 +94,22 @@ sub Run {
     ) {
         my %BasePermissionQueueIDs;
 
+        my $UserID = $Self->{Authorization}->{UserID};
+        if (
+            $Param{Data}->{requiredPermission}->{Object}
+            && $Param{Data}->{requiredPermission}->{Object} eq 'User'
+        ) {
+            # return empty list, when no user id is given for permission
+            if ( !$Param{Data}->{requiredPermission}->{ObjectID} ) {
+                return $Self->_Success(
+                    Queue => [],
+                );
+            }
+            $UserID = $Param{Data}->{requiredPermission}->{ObjectID};
+        }
+
         my $Result = $Kernel::OM->Get('Ticket')->BasePermissionRelevantObjectIDList(
-            UserID       => $Self->{Authorization}->{UserID},
+            UserID       => $UserID,
             UsageContext => $Self->{Authorization}->{UserType},
             Permission   => $Param{Data}->{requiredPermission}->{Permission},
         );
@@ -119,6 +133,18 @@ sub Run {
             %QueueList = %BasePermissionQueueIDs;
         } elsif ( $Result ne 1 ) {
             %QueueList = ();
+        }
+        else {
+            my $HasPermission = $Kernel::OM->Get('User')->CheckResourcePermission(
+                UserID              => $UserID,
+                UsageContext        => $Self->{Authorization}->{UserType},
+                Target              => '/tickets',
+                RequestedPermission => $Param{Data}->{requiredPermission}->{Permission},
+            );
+
+            if ( !$HasPermission ) {
+                %QueueList = ();
+            }
         }
 
         $Self->AddCacheKeyExtension(
