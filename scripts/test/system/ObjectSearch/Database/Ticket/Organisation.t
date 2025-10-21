@@ -46,7 +46,7 @@ $Self->IsDeeply(
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 0,
-            Operators      => ['EQ','NE','IN','!IN','GT','GTE','LT','LTE'],
+            Operators      => ['EMPTY','EQ','NE','IN','!IN','GT','GTE','LT','LTE'],
             ValueType      => 'NUMERIC'
         },
         Organisation => {
@@ -54,14 +54,14 @@ $Self->IsDeeply(
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 1,
-            Operators      => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            Operators      => ['EMPTY','EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
         OrganisationNumber => {
             IsSelectable   => 1,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 1,
-            Operators      => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            Operators      => ['EMPTY','EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         }
     },
     'GetSupportedAttributes provides expected data'
@@ -289,6 +289,34 @@ my @SearchTests = (
         }
     },
     {
+        Name         => "Search: valid search / Field OrganisationID / Operator EMPTY / Value 1",
+        Search       => {
+            Field    => 'OrganisationID',
+            Operator => 'EMPTY',
+            Value    => 1
+        },
+        Expected     => {
+            'Join'  => [],
+            'Where' => [
+                'st.organisation_id IS NULL'
+            ]
+        }
+    },
+    {
+        Name         => "Search: valid search / Field OrganisationID / Operator EMPTY / Value 0",
+        Search       => {
+            Field    => 'OrganisationID',
+            Operator => 'EMPTY',
+            Value    => 0
+        },
+        Expected     => {
+            'Join'  => [],
+            'Where' => [
+                'st.organisation_id IS NOT NULL'
+            ]
+        }
+    },
+    {
         Name         => "Search: valid search / Field Organisation / Operator EQ",
         Search       => {
             Field    => 'Organisation',
@@ -445,6 +473,38 @@ my @SearchTests = (
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(torg.name) LIKE \'test\'' : 'torg.name LIKE \'test\''
+            ]
+        }
+    },
+    {
+        Name         => "Search: valid search / Field Organisation / Operator EMPTY / Value 1",
+        Search       => {
+            Field    => 'Organisation',
+            Operator => 'EMPTY',
+            Value    => 1
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT OUTER JOIN organisation torg ON torg.id = st.organisation_id'
+            ],
+            'Where' => [
+                '(torg.name = \'\' OR torg.name IS NULL)'
+            ]
+        }
+    },
+    {
+        Name         => "Search: valid search / Field Organisation / Operator EMPTY / Value 0",
+        Search       => {
+            Field    => 'Organisation',
+            Operator => 'EMPTY',
+            Value    => 0
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT OUTER JOIN organisation torg ON torg.id = st.organisation_id'
+            ],
+            'Where' => [
+                '(torg.name != \'\' AND torg.name IS NOT NULL)'
             ]
         }
     },
@@ -607,7 +667,39 @@ my @SearchTests = (
                 $CaseSensitive ? 'LOWER(torg.number) LIKE \'test\'' : 'torg.number LIKE \'test\''
             ]
         }
-    }
+    },
+    {
+        Name         => "Search: valid search / Field OrganisationNumber / Operator EMPTY / Value 1",
+        Search       => {
+            Field    => 'OrganisationNumber',
+            Operator => 'EMPTY',
+            Value    => 1
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT OUTER JOIN organisation torg ON torg.id = st.organisation_id'
+            ],
+            'Where' => [
+                '(torg.number = \'\' OR torg.number IS NULL)'
+            ]
+        }
+    },
+    {
+        Name         => "Search: valid search / Field OrganisationNumber / Operator EMPTY / Value 0",
+        Search       => {
+            Field    => 'OrganisationNumber',
+            Operator => 'EMPTY',
+            Value    => 0
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT OUTER JOIN organisation torg ON torg.id = st.organisation_id'
+            ],
+            'Where' => [
+                '(torg.number != \'\' AND torg.number IS NOT NULL)'
+            ]
+        }
+    },
 );
 for my $Test ( @SearchTests ) {
     my $Result = $AttributeObject->Search(
@@ -941,6 +1033,32 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID2, $TicketID3]
     },
     {
+        Name     => "Search: Field OrganisationID / Operator EMPTY / Value 1",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'OrganisationID',
+                    Operator => 'EMPTY',
+                    Value    => 1
+                }
+            ]
+        },
+        Expected => [$TicketID4]
+    },
+    {
+        Name     => "Search: Field OrganisationID / Operator EMPTY / Value 0",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'OrganisationID',
+                    Operator => 'EMPTY',
+                    Value    => 0
+                }
+            ]
+        },
+        Expected => [$TicketID1,$TicketID2,$TicketID3]
+    },
+    {
         Name     => "Search: Field Organisation / Operator EQ / Value \$OrganisationName2",
         Search   => {
             'AND' => [
@@ -1084,6 +1202,32 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID2]
     },
     {
+        Name     => "Search: Field Organisation / Operator EMPTY / Value 1",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Organisation',
+                    Operator => 'EMPTY',
+                    Value    => 1
+                }
+            ]
+        },
+        Expected => [$TicketID4]
+    },
+    {
+        Name     => "Search: Field Organisation / Operator EMPTY / Value 0",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Organisation',
+                    Operator => 'EMPTY',
+                    Value    => 0
+                }
+            ]
+        },
+        Expected => [$TicketID1,$TicketID2,$TicketID3]
+    },
+    {
         Name     => "Search: Field OrganisationNumber / Operator EQ / Value \$OrganisationNumber2",
         Search   => {
             'AND' => [
@@ -1225,6 +1369,32 @@ my @IntegrationSearchTests = (
             ]
         },
         Expected => [$TicketID2]
+    },
+    {
+        Name     => "Search: Field OrganisationNumber / Operator EMPTY / Value 1",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'OrganisationNumber',
+                    Operator => 'EMPTY',
+                    Value    => 1
+                }
+            ]
+        },
+        Expected => [$TicketID4]
+    },
+    {
+        Name     => "Search: Field OrganisationNumber / Operator EMPTY / Value 0",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'OrganisationNumber',
+                    Operator => 'EMPTY',
+                    Value    => 0
+                }
+            ]
+        },
+        Expected => [$TicketID1,$TicketID2,$TicketID3]
     }
 );
 for my $Test ( @IntegrationSearchTests ) {
