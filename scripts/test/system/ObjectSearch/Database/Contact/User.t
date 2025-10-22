@@ -736,7 +736,6 @@ for my $Test ( @SortTests ) {
     );
 }
 
-
 ### Integration Test ###
 # discard current object search object
 $Kernel::OM->ObjectsDiscard(
@@ -1411,7 +1410,7 @@ my @IntegrationSortTests = (
                 Field => 'UserID'
             }
         ],
-        Expected => ['1',$ContactID1,$ContactID2,$ContactID3,$ContactID4]
+        Expected => $OrderByNull eq 'LAST' ? ['1',$ContactID1,$ContactID2,$ContactID3,$ContactID4] : [$ContactID4,'1',$ContactID1,$ContactID2,$ContactID3]
     },
     {
         Name     => 'Sort: Field UserID / Direction ascending',
@@ -1421,7 +1420,7 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => ['1',$ContactID1,$ContactID2,$ContactID3,$ContactID4]
+        Expected => $OrderByNull eq 'LAST' ? ['1',$ContactID1,$ContactID2,$ContactID3,$ContactID4] : [$ContactID4,'1',$ContactID1,$ContactID2,$ContactID3]
     },
     {
         Name     => 'Sort: Field UserID / Direction descending',
@@ -1431,7 +1430,7 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Expected => [$ContactID4,$ContactID3,$ContactID2,$ContactID1,'1']
+        Expected => $OrderByNull eq 'LAST' ? [$ContactID4,$ContactID3,$ContactID2,$ContactID1,'1'] : [$ContactID3,$ContactID2,$ContactID1,'1',$ContactID4]
     },
     {
         Name     => 'Sort: Field AssignedUserID',
@@ -1440,7 +1439,7 @@ my @IntegrationSortTests = (
                 Field => 'AssignedUserID'
             }
         ],
-        Expected => ['1',$ContactID1,$ContactID2,$ContactID3,$ContactID4]
+        Expected => $OrderByNull eq 'LAST' ? ['1',$ContactID1,$ContactID2,$ContactID3,$ContactID4] : [$ContactID4,'1',$ContactID1,$ContactID2,$ContactID3]
     },
     {
         Name     => 'Sort: Field AssignedUserID / Direction ascending',
@@ -1450,7 +1449,7 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => ['1',$ContactID1,$ContactID2,$ContactID3,$ContactID4]
+        Expected => $OrderByNull eq 'LAST' ? ['1',$ContactID1,$ContactID2,$ContactID3,$ContactID4] : [$ContactID4,'1',$ContactID1,$ContactID2,$ContactID3]
     },
     {
         Name     => 'Sort: Field AssignedUserID / Direction descending',
@@ -1460,7 +1459,7 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Expected => [$ContactID4,$ContactID3,$ContactID2,$ContactID1,'1']
+        Expected => $OrderByNull eq 'LAST' ? [$ContactID4,$ContactID3,$ContactID2,$ContactID1,'1'] : [$ContactID3,$ContactID2,$ContactID1,'1',$ContactID4]
     },
     {
         Name     => 'Sort: Field Login',
@@ -1469,7 +1468,9 @@ my @IntegrationSortTests = (
                 Field => 'Login'
             }
         ],
-        Expected => $CaseSensitive ? [$ContactID1,$ContactID3,'1',$ContactID2,$ContactID4] : ['1',$ContactID1,$ContactID2,$ContactID3,$ContactID4]
+        Expected => $CaseSensitive
+            ? $OrderByNull eq 'LAST' ? [$ContactID1,$ContactID3,'1',$ContactID2,$ContactID4] : [$ContactID4,$ContactID1,$ContactID3,'1',$ContactID2]
+            : $OrderByNull eq 'LAST' ? ['1',$ContactID1,$ContactID2,$ContactID3,$ContactID4] : [$ContactID4,'1',$ContactID1,$ContactID2,$ContactID3]
     },
     {
         Name     => 'Sort: Field Login / Direction ascending',
@@ -1479,7 +1480,9 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => $CaseSensitive ? [$ContactID1,$ContactID3,'1',$ContactID2,$ContactID4] : ['1',$ContactID1,$ContactID2,$ContactID3,$ContactID4]
+        Expected => $CaseSensitive
+            ? $OrderByNull eq 'LAST' ? [$ContactID1,$ContactID3,'1',$ContactID2,$ContactID4] : [$ContactID4,$ContactID1,$ContactID3,'1',$ContactID2]
+            : $OrderByNull eq 'LAST' ? ['1',$ContactID1,$ContactID2,$ContactID3,$ContactID4] : [$ContactID4,'1',$ContactID1,$ContactID2,$ContactID3]
     },
     {
         Name     => 'Sort: Field Login / Direction descending',
@@ -1489,7 +1492,9 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Expected => $CaseSensitive ? [$ContactID4,$ContactID2,'1',$ContactID3,$ContactID1] : [$ContactID4,$ContactID3,$ContactID2,$ContactID1,'1']
+        Expected => $CaseSensitive
+            ? $OrderByNull eq 'LAST' ? [$ContactID4,$ContactID2,'1',$ContactID3,$ContactID1] : [$ContactID2,'1',$ContactID3,$ContactID1,$ContactID4]
+            : $OrderByNull eq 'LAST' ? [$ContactID4,$ContactID3,$ContactID2,$ContactID1,'1'] : [$ContactID3,$ContactID2,$ContactID1,'1',$ContactID4]
     },
     {
         Name     => 'Sort: Field UserLogin',
@@ -1498,7 +1503,9 @@ my @IntegrationSortTests = (
                 Field => 'UserLogin'
             }
         ],
-        Expected => $CaseSensitive ? [$ContactID1,$ContactID3,'1',$ContactID2,$ContactID4] : ['1',$ContactID1,$ContactID2,$ContactID3,$ContactID4]
+        Expected => $CaseSensitive
+            ? $OrderByNull eq 'LAST' ? [$ContactID1,$ContactID3,'1',$ContactID2,$ContactID4] : [$ContactID4,$ContactID1,$ContactID3,'1',$ContactID2]
+            : $OrderByNull eq 'LAST' ? ['1',$ContactID1,$ContactID2,$ContactID3,$ContactID4] : [$ContactID4,'1',$ContactID1,$ContactID2,$ContactID3]
     },
     {
         Name     => 'Sort: Field UserLogin / Direction ascending',
@@ -1508,7 +1515,9 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => $CaseSensitive ? [$ContactID1,$ContactID3,'1',$ContactID2,$ContactID4] : ['1',$ContactID1,$ContactID2,$ContactID3,$ContactID4]
+        Expected => $CaseSensitive
+            ? $OrderByNull eq 'LAST' ? [$ContactID1,$ContactID3,'1',$ContactID2,$ContactID4] : [$ContactID4,$ContactID1,$ContactID3,'1',$ContactID2]
+            : $OrderByNull eq 'LAST' ? ['1',$ContactID1,$ContactID2,$ContactID3,$ContactID4] : [$ContactID4,'1',$ContactID1,$ContactID2,$ContactID3]
     },
     {
         Name     => 'Sort: Field UserLogin / Direction descending',
@@ -1518,7 +1527,9 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Expected => $CaseSensitive ? [$ContactID4,$ContactID2,'1',$ContactID3,$ContactID1] : [$ContactID4,$ContactID3,$ContactID2,$ContactID1,'1']
+        Expected => $CaseSensitive
+            ? $OrderByNull eq 'LAST' ? [$ContactID4,$ContactID2,'1',$ContactID3,$ContactID1] : [$ContactID2,'1',$ContactID3,$ContactID1,$ContactID4]
+            : $OrderByNull eq 'LAST' ? [$ContactID4,$ContactID3,$ContactID2,$ContactID1,'1'] : [$ContactID3,$ContactID2,$ContactID1,'1',$ContactID4]
     }
 );
 for my $Test ( @IntegrationSortTests ) {
