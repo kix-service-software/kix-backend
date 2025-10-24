@@ -64,8 +64,9 @@ sub new {
     }
 
     # define cache settings
-    $Self->{CacheType} = 'GeneralCatalog';
-    $Self->{CacheTTL}  = 60 * 60 * 3;
+    $Self->{CacheType}   = 'GeneralCatalog';
+    $Self->{OSCacheType} = 'ObjectSearch_GeneralCatalog';
+    $Self->{CacheTTL}    = 60 * 60 * 3;
 
     return $Self;
 }
@@ -169,6 +170,11 @@ sub ClassRename {
     # reset cache
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
+    );
+
+    # reset cache object search
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{OSCacheType},
     );
 
     # rename general catalog class
@@ -535,11 +541,6 @@ sub ItemAdd {
         return;
     }
 
-    # reset cache
-    $Kernel::OM->Get('Cache')->CleanUp(
-        Type => $Self->{CacheType},
-    );
-
     # insert new item
     return if !$Kernel::OM->Get('DB')->Do(
         SQL => 'INSERT INTO general_catalog '
@@ -567,6 +568,16 @@ sub ItemAdd {
     while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         $ItemID = $Row[0];
     }
+
+    # reset cache
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
+
+    # reset cache object search
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{OSCacheType},
+    );
 
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
@@ -698,6 +709,11 @@ sub ItemUpdate {
         Type => $Self->{CacheType},
     );
 
+    # reset cache object search
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{OSCacheType},
+    );
+
     my $Result = $Kernel::OM->Get('DB')->Do(
         SQL => 'UPDATE general_catalog SET '
             . 'name = ?, valid_id = ?, comments = ?, '
@@ -801,6 +817,11 @@ sub GeneralCatalogPreferencesSet {
         Type => $Self->{CacheType},
     );
 
+    # reset cache object search
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{OSCacheType},
+    );
+
     return $Self->{PreferencesObject}->GeneralCatalogPreferencesSet(@_);
 }
 
@@ -865,6 +886,11 @@ sub GeneralCatalogItemDelete {
     # reset cache
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
+    );
+
+    # reset cache object search
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{OSCacheType},
     );
 
     # push client callback event
