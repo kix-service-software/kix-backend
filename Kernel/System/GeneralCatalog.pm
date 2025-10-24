@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
+# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -82,6 +82,14 @@ return an array reference of all general catalog classes
 sub ClassList {
     my ( $Self, %Param ) = @_;
 
+    # check if result is already cached
+    my $CacheKey = 'ClassList';
+    my $Cache = $Kernel::OM->Get('Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return $Cache if $Cache;
+
     # ask database
     $Kernel::OM->Get('DB')->Prepare(
         SQL => 'SELECT DISTINCT(general_catalog_class) '
@@ -95,7 +103,6 @@ sub ClassList {
     }
 
     # cache the result
-    my $CacheKey = 'ClassList';
     $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
