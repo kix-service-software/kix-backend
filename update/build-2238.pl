@@ -31,7 +31,7 @@ use vars qw(%INC);
 # update object icon for depl state Expired
 _UpdateDeplStateExpiredIcon();
 
-sub _UpdateTicketAttachmentCounters {
+sub _UpdateDeplStateExpiredIcon {
     my ( $Self, %Param ) = @_;
 
     # get item id of depl state Production
