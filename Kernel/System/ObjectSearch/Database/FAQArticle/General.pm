@@ -70,8 +70,17 @@ sub Search {
         Language => 'f.language'
     );
 
+    # temporary special handling for Keywords with IN-Operations
+    my $Operator = $Param{Search}->{Operator};
+    if (
+        $Param{Search}->{Field} eq 'Keywords'
+        && $Param{Search}->{Operator} eq 'IN'
+    ) {
+        $Operator = 'CONTAINS';
+    }
+
     my $Condition = $Self->_GetCondition(
-        Operator        => $Param{Search}->{Operator},
+        Operator        => $Operator,
         Column          => $AttributeMapping{$Param{Search}->{Field}},
         Value           => $Param{Search}->{Value},
         NULLValue       => 1,
