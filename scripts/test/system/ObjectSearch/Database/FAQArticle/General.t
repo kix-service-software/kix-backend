@@ -377,7 +377,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                $CaseSensitive ? 'LOWER(f.f_keywords) IN (\'test\')' : 'f.f_keywords IN (\'test\')'
+                $CaseSensitive ? 'LOWER(f.f_keywords) LIKE \'%test%\'' : 'f.f_keywords LIKE \'%test%\''
             ]
         }
     },
