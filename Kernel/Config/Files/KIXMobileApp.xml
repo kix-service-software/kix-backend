@@ -57,5 +57,17 @@
             </Hash>
         </Setting>
     </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="KIXMobileApp::TimeAccounting::Disabled" Required="0" Valid="0">
+        <Description Translatable="1">Dis-/Enables time accounting in the connected KIX Field Agent app. Enable this configuration key and keep a value not equals 0 (nor empty), in order to disable time accounting within the KIX Field Agent app for any ticket.</Description>
+        <Group>KIXMobileApp</Group>
+        <SubGroup>TimeAccounting</SubGroup>
+        <Context>mobile-app</Context>
+        <Setting>
+            <Option SelectedID="1">
+                <Item Key="0">false</Item>
+                <Item Key="1">true</Item>
+            </Option>
+        </Setting>
+    </ConfigItem>
 
 </kix_config>
