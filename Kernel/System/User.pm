@@ -1816,6 +1816,16 @@ sub SetPreferences {
     # set preferences
     my $Result = $PreferencesObject->SetPreferences(%Param);
 
+    # trigger event
+    $Self->EventHandler(
+        Event  => 'UserSetPreferences',
+        Data   => {
+            UserID => $Param{UserID},
+            Key    => $Param{Key},
+        },
+        UserID => 1,
+    );
+
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
