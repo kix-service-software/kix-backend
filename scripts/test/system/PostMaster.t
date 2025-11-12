@@ -153,6 +153,34 @@ $Kernel::OM->Get('Config')->Set(
     Key => 'Ticket::EventModulePost###TicketDynamicFieldDefault',
 );
 
+# check log when To header is missing
+my $Location = $Kernel::OM->Get('Config')->Get('Home')
+    . "/scripts/test/system/sample/PostMaster/PostMaster-Test-NoToHeader.box";
+my $ContentRef = $Kernel::OM->Get('Main')->FileRead(
+    Location => $Location,
+    Mode     => 'binmode',
+    Result   => 'ARRAY',
+);
+{
+    my $PostMasterObject = Kernel::System::PostMaster->new(
+        Email => $ContentRef,
+    );
+
+    $PostMasterObject->Run();
+}
+
+my $Message = $Kernel::OM->Get('Log')->GetLogEntry(
+    Type  => 'info',   
+    What  => 'Message',
+    Index => -3,
+);
+ $Self->Is(
+     $Message,
+     'Email (<20011221002814.A3599.no.to.header@avro>) contains no To header.',
+     'log message when To header is missing',
+ );
+
+
 # use different subject format
 for my $TicketSubjectConfig ( 'Right', 'Left' ) {
     $Kernel::OM->Get('Config')->Set(
