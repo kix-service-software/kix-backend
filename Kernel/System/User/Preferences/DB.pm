@@ -68,7 +68,7 @@ sub SetPreferences {
 
     # prepare multiple values (i.e. MyQueues, MyServices, ...)
     my @Values;
-    if ( IsArrayRefWithData($Param{Value}) ) {
+    if ( IsArrayRef($Param{Value}) ) {
         @Values = @{$Param{Value}};
     }
     else {
