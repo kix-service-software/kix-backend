@@ -11,7 +11,7 @@ Feature: GET request to the /cmdb/configitems/:ConfigitemID/images resource
     When I get the configitem image from configitem
     Then the response code is 200
 #    And the response object is ConfigItemImageResponse
-    And the attribute "Image.Comment" is "this is a test"
+    And the attribute "Image.Comment" is "this is a test2"
     When I delete this configitem
     Then the response code is 204
     And the response has no content

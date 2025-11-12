@@ -176,6 +176,7 @@ Then qr/the response contains the following items type of (.*?)$/, sub {
 };
 
 Then qr/attribute "(.*?)" of the "(.*?)" item (\d+) is "(.*?)"$/, sub {
+    S->{ResponseContent}->{$2}->{$1} =~ s/\s*$//;
     is(S->{ResponseContent}->{$2}->{$1}, $4, 'Check attribute value in response');
 };
 

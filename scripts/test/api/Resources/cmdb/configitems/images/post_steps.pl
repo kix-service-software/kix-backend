@@ -56,10 +56,10 @@ When qr/added image to a configitem$/, sub {
       Token   => S->{Token},
       Content => {
 	      Image => {
-	        Comment     => "this is a test",
+	        Comment     => "this is a test2",
 	        Content     => "....",
 	        ContentType => "image/jpeg",
-	        Filename    => "test123.jpg"
+	        Filename    => "test1232.jpg"
 	      }
 	  }
    );
