@@ -1042,11 +1042,6 @@
         <SubGroup>Core::TicketStateWorkflow</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="Incident">processing</Item>
-                <Item Key="Problem">new</Item>
-                <Item Key="Service Request">processing</Item>
-                <Item Key="RfC">processing</Item>
-                <Item Key="Event">new</Item>
             </Hash>
         </Setting>
     </ConfigItem>
