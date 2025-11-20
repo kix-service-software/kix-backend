@@ -37,7 +37,6 @@ sub new {
 
     # Debug 0=off 1=on
     $Self->{Debug}                        = $Param{Config}->{Debug} || 0;
-    $Self->{Die}                          = $Param{Config}->{Die} || 1;
     $Self->{Host}                         = $Param{Config}->{Host} || '';
     $Self->{BaseDN}                       = $Param{Config}->{BaseDN} || '';
     $Self->{UID}                          = $Param{Config}->{UID} || 'uid';
@@ -94,10 +93,6 @@ sub Sync {
     # ldap connect and bind (maybe with SearchUserDN and SearchUserPw)
     my $LDAP = Net::LDAP->new( $Self->{Host}, %{ $Self->{Params} } );
     if ( !$LDAP ) {
-        if ( $Self->{Die} ) {
-            die "Can't connect to $Self->{Host}: $@";
-        }
-
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Can't connect to $Self->{Host}: $@",
@@ -725,22 +720,49 @@ sub Sync {
 
     # compare role permissions from ldap with current user role permissions and update if necessary
     if ( %RolesFromLDAP ) {
-
-        # cleanup all user roles
-        my $Success = $Kernel::OM->Get('Role')->RoleUserDelete(
+        # get current user roles
+        my @ExistingRoleIDs = $Kernel::OM->Get('Role')->UserRoleList(
             UserID             => $UserID,
             IgnoreContextRoles => 1,
         );
-        if ( !$Success ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Unable to cleanup role assignments of user \"$Param{User}\" (UserID: $UserID)!",
-            );
+
+        my @RoleIDsToDelete = ();
+        for my $RoleID ( @ExistingRoleIDs ) {
+            # existing role is not assigned anymore
+            if ( !$RolesFromLDAP{ $RoleID } ) {
+                push( @RoleIDsToDelete, $RoleID );
+            }
+            # existing role is unchanged
+            else {
+                delete( $RolesFromLDAP{ $RoleID } );
+            }
         }
 
+        # revoke existing roles not assigned anymore
+        if ( @RoleIDsToDelete ) {
+            my $Success = $Kernel::OM->Get('Role')->RoleUserDelete(
+                UserID             => $UserID,
+                RoleIDs            => \@RoleIDsToDelete,
+                IgnoreContextRoles => 1,
+            );
+            if ( !$Success ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Unable to revoke role assignments (RoleIDs: " . join( ', ', @RoleIDsToDelete ) . ") of user \"$Param{User}\" (UserID: $UserID)!",
+                );
+            }
+        }
+
+        # apply not existing roles from ldap
         ROLEID:
         for my $RoleID ( sort( keys( %RolesFromLDAP ) ) ) {
             next ROLEID if ( !$RolesFromLDAP{ $RoleID } );
+
+            # ignore context roles
+            next ROLEID if (
+                $SystemRoles{ $RoleID } eq 'Agent User'
+                || $SystemRoles{ $RoleID } eq 'Customer'
+            );
 
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'notice',

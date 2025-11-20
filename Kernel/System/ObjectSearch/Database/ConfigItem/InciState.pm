@@ -70,7 +70,7 @@ sub Search {
 
         if ( $Param{Search}->{Field} eq 'InciState' ) {
             if ( !$Param{Flags}->{JoinMap}->{ConfigItemVersionInciState} ) {
-                push( @SQLJoin, 'INNER JOIN general_catalog civis ON civis.id = civ.inci_state_id AND general_catalog_class = \'ITSM::Core::IncidentState\'' );
+                push( @SQLJoin, 'INNER JOIN general_catalog civis ON civis.id = civ.inci_state_id AND civis.general_catalog_class = \'ITSM::Core::IncidentState\'' );
 
                 $Param{Flags}->{JoinMap}->{ConfigItemVersionInciState} = 1;
             }
@@ -78,7 +78,7 @@ sub Search {
     }
     elsif ( $Param{Search}->{Field} eq 'InciState' ) {
         if ( !$Param{Flags}->{JoinMap}->{ConfigItemInciState} ) {
-            push( @SQLJoin, 'INNER JOIN general_catalog ciis ON ciis.id = ci.cur_inci_state_id AND general_catalog_class = \'ITSM::Core::IncidentState\'' );
+            push( @SQLJoin, 'INNER JOIN general_catalog ciis ON ciis.id = ci.cur_inci_state_id AND ciis.general_catalog_class = \'ITSM::Core::IncidentState\'' );
 
             $Param{Flags}->{JoinMap}->{ConfigItemInciState} = 1;
         }
@@ -128,7 +128,7 @@ sub Sort {
     my @SQLJoin = ();
     if ( $Param{Attribute} eq 'InciState' ) {
         if ( !$Param{Flags}->{JoinMap}->{ConfigItemInciStateSort} ) {
-            push( @SQLJoin, 'LEFT OUTER JOIN general_catalog ciis ON ciis.id = ci.cur_inci_state_id AND general_catalog_class = \'ITSM::Core::IncidentState\'' );
+            push( @SQLJoin, 'LEFT OUTER JOIN general_catalog ciis ON ciis.id = ci.cur_inci_state_id AND ciis.general_catalog_class = \'ITSM::Core::IncidentState\'' );
 
             $Param{Flags}->{JoinMap}->{ConfigItemInciStateSort} = 1;
         }

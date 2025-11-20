@@ -377,6 +377,59 @@ $Self->True(
     'QueueLookup() by Name',
 );
 
+%QueueGet = $QueueObject->QueueGet( ID => $QueueID );
+
+my $QueueUpdate = $QueueObject->QueueUpdate(
+    %QueueGet,
+    ValidID => 2,
+    UserID => 1,
+);
+
+$Self->True(
+    $QueueUpdate,
+    'QueueUpdate() set queue ' . $QueueID . ' invalid',
+);
+
+my %QueueList = $QueueObject->QueueList();
+
+$Self->Is(
+    scalar(keys %QueueList),
+    6,
+    'QueueList()',
+);
+
+%QueueList = $QueueObject->QueueList( Valid => 0 );
+
+$Self->Is(
+    scalar(keys %QueueList),
+    7,
+    'QueueList()',
+);
+
+%QueueList = $QueueObject->QueueList( Valid => 1 );
+
+$Self->Is(
+    scalar(keys %QueueList),
+    6,
+    'QueueList() only valid',
+);
+
+%QueueList = $QueueObject->QueueList( IDs => [1,2] );
+
+$Self->Is(
+    scalar(keys %QueueList),
+    2,
+    'QueueList() only IDs 1,2',
+);
+
+%QueueList = $QueueObject->QueueList( IDs => [1, $QueueID], Valid => 1 );
+
+$Self->Is(
+    scalar(keys %QueueList),
+    1,
+    'QueueList() only IDs 1,' . $QueueID . 'and valid',
+);
+
 # rollback transaction on database
 $Helper->Rollback();
 

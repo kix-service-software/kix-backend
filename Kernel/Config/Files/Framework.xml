@@ -7723,129 +7723,174 @@ Notes:
         <Group>Framework</Group>
         <Setting>
             <Object>[
-                {
-                    "Enabled": 0,
-                    "Name": "LDAP Example",
-                    "Module": "Kernel::System::Auth::LDAP",
-                    "Config": {
-                        "Host": "ldap.example.com",
-                        "BaseDN": "dc=example,dc=com",
-                        "UID": "uid",
-                        "GroupDN": "cn=kixallow,ou=posixGroups,dc=example,dc=com",
-                        "AccessAttr": "memberUid",
-                        "UserAttr": "UID",
-                        "SearchUserDN": "cn=binduser,ou=users,dc=example,dc=com",
-                        "SearchUserPw": "some_password",
-                        "AlwaysFilter": "(!objectclass=computer)",
-                        "UserSuffix": "@domain.com",
-                        "Charset": "utf-8",
-                        "Die": 0,
-                        "Params": {
-                            "port": 389,
-                            "timeout": 120,
-                            "async": 0,
-                            "version": 3
+    {
+        "Name": "1st Backend: Customer Contact From LDAP (use mail address as login)",
+        "Enabled": 0,
+        "UsageContext": "Customer",
+        "Module": "Kernel::System::Auth::LDAP",
+        "Config": {
+            "Host": "ldap.example.com",
+            "Params": {
+                "async": 0,
+                "port": 389,
+                "timeout": 10,
+                "version": 3
+            },
+            "BaseDN": "dc=example,dc=com",
+            "AlwaysFilter": "(&amp;(objectclass=person)(mail=*))",
+            "Charset": "utf-8",
+            "SearchUserDN": "cn=read-only-admin,dc=example,dc=com",
+            "SearchUserPw": "password",
+            "GroupDN": "dc=customercontacts,dc=example,dc=com",
+            "AccessAttr": "uid",
+            "UID": "uid",
+            "UserAttr": "UID",
+            "AuthAttr": "mail",
+            "UserSuffix": ""
+        },
+        "Sync": [
+            {
+                "Enabled": 1,
+                "Module": "Kernel::System::Auth::Sync::LDAP",
+                "Config": {
+                    "ContactUserSync": {
+                        "title": "title",
+                        "Email": "mail",
+                        "Firstname": "cn",
+                        "Lastname": "sn",
+                        "UserLogin": "uid",
+                        "Phone": "telephoneNumber",
+                        "Mobile": "mobile",
+                        "Street": "street",
+                        "Zip": "postalCode",
+                        "City": "l",
+                        "Comment": "CONCAT:{departmentNumber} {postalCode}-{l}",
+                        "PrimaryOrganisationID": "SET:1",
+                        "OrganisationIDs": [
+                            "departmentNumber",
+                            "SET:2",
+                            "SET:26"
+                        ],
+                        "ImgThumbNail": "TOBASE64:jpegPhoto",
+                        "DynamicField_Source": "SET:Backend001-D"
+                    },
+                    "GroupDNBasedRoleSync": {
+                        "dc=customercontacts,dc=example,dc=com": {
+                            "Some Customer Role": 1
                         }
                     },
-                    "Sync": [
-                        {
-                            "Enabled": 0,
-                            "Module": "Kernel::System::Auth::Sync::LDAP",
-                            "Config": {
-                                "GroupDNBasedUsageContextSync": {
-                                    "SomeDN": {
-                                        "IsAgent": 1,
-                                        "IsCustomer": 0
-                                    },
-                                    "SomeOtherDN": {
-                                        "IsCustomer": 1
-                                    }
-                                },
-                                "GroupDNBasedRoleSync": {
-                                    "SomeDN": {
-                                        "Role1": 1,
-                                        "Role2": 0,
-                                        "Role3": 1
-                                    }
-                                },
-                                "AttributeBasedRoleSync": {
-                                    "LDAPAttribute": {
-                                        "some value": {
-                                            "Role1": 1,
-                                            "Role2": 0,
-                                            "Role3": 1
-                                        }
-                                    }
-                                },
-                                "ContactUserSync" : {
-                                    "KIXAttribute1" : "LDAPAttribute1",
-                                    "KIXAttribute2" : "LDAPAttribute2",
-                                    "KIXAttribute3" : "SET:some value"
-                                }
+                    "GroupDNBasedUsageContextSync": {
+                        "dc=serviceteam,dc=example,dc=com": {
+                            "IsAgent": 1,
+                            "IsCustomer": 1
+                        },
+                        "dc=agentsonly,dc=example,dc=com": {
+                            "IsAgent": 1,
+                            "IsCustomer": 0
+                        },
+                        "dc=customercontacts,dc=example,dc=com": {
+                            "IsCustomer": 1
+                        },
+                        "dc=externals,dc=example,dc=com": {
+                            "IsCustomer": 1
+                        }
+                    }
+                }
+            }
+        ]
+    },
+    {
+        "Name": "2nd Backend: Agent Users from Active Directory (via multiple LDAPS)",
+        "Enabled": 0,
+        "UsageContext": "Agent",
+        "Module": "Kernel::System::Auth::LDAP",
+        "Config": {
+            "Host": [
+                "ldaps://dc1.example.com",
+                "ldaps://dc2.example.com"
+            ],
+            "Params": {
+                "async": 0,
+                "port": 636,
+                "timeout": 10,
+                "version": 3
+            },
+            "BaseDN": "dc=example,dc=com",
+            "AlwaysFilter": "(&amp;(objectclass=person)(mail=*))",
+            "Charset": "utf-8",
+            "SearchUserDN": "cn=read-only-admin,dc=example,dc=com",
+            "SearchUserPw": "password",
+            "GroupDN": "dc=serviceteam,dc=example,dc=com",
+            "AccessAttr": "member",
+            "UID": "sAMAccountName",
+            "UserAttr": "DN",
+            "UserSuffix": ""
+        },
+        "Sync": [
+            {
+                "Enabled": 1,
+                "Module": "Kernel::System::Auth::Sync::LDAP",
+                "Config": {
+                    "ContactUserSync": {
+                        "Email": "mail",
+                        "Title": "title",
+                        "Firstname": "givenname",
+                        "Lastname": "sn",
+                        "Street": "streetAddress",
+                        "City": "l",
+                        "Zip": "postalCode",
+                        "Phone": "telephoneNumber",
+                        "Mobile": "mobile",
+                        "Fax": "facsimileTelephoneNumber",
+                        "UserLogin": "sAMAccountName",
+                        "PrimaryOrganisationID": "department",
+                        "OrganisationIDs": [
+                            "department",
+                            "SET:13"
+                        ],
+                        "DynamicField_Source": "SET:Backend002-AD"
+                    },
+                    "GroupDNBasedRoleSync": {
+                        "dc=serviceteam,dc=example,dc=com": {
+                            "News Manager": 1,
+                            "Ticket Agent": 1,
+                            "Asset Maintainer": 1,
+                            "Customer Manager": 1,
+                            "FAQ Editor": 1
+                        }
+                    },
+                    "AttributeBasedRoleSync": {
+                        "sAMAccountName": {
+                            "m.mustermann": {
+                                "Superuser": 1
                             }
                         }
-                    ]
-                },
-                {
-                    "Enabled": 0,
-                    "Name": "HTTPBasicAuth Example",
-                    "Module": "Kernel::System::Auth::HTTPBasicAuth",
-                    "Config": {
-                        "Replace": "example_domain\\",
-                        "ReplaceRegExp": "^(.+?)@.+?$"
                     }
-                },
-                {
-                    "Enabled": 0,
-                    "Name": "Radius Example",
-                    "Module": "Kernel::System::Auth::Radius",
-                    "Config": {
-                        "Host": "radiushost",
-                        "Password": "radiussecret",
-                        "Die": 0
-                    }
-                },
-                {
-                    "Enabled": 0,
-                    "Module": "Kernel::System::Auth::ValidUser",
-                    "Name": "Valid User Example",
-                    "UsageContext": "Customer",
-                    "Config": {
-                        "RelevantClientIPs": [
-                            "^172\\..*?$"
-                        ],
-                        "RelevantUsers": [
-                            "mamu"
-                        ]
-                    }
-                },
-                {
-                    "Enabled": 0,
-                    "Name": "Foreign Database",
-                    "Module": "Kernel::System::Auth::DB",
-                    "UsageContext": "Customer",
-                    "Config": {
-                        "DSN": "DBI:mysql:database=customerdb;host=customerdbhost",
-                        "Type": "mysql",
-                        "User": "some_user",
-                        "Password": "come_password",
-                        "Table": "user",
-                        "Columns": {
-                            "ID": "id",
-                            "Login": "login",
-                            "Password": "password"
-                        }
-                    }
-                },
-                {
-                    "Enabled": 1,
-                    "Name": "Local Database",
-                    "Module": "Kernel::System::Auth::DB",
-                    "Config": {}
                 }
+            }
+        ]
+    },
+    {
+        "Name": "Valid User Example",
+        "Enabled": 0,
+        "UsageContext": "Customer",
+        "Module": "Kernel::System::Auth::ValidUser",
+        "Config": {
+            "RelevantClientIPs": [
+                "^172\\..*?$"
+            ],
+            "RelevantUsers": [
+                "mamu"
             ]
-
-            </Object>
+        }
+    },
+    {
+        "Name": "Local Database",
+        "Enabled": 1,
+        "Module": "Kernel::System::Auth::DB",
+        "Config": {}
+    }
+]</Object>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="confidential" Name="MultiFactorAuthentication###000-Default" Required="1" Valid="1" ConfigLevel="200">
@@ -7853,24 +7898,22 @@ Notes:
         <Group>Framework</Group>
         <Setting>
             <Object>[
-                {
-                    "Enabled": 0,
-                    "Name": "TOTP-Example",
-                    "Module": "Kernel::System::Auth::MFA::TOTP",
-                    "UsageContext": "Agent",
-                    "AuthType": "LOGIN",
-                    "Config": {
-                        "TimeStep": 30,
-                        "Digits": 6,
-                        "Algorithm": "SHA1",
-                        "AllowEmptySecret": 1,
-                        "MaxPreviousToken": 0,
-                        "SecretLength": 8
-                    }
-                }
-            ]
-
-            </Object>
+    {
+        "Enabled": 0,
+        "Name": "TOTP-Example",
+        "Module": "Kernel::System::Auth::MFA::TOTP",
+        "UsageContext": "Agent",
+        "AuthType": "LOGIN",
+        "Config": {
+            "TimeStep": 30,
+            "Digits": 6,
+            "Algorithm": "SHA1",
+            "AllowEmptySecret": 1,
+            "MaxPreviousToken": 0,
+            "SecretLength": 8
+        }
+    }
+]</Object>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="confidential" Name="Authentication::MaxLoginFailed" Required="1" Valid="1" ConfigLevel="200">

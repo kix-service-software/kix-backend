@@ -13,6 +13,8 @@ package Kernel::System::Ticket::TicketIndex;
 use strict;
 use warnings;
 
+use Kernel::System::VariableCheck qw(:all);
+
 our @ObjectDependencies = (
     'Config',
     'DB',
@@ -243,25 +245,39 @@ sub TicketIndexGetTicket {
 sub TicketIndexGetQueueStats {
     my ( $Self, %Param ) = @_;
 
-    my $CacheKey = 'TicketIndexGetQueueStats';
+    my @QueueIDs = ();
+    if ( $Param{QueueID} ) {
+        push @QueueIDs, $Param{QueueID};
+    }
+    elsif ( IsArrayRefWithData($Param{QueueIDs}) ) {
+        @QueueIDs = @{$Param{QueueIDs}};
+    }
+
+    my $CacheKey = 'TicketIndexGetQueueStats::'.(join('::', @QueueIDs));
     my $Cached = $Kernel::OM->Get('Cache')->Get(
         Type => 'TicketIndex',
         Key  => $CacheKey,
     );
     return %{$Cached} if $Cached;
 
-    # get database object
-    my $DBObject = $Kernel::OM->Get('DB');
+    my $Where = '';
+    my @Bind;
+
+    if ( @QueueIDs ) {
+        $Where = 'WHERE ti.queue_id IN ('.(join( ',', map { '?' } @QueueIDs)) . ')';;
+        push @Bind, map { \$_ } @QueueIDs;
+    }
 
     # sql query
-    return if !$DBObject->Prepare(
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL => 'SELECT queue_id, '
              . '(SELECT COUNT(*) FROM ticket_index WHERE queue_id = ti.queue_id), '
              . '(SELECT COUNT(*) FROM ticket_index WHERE queue_id = ti.queue_id AND lock_id = 2) '
-             . 'FROM ticket_index ti GROUP BY queue_id',
+             . 'FROM ticket_index ti ' . $Where . ' GROUP BY queue_id',
+        Bind => \@Bind,
     );
 
-    my $Result = $DBObject->FetchAllArrayRef(
+    my $Result = $Kernel::OM->Get('DB')->FetchAllArrayRef(
         Columns => ['QueueID', 'TotalCount', 'LockCount']
     );
 

@@ -62,10 +62,10 @@ $Self->IsDeeply(
     $AttributeList->{'DynamicField_UnitTest'},
     {
         IsSelectable   => 0,
-        IsSearchable   => 0,
+        IsSearchable   => 1,
         IsSortable     => 0,
         IsFulltextable => 0,
-        Operators      => [],
+        Operators      => ['EMPTY'],
         ValueType      => ''
     },
     'GetSupportedAttributes provides expected data'
@@ -134,12 +134,94 @@ my @SearchTests = (
         Expected => undef
     }
 );
+
+for my $UserType ( qw(Agent Customer) ) {
+
+    # prepare suffix for article join
+    my $JoinArticleSuffix = '';
+    if ( $UserType eq 'Customer' ) {
+        $JoinArticleSuffix = ' AND ta.customer_visible = 1'
+    }
+    push( @SearchTests,
+        {
+            Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator EMPTY',
+            Search       => {
+                Field    => 'DynamicField_UnitTest',
+                Operator => 'EMPTY',
+                Value    => 'some text'
+            },
+            UserType => $UserType,
+            Expected => {
+                'IsRelative' => undef,
+                'Join'       => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
+                    'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = ta.id AND dfv_left0.field_id = ' . $DynamicFieldID
+                ],
+                'Where'      => [
+                    '(dfv_left0.value_text = \'\' OR dfv_left0.value_text IS NULL)'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator EMPTY',
+            Search       => {
+                Field    => 'DynamicField_UnitTest',
+                Operator => 'EMPTY',
+                Value    => ''
+            },
+            UserType => $UserType,
+            Expected => {
+                'IsRelative' => undef,
+                'Join'       => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
+                    'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = ta.id AND dfv_left0.field_id = ' . $DynamicFieldID
+                ],
+                'Where'      => [
+                    '(dfv_left0.value_text != \'\' AND dfv_left0.value_text IS NOT NULL)'
+                ]
+            }
+        }
+    );
+}
+
 for my $Test ( @SearchTests ) {
     my $Result = $AttributeObject->Search(
         Search       => $Test->{Search},
         BoolOperator => 'AND',
         UserID       => 1,
+        UserType     => $Test->{UserType} || '',
         Silent       => defined( $Test->{Expected} ) ? 0 : 1
+    );
+    $Self->IsDeeply(
+        $Result,
+        $Test->{Expected},
+        $Test->{Name}
+    );
+}
+
+# check Sort
+my @SortTests = (
+    {
+        Name      => 'Sort: Attribute undef',
+        Attribute => undef,
+        Expected  => undef
+    },
+    {
+        Name      => 'Sort: Attribute invalid',
+        Attribute => 'Test',
+        Expected  => undef
+    },
+    {
+        Name      => 'Sort: Attribute "DynamicField_UnitTest"',
+        Attribute => 'DynamicField_UnitTest',
+        Expected  => undef
+    }
+);
+for my $Test ( @SortTests ) {
+    my $Result = $AttributeObject->Sort(
+        Attribute => $Test->{Attribute},
+        Language  => 'en',
+        Silent    => defined( $Test->{Expected} ) ? 0 : 1
     );
     $Self->IsDeeply(
         $Result,

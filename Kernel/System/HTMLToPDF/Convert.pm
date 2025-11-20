@@ -110,9 +110,14 @@ sub Convert {
             UserID => $Param{UserID},
         );
 
+        my $ObjectType = $Data{Object};
+        if ( $ObjectType eq 'Asset' ) {
+            $ObjectType = 'ITSMConfigItem';
+        }
+
         $Filename = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
             Text       => $Replaced{Text},
-            ObjectType => $Data{Object},
+            ObjectType => $ObjectType,
             ObjectID   => $Param{$IdentifierKey},
             RichText   => 1,
             UserID     => $Param{UserID},

@@ -46,7 +46,7 @@ $Self->IsDeeply(
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 0,
-            Operators      => ['EQ','NE','IN','!IN'],
+            Operators      => ['EMPTY','EQ','NE','IN','!IN'],
             ValueType      => 'NUMERIC'
         },
         AssignedUserID => {
@@ -54,7 +54,7 @@ $Self->IsDeeply(
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 0,
-            Operators      => ['EQ','NE','IN','!IN'],
+            Operators      => ['EMPTY','EQ','NE','IN','!IN'],
             ValueType      => 'NUMERIC'
         },
         Login => {
@@ -62,14 +62,14 @@ $Self->IsDeeply(
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 1,
-            Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            Operators      => ['EMPTY','EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         UserLogin => {
             IsSelectable   => 1,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 1,
-            Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            Operators      => ['EMPTY','EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         }
     },
     'GetSupportedAttributes provides expected data'
@@ -204,6 +204,34 @@ my @SearchTests = (
         }
     },
     {
+        Name         => 'Search: valid search / Field UserID / Operator EMPTY / Value 1',
+        Search       => {
+            Field    => 'UserID',
+            Operator => 'EMPTY',
+            Value    => 1
+        },
+        Expected     => {
+            'Join' => [],
+            'Where' => [
+                'c.user_id IS NULL'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field UserID / Operator EMPTY / Value 0',
+        Search       => {
+            Field    => 'UserID',
+            Operator => 'EMPTY',
+            Value    => 0
+        },
+        Expected     => {
+            'Join' => [],
+            'Where' => [
+                'c.user_id IS NOT NULL'
+            ]
+        }
+    },
+    {
         Name         => 'Search: valid search / Field AssignedUserID / Operator EQ',
         Search       => {
             Field    => 'AssignedUserID',
@@ -256,6 +284,34 @@ my @SearchTests = (
             'Join' => [],
             'Where' => [
                 'c.user_id NOT IN (1)'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field AssignedUserID / Operator EMPTY / Value 1',
+        Search       => {
+            Field    => 'AssignedUserID',
+            Operator => 'EMPTY',
+            Value    => 1
+        },
+        Expected     => {
+            'Join' => [],
+            'Where' => [
+                'c.user_id IS NULL'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field AssignedUserID / Operator EMPTY / Value 0',
+        Search       => {
+            Field    => 'AssignedUserID',
+            Operator => 'EMPTY',
+            Value    => 0
+        },
+        Expected     => {
+            'Join' => [],
+            'Where' => [
+                'c.user_id IS NOT NULL'
             ]
         }
     },
@@ -388,6 +444,40 @@ my @SearchTests = (
         }
     },
     {
+        Name         => 'Search: valid search / Field Login / Operator EMPTY / Value 1',
+        Search       => {
+            Field    => 'Login',
+            Operator => 'EMPTY',
+            Value    => 1
+        },
+        Expected     => {
+            'IsRelative' => undef,
+            'Join'       => [
+                'LEFT JOIN users u0 ON c.user_id = u0.id'
+            ],
+            'Where'      => [
+                '(u0.login = \'\' OR u0.login IS NULL)'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field Login / Operator EMPTY / Value 0',
+        Search       => {
+            Field    => 'Login',
+            Operator => 'EMPTY',
+            Value    => 0
+        },
+        Expected     => {
+            'IsRelative' => undef,
+            'Join'       => [
+                'LEFT JOIN users u0 ON c.user_id = u0.id'
+            ],
+            'Where'      => [
+                '(u0.login != \'\' AND u0.login IS NOT NULL)'
+            ]
+        }
+    },
+    {
         Name         => 'Search: valid search / Field UserLogin / Operator EQ',
         Search       => {
             Field    => 'UserLogin',
@@ -514,6 +604,40 @@ my @SearchTests = (
                 $CaseSensitive ? 'LOWER(u0.login) LIKE \'testlog\'' : 'u0.login LIKE \'testlog\''
             ]
         }
+    },
+    {
+        Name         => 'Search: valid search / Field UserLogin / Operator EMPTY / Value 1',
+        Search       => {
+            Field    => 'UserLogin',
+            Operator => 'EMPTY',
+            Value    => 1
+        },
+        Expected     => {
+            'IsRelative' => undef,
+            'Join'       => [
+                'LEFT JOIN users u0 ON c.user_id = u0.id'
+            ],
+            'Where'      => [
+                '(u0.login = \'\' OR u0.login IS NULL)'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field UserLogin / Operator EMPTY / Value 0',
+        Search       => {
+            Field    => 'UserLogin',
+            Operator => 'EMPTY',
+            Value    => 0
+        },
+        Expected     => {
+            'IsRelative' => undef,
+            'Join'       => [
+                'LEFT JOIN users u0 ON c.user_id = u0.id'
+            ],
+            'Where'      => [
+                '(u0.login != \'\' AND u0.login IS NOT NULL)'
+            ]
+        }
     }
 );
 for my $Test ( @SearchTests ) {
@@ -611,7 +735,6 @@ for my $Test ( @SortTests ) {
         $Test->{Name}
     );
 }
-
 
 ### Integration Test ###
 # discard current object search object
@@ -719,6 +842,16 @@ $Self->True(
     $ContactID3,
     'Contact for third user created'
 );
+my $ContactID4 = $Kernel::OM->Get('Contact')->ContactAdd(
+    Firstname             => $Helper->GetRandomID(),
+    Lastname              => $Helper->GetRandomID(),
+    ValidID               => 1,
+    UserID                => 1
+);
+$Self->True(
+    $ContactID4,
+    'fourth contact without user'
+);
 
 # discard contact object to process events
 $Kernel::OM->ObjectsDiscard(
@@ -756,7 +889,7 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => ['1',$ContactID2,$ContactID3]
+        Expected => ['1',$ContactID2,$ContactID3,$ContactID4]
     },
     {
         Name     => "Search: Field UserID / Operator IN / Value [\$UserID1,\$UserID3]",
@@ -785,6 +918,32 @@ my @IntegrationSearchTests = (
         Expected => ['1',$ContactID2]
     },
     {
+        Name     => "Search: Field UserID / Operator EMPTY / Value 1",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'UserID',
+                    Operator => 'EMPTY',
+                    Value    => 1
+                }
+            ]
+        },
+        Expected => [$ContactID4]
+    },
+    {
+        Name     => "Search: Field UserID / Operator EMPTY / Value 0",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'UserID',
+                    Operator => 'EMPTY',
+                    Value    => 0
+                }
+            ]
+        },
+        Expected => ['1',$ContactID1,$ContactID2,$ContactID3]
+    },
+    {
         Name     => "Search: Field AssignedUserID / Operator EQ / Value \$UserID1",
         Search   => {
             'AND' => [
@@ -808,7 +967,7 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => ['1',$ContactID2,$ContactID3]
+        Expected => ['1',$ContactID2,$ContactID3,$ContactID4]
     },
     {
         Name     => "Search: Field AssignedUserID / Operator IN / Value [\$UserID1,\$UserID3]",
@@ -837,6 +996,32 @@ my @IntegrationSearchTests = (
         Expected => ['1',$ContactID2]
     },
     {
+        Name     => "Search: Field AssignedUserID / Operator EMPTY / Value 1",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'AssignedUserID',
+                    Operator => 'EMPTY',
+                    Value    => 1
+                }
+            ]
+        },
+        Expected => [$ContactID4]
+    },
+    {
+        Name     => "Search: Field AssignedUserID / Operator EMPTY / Value 0",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'AssignedUserID',
+                    Operator => 'EMPTY',
+                    Value    => 0
+                }
+            ]
+        },
+        Expected => ['1',$ContactID1,$ContactID2,$ContactID3]
+    },
+    {
         Name     => "Search: Field Login / Operator EQ / Value \$UserLogin1",
         Search   => {
             'AND' => [
@@ -860,7 +1045,7 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => ['1',$ContactID2,$ContactID3]
+        Expected => ['1',$ContactID2,$ContactID3,$ContactID4]
     },
     {
         Name     => "Search: Field Login / Operator IN / Value [\$UserLogin1,\$UserLogin2]",
@@ -993,6 +1178,32 @@ my @IntegrationSearchTests = (
         Expected => [$ContactID3]
     },
     {
+        Name     => "Search: Field Login / Operator EMPTY / Value 1",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Login',
+                    Operator => 'EMPTY',
+                    Value    => 1
+                }
+            ]
+        },
+        Expected => [$ContactID4]
+    },
+    {
+        Name     => "Search: Field Login / Operator EMPTY / Value 0",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Login',
+                    Operator => 'EMPTY',
+                    Value    => 0
+                }
+            ]
+        },
+        Expected => ['1',$ContactID1,$ContactID2,$ContactID3]
+    },
+    {
         Name     => "Search: Field UserLogin / Operator EQ / Value \$UserLogin1",
         Search   => {
             'AND' => [
@@ -1016,7 +1227,7 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => ['1',$ContactID2,$ContactID3]
+        Expected => ['1',$ContactID2,$ContactID3,$ContactID4]
     },
     {
         Name     => "Search: Field UserLogin / Operator IN / Value [\$UserLogin1,\$UserLogin2]",
@@ -1148,6 +1359,32 @@ my @IntegrationSearchTests = (
         },
         Expected => [$ContactID3]
     },
+    {
+        Name     => "Search: Field UserLogin / Operator EMPTY / Value 1",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'UserLogin',
+                    Operator => 'EMPTY',
+                    Value    => 1
+                }
+            ]
+        },
+        Expected => [$ContactID4]
+    },
+    {
+        Name     => "Search: Field UserLogin / Operator EMPTY / Value 0",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'UserLogin',
+                    Operator => 'EMPTY',
+                    Value    => 0
+                }
+            ]
+        },
+        Expected => ['1',$ContactID1,$ContactID2,$ContactID3]
+    }
 );
 for my $Test ( @IntegrationSearchTests ) {
     my @Result = $ObjectSearch->Search(
@@ -1173,7 +1410,7 @@ my @IntegrationSortTests = (
                 Field => 'UserID'
             }
         ],
-        Expected => ['1',$ContactID1,$ContactID2,$ContactID3]
+        Expected => $OrderByNull eq 'LAST' ? ['1',$ContactID1,$ContactID2,$ContactID3,$ContactID4] : [$ContactID4,'1',$ContactID1,$ContactID2,$ContactID3]
     },
     {
         Name     => 'Sort: Field UserID / Direction ascending',
@@ -1183,7 +1420,7 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => ['1',$ContactID1,$ContactID2,$ContactID3]
+        Expected => $OrderByNull eq 'LAST' ? ['1',$ContactID1,$ContactID2,$ContactID3,$ContactID4] : [$ContactID4,'1',$ContactID1,$ContactID2,$ContactID3]
     },
     {
         Name     => 'Sort: Field UserID / Direction descending',
@@ -1193,7 +1430,7 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Expected => [$ContactID3,$ContactID2,$ContactID1,'1']
+        Expected => $OrderByNull eq 'LAST' ? [$ContactID4,$ContactID3,$ContactID2,$ContactID1,'1'] : [$ContactID3,$ContactID2,$ContactID1,'1',$ContactID4]
     },
     {
         Name     => 'Sort: Field AssignedUserID',
@@ -1202,7 +1439,7 @@ my @IntegrationSortTests = (
                 Field => 'AssignedUserID'
             }
         ],
-        Expected => ['1',$ContactID1,$ContactID2,$ContactID3]
+        Expected => $OrderByNull eq 'LAST' ? ['1',$ContactID1,$ContactID2,$ContactID3,$ContactID4] : [$ContactID4,'1',$ContactID1,$ContactID2,$ContactID3]
     },
     {
         Name     => 'Sort: Field AssignedUserID / Direction ascending',
@@ -1212,7 +1449,7 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => ['1',$ContactID1,$ContactID2,$ContactID3]
+        Expected => $OrderByNull eq 'LAST' ? ['1',$ContactID1,$ContactID2,$ContactID3,$ContactID4] : [$ContactID4,'1',$ContactID1,$ContactID2,$ContactID3]
     },
     {
         Name     => 'Sort: Field AssignedUserID / Direction descending',
@@ -1222,7 +1459,7 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Expected => [$ContactID3,$ContactID2,$ContactID1,'1']
+        Expected => $OrderByNull eq 'LAST' ? [$ContactID4,$ContactID3,$ContactID2,$ContactID1,'1'] : [$ContactID3,$ContactID2,$ContactID1,'1',$ContactID4]
     },
     {
         Name     => 'Sort: Field Login',
@@ -1231,7 +1468,9 @@ my @IntegrationSortTests = (
                 Field => 'Login'
             }
         ],
-        Expected => $CaseSensitive ? [$ContactID1,$ContactID3,'1',$ContactID2] : ['1',$ContactID1,$ContactID2,$ContactID3]
+        Expected => $CaseSensitive
+            ? $OrderByNull eq 'LAST' ? [$ContactID1,$ContactID3,'1',$ContactID2,$ContactID4] : [$ContactID4,$ContactID1,$ContactID3,'1',$ContactID2]
+            : $OrderByNull eq 'LAST' ? ['1',$ContactID1,$ContactID2,$ContactID3,$ContactID4] : [$ContactID4,'1',$ContactID1,$ContactID2,$ContactID3]
     },
     {
         Name     => 'Sort: Field Login / Direction ascending',
@@ -1241,7 +1480,9 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => $CaseSensitive ? [$ContactID1,$ContactID3,'1',$ContactID2] : ['1',$ContactID1,$ContactID2,$ContactID3]
+        Expected => $CaseSensitive
+            ? $OrderByNull eq 'LAST' ? [$ContactID1,$ContactID3,'1',$ContactID2,$ContactID4] : [$ContactID4,$ContactID1,$ContactID3,'1',$ContactID2]
+            : $OrderByNull eq 'LAST' ? ['1',$ContactID1,$ContactID2,$ContactID3,$ContactID4] : [$ContactID4,'1',$ContactID1,$ContactID2,$ContactID3]
     },
     {
         Name     => 'Sort: Field Login / Direction descending',
@@ -1251,7 +1492,9 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Expected => $CaseSensitive ? [$ContactID2,'1',$ContactID3,$ContactID1] : [$ContactID3,$ContactID2,$ContactID1,'1']
+        Expected => $CaseSensitive
+            ? $OrderByNull eq 'LAST' ? [$ContactID4,$ContactID2,'1',$ContactID3,$ContactID1] : [$ContactID2,'1',$ContactID3,$ContactID1,$ContactID4]
+            : $OrderByNull eq 'LAST' ? [$ContactID4,$ContactID3,$ContactID2,$ContactID1,'1'] : [$ContactID3,$ContactID2,$ContactID1,'1',$ContactID4]
     },
     {
         Name     => 'Sort: Field UserLogin',
@@ -1260,7 +1503,9 @@ my @IntegrationSortTests = (
                 Field => 'UserLogin'
             }
         ],
-        Expected => $CaseSensitive ? [$ContactID1,$ContactID3,'1',$ContactID2] : ['1',$ContactID1,$ContactID2,$ContactID3]
+        Expected => $CaseSensitive
+            ? $OrderByNull eq 'LAST' ? [$ContactID1,$ContactID3,'1',$ContactID2,$ContactID4] : [$ContactID4,$ContactID1,$ContactID3,'1',$ContactID2]
+            : $OrderByNull eq 'LAST' ? ['1',$ContactID1,$ContactID2,$ContactID3,$ContactID4] : [$ContactID4,'1',$ContactID1,$ContactID2,$ContactID3]
     },
     {
         Name     => 'Sort: Field UserLogin / Direction ascending',
@@ -1270,7 +1515,9 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => $CaseSensitive ? [$ContactID1,$ContactID3,'1',$ContactID2] : ['1',$ContactID1,$ContactID2,$ContactID3]
+        Expected => $CaseSensitive
+            ? $OrderByNull eq 'LAST' ? [$ContactID1,$ContactID3,'1',$ContactID2,$ContactID4] : [$ContactID4,$ContactID1,$ContactID3,'1',$ContactID2]
+            : $OrderByNull eq 'LAST' ? ['1',$ContactID1,$ContactID2,$ContactID3,$ContactID4] : [$ContactID4,'1',$ContactID1,$ContactID2,$ContactID3]
     },
     {
         Name     => 'Sort: Field UserLogin / Direction descending',
@@ -1280,7 +1527,9 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Expected => $CaseSensitive ? [$ContactID2,'1',$ContactID3,$ContactID1] : [$ContactID3,$ContactID2,$ContactID1,'1']
+        Expected => $CaseSensitive
+            ? $OrderByNull eq 'LAST' ? [$ContactID4,$ContactID2,'1',$ContactID3,$ContactID1] : [$ContactID2,'1',$ContactID3,$ContactID1,$ContactID4]
+            : $OrderByNull eq 'LAST' ? [$ContactID4,$ContactID3,$ContactID2,$ContactID1,'1'] : [$ContactID3,$ContactID2,$ContactID1,'1',$ContactID4]
     }
 );
 for my $Test ( @IntegrationSortTests ) {

@@ -60,6 +60,7 @@ Console::Command::Admin::Installation::Migrate::ListTypes                     = 
 Console::Command::Admin::Installation::Migrate::Run                           = Kernel::System::Console::Command::Admin::Installation::Migrate::Run
 Console::Command::Admin::Installation::Migrate::KIX17::MigrateTicketAttachments   = Kernel::System::Console::Command::Admin::Installation::Migrate::KIX17::MigrateTicketAttachments
 Console::Command::Admin::Installation::Migrate::Ticket::SetAffectedAssetFromLinks = Kernel::System::Console::Command::Admin::Installation::Migrate::Ticket::SetAffectedAssetFromLinks
+Console::Command::Admin::Installation::Migrate::Ticket::UpdateMergedTicketRefs = Kernel::System::Console::Command::Admin::Installation::Migrate::Ticket::UpdateMergedTicketRefs
 Console::Command::Admin::Installation::Update                                 = Kernel::System::Console::Command::Admin::Installation::Update
 Console::Command::Admin::ITSM::Configitem::Delete                             = Kernel::System::Console::Command::Admin::ITSM::Configitem::Delete
 Console::Command::Admin::ITSM::Configitem::ListDuplicates                     = Kernel::System::Console::Command::Admin::ITSM::Configitem::ListDuplicates

@@ -208,7 +208,8 @@ my @Tests = (
             TableAlias         => 'dfv',
         },
         ExpectedResult => {
-            Column => "dfv.value_date"
+            Column    => "dfv.value_date",
+            ValueType => 'DATETIME'
         },
         Silent => 1,
     },
@@ -219,7 +220,8 @@ my @Tests = (
             TableAlias         => 'dfv',
         },
         ExpectedResult => {
-            Column => "dfv.value_date"
+            Column    => "dfv.value_date",
+            ValueType => 'DATE'
         },
         Silent => 1,
     }

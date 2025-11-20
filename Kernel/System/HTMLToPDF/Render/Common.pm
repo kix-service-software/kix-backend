@@ -455,6 +455,10 @@ sub _ReplaceKIX {
         return $Text;
     }
 
+    if ( $ObjectType eq 'Asset' ) {
+        $ObjectType = 'ITSMConfigItem';
+    }
+
     $Text = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
         Text            => $Text,
         ObjectType      => $ObjectType,

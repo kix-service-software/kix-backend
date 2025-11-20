@@ -1,0 +1,30 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "QueueTicketStatsResponse.json",
+  "type": "object",
+  "description": "The ticket stats for this queue.",
+  "properties": {
+    "TicketStats": {
+      "type": "object",
+      "readOnly": true,
+      "properties": {
+        "EscalatedCount": {
+          "type": "integer",
+          "readOnly": true,
+          "description": "added by KIXPro"
+        },
+        "LockCount": {
+          "type": "integer",
+          "readOnly": true
+        },
+        "TotalCount": {
+          "type": "integer",
+          "readOnly": true
+        }
+      }
+    }
+  },
+  "required": [
+    "TicketStats"
+  ]
+}

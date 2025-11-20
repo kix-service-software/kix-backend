@@ -63,6 +63,14 @@ $Self->IsDeeply(
             IsFulltextable => 0,
             Operators      => ['EQ'],
             ValueType      => 'NUMERIC'
+        },
+        HistoricMyQueues => {
+            IsFulltextable => 0,
+            IsSearchable   => 1,
+            IsSelectable   => 0,
+            IsSortable     => 0,
+            Operators      => ['EQ'],
+            ValueType      => 'NUMERIC'
         }
     },
     'GetSupportedAttributes provides expected data'
@@ -393,6 +401,7 @@ my @SearchTests = (
             Value    => '1'
         },
         Expected     => {
+            'Join'  => [],
             'Where' => [
                 'st.queue_id IN (1)'
             ]
@@ -406,6 +415,7 @@ my @SearchTests = (
             Value    => '0'
         },
         Expected     => {
+            'Join'  => [],
             'Where' => [
                 'st.queue_id NOT IN (1)'
             ]
@@ -419,8 +429,57 @@ my @SearchTests = (
             Value    => ['0','1']
         },
         Expected     => {
+            'Join'  => [],
             'Where' => [
                 '(st.queue_id NOT IN (1) OR st.queue_id IN (1))'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field HistoricMyQueues / Operator EQ / Value 1',
+        Search       => {
+            Field    => 'HistoricMyQueues',
+            Operator => 'EQ',
+            Value    => '1'
+        },
+        Expected     => {
+            'Join'  => [
+                'INNER JOIN ticket_history th ON th.ticket_id = st.id'
+            ],
+            'Where' => [
+                'th.queue_id IN (1)'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field HistoricMyQueues / Operator EQ / Value 0',
+        Search       => {
+            Field    => 'HistoricMyQueues',
+            Operator => 'EQ',
+            Value    => '0'
+        },
+        Expected     => {
+            'Join'  => [
+                'INNER JOIN ticket_history th ON th.ticket_id = st.id'
+            ],
+            'Where' => [
+                'th.queue_id NOT IN (1)'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field HistoricMyQueues / Operator EQ / Value [0,1]',
+        Search       => {
+            Field    => 'HistoricMyQueues',
+            Operator => 'EQ',
+            Value    => ['0','1']
+        },
+        Expected     => {
+            'Join'  => [
+                'INNER JOIN ticket_history th ON th.ticket_id = st.id'
+            ],
+            'Where' => [
+                '(th.queue_id NOT IN (1) OR th.queue_id IN (1))'
             ]
         }
     }
@@ -449,6 +508,7 @@ my @SearchTestsSpecial = (
             Value    => '1'
         },
         Expected     => {
+            'Join'  => [],
             'Where' => [
                 '1=0'
             ]
@@ -462,6 +522,7 @@ my @SearchTestsSpecial = (
             Value    => '0'
         },
         Expected     => {
+            'Join'  => [],
             'Where' => [
                 '1=1'
             ]
@@ -475,6 +536,55 @@ my @SearchTestsSpecial = (
             Value    => ['0','1']
         },
         Expected     => {
+            'Join'  => [],
+            'Where' => [
+                '(1=1 OR 1=0)'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field HistoricMyQueues / Operator EQ / Value 1',
+        Search       => {
+            Field    => 'HistoricMyQueues',
+            Operator => 'EQ',
+            Value    => '1'
+        },
+        Expected     => {
+            'Join'  => [
+                'INNER JOIN ticket_history th ON th.ticket_id = st.id'
+            ],
+            'Where' => [
+                '1=0'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field HistoricMyQueues / Operator EQ / Value 0',
+        Search       => {
+            Field    => 'HistoricMyQueues',
+            Operator => 'EQ',
+            Value    => '0'
+        },
+        Expected     => {
+            'Join'  => [
+                'INNER JOIN ticket_history th ON th.ticket_id = st.id'
+            ],
+            'Where' => [
+                '1=1'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field HistoricMyQueues / Operator EQ / Value [0,1]',
+        Search       => {
+            Field    => 'HistoricMyQueues',
+            Operator => 'EQ',
+            Value    => ['0','1']
+        },
+        Expected     => {
+            'Join'  => [
+                'INNER JOIN ticket_history th ON th.ticket_id = st.id'
+            ],
             'Where' => [
                 '(1=1 OR 1=0)'
             ]
@@ -540,6 +650,11 @@ my @SortTests = (
     {
         Name      => 'Sort: Attribute "MyQueues" is not sortable',
         Attribute => 'MyQueues',
+        Expected  => undef
+    },
+    {
+        Name      => 'Sort: Attribute "HistoricMyQueues" is not sortable',
+        Attribute => 'HistoricMyQueues',
         Expected  => undef
     }
 );
@@ -957,6 +1072,32 @@ my @IntegrationSearchTests = (
             'AND' => [
                 {
                     Field    => 'MyQueues',
+                    Operator => 'EQ',
+                    Value    => 0
+                }
+            ]
+        },
+        Expected => [$TicketID2,$TicketID3]
+    },
+    {
+        Name     => 'Search: Field HistoricMyQueues / Operator EQ / Value 1',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'HistoricMyQueues',
+                    Operator => 'EQ',
+                    Value    => 1
+                }
+            ]
+        },
+        Expected => [$TicketID1]
+    },
+    {
+        Name     => 'Search: Field HistoricMyQueues / Operator EQ / Value 0',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'HistoricMyQueues',
                     Operator => 'EQ',
                     Value    => 0
                 }

@@ -365,7 +365,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'INNER JOIN general_catalog cids ON cids.id = ci.cur_depl_state_id AND general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
+                'INNER JOIN general_catalog cids ON cids.id = ci.cur_depl_state_id AND cids.general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
             ],
             'Where' => [
                 'cids.name = \'Test\''
@@ -381,7 +381,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'INNER JOIN general_catalog cids ON cids.id = ci.cur_depl_state_id AND general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
+                'INNER JOIN general_catalog cids ON cids.id = ci.cur_depl_state_id AND cids.general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
             ],
             'Where' => [
                 'cids.name != \'Test\''
@@ -397,7 +397,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'INNER JOIN general_catalog cids ON cids.id = ci.cur_depl_state_id AND general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
+                'INNER JOIN general_catalog cids ON cids.id = ci.cur_depl_state_id AND cids.general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
             ],
             'Where' => [
                 'cids.name IN (\'Test\')'
@@ -413,7 +413,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'INNER JOIN general_catalog cids ON cids.id = ci.cur_depl_state_id AND general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
+                'INNER JOIN general_catalog cids ON cids.id = ci.cur_depl_state_id AND cids.general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
             ],
             'Where' => [
                 'cids.name NOT IN (\'Test\')'
@@ -429,7 +429,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'INNER JOIN general_catalog cids ON cids.id = ci.cur_depl_state_id AND general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
+                'INNER JOIN general_catalog cids ON cids.id = ci.cur_depl_state_id AND cids.general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
             ],
             'Where' => [
                 'cids.name LIKE \'Test%\''
@@ -445,7 +445,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'INNER JOIN general_catalog cids ON cids.id = ci.cur_depl_state_id AND general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
+                'INNER JOIN general_catalog cids ON cids.id = ci.cur_depl_state_id AND cids.general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
             ],
             'Where' => [
                 'cids.name LIKE \'%Test\''
@@ -461,7 +461,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'INNER JOIN general_catalog cids ON cids.id = ci.cur_depl_state_id AND general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
+                'INNER JOIN general_catalog cids ON cids.id = ci.cur_depl_state_id AND cids.general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
             ],
             'Where' => [
                 'cids.name LIKE \'%Test%\''
@@ -477,7 +477,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'INNER JOIN general_catalog cids ON cids.id = ci.cur_depl_state_id AND general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
+                'INNER JOIN general_catalog cids ON cids.id = ci.cur_depl_state_id AND cids.general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
             ],
             'Where' => [
                 'cids.name LIKE \'Test\''
@@ -945,7 +945,7 @@ my @SearchTests = (
         Expected     => {
             'Join' => [
                 'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
-                'INNER JOIN general_catalog civds ON civds.id = civ.depl_state_id AND general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
+                'INNER JOIN general_catalog civds ON civds.id = civ.depl_state_id AND civds.general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
             ],
             'Where' => [
                 'civds.name = \'Test\''
@@ -965,7 +965,7 @@ my @SearchTests = (
         Expected     => {
             'Join' => [
                 'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
-                'INNER JOIN general_catalog civds ON civds.id = civ.depl_state_id AND general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
+                'INNER JOIN general_catalog civds ON civds.id = civ.depl_state_id AND civds.general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
             ],
             'Where' => [
                 'civds.name != \'Test\''
@@ -985,7 +985,7 @@ my @SearchTests = (
         Expected     => {
             'Join' => [
                 'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
-                'INNER JOIN general_catalog civds ON civds.id = civ.depl_state_id AND general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
+                'INNER JOIN general_catalog civds ON civds.id = civ.depl_state_id AND civds.general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
             ],
             'Where' => [
                 'civds.name IN (\'Test\')'
@@ -1005,7 +1005,7 @@ my @SearchTests = (
         Expected     => {
             'Join' => [
                 'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
-                'INNER JOIN general_catalog civds ON civds.id = civ.depl_state_id AND general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
+                'INNER JOIN general_catalog civds ON civds.id = civ.depl_state_id AND civds.general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
             ],
             'Where' => [
                 'civds.name NOT IN (\'Test\')'
@@ -1025,7 +1025,7 @@ my @SearchTests = (
         Expected     => {
             'Join' => [
                 'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
-                'INNER JOIN general_catalog civds ON civds.id = civ.depl_state_id AND general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
+                'INNER JOIN general_catalog civds ON civds.id = civ.depl_state_id AND civds.general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
             ],
             'Where' => [
                 'civds.name LIKE \'Test%\''
@@ -1045,7 +1045,7 @@ my @SearchTests = (
         Expected     => {
             'Join' => [
                 'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
-                'INNER JOIN general_catalog civds ON civds.id = civ.depl_state_id AND general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
+                'INNER JOIN general_catalog civds ON civds.id = civ.depl_state_id AND civds.general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
             ],
             'Where' => [
                 'civds.name LIKE \'%Test\''
@@ -1065,7 +1065,7 @@ my @SearchTests = (
         Expected     => {
             'Join' => [
                 'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
-                'INNER JOIN general_catalog civds ON civds.id = civ.depl_state_id AND general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
+                'INNER JOIN general_catalog civds ON civds.id = civ.depl_state_id AND civds.general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
             ],
             'Where' => [
                 'civds.name LIKE \'%Test%\''
@@ -1085,7 +1085,7 @@ my @SearchTests = (
         Expected     => {
             'Join' => [
                 'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
-                'INNER JOIN general_catalog civds ON civds.id = civ.depl_state_id AND general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
+                'INNER JOIN general_catalog civds ON civds.id = civ.depl_state_id AND civds.general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
             ],
             'Where' => [
                 'civds.name LIKE \'Test\''
@@ -1331,7 +1331,7 @@ my @SortTests = (
         Attribute => 'DeplState',
         Expected  => {
             'Join'    => [
-                'LEFT OUTER JOIN general_catalog cids ON cids.id = ci.cur_depl_state_id AND general_catalog_class = \'ITSM::ConfigItem::DeploymentState\'',
+                'LEFT OUTER JOIN general_catalog cids ON cids.id = ci.cur_depl_state_id AND cids.general_catalog_class = \'ITSM::ConfigItem::DeploymentState\'',
                 'LEFT OUTER JOIN translation_pattern tlp0 ON tlp0.value = cids.name',
                 'LEFT OUTER JOIN translation_language tl0 ON tl0.pattern_id = tlp0.id AND tl0.language = \'en\''
             ],
