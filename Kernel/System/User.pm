@@ -1816,6 +1816,16 @@ sub SetPreferences {
     # set preferences
     my $Result = $PreferencesObject->SetPreferences(%Param);
 
+    # trigger event
+    $Self->EventHandler(
+        Event  => 'UserSetPreferences',
+        Data   => {
+            UserID => $Param{UserID},
+            Key    => $Param{Key},
+        },
+        UserID => 1,
+    );
+
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
@@ -2041,115 +2051,31 @@ update the users counters for all users
 sub UpdateCounters {
     my ( $Self, %Param ) = @_;
 
-    my $BaseTicketFilter = {
-        Field    => 'StateType',
-        Operator => 'EQ',
-        Value    => 'Open',
-    };
-
     # cleanup existing counters
     $Self->DeleteCounters();
 
+    # get list of agents
     my %UserList = $Self->UserSearch(
         IsAgent => 1,
         Valid   => 0,
     );
 
-    foreach my $UserID ( sort keys %UserList ) {
-        my %Counters = (
-            Owned => [
-                $BaseTicketFilter,
-                {
-                    Field    => 'OwnerID',
-                    Operator => 'EQ',
-                    Value    => $UserID,
-                }
-            ],
-            OwnedAndLocked =>  [
-                $BaseTicketFilter,
-                {
-                    Field    => 'OwnerID',
-                    Operator => 'EQ',
-                    Value    => $UserID,
-                },
-                {
-                    Field    => 'LockID',
-                    Operator => 'EQ',
-                    Value    => 2,
-                }
-            ],
-            OwnedAndUnseen => [
-                $BaseTicketFilter,
-                {
-                    Field    => 'OwnerID',
-                    Operator => 'EQ',
-                    Value    => $UserID,
-                },
-                {
-                    Field    => 'TicketFlag.Seen',
-                    Operator => 'NE',
-                    Value    => '1',
-                }
-            ],
-            OwnedAndLockedAndUnseen => [
-                $BaseTicketFilter,
-                {
-                    Field    => 'OwnerID',
-                    Operator => 'EQ',
-                    Value    => $UserID,
-                },
-                {
-                    Field    => 'LockID',
-                    Operator => 'EQ',
-                    Value    => 2,
-                },
-                {
-                    Field    => 'TicketFlag.Seen',
-                    Operator => 'NE',
-                    Value    => '1'
-                }
-            ],
-            Watched => [
-                {
-                    Field    => 'WatcherUserID',
-                    Operator => 'EQ',
-                    Value    => $UserID,
-                }
-            ],
-            WatchedAndUnseen => [
-                {
-                    Field    => 'WatcherUserID',
-                    Operator => 'EQ',
-                    Value    => $UserID,
-                },
-                {
-                    Field    => 'TicketFlag.Seen',
-                    Operator => 'NE',
-                    Value    => '1'
-                }
-            ]
+    # update counters for every agent
+    for my $UserID ( keys( %UserList ) ) {
+        my $UserCounters = $Self->PrepareUserCounters(
+            UserID => $UserID
         );
 
-        my %CounterData;
-        foreach my $Counter ( sort keys %Counters ) {
-            # execute ticket search
-            my @TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
-                Search => {
-                    AND => $Counters{$Counter}
-                },
-                ObjectType => 'Ticket',
-                UserID     => $UserID,
-                UserType   => 'Agent',
-                Result     => 'ARRAY',
-            );
-
-            foreach my $TicketID ( @TicketIDs ) {
-                $Self->AddUserCounterObject(
-                    Category => 'Ticket',
-                    ObjectID => $TicketID,
-                    Counter  => $Counter,
-                    UserID   => $UserID,
-                );
+        for my $Category ( keys( %{ $UserCounters } ) ) {
+            for my $Counter ( keys( %{ $UserCounters->{ $Category } } ) ) {
+                for my $ObjectID ( @{ $UserCounters->{ $Category }->{ $Counter } } ) {
+                    $Self->AddUserCounterObject(
+                        Category => $Category,
+                        ObjectID => $ObjectID,
+                        Counter  => $Counter,
+                        UserID   => $UserID,
+                    );
+                }
             }
         }
     }
@@ -2186,6 +2112,164 @@ sub DeleteCounters {
     );
 
     return 1
+}
+
+=item PrepareUserCounters()
+
+prepare the counters for a given user
+
+    my $Success = $UserObject->PrepareUserCounters(
+        UserID   => 123,                # required
+        Category => 'Ticket',           # optional
+        ObjectID => 123,                # optional, requires Category
+    );
+
+=cut
+
+sub PrepareUserCounters {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed ( qw(UserID) ) {
+        if ( !$Param{ $Needed } ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!",
+                Silent   => $Param{Silent},
+            );
+            return;
+        }
+    }
+    if (
+        $Param{ObjectID}
+        && !$Param{Category}
+    ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Need Category when using ObjectID!",
+            Silent   => $Param{Silent},
+        );
+        return;
+    }
+
+    my $BaseTicketFilter = {
+        Field    => 'StateType',
+        Operator => 'EQ',
+        Value    => 'Open',
+    };
+
+    my %Counters = (
+        Ticket => {
+            Owned => [
+                $BaseTicketFilter,
+                {
+                    Field    => 'OwnerID',
+                    Operator => 'EQ',
+                    Value    => $Param{UserID},
+                }
+            ],
+            OwnedAndLocked =>  [
+                $BaseTicketFilter,
+                {
+                    Field    => 'OwnerID',
+                    Operator => 'EQ',
+                    Value    => $Param{UserID},
+                },
+                {
+                    Field    => 'LockID',
+                    Operator => 'EQ',
+                    Value    => 2,
+                }
+            ],
+            OwnedAndUnseen => [
+                $BaseTicketFilter,
+                {
+                    Field    => 'OwnerID',
+                    Operator => 'EQ',
+                    Value    => $Param{UserID},
+                },
+                {
+                    Field    => 'TicketFlag.Seen',
+                    Operator => 'NE',
+                    Value    => '1',
+                }
+            ],
+            OwnedAndLockedAndUnseen => [
+                $BaseTicketFilter,
+                {
+                    Field    => 'OwnerID',
+                    Operator => 'EQ',
+                    Value    => $Param{UserID},
+                },
+                {
+                    Field    => 'LockID',
+                    Operator => 'EQ',
+                    Value    => 2,
+                },
+                {
+                    Field    => 'TicketFlag.Seen',
+                    Operator => 'NE',
+                    Value    => '1'
+                }
+            ],
+            Watched => [
+                {
+                    Field    => 'WatcherUserID',
+                    Operator => 'EQ',
+                    Value    => $Param{UserID},
+                }
+            ],
+            WatchedAndUnseen => [
+                {
+                    Field    => 'WatcherUserID',
+                    Operator => 'EQ',
+                    Value    => $Param{UserID},
+                },
+                {
+                    Field    => 'TicketFlag.Seen',
+                    Operator => 'NE',
+                    Value    => '1'
+                }
+            ]
+        }
+    );
+
+    my %CounterData;
+    CATEGORY:
+    for my $Category ( keys( %Counters ) ) {
+        next CATEGORY if (
+            defined( $Param{Category} )
+            && $Category ne $Param{Category}
+        );
+        for my $Counter ( keys( %{ $Counters{ $Category } } ) ) {
+            # add ObjectID to search params if given
+            if ( $Param{ObjectID} ) {
+                push(
+                    @{ $Counters{ $Category }->{ $Counter } },
+                    {
+                        Field    => 'ID',
+                        Operator => 'EQ',
+                        Value    => $Param{ObjectID}
+                    }
+                );
+            }
+
+            # execute object search
+            my @ObjectIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+                Search => {
+                    AND => $Counters{ $Category }->{ $Counter }
+                },
+                ObjectType => $Category,
+                UserID     => $Param{UserID},
+                UserType   => 'Agent',
+                Result     => 'ARRAY',
+            );
+
+            $CounterData{ $Category }->{ $Counter } = \@ObjectIDs;
+        }
+    }
+
+    return \%CounterData;
 }
 
 =item GetUserCounters()
@@ -2293,7 +2377,7 @@ sub AddUserCounterObject {
 delete a user counter entry
 
     my $Success = $UserObject->DeleteUserCounterObject(
-        Category => 'Ticket'
+        Category => 'Ticket',
         Counter  => '...',              # optional, if not given, all relevant counters will be deleted, wildcard '*' supported
         ObjectID => 123,
         UserID   => 123,                # optional, if not given, all relevant counters for all users will be deleted
@@ -2389,6 +2473,97 @@ sub DeleteUserCounterObject {
     return 1
 }
 
+=item UpdateUserCounterObject()
+
+update a user counter entry
+
+    my $Success = $UserObject->UpdateUserCounterObject(
+        Category => 'Ticket',
+        ObjectID => 123,
+    );
+
+=cut
+
+sub UpdateUserCounterObject {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for my $Needed ( qw(Category ObjectID) ) {
+        if ( !$Param{ $Needed } ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!",
+                Silent   => $Param{Silent},
+            );
+            return;
+        }
+    }
+
+    # get list of agents
+    my %UserList = $Self->UserSearch(
+        IsAgent => 1,
+        Valid   => 0,
+    );
+
+    # update counters for every agent
+    for my $UserID ( keys( %UserList ) ) {
+        my $UserCounters = $Self->PrepareUserCounters(
+            UserID => $UserID,
+            Category => $Param{Category},
+            ObjectID => $Param{ObjectID},
+        );
+
+        for my $Category ( keys( %{ $UserCounters } ) ) {
+            for my $Counter ( keys( %{ $UserCounters->{ $Category } } ) ) {
+                # map prepared objects
+                my %ObjectIDsMap = map { $_ => 1 } @{ $UserCounters->{ $Category }->{ $Counter } };
+
+                # get existing counter objects
+                my @ExistingObjectIDs = $Self->GetObjectIDsForCounter(
+                    UserID   => $UserID,
+                    Category => $Category,
+                    Counter  => $Counter,
+                );
+
+                # prepare objects to delete and add
+                my @ObjectIDsToDelete = ();
+                for my $ObjectID ( @ExistingObjectIDs ) {
+                    # existing object to delete
+                    if ( !$ObjectIDsMap{ $ObjectID } ) {
+                        push( @ObjectIDsToDelete, $ObjectID );
+                    }
+                    # existing object is unchanged
+                    else {
+                        delete( $ObjectIDsMap{ $ObjectID } );
+                    }
+                }
+
+                # delete obsolete counter
+                for my $ObjectID ( @ObjectIDsToDelete ) {
+                    $Self->DeleteUserCounterObject(
+                        Category => $Category,
+                        Counter  => $Counter,
+                        ObjectID => $ObjectID,
+                        UserID   => $UserID,
+                    );
+                }
+
+                # add new counter
+                for my $ObjectID ( keys( %ObjectIDsMap ) ) {
+                    $Self->AddUserCounterObject(
+                        Category => $Category,
+                        Counter  => $Counter,
+                        ObjectID => $ObjectID,
+                        UserID   => $UserID,
+                    );
+                }
+            }
+        }
+    }
+
+    return 1;
+}
+
 =item GetObjectIDsForCounter()
 
 get the list of ObjectIDs for a specific user counter
@@ -2430,9 +2605,9 @@ sub GetObjectIDsForCounter {
     my $Data = $Kernel::OM->Get('DB')->FetchAllArrayRef(
         Columns => [ 'ObjectID' ]
     );
-    my @TicketIDs = map { $_->{ObjectID} } @{$Data};
+    my @ObjectIDs = map { $_->{ObjectID} } @{$Data};
 
-    return @TicketIDs;
+    return @ObjectIDs;
 }
 
 sub _AssignRolesByContext {

@@ -4849,9 +4849,9 @@ DefaultValue:
         <Data Key="type" Type="Quote">Ticket</Data>
         <Data Key="filter" Type="Quote"><![CDATA[
 {"AND":[
-{"Field":"SenderTypeID","Value":3,"Operator":"EQ","Type":"NUMERIC"},
+{"Field":"SenderTypeID","Value":[3],"Operator":"IN","Type":"NUMERIC"},
 {"Field":"StateTypeID","Value":[4,5],"Operator":"IN","Type":"NUMERIC"},
-{"Field":"ChannelID","Value":1,"Operator":"EQ","Type":"NUMERIC"},
+{"Field":"ChannelID","Value":[1],"Operator":"IN","Type":"NUMERIC"},
 {"Field":"CreateTime","Operator":"LT","Type":"DATETIME","Value":"-1m"}
 ]}
     ]]></Data>

@@ -8899,4 +8899,25 @@ Notes:
             </Hash>
         </Setting>
     </ConfigItem>
+
+    <ConfigItem AccessLevel="internal" Name="Role::EventModulePost###010-MyQueuesValidation" Required="1" Valid="1">
+        <Description Translatable="1">Event module registration.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Role::Event::MyQueuesValidation</Item>
+                <Item Key="Transaction">1</Item>
+                <Item Key="Event">(RoleUpdate|RolePermissionUpdate|RolePermissionDelete|RoleUserDelete)</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="User::EventModulePost###010-MyQueuesValidation" Required="1" Valid="1">
+        <Description Translatable="1">Event module registration.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::User::Event::MyQueuesValidation</Item>
+                <Item Key="Transaction">1</Item>
+                <Item Key="Event">UserSetPreferences</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
 </kix_config>

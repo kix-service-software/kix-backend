@@ -506,6 +506,16 @@ sub PermissionAdd {
     # delete whole cache
     $Kernel::OM->Get('Cache')->CleanUp();
 
+    # event
+    $Self->EventHandler(
+        Event => 'RolePermissionAdd',
+        Data  => {
+            ID     => $ID,
+            RoleID => $Param{RoleID},
+        },
+        UserID => $Param{UserID},
+    );
+
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
@@ -618,6 +628,17 @@ sub PermissionUpdate {
 
     # delete whole cache
     $Kernel::OM->Get('Cache')->CleanUp();
+
+    # event
+    $Self->EventHandler(
+        Event => 'RolePermissionUpdate',
+        Data  => {
+            ID      => $Param{ID},
+            RoleID  => $Data{RoleID},
+            OldData => \%Data,
+        },
+        UserID => $Param{UserID},
+    );
 
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
@@ -804,6 +825,17 @@ sub PermissionDelete {
 
     # delete whole cache
     $Kernel::OM->Get('Cache')->CleanUp();
+
+    # event
+    $Self->EventHandler(
+        Event => 'RolePermissionDelete',
+        Data  => {
+            ID      => $Param{ID},
+            RoleID  => $Data{RoleID},
+            OldData => \%Data,
+        },
+        UserID => $Param{UserID},
+    );
 
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
