@@ -100,7 +100,6 @@ Then qr/the response object is (.*?)$/, sub {
 
   isnt($Schema, undef, 'read schema file');
   is(ref $Schema, 'SCALAR', 'get schema file content');
-
   my $Validator = JSON::Validator->new();
   $Validator->schema($$Schema);
   my @Result = $Validator->validate(S->{ResponseContent});

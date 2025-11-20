@@ -98,8 +98,9 @@ sub Run {
         # check if this object is already mapped
         my $MappedID = $Self->GetOIDMapping(
             ObjectType     => 'contact',
-            SourceObjectID => $Item->{login}
+            SourceObjectID => $Item->{id}
         );
+
         if ( $MappedID ) {
             $Self->UpdateProgress($Param{Type}, 'Ignored');
             next;

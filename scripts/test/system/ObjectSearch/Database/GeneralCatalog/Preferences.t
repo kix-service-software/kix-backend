@@ -95,7 +95,7 @@ $Self->IsDeeply(
     {
         IsSearchable => 1,
         IsSortable   => 1,
-        Operators    => ['EQ','NE','IN','!IN','ENDSWITH','STARTSWITH','CONTAINS','LIKE'],
+        Operators    => ['EMPTY','EQ','NE','IN','!IN','ENDSWITH','STARTSWITH','CONTAINS','LIKE'],
         Class        => [ 'Unit::Test::Type' ]
     },
     'GetSupportedAttributes provides expected data for searchable attribute'
@@ -323,6 +323,40 @@ my @SearchTests = (
                 $CaseSensitive ? 'LOWER(gcp0.pref_value) LIKE \'test\'' : 'gcp0.pref_value LIKE \'test\''
             ]
         }
+    },
+    {
+        Name         => 'Search: valid search / Field UnitTest / Operator EMPTY',
+        Search       => {
+            Field    => 'UnitTest',
+            Operator => 'EMPTY',
+            Value    => 0
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT OUTER JOIN general_catalog_preferences gcp0 ON gcp0.general_catalog_id = gc.id',
+                'AND gcp0.pref_key = \'UnitTest\''
+            ],
+            'Where' => [
+                "(gcp0.pref_value != '' AND gcp0.pref_value IS NOT NULL)"
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field UnitTest / Operator EMPTY',
+        Search       => {
+            Field    => 'UnitTest',
+            Operator => 'EMPTY',
+            Value    => 1
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT OUTER JOIN general_catalog_preferences gcp0 ON gcp0.general_catalog_id = gc.id',
+                'AND gcp0.pref_key = \'UnitTest\''
+            ],
+            'Where' => [
+                "(gcp0.pref_value = '' OR gcp0.pref_value IS NULL)"
+            ]
+        }
     }
 );
 for my $Test ( @SearchTests ) {
@@ -480,7 +514,7 @@ $Self->True(
     'Add preference to third item'
 );
 
-# discard config item object to process events
+# discard general catalog object to process events
 $Kernel::OM->ObjectsDiscard(
     Objects => ['GeneralCatalog'],
 );
@@ -656,6 +690,32 @@ my @IntegrationSearchTests = (
             ]
         },
         Expected => []
+    },
+    {
+        Name     => 'Search: Field UnitTest / Operator EMPTY / Value 0',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'UnitTest',
+                    Operator => 'EMPTY',
+                    Value    => 0
+                }
+            ]
+        },
+        Expected => [$ItemID1,$ItemID2,$ItemID3]
+    },
+    {
+        Name     => 'Search: Field UnitTest / Operator EMPTY / Value 1',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'UnitTest',
+                    Operator => 'EMPTY',
+                    Value    => 1
+                }
+            ]
+        },
+        Expected => [@ItemIDs]
     }
 );
 for my $Test ( @IntegrationSearchTests ) {

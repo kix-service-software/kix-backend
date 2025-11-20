@@ -29,7 +29,7 @@ $Self->Is(
 );
 
 # check supported methods
-for my $Method ( qw(GetSupportedAttributes Search Sort) ) {
+for my $Method ( qw(GetSupportedAttributes AttributePrepare Select Search Sort) ) {
     $Self->True(
         $AttributeObject->can($Method),
         'Attribute object can "' . $Method . q{"}
@@ -42,48 +42,85 @@ $Self->IsDeeply(
     $AttributeList,
     {
         OwnerID => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','GT','GTE','LT','LTE'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN','GT','GTE','LT','LTE'],
+            ValueType      => 'NUMERIC'
         },
         Owner => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
         OwnerName => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
         OwnerOutOfOffice => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EQ'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 0,
+            Operators      => ['EQ'],
+            ValueType      => 'NUMERIC'
+        },
+        OwnerOutOfOfficeSubstitute => {
+            IsFulltextable => 0,
+            IsSearchable   => 1,
+            IsSelectable   => 0,
+            IsSortable     => 0,
+            Operators      => ['EMPTY','EQ','NE','IN','!IN','GT','GTE','LT','LTE']
         },
         ResponsibleID => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','GT','GTE','LT','LTE'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN','GT','GTE','LT','LTE'],
+            ValueType      => 'NUMERIC'
         },
         Responsible => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
         ResponsibleName => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
         ResponsibleOutOfOffice => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EQ'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 0,
+            Operators      => ['EQ'],
+            ValueType      => 'NUMERIC'
+        },
+        ResponsibleOutOfOfficeSubstitute => {
+            IsFulltextable => 0,
+            IsSearchable   => 1,
+            IsSelectable   => 0,
+            IsSortable     => 0,
+            Operators      => ['EMPTY','EQ','NE','IN','!IN','GT','GTE','LT','LTE']
+        },
+        TicketOutOfOfficeSubstitute => {
+            IsFulltextable => 0,
+            IsSearchable   => 1,
+            IsSelectable   => 0,
+            IsSortable     => 0,
+            Operators      => ['EMPTY','EQ','NE','IN','!IN','GT','GTE','LT','LTE']
         }
     },
     'GetSupportedAttributes provides expected data'
@@ -631,6 +668,176 @@ my @SearchTests = (
         }
     },
     {
+        Name         => "Search: valid search / Field OwnerOutOfOfficeSubstitute / Operator EQ",
+        Search       => {
+            Field    => 'OwnerOutOfOfficeSubstitute',
+            Operator => 'EQ',
+            Value    => '1'
+        },
+        Expected     => {
+            'Join'       => [
+                'LEFT OUTER JOIN user_preferences toupooosub ON toupooosub.user_id = st.user_id AND toupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+            ],
+            'Where'      => [
+                'toupooosub.preferences_value = \'1\''
+            ],
+            'IsRelative' => undef
+        }
+    },
+    {
+        Name         => "Search: valid search / Field OwnerOutOfOfficeSubstitute / Operator NE",
+        Search       => {
+            Field    => 'OwnerOutOfOfficeSubstitute',
+            Operator => 'NE',
+            Value    => '1'
+        },
+        Expected     => {
+            'Join'       => [
+                'LEFT OUTER JOIN user_preferences toupooosub ON toupooosub.user_id = st.user_id AND toupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+            ],
+            'Where'      => [
+                '(toupooosub.preferences_value != \'1\' OR toupooosub.preferences_value IS NULL)'
+            ],
+            'IsRelative' => undef
+        }
+    },
+    {
+        Name         => "Search: valid search / Field OwnerOutOfOfficeSubstitute / Operator IN",
+        Search       => {
+            Field    => 'OwnerOutOfOfficeSubstitute',
+            Operator => 'IN',
+            Value    => ['1']
+        },
+        Expected     => {
+            'Join'       => [
+                'LEFT OUTER JOIN user_preferences toupooosub ON toupooosub.user_id = st.user_id AND toupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+            ],
+            'Where'      => [
+                'toupooosub.preferences_value IN (\'1\')'
+            ],
+            'IsRelative' => undef
+        }
+    },
+    {
+        Name         => "Search: valid search / Field OwnerOutOfOfficeSubstitute / Operator !IN",
+        Search       => {
+            Field    => 'OwnerOutOfOfficeSubstitute',
+            Operator => '!IN',
+            Value    => ['1']
+        },
+        Expected     => {
+             'Join'      => [
+                'LEFT OUTER JOIN user_preferences toupooosub ON toupooosub.user_id = st.user_id AND toupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+            ],
+            'Where'      => [
+                'toupooosub.preferences_value NOT IN (\'1\')'
+            ],
+            'IsRelative' => undef
+        }
+    },
+    {
+        Name         => "Search: valid search / Field OwnerOutOfOfficeSubstitute / Operator LT",
+        Search       => {
+            Field    => 'OwnerOutOfOfficeSubstitute',
+            Operator => 'LT',
+            Value    => '1'
+        },
+        Expected     => {
+            'Join'       => [
+                'LEFT OUTER JOIN user_preferences toupooosub ON toupooosub.user_id = st.user_id AND toupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+            ],
+            'Where'      => [
+                'toupooosub.preferences_value < \'1\''
+            ],
+            'IsRelative' => undef
+        }
+    },
+    {
+        Name         => "Search: valid search / Field OwnerOutOfOfficeSubstitute / Operator GT",
+        Search       => {
+            Field    => 'OwnerOutOfOfficeSubstitute',
+            Operator => 'GT',
+            Value    => '1'
+        },
+        Expected     => {
+            'Join'       => [
+                'LEFT OUTER JOIN user_preferences toupooosub ON toupooosub.user_id = st.user_id AND toupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+            ],
+            'Where'      => [
+                'toupooosub.preferences_value > \'1\''
+            ],
+            'IsRelative' => undef
+        }
+    },
+    {
+        Name         => "Search: valid search / Field OwnerOutOfOfficeSubstitute / Operator LTE",
+        Search       => {
+            Field    => 'OwnerOutOfOfficeSubstitute',
+            Operator => 'LTE',
+            Value    => '1'
+        },
+        Expected     => {
+            'Join'       => [
+                'LEFT OUTER JOIN user_preferences toupooosub ON toupooosub.user_id = st.user_id AND toupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+            ],
+            'Where'      => [
+                'toupooosub.preferences_value <= \'1\''
+            ],
+            'IsRelative' => undef
+        }
+    },
+    {
+        Name         => "Search: valid search / Field OwnerOutOfOfficeSubstitute / Operator GTE",
+        Search       => {
+            Field    => 'OwnerOutOfOfficeSubstitute',
+            Operator => 'GTE',
+            Value    => '1'
+        },
+        Expected     => {
+            'Join'       => [
+                'LEFT OUTER JOIN user_preferences toupooosub ON toupooosub.user_id = st.user_id AND toupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+            ],
+            'Where'      => [
+                'toupooosub.preferences_value >= \'1\''
+            ],
+            'IsRelative' => undef
+        }
+    },
+    {
+        Name         => "Search: valid search / Field OwnerOutOfOfficeSubstitute / Operator EMPTY / Value 1",
+        Search       => {
+            Field    => 'OwnerOutOfOfficeSubstitute',
+            Operator => 'EMPTY',
+            Value    => 1
+        },
+        Expected     => {
+            'Join'       => [
+                'LEFT OUTER JOIN user_preferences toupooosub ON toupooosub.user_id = st.user_id AND toupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+            ],
+            'Where'      => [
+                '(toupooosub.preferences_value = \'\' OR toupooosub.preferences_value IS NULL)'
+            ],
+            'IsRelative' => undef
+        }
+    },
+    {
+        Name         => "Search: valid search / Field OwnerOutOfOfficeSubstitute / Operator EMPTY / Value 0",
+        Search       => {
+            Field    => 'OwnerOutOfOfficeSubstitute',
+            Operator => 'EMPTY',
+            Value    => 0
+        },
+        Expected     => {
+            'Join'       => [
+                'LEFT OUTER JOIN user_preferences toupooosub ON toupooosub.user_id = st.user_id AND toupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+            ],
+            'Where'      => [
+                '(toupooosub.preferences_value != \'\' AND toupooosub.preferences_value IS NOT NULL)'
+            ],
+            'IsRelative' => undef
+        }
+    },
+    {
         Name         => "Search: valid search / Field ResponsibleID / Operator EQ",
         Search       => {
             Field    => 'ResponsibleID',
@@ -1039,8 +1246,8 @@ my @SearchTests = (
         },
         Expected     => {
             'Join'       => [
-                'LEFT OUTER JOIN user_preferences trupooos ON trupooos.user_id = st.user_id AND trupooos.preferences_key = \'OutOfOfficeStart\'',
-                'LEFT OUTER JOIN user_preferences trupoooe ON trupoooe.user_id = st.user_id AND trupoooe.preferences_key = \'OutOfOfficeEnd\''
+                'LEFT OUTER JOIN user_preferences trupooos ON trupooos.user_id = st.responsible_user_id AND trupooos.preferences_key = \'OutOfOfficeStart\'',
+                'LEFT OUTER JOIN user_preferences trupoooe ON trupoooe.user_id = st.responsible_user_id AND trupoooe.preferences_key = \'OutOfOfficeEnd\''
             ],
             'Where'      => [
                 '(trupooos.preferences_value <= \'2014-01-01\' AND trupoooe.preferences_value >= \'2014-01-01\')'
@@ -1057,8 +1264,8 @@ my @SearchTests = (
         },
         Expected     => {
             'Join'       => [
-                'LEFT OUTER JOIN user_preferences trupooos ON trupooos.user_id = st.user_id AND trupooos.preferences_key = \'OutOfOfficeStart\'',
-                'LEFT OUTER JOIN user_preferences trupoooe ON trupoooe.user_id = st.user_id AND trupoooe.preferences_key = \'OutOfOfficeEnd\''
+                'LEFT OUTER JOIN user_preferences trupooos ON trupooos.user_id = st.responsible_user_id AND trupooos.preferences_key = \'OutOfOfficeStart\'',
+                'LEFT OUTER JOIN user_preferences trupoooe ON trupoooe.user_id = st.responsible_user_id AND trupoooe.preferences_key = \'OutOfOfficeEnd\''
             ],
             'Where'      => [
                 '(trupooos.preferences_value > \'2014-01-01\' OR trupoooe.preferences_value < \'2014-01-01\' OR trupooos.preferences_value IS NULL OR trupoooe.preferences_value IS NULL)'
@@ -1075,11 +1282,401 @@ my @SearchTests = (
         },
         Expected     => {
             'Join'       => [
-                'LEFT OUTER JOIN user_preferences trupooos ON trupooos.user_id = st.user_id AND trupooos.preferences_key = \'OutOfOfficeStart\'',
-                'LEFT OUTER JOIN user_preferences trupoooe ON trupoooe.user_id = st.user_id AND trupoooe.preferences_key = \'OutOfOfficeEnd\''
+                'LEFT OUTER JOIN user_preferences trupooos ON trupooos.user_id = st.responsible_user_id AND trupooos.preferences_key = \'OutOfOfficeStart\'',
+                'LEFT OUTER JOIN user_preferences trupoooe ON trupoooe.user_id = st.responsible_user_id AND trupoooe.preferences_key = \'OutOfOfficeEnd\''
             ],
             'Where'      => [
                 '((trupooos.preferences_value > \'2014-01-01\' OR trupoooe.preferences_value < \'2014-01-01\' OR trupooos.preferences_value IS NULL OR trupoooe.preferences_value IS NULL) OR (trupooos.preferences_value <= \'2014-01-01\' AND trupoooe.preferences_value >= \'2014-01-01\'))'
+            ],
+            'IsRelative' => 1
+        }
+    },
+    {
+        Name         => "Search: valid search / Field ResponsibleOutOfOfficeSubstitute / Operator EQ",
+        Search       => {
+            Field    => 'ResponsibleOutOfOfficeSubstitute',
+            Operator => 'EQ',
+            Value    => '1'
+        },
+        Expected     => {
+            'Join'       => [
+                'LEFT OUTER JOIN user_preferences trupooosub ON trupooosub.user_id = st.responsible_user_id AND trupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+            ],
+            'Where'      => [
+                'trupooosub.preferences_value = \'1\''
+            ],
+            'IsRelative' => undef
+        }
+    },
+    {
+        Name         => "Search: valid search / Field ResponsibleOutOfOfficeSubstitute / Operator NE",
+        Search       => {
+            Field    => 'ResponsibleOutOfOfficeSubstitute',
+            Operator => 'NE',
+            Value    => '1'
+        },
+        Expected     => {
+            'Join'       => [
+                'LEFT OUTER JOIN user_preferences trupooosub ON trupooosub.user_id = st.responsible_user_id AND trupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+            ],
+            'Where'      => [
+                '(trupooosub.preferences_value != \'1\' OR trupooosub.preferences_value IS NULL)'
+            ],
+            'IsRelative' => undef
+        }
+    },
+    {
+        Name         => "Search: valid search / Field ResponsibleOutOfOfficeSubstitute / Operator IN",
+        Search       => {
+            Field    => 'ResponsibleOutOfOfficeSubstitute',
+            Operator => 'IN',
+            Value    => ['1']
+        },
+        Expected     => {
+            'Join'       => [
+                'LEFT OUTER JOIN user_preferences trupooosub ON trupooosub.user_id = st.responsible_user_id AND trupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+            ],
+            'Where'      => [
+                'trupooosub.preferences_value IN (\'1\')'
+            ],
+            'IsRelative' => undef
+        }
+    },
+    {
+        Name         => "Search: valid search / Field ResponsibleOutOfOfficeSubstitute / Operator !IN",
+        Search       => {
+            Field    => 'ResponsibleOutOfOfficeSubstitute',
+            Operator => '!IN',
+            Value    => ['1']
+        },
+        Expected     => {
+             'Join'      => [
+                'LEFT OUTER JOIN user_preferences trupooosub ON trupooosub.user_id = st.responsible_user_id AND trupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+            ],
+            'Where'      => [
+                'trupooosub.preferences_value NOT IN (\'1\')'
+            ],
+            'IsRelative' => undef
+        }
+    },
+    {
+        Name         => "Search: valid search / Field ResponsibleOutOfOfficeSubstitute / Operator LT",
+        Search       => {
+            Field    => 'ResponsibleOutOfOfficeSubstitute',
+            Operator => 'LT',
+            Value    => '1'
+        },
+        Expected     => {
+            'Join'       => [
+                'LEFT OUTER JOIN user_preferences trupooosub ON trupooosub.user_id = st.responsible_user_id AND trupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+            ],
+            'Where'      => [
+                'trupooosub.preferences_value < \'1\''
+            ],
+            'IsRelative' => undef
+        }
+    },
+    {
+        Name         => "Search: valid search / Field ResponsibleOutOfOfficeSubstitute / Operator GT",
+        Search       => {
+            Field    => 'ResponsibleOutOfOfficeSubstitute',
+            Operator => 'GT',
+            Value    => '1'
+        },
+        Expected     => {
+            'Join'       => [
+                'LEFT OUTER JOIN user_preferences trupooosub ON trupooosub.user_id = st.responsible_user_id AND trupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+            ],
+            'Where'      => [
+                'trupooosub.preferences_value > \'1\''
+            ],
+            'IsRelative' => undef
+        }
+    },
+    {
+        Name         => "Search: valid search / Field ResponsibleOutOfOfficeSubstitute / Operator LTE",
+        Search       => {
+            Field    => 'ResponsibleOutOfOfficeSubstitute',
+            Operator => 'LTE',
+            Value    => '1'
+        },
+        Expected     => {
+            'Join'       => [
+                'LEFT OUTER JOIN user_preferences trupooosub ON trupooosub.user_id = st.responsible_user_id AND trupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+            ],
+            'Where'      => [
+                'trupooosub.preferences_value <= \'1\''
+            ],
+            'IsRelative' => undef
+        }
+    },
+    {
+        Name         => "Search: valid search / Field ResponsibleOutOfOfficeSubstitute / Operator GTE",
+        Search       => {
+            Field    => 'ResponsibleOutOfOfficeSubstitute',
+            Operator => 'GTE',
+            Value    => '1'
+        },
+        Expected     => {
+            'Join'       => [
+                'LEFT OUTER JOIN user_preferences trupooosub ON trupooosub.user_id = st.responsible_user_id AND trupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+            ],
+            'Where'      => [
+                'trupooosub.preferences_value >= \'1\''
+            ],
+            'IsRelative' => undef
+        }
+    },
+    {
+        Name         => "Search: valid search / Field ResponsibleOutOfOfficeSubstitute / Operator EMPTY / Value 1",
+        Search       => {
+            Field    => 'ResponsibleOutOfOfficeSubstitute',
+            Operator => 'EMPTY',
+            Value    => 1
+        },
+        Expected     => {
+            'Join'       => [
+                'LEFT OUTER JOIN user_preferences trupooosub ON trupooosub.user_id = st.responsible_user_id AND trupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+            ],
+            'Where'      => [
+                '(trupooosub.preferences_value = \'\' OR trupooosub.preferences_value IS NULL)'
+            ],
+            'IsRelative' => undef
+        }
+    },
+    {
+        Name         => "Search: valid search / Field ResponsibleOutOfOfficeSubstitute / Operator EMPTY / Value 0",
+        Search       => {
+            Field    => 'ResponsibleOutOfOfficeSubstitute',
+            Operator => 'EMPTY',
+            Value    => 0
+        },
+        Expected     => {
+            'Join'       => [
+                'LEFT OUTER JOIN user_preferences trupooosub ON trupooosub.user_id = st.responsible_user_id AND trupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+            ],
+            'Where'      => [
+                '(trupooosub.preferences_value != \'\' AND trupooosub.preferences_value IS NOT NULL)'
+            ],
+            'IsRelative' => undef
+        }
+    },
+    {
+        Name         => "Search: valid search / Field TicketOutOfOfficeSubstitute / Operator EQ",
+        Search       => {
+            Field    => 'TicketOutOfOfficeSubstitute',
+            Operator => 'EQ',
+            Value    => '1'
+        },
+        Expected     => {
+            'Join'       => [
+                'LEFT OUTER JOIN user_preferences toupooos ON toupooos.user_id = st.user_id AND toupooos.preferences_key = \'OutOfOfficeStart\'',
+                'LEFT OUTER JOIN user_preferences toupoooe ON toupoooe.user_id = st.user_id AND toupoooe.preferences_key = \'OutOfOfficeEnd\'',
+                'LEFT OUTER JOIN user_preferences toupooosub ON toupooosub.user_id = st.user_id AND toupooosub.preferences_key = \'OutOfOfficeSubstitute\'',
+                'LEFT OUTER JOIN user_preferences trupooos ON trupooos.user_id = st.responsible_user_id AND trupooos.preferences_key = \'OutOfOfficeStart\'',
+                'LEFT OUTER JOIN user_preferences trupoooe ON trupoooe.user_id = st.responsible_user_id AND trupoooe.preferences_key = \'OutOfOfficeEnd\'',
+                'LEFT OUTER JOIN user_preferences trupooosub ON trupooosub.user_id = st.responsible_user_id AND trupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+            ],
+            'Where'      => [
+                '(((toupooos.preferences_value <= \'2014-01-01\' AND toupoooe.preferences_value >= \'2014-01-01\') AND toupooosub.preferences_value = \'1\') OR ((trupooos.preferences_value <= \'2014-01-01\' AND trupoooe.preferences_value >= \'2014-01-01\') AND trupooosub.preferences_value = \'1\'))'
+            ],
+            'IsRelative' => 1
+        }
+    },
+    {
+        Name         => "Search: valid search / Field TicketOutOfOfficeSubstitute / Operator NE",
+        Search       => {
+            Field    => 'TicketOutOfOfficeSubstitute',
+            Operator => 'NE',
+            Value    => '1'
+        },
+        Expected     => {
+            'Join'       => [
+                'LEFT OUTER JOIN user_preferences toupooos ON toupooos.user_id = st.user_id AND toupooos.preferences_key = \'OutOfOfficeStart\'',
+                'LEFT OUTER JOIN user_preferences toupoooe ON toupoooe.user_id = st.user_id AND toupoooe.preferences_key = \'OutOfOfficeEnd\'',
+                'LEFT OUTER JOIN user_preferences toupooosub ON toupooosub.user_id = st.user_id AND toupooosub.preferences_key = \'OutOfOfficeSubstitute\'',
+                'LEFT OUTER JOIN user_preferences trupooos ON trupooos.user_id = st.responsible_user_id AND trupooos.preferences_key = \'OutOfOfficeStart\'',
+                'LEFT OUTER JOIN user_preferences trupoooe ON trupoooe.user_id = st.responsible_user_id AND trupoooe.preferences_key = \'OutOfOfficeEnd\'',
+                'LEFT OUTER JOIN user_preferences trupooosub ON trupooosub.user_id = st.responsible_user_id AND trupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+            ],
+            'Where'      => [
+                '(((toupooos.preferences_value <= \'2014-01-01\' AND toupoooe.preferences_value >= \'2014-01-01\') AND (toupooosub.preferences_value != \'1\' OR toupooosub.preferences_value IS NULL)) OR ((trupooos.preferences_value <= \'2014-01-01\' AND trupoooe.preferences_value >= \'2014-01-01\') AND (trupooosub.preferences_value != \'1\' OR trupooosub.preferences_value IS NULL)))'
+            ],
+            'IsRelative' => 1
+        }
+    },
+    {
+        Name         => "Search: valid search / Field TicketOutOfOfficeSubstitute / Operator IN",
+        Search       => {
+            Field    => 'TicketOutOfOfficeSubstitute',
+            Operator => 'IN',
+            Value    => ['1']
+        },
+        Expected     => {
+            'Join'       => [
+                'LEFT OUTER JOIN user_preferences toupooos ON toupooos.user_id = st.user_id AND toupooos.preferences_key = \'OutOfOfficeStart\'',
+                'LEFT OUTER JOIN user_preferences toupoooe ON toupoooe.user_id = st.user_id AND toupoooe.preferences_key = \'OutOfOfficeEnd\'',
+                'LEFT OUTER JOIN user_preferences toupooosub ON toupooosub.user_id = st.user_id AND toupooosub.preferences_key = \'OutOfOfficeSubstitute\'',
+                'LEFT OUTER JOIN user_preferences trupooos ON trupooos.user_id = st.responsible_user_id AND trupooos.preferences_key = \'OutOfOfficeStart\'',
+                'LEFT OUTER JOIN user_preferences trupoooe ON trupoooe.user_id = st.responsible_user_id AND trupoooe.preferences_key = \'OutOfOfficeEnd\'',
+                'LEFT OUTER JOIN user_preferences trupooosub ON trupooosub.user_id = st.responsible_user_id AND trupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+            ],
+            'Where'      => [
+                '(((toupooos.preferences_value <= \'2014-01-01\' AND toupoooe.preferences_value >= \'2014-01-01\') AND toupooosub.preferences_value IN (\'1\')) OR ((trupooos.preferences_value <= \'2014-01-01\' AND trupoooe.preferences_value >= \'2014-01-01\') AND trupooosub.preferences_value IN (\'1\')))'
+            ],
+            'IsRelative' => 1
+        }
+    },
+    {
+        Name         => "Search: valid search / Field TicketOutOfOfficeSubstitute / Operator !IN",
+        Search       => {
+            Field    => 'TicketOutOfOfficeSubstitute',
+            Operator => '!IN',
+            Value    => ['1']
+        },
+        Expected     => {
+             'Join'      => [
+                'LEFT OUTER JOIN user_preferences toupooos ON toupooos.user_id = st.user_id AND toupooos.preferences_key = \'OutOfOfficeStart\'',
+                'LEFT OUTER JOIN user_preferences toupoooe ON toupoooe.user_id = st.user_id AND toupoooe.preferences_key = \'OutOfOfficeEnd\'',
+                'LEFT OUTER JOIN user_preferences toupooosub ON toupooosub.user_id = st.user_id AND toupooosub.preferences_key = \'OutOfOfficeSubstitute\'',
+                'LEFT OUTER JOIN user_preferences trupooos ON trupooos.user_id = st.responsible_user_id AND trupooos.preferences_key = \'OutOfOfficeStart\'',
+                'LEFT OUTER JOIN user_preferences trupoooe ON trupoooe.user_id = st.responsible_user_id AND trupoooe.preferences_key = \'OutOfOfficeEnd\'',
+                'LEFT OUTER JOIN user_preferences trupooosub ON trupooosub.user_id = st.responsible_user_id AND trupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+            ],
+            'Where'      => [
+                '(((toupooos.preferences_value <= \'2014-01-01\' AND toupoooe.preferences_value >= \'2014-01-01\') AND toupooosub.preferences_value NOT IN (\'1\')) OR ((trupooos.preferences_value <= \'2014-01-01\' AND trupoooe.preferences_value >= \'2014-01-01\') AND trupooosub.preferences_value NOT IN (\'1\')))'
+            ],
+            'IsRelative' => 1
+        }
+    },
+    {
+        Name         => "Search: valid search / Field TicketOutOfOfficeSubstitute / Operator LT",
+        Search       => {
+            Field    => 'TicketOutOfOfficeSubstitute',
+            Operator => 'LT',
+            Value    => '1'
+        },
+        Expected     => {
+            'Join'       => [
+                'LEFT OUTER JOIN user_preferences toupooos ON toupooos.user_id = st.user_id AND toupooos.preferences_key = \'OutOfOfficeStart\'',
+                'LEFT OUTER JOIN user_preferences toupoooe ON toupoooe.user_id = st.user_id AND toupoooe.preferences_key = \'OutOfOfficeEnd\'',
+                'LEFT OUTER JOIN user_preferences toupooosub ON toupooosub.user_id = st.user_id AND toupooosub.preferences_key = \'OutOfOfficeSubstitute\'',
+                'LEFT OUTER JOIN user_preferences trupooos ON trupooos.user_id = st.responsible_user_id AND trupooos.preferences_key = \'OutOfOfficeStart\'',
+                'LEFT OUTER JOIN user_preferences trupoooe ON trupoooe.user_id = st.responsible_user_id AND trupoooe.preferences_key = \'OutOfOfficeEnd\'',
+                'LEFT OUTER JOIN user_preferences trupooosub ON trupooosub.user_id = st.responsible_user_id AND trupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+            ],
+            'Where'      => [
+                '(((toupooos.preferences_value <= \'2014-01-01\' AND toupoooe.preferences_value >= \'2014-01-01\') AND toupooosub.preferences_value < \'1\') OR ((trupooos.preferences_value <= \'2014-01-01\' AND trupoooe.preferences_value >= \'2014-01-01\') AND trupooosub.preferences_value < \'1\'))'
+            ],
+            'IsRelative' => 1
+        }
+    },
+    {
+        Name         => "Search: valid search / Field TicketOutOfOfficeSubstitute / Operator GT",
+        Search       => {
+            Field    => 'TicketOutOfOfficeSubstitute',
+            Operator => 'GT',
+            Value    => '1'
+        },
+        Expected     => {
+            'Join'       => [
+                'LEFT OUTER JOIN user_preferences toupooos ON toupooos.user_id = st.user_id AND toupooos.preferences_key = \'OutOfOfficeStart\'',
+                'LEFT OUTER JOIN user_preferences toupoooe ON toupoooe.user_id = st.user_id AND toupoooe.preferences_key = \'OutOfOfficeEnd\'',
+                'LEFT OUTER JOIN user_preferences toupooosub ON toupooosub.user_id = st.user_id AND toupooosub.preferences_key = \'OutOfOfficeSubstitute\'',
+                'LEFT OUTER JOIN user_preferences trupooos ON trupooos.user_id = st.responsible_user_id AND trupooos.preferences_key = \'OutOfOfficeStart\'',
+                'LEFT OUTER JOIN user_preferences trupoooe ON trupoooe.user_id = st.responsible_user_id AND trupoooe.preferences_key = \'OutOfOfficeEnd\'',
+                'LEFT OUTER JOIN user_preferences trupooosub ON trupooosub.user_id = st.responsible_user_id AND trupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+            ],
+            'Where'      => [
+                '(((toupooos.preferences_value <= \'2014-01-01\' AND toupoooe.preferences_value >= \'2014-01-01\') AND toupooosub.preferences_value > \'1\') OR ((trupooos.preferences_value <= \'2014-01-01\' AND trupoooe.preferences_value >= \'2014-01-01\') AND trupooosub.preferences_value > \'1\'))'
+            ],
+            'IsRelative' => 1
+        }
+    },
+    {
+        Name         => "Search: valid search / Field TicketOutOfOfficeSubstitute / Operator LTE",
+        Search       => {
+            Field    => 'TicketOutOfOfficeSubstitute',
+            Operator => 'LTE',
+            Value    => '1'
+        },
+        Expected     => {
+            'Join'       => [
+                'LEFT OUTER JOIN user_preferences toupooos ON toupooos.user_id = st.user_id AND toupooos.preferences_key = \'OutOfOfficeStart\'',
+                'LEFT OUTER JOIN user_preferences toupoooe ON toupoooe.user_id = st.user_id AND toupoooe.preferences_key = \'OutOfOfficeEnd\'',
+                'LEFT OUTER JOIN user_preferences toupooosub ON toupooosub.user_id = st.user_id AND toupooosub.preferences_key = \'OutOfOfficeSubstitute\'',
+                'LEFT OUTER JOIN user_preferences trupooos ON trupooos.user_id = st.responsible_user_id AND trupooos.preferences_key = \'OutOfOfficeStart\'',
+                'LEFT OUTER JOIN user_preferences trupoooe ON trupoooe.user_id = st.responsible_user_id AND trupoooe.preferences_key = \'OutOfOfficeEnd\'',
+                'LEFT OUTER JOIN user_preferences trupooosub ON trupooosub.user_id = st.responsible_user_id AND trupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+            ],
+            'Where'      => [
+                '(((toupooos.preferences_value <= \'2014-01-01\' AND toupoooe.preferences_value >= \'2014-01-01\') AND toupooosub.preferences_value <= \'1\') OR ((trupooos.preferences_value <= \'2014-01-01\' AND trupoooe.preferences_value >= \'2014-01-01\') AND trupooosub.preferences_value <= \'1\'))'
+            ],
+            'IsRelative' => 1
+        }
+    },
+    {
+        Name         => "Search: valid search / Field TicketOutOfOfficeSubstitute / Operator GTE",
+        Search       => {
+            Field    => 'TicketOutOfOfficeSubstitute',
+            Operator => 'GTE',
+            Value    => '1'
+        },
+        Expected     => {
+            'Join'       => [
+                'LEFT OUTER JOIN user_preferences toupooos ON toupooos.user_id = st.user_id AND toupooos.preferences_key = \'OutOfOfficeStart\'',
+                'LEFT OUTER JOIN user_preferences toupoooe ON toupoooe.user_id = st.user_id AND toupoooe.preferences_key = \'OutOfOfficeEnd\'',
+                'LEFT OUTER JOIN user_preferences toupooosub ON toupooosub.user_id = st.user_id AND toupooosub.preferences_key = \'OutOfOfficeSubstitute\'',
+                'LEFT OUTER JOIN user_preferences trupooos ON trupooos.user_id = st.responsible_user_id AND trupooos.preferences_key = \'OutOfOfficeStart\'',
+                'LEFT OUTER JOIN user_preferences trupoooe ON trupoooe.user_id = st.responsible_user_id AND trupoooe.preferences_key = \'OutOfOfficeEnd\'',
+                'LEFT OUTER JOIN user_preferences trupooosub ON trupooosub.user_id = st.responsible_user_id AND trupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+            ],
+            'Where'      => [
+                '(((toupooos.preferences_value <= \'2014-01-01\' AND toupoooe.preferences_value >= \'2014-01-01\') AND toupooosub.preferences_value >= \'1\') OR ((trupooos.preferences_value <= \'2014-01-01\' AND trupoooe.preferences_value >= \'2014-01-01\') AND trupooosub.preferences_value >= \'1\'))'
+            ],
+            'IsRelative' => 1
+        }
+    },
+    {
+        Name         => "Search: valid search / Field TicketOutOfOfficeSubstitute / Operator EMPTY / Value 1",
+        Search       => {
+            Field    => 'TicketOutOfOfficeSubstitute',
+            Operator => 'EMPTY',
+            Value    => 1
+        },
+        Expected     => {
+            'Join'       => [
+                'LEFT OUTER JOIN user_preferences toupooos ON toupooos.user_id = st.user_id AND toupooos.preferences_key = \'OutOfOfficeStart\'',
+                'LEFT OUTER JOIN user_preferences toupoooe ON toupoooe.user_id = st.user_id AND toupoooe.preferences_key = \'OutOfOfficeEnd\'',
+                'LEFT OUTER JOIN user_preferences toupooosub ON toupooosub.user_id = st.user_id AND toupooosub.preferences_key = \'OutOfOfficeSubstitute\'',
+                'LEFT OUTER JOIN user_preferences trupooos ON trupooos.user_id = st.responsible_user_id AND trupooos.preferences_key = \'OutOfOfficeStart\'',
+                'LEFT OUTER JOIN user_preferences trupoooe ON trupoooe.user_id = st.responsible_user_id AND trupoooe.preferences_key = \'OutOfOfficeEnd\'',
+                'LEFT OUTER JOIN user_preferences trupooosub ON trupooosub.user_id = st.responsible_user_id AND trupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+            ],
+            'Where'      => [
+                '(((toupooos.preferences_value <= \'2014-01-01\' AND toupoooe.preferences_value >= \'2014-01-01\') AND (toupooosub.preferences_value = \'\' OR toupooosub.preferences_value IS NULL)) OR ((trupooos.preferences_value <= \'2014-01-01\' AND trupoooe.preferences_value >= \'2014-01-01\') AND (trupooosub.preferences_value = \'\' OR trupooosub.preferences_value IS NULL)))'
+            ],
+            'IsRelative' => 1
+        }
+    },
+    {
+        Name         => "Search: valid search / Field TicketOutOfOfficeSubstitute / Operator EMPTY / Value 0",
+        Search       => {
+            Field    => 'TicketOutOfOfficeSubstitute',
+            Operator => 'EMPTY',
+            Value    => 0
+        },
+        Expected     => {
+            'Join'       => [
+                'LEFT OUTER JOIN user_preferences toupooos ON toupooos.user_id = st.user_id AND toupooos.preferences_key = \'OutOfOfficeStart\'',
+                'LEFT OUTER JOIN user_preferences toupoooe ON toupoooe.user_id = st.user_id AND toupoooe.preferences_key = \'OutOfOfficeEnd\'',
+                'LEFT OUTER JOIN user_preferences toupooosub ON toupooosub.user_id = st.user_id AND toupooosub.preferences_key = \'OutOfOfficeSubstitute\'',
+                'LEFT OUTER JOIN user_preferences trupooos ON trupooos.user_id = st.responsible_user_id AND trupooos.preferences_key = \'OutOfOfficeStart\'',
+                'LEFT OUTER JOIN user_preferences trupoooe ON trupoooe.user_id = st.responsible_user_id AND trupoooe.preferences_key = \'OutOfOfficeEnd\'',
+                'LEFT OUTER JOIN user_preferences trupooosub ON trupooosub.user_id = st.responsible_user_id AND trupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+            ],
+            'Where'      => [
+                '(((toupooos.preferences_value <= \'2014-01-01\' AND toupoooe.preferences_value >= \'2014-01-01\') AND (toupooosub.preferences_value != \'\' AND toupooosub.preferences_value IS NOT NULL)) OR ((trupooos.preferences_value <= \'2014-01-01\' AND trupoooe.preferences_value >= \'2014-01-01\') AND (trupooosub.preferences_value != \'\' AND trupooosub.preferences_value IS NOT NULL)))'
             ],
             'IsRelative' => 1
         }
@@ -1117,10 +1714,10 @@ my @SortTests = (
         Expected  => {
             'Join'    => [],
             'OrderBy' => [
-                'st.user_id'
+                'SortAttr0'
             ],
             'Select'  => [
-                'st.user_id'
+                'st.user_id AS SortAttr0'
             ]
         }
     },
@@ -1133,14 +1730,14 @@ my @SortTests = (
                 'LEFT OUTER JOIN contact touc ON touc.user_id = tou.id'
             ],
             'OrderBy' => [
-                'LOWER(touc.lastname)',
-                'LOWER(touc.firstname)',
-                'LOWER(tou.login)'
+                'SortAttr0',
+                'SortAttr1',
+                'SortAttr2'
             ],
             'Select' => [
-                'touc.lastname',
-                'touc.firstname',
-                'tou.login'
+                'LOWER(touc.lastname) AS SortAttr0',
+                'LOWER(touc.firstname) AS SortAttr1',
+                'LOWER(tou.login) AS SortAttr2'
             ]
         }
     },
@@ -1153,12 +1750,12 @@ my @SortTests = (
                 'LEFT OUTER JOIN contact touc ON touc.user_id = tou.id'
             ],
             'OrderBy' => [
-                'LOWER(touc.lastname)',
-                'LOWER(touc.firstname)'
+                'SortAttr0',
+                'SortAttr1'
             ],
             'Select' => [
-                'touc.lastname',
-                'touc.firstname'
+                'LOWER(touc.lastname) AS SortAttr0',
+                'LOWER(touc.firstname) AS SortAttr1'
             ]
         }
     },
@@ -1168,10 +1765,10 @@ my @SortTests = (
         Expected  => {
             'Join'    => [],
             'OrderBy' => [
-                'st.responsible_user_id'
+                'SortAttr0'
             ],
             'Select'  => [
-                'st.responsible_user_id'
+                'st.responsible_user_id AS SortAttr0'
             ]
         }
     },
@@ -1184,14 +1781,14 @@ my @SortTests = (
                 'LEFT OUTER JOIN contact truc ON truc.user_id = tru.id'
             ],
             'OrderBy' => [
-                'LOWER(truc.lastname)',
-                'LOWER(truc.firstname)',
-                'LOWER(tru.login)'
+                'SortAttr0',
+                'SortAttr1',
+                'SortAttr2'
             ],
             'Select' => [
-                'truc.lastname',
-                'truc.firstname',
-                'tru.login'
+                'LOWER(truc.lastname) AS SortAttr0',
+                'LOWER(truc.firstname) AS SortAttr1',
+                'LOWER(tru.login) AS SortAttr2'
             ]
         }
     },
@@ -1204,12 +1801,12 @@ my @SortTests = (
                 'LEFT OUTER JOIN contact truc ON truc.user_id = tru.id'
             ],
             'OrderBy' => [
-                'LOWER(truc.lastname)',
-                'LOWER(truc.firstname)'
+                'SortAttr0',
+                'SortAttr1'
             ],
             'Select' => [
-                'truc.lastname',
-                'truc.firstname'
+                'LOWER(truc.lastname) AS SortAttr0',
+                'LOWER(truc.firstname) AS SortAttr1'
             ]
         }
     },
@@ -1373,6 +1970,26 @@ $Kernel::OM->Get('Role')->RoleUserAdd(
 $Self->True(
     $UserID3,
     'Third user created'
+);
+
+my $UserPOOOOSub1 = $Kernel::OM->Get('User')->SetPreferences(
+    Key    => 'OutOfOfficeSubstitute',
+    Value  => $UserID2,
+    UserID => $UserID1,
+);
+$Self->True(
+    $UserPOOOOSub1,
+    'OutOfOfficeSubstitute for first user created'
+);
+
+my $UserPOOOOSub2 = $Kernel::OM->Get('User')->SetPreferences(
+    Key    => 'OutOfOfficeSubstitute',
+    Value  => $UserID3,
+    UserID => $UserID2,
+);
+$Self->True(
+    $UserPOOOOSub2,
+    'OutOfOfficeSubstitute for second user created'
 );
 
 # discard contact object to process events
@@ -2255,6 +2872,110 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID2,$TicketID3]
     },
     {
+        Name     => "Search: Field OwnerOutOfOfficeSubstitute / Operator EQ / Value \$UserID3",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'OwnerOutOfOfficeSubstitute',
+                    Operator => 'EQ',
+                    Value    => $UserID3
+                }
+            ]
+        },
+        Expected => [$TicketID2]
+    },
+    {
+        Name     => "Search: Field OwnerOutOfOfficeSubstitute / Operator NE / Value \$UserID3",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'OwnerOutOfOfficeSubstitute',
+                    Operator => 'NE',
+                    Value    => $UserID3
+                }
+            ]
+        },
+        Expected => [$TicketID1,$TicketID3]
+    },
+    {
+        Name     => "Search: Field OwnerOutOfOfficeSubstitute / Operator IN / Value [\$UserID2,\$UserID3]",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'OwnerOutOfOfficeSubstitute',
+                    Operator => 'IN',
+                    Value    => [$UserID2,$UserID3]
+                }
+            ]
+        },
+        Expected => [$TicketID1, $TicketID2]
+    },
+    {
+        Name     => "Search: Field OwnerOutOfOfficeSubstitute / Operator !IN / Value [\$UserID1,\$UserID3]",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'OwnerOutOfOfficeSubstitute',
+                    Operator => '!IN',
+                    Value    => [$UserID1,$UserID3]
+                }
+            ]
+        },
+        Expected => [$TicketID1]
+    },
+    {
+        Name     => "Search: Field OwnerOutOfOfficeSubstitute / Operator LT / Value \$UserID3",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'OwnerOutOfOfficeSubstitute',
+                    Operator => 'LT',
+                    Value    => $UserID3
+                }
+            ]
+        },
+        Expected => [$TicketID1]
+    },
+    {
+        Name     => "Search: Field OwnerOutOfOfficeSubstitute / Operator GT / Value \$UserID2",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'OwnerOutOfOfficeSubstitute',
+                    Operator => 'GT',
+                    Value    => $UserID2
+                }
+            ]
+        },
+        Expected => [$TicketID2]
+    },
+    {
+        Name     => "Search: Field OwnerOutOfOfficeSubstitute / Operator LTE / Value \$UserID3",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'OwnerOutOfOfficeSubstitute',
+                    Operator => 'LTE',
+                    Value    => $UserID3
+                }
+            ]
+        },
+        Expected => [$TicketID1, $TicketID2]
+    },
+    {
+        Name     => "Search: Field OwnerOutOfOfficeSubstitute / Operator GTE / Value \$UserID3",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'OwnerOutOfOfficeSubstitute',
+                    Operator => 'GTE',
+                    Value    => $UserID3
+                }
+            ]
+        },
+        Expected => [$TicketID2]
+    },
+    {
         Name     => 'Search: Field ResponsibleOutOfOffice / Operator EQ / Value 1',
         Search   => {
             'AND' => [
@@ -2279,7 +3000,215 @@ my @IntegrationSearchTests = (
             ]
         },
         Expected => [$TicketID2,$TicketID3]
-    }
+    },
+    {
+        Name     => "Search: Field ResponsibleOutOfOfficeSubstitute / Operator EQ / Value \$UserID3",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'ResponsibleOutOfOfficeSubstitute',
+                    Operator => 'EQ',
+                    Value    => $UserID3
+                }
+            ]
+        },
+        Expected => [$TicketID2]
+    },
+    {
+        Name     => "Search: Field ResponsibleOutOfOfficeSubstitute / Operator NE / Value \$UserID3",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'ResponsibleOutOfOfficeSubstitute',
+                    Operator => 'NE',
+                    Value    => $UserID3
+                }
+            ]
+        },
+        Expected => [$TicketID1,$TicketID3]
+    },
+    {
+        Name     => "Search: Field ResponsibleOutOfOfficeSubstitute / Operator IN / Value [\$UserID2,\$UserID3]",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'ResponsibleOutOfOfficeSubstitute',
+                    Operator => 'IN',
+                    Value    => [$UserID2,$UserID3]
+                }
+            ]
+        },
+        Expected => [$TicketID1, $TicketID2]
+    },
+    {
+        Name     => "Search: Field ResponsibleOutOfOfficeSubstitute / Operator !IN / Value [\$UserID1,\$UserID3]",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'ResponsibleOutOfOfficeSubstitute',
+                    Operator => '!IN',
+                    Value    => [$UserID1,$UserID3]
+                }
+            ]
+        },
+        Expected => [$TicketID1]
+    },
+    {
+        Name     => "Search: Field ResponsibleOutOfOfficeSubstitute / Operator LT / Value \$UserID3",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'ResponsibleOutOfOfficeSubstitute',
+                    Operator => 'LT',
+                    Value    => $UserID3
+                }
+            ]
+        },
+        Expected => [$TicketID1]
+    },
+    {
+        Name     => "Search: Field ResponsibleOutOfOfficeSubstitute / Operator GT / Value \$UserID2",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'ResponsibleOutOfOfficeSubstitute',
+                    Operator => 'GT',
+                    Value    => $UserID2
+                }
+            ]
+        },
+        Expected => [$TicketID2]
+    },
+    {
+        Name     => "Search: Field ResponsibleOutOfOfficeSubstitute / Operator LTE / Value \$UserID3",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'ResponsibleOutOfOfficeSubstitute',
+                    Operator => 'LTE',
+                    Value    => $UserID3
+                }
+            ]
+        },
+        Expected => [$TicketID1, $TicketID2]
+    },
+    {
+        Name     => "Search: Field ResponsibleOutOfOfficeSubstitute / Operator GTE / Value \$UserID3",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'ResponsibleOutOfOfficeSubstitute',
+                    Operator => 'GTE',
+                    Value    => $UserID3
+                }
+            ]
+        },
+        Expected => [$TicketID2]
+    },
+    {
+        Name     => "Search: Field TicketOutOfOfficeSubstitute / Operator EQ / Value \$UserID2",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'TicketOutOfOfficeSubstitute',
+                    Operator => 'EQ',
+                    Value    => $UserID2
+                }
+            ]
+        },
+        Expected => [$TicketID1]
+    },
+    {
+        Name     => "Search: Field TicketOutOfOfficeSubstitute / Operator NE / Value \$UserID3",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'TicketOutOfOfficeSubstitute',
+                    Operator => 'NE',
+                    Value    => $UserID3
+                }
+            ]
+        },
+        Expected => [$TicketID1]
+    },
+    {
+        Name     => "Search: Field TicketOutOfOfficeSubstitute / Operator IN / Value [\$UserID2,\$UserID3]",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'TicketOutOfOfficeSubstitute',
+                    Operator => 'IN',
+                    Value    => [$UserID2,$UserID3]
+                }
+            ]
+        },
+        Expected => [$TicketID1]
+    },
+    {
+        Name     => "Search: Field TicketOutOfOfficeSubstitute / Operator !IN / Value [\$UserID1,\$UserID3]",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'TicketOutOfOfficeSubstitute',
+                    Operator => '!IN',
+                    Value    => [$UserID1,$UserID3]
+                }
+            ]
+        },
+        Expected => [$TicketID1]
+    },
+    {
+        Name     => "Search: Field TicketOutOfOfficeSubstitute / Operator LT / Value \$UserID3",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'TicketOutOfOfficeSubstitute',
+                    Operator => 'LT',
+                    Value    => $UserID3
+                }
+            ]
+        },
+        Expected => [$TicketID1]
+    },
+    {
+        Name     => "Search: Field TicketOutOfOfficeSubstitute / Operator GT / Value \$UserID1",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'TicketOutOfOfficeSubstitute',
+                    Operator => 'GT',
+                    Value    => $UserID1
+                }
+            ]
+        },
+        Expected => [$TicketID1]
+    },
+    {
+        Name     => "Search: Field TicketOutOfOfficeSubstitute / Operator LTE / Value \$UserID3",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'TicketOutOfOfficeSubstitute',
+                    Operator => 'LTE',
+                    Value    => $UserID3
+                }
+            ]
+        },
+        Expected => [$TicketID1]
+    },
+    {
+        Name     => "Search: Field TicketOutOfOfficeSubstitute / Operator GTE / Value \$UserID2",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'TicketOutOfOfficeSubstitute',
+                    Operator => 'GTE',
+                    Value    => $UserID2
+                }
+            ]
+        },
+        Expected => [$TicketID1]
+    },
 );
 for my $Test ( @IntegrationSearchTests ) {
     my @Result = $ObjectSearch->Search(

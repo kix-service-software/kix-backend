@@ -127,7 +127,34 @@ Given qr/(\d+) of faq articles$/, sub {
     }
 };
 
-
+When qr/I create a faq article with no categoryid$/, sub {
+    ( S->{Response}, S->{ResponseContent} ) = _Post(
+        URL     => S->{API_URL}.'/faq/articles',
+        Token   => S->{Token},
+        Content => {
+            FAQArticle => {
+                Title => "Some Text2".rand(),
+                CategoryID => ,
+                Visibility => "internal",
+                Language => "en",
+                ContentType => "text/plain",
+                Number => "13402",
+                Keywords => [
+                    "some",
+                    "keywords"
+                ],
+                Field1 => "Symptom...",
+                Field2 => "Problem...",
+                Field3 => "Solution...",
+                Field4 => "Field4...",
+                Field5 => "Field5...",
+                Field6 => "Comment...",
+                Approved => 1,
+                ValidID => 1
+            }
+        }
+    );
+};
 
 
 

@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
+# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -468,6 +468,13 @@ sub NotificationAdd {
         Type => $Self->{CacheType},
     );
 
+    # push client callback event
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
+        Event     => 'CREATE',
+        Namespace => 'Notification',
+        ObjectID  => $ID,
+    );
+
     return $ID;
 }
 
@@ -634,6 +641,13 @@ sub NotificationUpdate {
         Type => $Self->{CacheType},
     );
 
+    # push client callback event
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
+        Event     => 'UPDATE',
+        Namespace => 'Notification',
+        ObjectID  => $Param{ID},
+    );
+
     return 1;
 }
 
@@ -730,6 +744,13 @@ sub NotificationDelete {
     $Kernel::OM->Get('Log')->Log(
         Priority => 'notice',
         Message  => "NotificationEvent notification '$Check{Name}' deleted (UserID=$Param{UserID}).",
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
+        Event     => 'DELETE',
+        Namespace => 'Notification',
+        ObjectID  => $Param{ID},
     );
 
     return 1;

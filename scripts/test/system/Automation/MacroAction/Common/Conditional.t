@@ -87,6 +87,45 @@ $Self->True(
     'Check MacroUpdate - ExecOrder',
 );
 
+# create false check macro
+my $MacroIDFalseCheck = $Kernel::OM->Get('Automation')->MacroAdd(
+    Name    => 'Conditional - FalseCheck Macro',
+    Type    => 'Ticket',
+    ValidID => 1,
+    UserID  => 1,
+);
+$Self->True(
+    $MacroIDFalseCheck,
+    'FalseCheck MacroAdd',
+);
+
+# create macro action
+my $MacroActionIDFalseCheck = $Kernel::OM->Get('Automation')->MacroActionAdd(
+    MacroID    => $MacroIDFalseCheck,
+    Type       => 'AssembleObject',
+    Parameters => {
+        Type       => 'JSON',
+        Definition => '"False"',
+    },
+    ValidID    => 1,
+    UserID     => 1,
+);
+$Self->True(
+    $MacroActionIDFalseCheck,
+    'FalseCheck MacroActionAdd',
+);
+
+# update macro - set ExecOrder
+my $Success = $Kernel::OM->Get('Automation')->MacroUpdate(
+    ID        => $MacroIDFalseCheck,
+    ExecOrder => [ $MacroActionIDFalseCheck ],
+    UserID    => 1,
+);
+$Self->True(
+    $Success,
+    'FalseCheck MacroUpdate - ExecOrder',
+);
+
 # create macro
 my $MacroID = $Kernel::OM->Get('Automation')->MacroAdd(
     Name    => 'Conditional - Macro',
@@ -104,8 +143,9 @@ my $MacroActionID = $Kernel::OM->Get('Automation')->MacroActionAdd(
     MacroID    => $MacroID,
     Type       => 'Conditional',
     Parameters => {
-        If      => '<KIX_TICKET_TicketID> == ' . $TicketID,
-        MacroID => $MacroIDCheck,
+        If          => '<KIX_TICKET_TicketID> == ' . $TicketID,
+        MacroID     => $MacroIDCheck,
+        ElseMacroID => $MacroIDFalseCheck,
     },
     ValidID    => 1,
     UserID     => 1,
@@ -135,7 +175,7 @@ my @Tests = (
     {
         Name   => 'Negative check TicketID',
         If     => '<KIX_TICKET_TicketID> != ' . $TicketID,
-        Result => undef,
+        Result => 'False',
     },
     {
         Name   => 'Check TicketID AND Title',
@@ -145,17 +185,17 @@ my @Tests = (
     {
         Name   => 'Negative check TicketID AND Title (TicketID missmatch)',
         If     => '<KIX_TICKET_TicketID> != ' . $TicketID . ' && "<KIX_TICKET_Title>" eq "Conditional test ticket"',
-        Result => undef,
+        Result => 'False',
     },
     {
         Name   => 'Negative check TicketID AND Title (Title missmatch)',
         If     => '<KIX_TICKET_TicketID> == ' . $TicketID . ' && "<KIX_TICKET_Title>" ne "Conditional test ticket"',
-        Result => undef,
+        Result => 'False',
     },
     {
         Name   => 'Negative check TicketID AND Title (both missmatch)',
         If     => '<KIX_TICKET_TicketID> != ' . $TicketID . ' && "<KIX_TICKET_Title>" ne "Conditional test ticket"',
-        Result => undef,
+        Result => 'False',
     },
     {
         Name   => 'Check TicketID OR Title',
@@ -175,7 +215,7 @@ my @Tests = (
     {
         Name   => 'Negative check TicketID OR Title (both missmatch)',
         If     => '<KIX_TICKET_TicketID> != ' . $TicketID . ' || "<KIX_TICKET_Title>" ne "Conditional test ticket"',
-        Result => undef,
+        Result => 'False',
     },
     {
         Name   => 'Check ( TicketID OR Title ) AND State',
@@ -195,27 +235,27 @@ my @Tests = (
     {
         Name   => 'Negative check ( TicketID OR Title ) AND State (State missmatch)',
         If     => '( <KIX_TICKET_TicketID> == ' . $TicketID . ' || "<KIX_TICKET_Title>" eq "Conditional test ticket" ) && "<KIX_TICKET_State>" ne "closed"',
-        Result => undef,
+        Result => 'False',
     },
     {
         Name   => 'Negative check ( TicketID OR Title ) AND State (TicketID and Title missmatch)',
         If     => '( <KIX_TICKET_TicketID> != ' . $TicketID . ' || "<KIX_TICKET_Title>" ne "Conditional test ticket" ) && "<KIX_TICKET_State>" eq "closed"',
-        Result => undef,
+        Result => 'False',
     },
     {
         Name   => 'Negative check ( TicketID OR Title ) AND State (TicketID and State missmatch)',
         If     => '( <KIX_TICKET_TicketID> != ' . $TicketID . ' || "<KIX_TICKET_Title>" eq "Conditional test ticket" ) && "<KIX_TICKET_State>" ne "closed"',
-        Result => undef,
+        Result => 'False',
     },
     {
         Name   => 'Negative check ( TicketID OR Title ) AND State (Title and State missmatch)',
         If     => '( <KIX_TICKET_TicketID> == ' . $TicketID . ' || "<KIX_TICKET_Title>" ne "Conditional test ticket" ) && "<KIX_TICKET_State>" ne "closed"',
-        Result => undef,
+        Result => 'False',
     },
     {
         Name   => 'Negative check ( TicketID OR Title ) AND State (All missmatch)',
         If     => '( <KIX_TICKET_TicketID> != ' . $TicketID . ' || "<KIX_TICKET_Title>" ne "Conditional test ticket" ) && "<KIX_TICKET_State>" ne "closed"',
-        Result => undef,
+        Result => 'False',
     },
     {
         Name   => 'Check ( TicketID AND Title ) OR State',
@@ -245,17 +285,17 @@ my @Tests = (
     {
         Name   => 'Negative check ( TicketID AND Title ) OR State (TicketID and State missmatch)',
         If     => '( <KIX_TICKET_TicketID> != ' . $TicketID . ' && "<KIX_TICKET_Title>" eq "Conditional test ticket" ) || "<KIX_TICKET_State>" ne "closed"',
-        Result => undef,
+        Result => 'False',
     },
     {
         Name   => 'Negative check ( TicketID AND Title ) OR State (Title and State missmatch)',
         If     => '( <KIX_TICKET_TicketID> == ' . $TicketID . ' && "<KIX_TICKET_Title>" ne "Conditional test ticket" ) || "<KIX_TICKET_State>" ne "closed"',
-        Result => undef,
+        Result => 'False',
     },
     {
         Name   => 'Negative check ( TicketID AND Title ) OR State (All missmatch)',
         If     => '( <KIX_TICKET_TicketID> != ' . $TicketID . ' && "<KIX_TICKET_Title>" ne "Conditional test ticket" ) || "<KIX_TICKET_State>" ne "closed"',
-        Result => undef,
+        Result => 'False',
     },
 );
 
@@ -272,8 +312,9 @@ for my $Test ( @Tests ) {
     $Success = $Kernel::OM->Get('Automation')->MacroActionUpdate(
         ID         => $MacroActionID,
         Parameters => {
-            If      => $Test->{If},
-            MacroID => $MacroIDCheck,
+            If          => $Test->{If},
+            MacroID     => $MacroIDCheck,
+            ElseMacroID => $MacroIDFalseCheck,
         },
         UserID  => 1,
         ValidID => 1,

@@ -12,60 +12,72 @@ use strict;
 use warnings;
 use utf8;
 
-use vars qw( $Self %Param );
+use vars qw($Self);
 
-# get needed objects
-my $JSONObject = $Kernel::OM->Get('JSON');
+# check supported methods
+for my $Method (
+    qw(
+        Encode Decode
+        True False
+        Jq
+    )
+) {
+    $Self->True(
+        $Kernel::OM->Get('JSON')->can($Method),
+        'JSON object can "' . $Method . '"'
+    );
+}
 
-# Tests for JSON encode method
+# tests for JSON encode method
 my @Tests = (
     {
+        Name   => 'JSON->Encode: undef test',
         Input  => undef,
         Result => 'null',
-        Name   => 'JSON - undef test',
         Silent => 1,
     },
     {
+        Name   => 'JSON->Encode: empty test',
         Input  => '',
         Result => '""',
-        Name   => 'JSON - empty test',
     },
     {
+        Name   => 'JSON->Encode: simple',
         Input  => 'Some Text',
         Result => '"Some Text"',
-        Name   => 'JSON - simple'
     },
     {
+        Name   => 'JSON->Encode: simple',
         Input  => 42,
         Result => '42',
-        Name   => 'JSON - simple'
     },
     {
+        Name   => 'JSON->Encode: simple',
         Input  => [ 1, 2, "3", "Foo", 5 ],
         Result => '[1,2,"3","Foo",5]',
-        Name   => 'JSON - simple'
     },
     {
-        Input => {
+        Name   => 'JSON->Encode: simple',
+        Input  => {
             Key1   => "Value1",
             Key2   => 42,
             "Key3" => "Another Value"
         },
         Result => '{"Key1":"Value1","Key2":42,"Key3":"Another Value"}',
-        Name   => 'JSON - simple'
     },
     {
+        Name   => 'JSON->Encode: bool true',
         Input  => Kernel::System::JSON::True(),
         Result => 'true',
-        Name   => 'JSON - bool true'
     },
     {
+        Name   => 'JSON->Encode: bool false',
         Input  => Kernel::System::JSON::False(),
         Result => 'false',
-        Name   => 'JSON - bool false'
     },
     {
-        Input => [
+        Name   => 'JSON->Encode: complex structure',
+        Input  => [
             [ 1, 2, "Foo", "Bar" ],
             {
                 Key1 => 'Something',
@@ -80,18 +92,15 @@ my @Tests = (
         ],
         Result =>
             '[[1,2,"Foo","Bar"],{"Key1":"Something","Key2":["Foo","Bar"],"Key3":{"Foo":"Bar"},"Key4":{"Bar":["f","o","o"]}}]',
-        Name => 'JSON - complex structure'
     },
     {
+        Name   => 'JSON->Encode: Unicode Line Terminators are not allowed in JavaScript',
         Input  => "Some Text with Unicode Characters that  are not allowed\x{2029} in JavaScript",
         Result => '"Some Text with Unicode Characters that\u2028 are not allowed\u2029 in JavaScript"',
-        Name   => 'JSON - Unicode Line Terminators are not allowed in JavaScript',
     }
 );
-
 for my $Test (@Tests) {
-
-    my $JSON = $JSONObject->Encode(
+    my $JSON = $Kernel::OM->Get('JSON')->Encode(
         Data     => $Test->{Input},
         SortKeys => 1,
         Silent   => $Test->{Silent},
@@ -104,44 +113,52 @@ for my $Test (@Tests) {
     );
 }
 
+# tests for JSON decode method
 @Tests = (
     {
-        Result      => undef,
-        InputDecode => undef,
-        Name        => 'JSON - undef test',
-        Silent      => 1,
+        Name   => 'JSON->Decode: undef test',
+        Data   => undef,
+        Result => undef,
+        Silent => 1,
     },
     {
-        Result      => undef,
-        InputDecode => '" bla blubb',
-        Name        => 'JSON - malformed data test',
-        Silent      => 1,
+        Name   => 'JSON->Decode: malformed data test',
+        Data   => '" bla blubb',
+        Result => undef,
+        Silent => 1,
     },
     {
-        Result      => 'Some Text',
-        InputDecode => '"Some Text"',
-        Name        => 'JSON - simple'
+        Name   => 'JSON->Decode: null',
+        Data   => 'null',
+        Result => undef,
     },
     {
-        Result      => 42,
-        InputDecode => '42',
-        Name        => 'JSON - simple'
+        Name   => 'JSON->Decode: simple string',
+        Data   => '"Some Text"',
+        Result => 'Some Text',
     },
     {
-        Result      => [ 1, 2, "3", "Foo", 5 ],
-        InputDecode => '[1,2,"3","Foo",5]',
-        Name        => 'JSON - simple'
+        Name   => 'JSON->Decode: simple number',
+        Data   => '42',
+        Result => 42,
     },
     {
+        Name   => 'JSON->Decode: simple array',
+        Data   => '[1,2,"3","Foo",5]',
+        Result => [ 1, 2, "3", "Foo", 5 ],
+    },
+    {
+        Name   => 'JSON->Decode: simple hash',
+        Data   => '{"Key1":"Value1","Key2":42,"Key3":"Another Value"}',
         Result => {
             Key1   => "Value1",
             Key2   => 42,
             "Key3" => "Another Value"
         },
-        InputDecode => '{"Key1":"Value1","Key2":42,"Key3":"Another Value"}',
-        Name        => 'JSON - simple'
     },
     {
+        Name   => 'JSON->Decode: complex structure',
+        Data   => '[[1,2,"Foo","Bar"],{"Key1":"Something","Key2":["Foo","Bar"],"Key3":{"Foo":"Bar"},"Key4":{"Bar":["f","o","o"]}}]',
         Result => [
             [ 1, 2, "Foo", "Bar" ],
             {
@@ -155,44 +172,39 @@ for my $Test (@Tests) {
                     }
             },
         ],
-        InputDecode =>
-            '[[1,2,"Foo","Bar"],{"Key1":"Something","Key2":["Foo","Bar"],"Key3":{"Foo":"Bar"},"Key4":{"Bar":["f","o","o"]}}]',
-        Name => 'JSON - complex structure'
     },
     {
-        Result => {'Test' => 1},
-        InputDecode =>
-            '{"Test":true}',
-        Name => 'JSON - booleans'
+        Name   => 'JSON->Decode: boolean true',
+        Data   => 'true',
+        Result => 1,
     },
     {
-        Result => {'Test' => 0},
-        InputDecode =>
-            '{"Test":false}',
-        Name => 'JSON - booleans2'
+        Name   => 'JSON->Decode: boolean false',
+        Data   => 'false',
+        Result => undef,
     },
     {
+        Name   => 'JSON->Decode: hash containing boolean true value',
+        Data   => '{"Key1" : true}',
         Result => {
             Key1 => 1,
         },
-        InputDecode =>
-            '{"Key1" : true}',
-        Name => 'JSON - hash containing booleans'
     },
     {
+        Name   => 'JSON->Decode: hash containing boolean false value',
+        Data   => '{"Key1" : false}',
         Result => {
             Key1 => 0,
         },
-        InputDecode =>
-            '{"Key1" : false}',
-        Name => 'JSON - hash containing booleans2'
     },
     {
-        Result      => [ 1, 0, "3", "Foo", 1 ],
-        InputDecode => '[1,false,"3","Foo",true]',
-        Name        => 'JSON - array containing booleans'
+        Name   => 'JSON->Decode: array containing booleans',
+        Data   => '[1,false,"3","Foo",true]',
+        Result => [ 1, 0, "3", "Foo", 1 ],
     },
     {
+        Name   => 'JSON->Decode: complex structure containing booleans',
+        Data => '[[true,2,"Foo","Bar"],{"Key1":false,"Key2":["Foo","Bar"],"Key3":{"Foo":true},"Key4":{"Bar":[false,"o",true]}}]',
         Result => [
             [ 1, 2, "Foo", "Bar" ],
             {
@@ -206,38 +218,81 @@ for my $Test (@Tests) {
                     }
             },
         ],
-        InputDecode =>
-            '[[true,2,"Foo","Bar"],{"Key1":false,"Key2":["Foo","Bar"],"Key3":{"Foo":true},"Key4":{"Bar":[false,"o",true]}}]',
-        Name => 'JSON - complex structure containing booleans'
     },
 );
-
 for my $Test (@Tests) {
-
-    my $JSON = $JSONObject->Decode(
-        Data   => $Test->{InputDecode},
+    my $JSON = $Kernel::OM->Get('JSON')->Decode(
+        Data   => $Test->{Data},
         Silent => $Test->{Silent},
     );
 
-    if ( defined( $Test->{Result} ) ) {
-        $Self->IsDeeply(
-            $JSON,
-            $Test->{Result},
-            $Test->{Name},
-        );
+    $Self->IsDeeply(
+        $JSON,
+        $Test->{Result},
+        $Test->{Name},
+    );
+}
+
+# test for JSON true method
+$Self->IsDeeply(
+     $Kernel::OM->Get('JSON')->True(),
+    \1,
+    'JSON->True',
+);
+
+# test for JSON false method
+$Self->IsDeeply(
+     $Kernel::OM->Get('JSON')->False(),
+    \0,
+    'JSON->False',
+);
+
+# tests for JSON jq method
+@Tests = (
+    {
+        Name   => 'JSON->Jq: undef data',
+        Data   => undef,
+        Filter => '. - map(. | select(.Flag=="b")) | .[] .Key',
+        Result => undef,
+        Silent => 1,
+    },
+    {
+        Name   => 'JSON->Jq: undef filter',
+        Data   => '[
+            { "Key": 1, "Value": 1111, "Flag": "a" },
+            { "Key": 2, "Value": 2222, "Flag": "b" },
+            { "Key": 3, "Value": 3333, "Flag": "a" }
+        ]',
+        Filter => undef,
+        Result => undef,
+        Silent => 1,
+    },
+    {
+        Name   => 'JSON->Jq: simple test',
+        Data   => '[
+            { "Key": 1, "Value": 1111, "Flag": "a" },
+            { "Key": 2, "Value": 2222, "Flag": "b" },
+            { "Key": 3, "Value": 3333, "Flag": "a" }
+        ]',
+        Filter => '. - map(. | select(.Flag=="b")) | .[] .Key',
+        Result => "1\n3",
     }
-    else {
-        $Self->Is(
-            $JSON,
-            $Test->{Result},
-            $Test->{Name},
-        );
-    }
+);
+for my $Test (@Tests) {
+    my $JSON = $Kernel::OM->Get('JSON')->Jq(
+        Data   => $Test->{Data},
+        Filter => $Test->{Filter},
+        Silent => $Test->{Silent},
+    );
+
+    $Self->IsDeeply(
+        $JSON,
+        $Test->{Result},
+        $Test->{Name},
+    );
 }
 
 1;
-
-
 
 =back
 

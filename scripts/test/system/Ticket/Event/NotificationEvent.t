@@ -962,6 +962,7 @@ my @Tests = (
             Events             => [ 'TicketDynamicFieldUpdate_DFT1' . $RandomID . 'Update' ],
             Recipients         => ['Customer'],
             Channel            => ['email'],
+            CreateArticle      => [1],
             VisibleForCustomer => [1],
             Transports         => ['Email'],
         },
@@ -1418,7 +1419,7 @@ for my $Test (@Tests) {
                 ContentType => 'text/plain',
             }
         }
-    } 
+    }
     elsif ( !$Test->{Message} ) {
         $Message = {
             en => {

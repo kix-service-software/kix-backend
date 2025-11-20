@@ -34,47 +34,28 @@ sub GetSupportedAttributes {
 
     return {
         TicketNumber => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
     };
 }
 
-sub Search {
+sub AttributePrepare {
     my ( $Self, %Param ) = @_;
 
-    # check params
-    return if ( !$Self->_CheckSearchParams( %Param ) );
-
-    # prepare condition
-    my $Condition = $Self->_GetCondition(
-        Operator        => $Param{Search}->{Operator},
-        Column          => 'st.tn',
-        Value           => $Param{Search}->{Value},
-        CaseInsensitive => 1,
-        Silent          => $Param{Silent}
+    my %Attribute = (
+        Column       => 'st.tn',
     );
-    return if ( !$Condition );
+    if ( $Param{PrepareType} eq 'Condition' ) {
+        $Attribute{ConditionDef} = {
+            CaseInsensitive => 1
+        };
+    }
 
-    # return search def
-    return {
-        Where => [ $Condition ]
-    };
-}
-
-sub Sort {
-    my ( $Self, %Param ) = @_;
-
-
-    # check params
-    return if ( !$Self->_CheckSortParams(%Param) );
-
-    # return sort def
-    return {
-        Select  => ['st.tn'],
-        OrderBy => ['st.tn']
-    };
+    return \%Attribute;
 }
 
 1;

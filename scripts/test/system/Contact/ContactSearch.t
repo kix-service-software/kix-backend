@@ -98,7 +98,7 @@ my @Tests = (
         Name        => 'Match A AND B => nothing'
     },
     {
-        Search      => '*Test_A|Login*+*Test_B',
+        Search      => '*Test_A|Last*+*Test_B',
         ResultCount => 2,
         Name        => 'Match A OR all AND B => A and B'
     }

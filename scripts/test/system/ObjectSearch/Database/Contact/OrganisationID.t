@@ -29,7 +29,7 @@ $Self->Is(
 );
 
 # check supported methods
-for my $Method ( qw(GetSupportedAttributes Search Sort) ) {
+for my $Method ( qw(GetSupportedAttributes AttributePrepare Select Search Sort) ) {
     $Self->True(
         $AttributeObject->can($Method),
         'Attribute object can "' . $Method . q{"}
@@ -42,42 +42,56 @@ $Self->IsDeeply(
     $AttributeList,
     {
         OrganisationID => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EMPTY','EQ','NE','IN','!IN'],
+            ValueType      => 'NUMERIC'
         },
         OrganisationIDs => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EMPTY','EQ','NE','IN','!IN'],
+            ValueType      => 'NUMERIC'
         },
         Organisation => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            IsSelectable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EMPTY','EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         OrganisationNumber => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            IsSelectable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EMPTY','EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         PrimaryOrganisationID => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EMPTY','EQ','NE','IN','!IN'],
+            ValueType      => 'NUMERIC'
         },
         PrimaryOrganisation => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EMPTY','EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         PrimaryOrganisationNumber => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EMPTY','EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         }
     },
     'GetSupportedAttributes provides expected data'
@@ -98,6 +112,9 @@ my $QuoteSemicolon = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteSemicolon
 
 # check if database is casesensitive
 my $CaseSensitive = $Kernel::OM->Get('DB')->GetDatabaseFunction('CaseSensitive');
+
+# get handling of order by null
+my $OrderByNull = $Kernel::OM->Get('DB')->GetDatabaseFunction('OrderByNull') || '';
 
 # check Search
 my @SearchTests = (
@@ -176,11 +193,12 @@ my @SearchTests = (
             Value    => '1'
         },
         Expected     => {
-            'Join' => [
+            'IsRelative' => undef,
+            'Join'       => [
                 'LEFT JOIN contact_organisation co ON co.contact_id = c.id'
             ],
-            'Where' => [
-                'co.org_id <> 1'
+            'Where'      => [
+                '(co.org_id <> 1 OR co.org_id IS NULL)'
             ]
         }
     },
@@ -208,11 +226,46 @@ my @SearchTests = (
             Value    => ['1']
         },
         Expected     => {
-            'Join' => [
+            'IsRelative' => undef,
+            'Join'       => [
                 'LEFT JOIN contact_organisation co ON co.contact_id = c.id'
             ],
-            'Where' => [
+            'Where'      => [
                 'co.org_id NOT IN (1)'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field OrganisationID / Operator EMPTY / Value 1',
+        Search       => {
+            Field    => 'OrganisationID',
+            Operator => 'EMPTY',
+            Value    => 1
+        },
+        Expected     => {
+            'IsRelative' => undef,
+            'Join'       => [
+                'LEFT JOIN contact_organisation co ON co.contact_id = c.id'
+            ],
+            'Where'      => [
+                'co.org_id IS NULL'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field OrganisationID / Operator EMPTY / Value 0',
+        Search       => {
+            Field    => 'OrganisationID',
+            Operator => 'EMPTY',
+            Value    => 0
+        },
+        Expected     => {
+            'IsRelative' => undef,
+            'Join'       => [
+                'LEFT JOIN contact_organisation co ON co.contact_id = c.id'
+            ],
+            'Where'      => [
+                'co.org_id IS NOT NULL'
             ]
         }
     },
@@ -240,11 +293,12 @@ my @SearchTests = (
             Value    => '1'
         },
         Expected     => {
-            'Join' => [
+            'IsRelative' => undef,
+            'Join'       => [
                 'LEFT JOIN contact_organisation co ON co.contact_id = c.id'
             ],
-            'Where' => [
-                'co.org_id <> 1'
+            'Where'      => [
+                '(co.org_id <> 1 OR co.org_id IS NULL)'
             ]
         }
     },
@@ -281,6 +335,40 @@ my @SearchTests = (
         }
     },
     {
+        Name         => 'Search: valid search / Field OrganisationIDs / Operator EMPTY / Value 1',
+        Search       => {
+            Field    => 'OrganisationIDs',
+            Operator => 'EMPTY',
+            Value    => 1
+        },
+        Expected     => {
+            'IsRelative' => undef,
+            'Join'       => [
+                'LEFT JOIN contact_organisation co ON co.contact_id = c.id'
+            ],
+            'Where'      => [
+                'co.org_id IS NULL'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field OrganisationIDs / Operator EMPTY / Value 0',
+        Search       => {
+            Field    => 'OrganisationIDs',
+            Operator => 'EMPTY',
+            Value    => 0
+        },
+        Expected     => {
+            'IsRelative' => undef,
+            'Join'       => [
+                'LEFT JOIN contact_organisation co ON co.contact_id = c.id'
+            ],
+            'Where'      => [
+                'co.org_id IS NOT NULL'
+            ]
+        }
+    },
+    {
         Name         => 'Search: valid search / Field PrimaryOrganisationID / Operator EQ',
         Search       => {
             Field    => 'PrimaryOrganisationID',
@@ -305,12 +393,13 @@ my @SearchTests = (
             Value    => '1'
         },
         Expected     => {
-            'Join' => [
+            'IsRelative' => undef,
+            'Join'       => [
                 'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
                 'AND cpo.is_primary = 1'
             ],
-            'Where' => [
-                'cpo.org_id <> 1'
+            'Where'      => [
+                '(cpo.org_id <> 1 OR cpo.org_id IS NULL)'
             ]
         }
     },
@@ -349,6 +438,42 @@ my @SearchTests = (
         }
     },
     {
+        Name         => 'Search: valid search / Field PrimaryOrganisationID / Operator EMPTY / Value 1',
+        Search       => {
+            Field    => 'PrimaryOrganisationID',
+            Operator => 'EMPTY',
+            Value    => 1
+        },
+        Expected     => {
+            'IsRelative' => undef,
+            'Join'       => [
+                'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
+                'AND cpo.is_primary = 1'
+            ],
+            'Where'      => [
+                'cpo.org_id IS NULL'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field PrimaryOrganisationID / Operator EMPTY / Value 0',
+        Search       => {
+            Field    => 'PrimaryOrganisationID',
+            Operator => 'EMPTY',
+            Value    => 0
+        },
+        Expected     => {
+            'IsRelative' => undef,
+            'Join'       => [
+                'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
+                'AND cpo.is_primary = 1'
+            ],
+            'Where'      => [
+                'cpo.org_id IS NOT NULL'
+            ]
+        }
+    },
+    {
         Name         => 'Search: valid search / Field Organisation / Operator EQ',
         Search       => {
             Field    => 'Organisation',
@@ -358,7 +483,7 @@ my @SearchTests = (
         Expected     => {
             'Join' => [
                 'LEFT JOIN contact_organisation co ON co.contact_id = c.id',
-                'INNER JOIN organisation o ON co.org_id = o.id'
+                'LEFT JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(o.name) = \'test\'' : 'o.name = \'test\''
@@ -373,12 +498,13 @@ my @SearchTests = (
             Value    => 'Test'
         },
         Expected     => {
-            'Join' => [
+            'IsRelative' => undef,
+            'Join'       => [
                 'LEFT JOIN contact_organisation co ON co.contact_id = c.id',
-                'INNER JOIN organisation o ON co.org_id = o.id'
+                'LEFT JOIN organisation o ON co.org_id = o.id'
             ],
-            'Where' => [
-                $CaseSensitive ? 'LOWER(o.name) != \'test\'' : 'o.name != \'test\''
+            'Where'      => [
+                $CaseSensitive ? '(LOWER(o.name) != \'test\' OR o.name IS NULL)' : '(o.name != \'test\' OR o.name IS NULL)'
             ]
         }
     },
@@ -392,7 +518,7 @@ my @SearchTests = (
         Expected     => {
             'Join' => [
                 'LEFT JOIN contact_organisation co ON co.contact_id = c.id',
-                'INNER JOIN organisation o ON co.org_id = o.id'
+                'LEFT JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(o.name) IN (\'test\')' : 'o.name IN (\'test\')'
@@ -409,7 +535,7 @@ my @SearchTests = (
         Expected     => {
             'Join' => [
                 'LEFT JOIN contact_organisation co ON co.contact_id = c.id',
-                'INNER JOIN organisation o ON co.org_id = o.id'
+                'LEFT JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(o.name) NOT IN (\'test\')' : 'o.name NOT IN (\'test\')'
@@ -426,7 +552,7 @@ my @SearchTests = (
         Expected     => {
             'Join' => [
                 'LEFT JOIN contact_organisation co ON co.contact_id = c.id',
-                'INNER JOIN organisation o ON co.org_id = o.id'
+                'LEFT JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(o.name) LIKE \'test%\'' : 'o.name LIKE \'test%\''
@@ -443,7 +569,7 @@ my @SearchTests = (
         Expected     => {
             'Join' => [
                 'LEFT JOIN contact_organisation co ON co.contact_id = c.id',
-                'INNER JOIN organisation o ON co.org_id = o.id'
+                'LEFT JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(o.name) LIKE \'%test\'' : 'o.name LIKE \'%test\''
@@ -460,7 +586,7 @@ my @SearchTests = (
         Expected     => {
             'Join' => [
                 'LEFT JOIN contact_organisation co ON co.contact_id = c.id',
-                'INNER JOIN organisation o ON co.org_id = o.id'
+                'LEFT JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(o.name) LIKE \'%test%\'' : 'o.name LIKE \'%test%\''
@@ -477,10 +603,46 @@ my @SearchTests = (
         Expected     => {
             'Join' => [
                 'LEFT JOIN contact_organisation co ON co.contact_id = c.id',
-                'INNER JOIN organisation o ON co.org_id = o.id'
+                'LEFT JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(o.name) LIKE \'test\'' : 'o.name LIKE \'test\''
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field Organisation / Operator EMPTY / Value 1',
+        Search       => {
+            Field    => 'Organisation',
+            Operator => 'EMPTY',
+            Value    => 1
+        },
+        Expected     => {
+            'IsRelative' => undef,
+            'Join'       => [
+                'LEFT JOIN contact_organisation co ON co.contact_id = c.id',
+                'LEFT JOIN organisation o ON co.org_id = o.id'
+            ],
+            'Where'      => [
+                '(o.name = \'\' OR o.name IS NULL)'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field Organisation / Operator EMPTY / Value 0',
+        Search       => {
+            Field    => 'Organisation',
+            Operator => 'EMPTY',
+            Value    => 0
+        },
+        Expected     => {
+            'IsRelative' => undef,
+            'Join'       => [
+                'LEFT JOIN contact_organisation co ON co.contact_id = c.id',
+                'LEFT JOIN organisation o ON co.org_id = o.id'
+            ],
+            'Where'      => [
+                '(o.name != \'\' AND o.name IS NOT NULL)'
             ]
         }
     },
@@ -494,7 +656,7 @@ my @SearchTests = (
         Expected     => {
             'Join' => [
                 'LEFT JOIN contact_organisation co ON co.contact_id = c.id',
-                'INNER JOIN organisation o ON co.org_id = o.id'
+                'LEFT JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(o.number) = \'test\'' : 'o.number = \'test\''
@@ -509,12 +671,13 @@ my @SearchTests = (
             Value    => 'Test'
         },
         Expected     => {
-            'Join' => [
+            'IsRelative' => undef,
+            'Join'       => [
                 'LEFT JOIN contact_organisation co ON co.contact_id = c.id',
-                'INNER JOIN organisation o ON co.org_id = o.id'
+                'LEFT JOIN organisation o ON co.org_id = o.id'
             ],
-            'Where' => [
-                $CaseSensitive ? 'LOWER(o.number) != \'test\'' : 'o.number != \'test\''
+            'Where'      => [
+                $CaseSensitive ? '(LOWER(o.number) != \'test\' OR o.number IS NULL)' : '(o.number != \'test\' OR o.number IS NULL)'
             ]
         }
     },
@@ -528,7 +691,7 @@ my @SearchTests = (
         Expected     => {
             'Join' => [
                 'LEFT JOIN contact_organisation co ON co.contact_id = c.id',
-                'INNER JOIN organisation o ON co.org_id = o.id'
+                'LEFT JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(o.number) IN (\'test\')' : 'o.number IN (\'test\')'
@@ -545,7 +708,7 @@ my @SearchTests = (
         Expected     => {
             'Join' => [
                 'LEFT JOIN contact_organisation co ON co.contact_id = c.id',
-                'INNER JOIN organisation o ON co.org_id = o.id'
+                'LEFT JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(o.number) NOT IN (\'test\')' : 'o.number NOT IN (\'test\')'
@@ -562,7 +725,7 @@ my @SearchTests = (
         Expected     => {
             'Join' => [
                 'LEFT JOIN contact_organisation co ON co.contact_id = c.id',
-                'INNER JOIN organisation o ON co.org_id = o.id'
+                'LEFT JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(o.number) LIKE \'test%\'' : 'o.number LIKE \'test%\''
@@ -579,7 +742,7 @@ my @SearchTests = (
         Expected     => {
             'Join' => [
                 'LEFT JOIN contact_organisation co ON co.contact_id = c.id',
-                'INNER JOIN organisation o ON co.org_id = o.id'
+                'LEFT JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(o.number) LIKE \'%test\'' : 'o.number LIKE \'%test\''
@@ -596,7 +759,7 @@ my @SearchTests = (
         Expected     => {
             'Join' => [
                 'LEFT JOIN contact_organisation co ON co.contact_id = c.id',
-                'INNER JOIN organisation o ON co.org_id = o.id'
+                'LEFT JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(o.number) LIKE \'%test%\'' : 'o.number LIKE \'%test%\''
@@ -613,10 +776,46 @@ my @SearchTests = (
         Expected     => {
             'Join' => [
                 'LEFT JOIN contact_organisation co ON co.contact_id = c.id',
-                'INNER JOIN organisation o ON co.org_id = o.id'
+                'LEFT JOIN organisation o ON co.org_id = o.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(o.number) LIKE \'test\'' : 'o.number LIKE \'test\''
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field OrganisationNumber / Operator EMPTY / Value 1',
+        Search       => {
+            Field    => 'OrganisationNumber',
+            Operator => 'EMPTY',
+            Value    => 1
+        },
+        Expected     => {
+            'IsRelative' => undef,
+            'Join'       => [
+                'LEFT JOIN contact_organisation co ON co.contact_id = c.id',
+                'LEFT JOIN organisation o ON co.org_id = o.id'
+            ],
+            'Where'      => [
+                '(o.number = \'\' OR o.number IS NULL)'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field OrganisationNumber / Operator EMPTY / Value 0',
+        Search       => {
+            Field    => 'OrganisationNumber',
+            Operator => 'EMPTY',
+            Value    => 0
+        },
+        Expected     => {
+            'IsRelative' => undef,
+            'Join'       => [
+                'LEFT JOIN contact_organisation co ON co.contact_id = c.id',
+                'LEFT JOIN organisation o ON co.org_id = o.id'
+            ],
+            'Where'      => [
+                '(o.number != \'\' AND o.number IS NOT NULL)'
             ]
         }
     },
@@ -631,7 +830,7 @@ my @SearchTests = (
             'Join' => [
                 'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
                 'AND cpo.is_primary = 1',
-                'INNER JOIN organisation po ON cpo.org_id = po.id'
+                'LEFT JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(po.name) = \'test\'' : 'po.name = \'test\''
@@ -649,10 +848,10 @@ my @SearchTests = (
             'Join' => [
                 'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
                 'AND cpo.is_primary = 1',
-                'INNER JOIN organisation po ON cpo.org_id = po.id'
+                'LEFT JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
-                $CaseSensitive ? 'LOWER(po.name) != \'test\'' : 'po.name != \'test\''
+                $CaseSensitive ? '(LOWER(po.name) != \'test\' OR po.name IS NULL)' : '(po.name != \'test\' OR po.name IS NULL)'
             ]
         }
     },
@@ -667,7 +866,7 @@ my @SearchTests = (
             'Join' => [
                 'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
                 'AND cpo.is_primary = 1',
-                'INNER JOIN organisation po ON cpo.org_id = po.id'
+                'LEFT JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(po.name) IN (\'test\')' : 'po.name IN (\'test\')'
@@ -685,7 +884,7 @@ my @SearchTests = (
             'Join' => [
                 'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
                 'AND cpo.is_primary = 1',
-                'INNER JOIN organisation po ON cpo.org_id = po.id'
+                'LEFT JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(po.name) NOT IN (\'test\')' : 'po.name NOT IN (\'test\')'
@@ -703,7 +902,7 @@ my @SearchTests = (
             'Join' => [
                 'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
                 'AND cpo.is_primary = 1',
-                'INNER JOIN organisation po ON cpo.org_id = po.id'
+                'LEFT JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(po.name) LIKE \'test%\'' : 'po.name LIKE \'test%\''
@@ -721,7 +920,7 @@ my @SearchTests = (
             'Join' => [
                 'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
                 'AND cpo.is_primary = 1',
-                'INNER JOIN organisation po ON cpo.org_id = po.id'
+                'LEFT JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(po.name) LIKE \'%test\'' : 'po.name LIKE \'%test\''
@@ -740,7 +939,7 @@ my @SearchTests = (
             'Join' => [
                 'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
                 'AND cpo.is_primary = 1',
-                'INNER JOIN organisation po ON cpo.org_id = po.id'
+                'LEFT JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(po.name) LIKE \'%test%\'' : 'po.name LIKE \'%test%\''
@@ -758,10 +957,48 @@ my @SearchTests = (
             'Join' => [
                 'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
                 'AND cpo.is_primary = 1',
-                'INNER JOIN organisation po ON cpo.org_id = po.id'
+                'LEFT JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(po.name) LIKE \'test\'' : 'po.name LIKE \'test\''
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field PrimaryOrganisation / Operator EMPTY / Value 1',
+        Search       => {
+            Field    => 'PrimaryOrganisation',
+            Operator => 'EMPTY',
+            Value    => 1
+        },
+        Expected     => {
+            'IsRelative' => undef,
+            'Join'       => [
+                'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
+                'AND cpo.is_primary = 1',
+                'LEFT JOIN organisation po ON cpo.org_id = po.id'
+            ],
+            'Where'      => [
+                '(po.name = \'\' OR po.name IS NULL)'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field PrimaryOrganisation / Operator EMPTY / Value 0',
+        Search       => {
+            Field    => 'PrimaryOrganisation',
+            Operator => 'EMPTY',
+            Value    => 0
+        },
+        Expected     => {
+            'IsRelative' => undef,
+            'Join'       => [
+                'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
+                'AND cpo.is_primary = 1',
+                'LEFT JOIN organisation po ON cpo.org_id = po.id'
+            ],
+            'Where'      => [
+                '(po.name != \'\' AND po.name IS NOT NULL)'
             ]
         }
     },
@@ -776,7 +1013,7 @@ my @SearchTests = (
             'Join' => [
                 'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
                 'AND cpo.is_primary = 1',
-                'INNER JOIN organisation po ON cpo.org_id = po.id'
+                'LEFT JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(po.number) = \'test\'' : 'po.number = \'test\''
@@ -794,10 +1031,10 @@ my @SearchTests = (
             'Join' => [
                 'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
                 'AND cpo.is_primary = 1',
-                'INNER JOIN organisation po ON cpo.org_id = po.id'
+                'LEFT JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
-                $CaseSensitive ? 'LOWER(po.number) != \'test\'' : 'po.number != \'test\''
+                $CaseSensitive ? '(LOWER(po.number) != \'test\' OR po.number IS NULL)' : '(po.number != \'test\' OR po.number IS NULL)'
             ]
         }
     },
@@ -812,7 +1049,7 @@ my @SearchTests = (
             'Join' => [
                 'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
                 'AND cpo.is_primary = 1',
-                'INNER JOIN organisation po ON cpo.org_id = po.id'
+                'LEFT JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(po.number) IN (\'test\')' : 'po.number IN (\'test\')'
@@ -830,7 +1067,7 @@ my @SearchTests = (
             'Join' => [
                 'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
                 'AND cpo.is_primary = 1',
-                'INNER JOIN organisation po ON cpo.org_id = po.id'
+                'LEFT JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(po.number) NOT IN (\'test\')' : 'po.number NOT IN (\'test\')'
@@ -848,7 +1085,7 @@ my @SearchTests = (
             'Join' => [
                 'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
                 'AND cpo.is_primary = 1',
-                'INNER JOIN organisation po ON cpo.org_id = po.id'
+                'LEFT JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(po.number) LIKE \'test%\'' : 'po.number LIKE \'test%\''
@@ -866,7 +1103,7 @@ my @SearchTests = (
             'Join' => [
                 'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
                 'AND cpo.is_primary = 1',
-                'INNER JOIN organisation po ON cpo.org_id = po.id'
+                'LEFT JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(po.number) LIKE \'%test\'' : 'po.number LIKE \'%test\''
@@ -884,7 +1121,7 @@ my @SearchTests = (
             'Join' => [
                 'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
                 'AND cpo.is_primary = 1',
-                'INNER JOIN organisation po ON cpo.org_id = po.id'
+                'LEFT JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(po.number) LIKE \'%test%\'' : 'po.number LIKE \'%test%\''
@@ -902,10 +1139,48 @@ my @SearchTests = (
             'Join' => [
                 'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
                 'AND cpo.is_primary = 1',
-                'INNER JOIN organisation po ON cpo.org_id = po.id'
+                'LEFT JOIN organisation po ON cpo.org_id = po.id'
             ],
             'Where' => [
                 $CaseSensitive ? 'LOWER(po.number) LIKE \'test\'' : 'po.number LIKE \'test\''
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field PrimaryOrganisationNumber / Operator EMPTY / Value 1',
+        Search       => {
+            Field    => 'PrimaryOrganisationNumber',
+            Operator => 'EMPTY',
+            Value    => 1
+        },
+        Expected     => {
+            'IsRelative' => undef,
+            'Join'       => [
+                'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
+                'AND cpo.is_primary = 1',
+                'LEFT JOIN organisation po ON cpo.org_id = po.id'
+            ],
+            'Where'      => [
+                '(po.number = \'\' OR po.number IS NULL)'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field PrimaryOrganisationNumber / Operator EMPTY / Value 0',
+        Search       => {
+            Field    => 'PrimaryOrganisationNumber',
+            Operator => 'EMPTY',
+            Value    => 0
+        },
+        Expected     => {
+            'IsRelative' => undef,
+            'Join'       => [
+                'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
+                'AND cpo.is_primary = 1',
+                'LEFT JOIN organisation po ON cpo.org_id = po.id'
+            ],
+            'Where'      => [
+                '(po.number != \'\' AND po.number IS NOT NULL)'
             ]
         }
     }
@@ -944,10 +1219,10 @@ my @SortTests = (
                 'LEFT JOIN contact_organisation co ON co.contact_id = c.id'
             ],
             'OrderBy' => [
-                'co.org_id'
+                'SortAttr0'
             ],
             'Select' => [
-                'co.org_id'
+                'co.org_id AS SortAttr0'
             ]
         }
     },
@@ -959,10 +1234,10 @@ my @SortTests = (
                 'LEFT JOIN contact_organisation co ON co.contact_id = c.id'
             ],
             'OrderBy' => [
-                'co.org_id'
+                'SortAttr0'
             ],
             'Select' => [
-                'co.org_id'
+                'co.org_id AS SortAttr0'
             ]
         }
     },
@@ -972,13 +1247,13 @@ my @SortTests = (
         Expected  => {
             'Join' => [
                 'LEFT JOIN contact_organisation co ON co.contact_id = c.id',
-                'INNER JOIN organisation o ON co.org_id = o.id'
+                'LEFT JOIN organisation o ON co.org_id = o.id'
             ],
             'OrderBy' => [
-                'o.name'
+                'SortAttr0'
             ],
             'Select' => [
-                'o.name'
+                'o.name AS SortAttr0'
             ]
         }
     },
@@ -988,13 +1263,13 @@ my @SortTests = (
         Expected  => {
             'Join' => [
                 'LEFT JOIN contact_organisation co ON co.contact_id = c.id',
-                'INNER JOIN organisation o ON co.org_id = o.id'
+                'LEFT JOIN organisation o ON co.org_id = o.id'
             ],
             'OrderBy' => [
-                'o.number'
+                'SortAttr0'
             ],
             'Select' => [
-                'o.number'
+                'o.number AS SortAttr0'
             ]
         }
     },
@@ -1007,10 +1282,10 @@ my @SortTests = (
                 'AND cpo.is_primary = 1'
             ],
             'OrderBy' => [
-                'cpo.org_id'
+                'SortAttr0'
             ],
             'Select' => [
-                'cpo.org_id'
+                'cpo.org_id AS SortAttr0'
             ]
         }
     },
@@ -1021,13 +1296,13 @@ my @SortTests = (
            'Join' => [
                 'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
                 'AND cpo.is_primary = 1',
-                'INNER JOIN organisation po ON cpo.org_id = po.id'
+                'LEFT JOIN organisation po ON cpo.org_id = po.id'
             ],
             'OrderBy' => [
-                'po.name'
+                'SortAttr0'
             ],
             'Select' => [
-                'po.name'
+                'po.name AS SortAttr0'
             ]
         }
     },
@@ -1038,13 +1313,13 @@ my @SortTests = (
             'Join' => [
                 'LEFT JOIN contact_organisation cpo ON cpo.contact_id = c.id',
                 'AND cpo.is_primary = 1',
-                'INNER JOIN organisation po ON cpo.org_id = po.id'
+                'LEFT JOIN organisation po ON cpo.org_id = po.id'
             ],
             'OrderBy' => [
-                'po.number'
+                'SortAttr0'
             ],
             'Select' => [
-                'po.number'
+                'po.number AS SortAttr0'
             ]
         }
     }
@@ -1181,6 +1456,25 @@ $Kernel::OM->ObjectsDiscard(
         'Contact'
     ],
 );
+# fourth contact
+my $ContactID4 = $Kernel::OM->Get('Contact')->ContactAdd(
+    Firstname => $Helper->GetRandomID(),
+    Lastname  => $Helper->GetRandomID(),
+    ValidID   => 1,
+    UserID    => 1
+);
+$Self->True(
+    $ContactID4,
+    'Created fourth contact'
+);
+
+# discard object to process events
+$Kernel::OM->ObjectsDiscard(
+    Objects => [
+        'Organisation',
+        'Contact'
+    ],
+);
 
 # test Search
 my @IntegrationSearchTests = (
@@ -1208,7 +1502,7 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => ['1',$ContactID1,$ContactID2,$ContactID3]
+        Expected => ['1',$ContactID1,$ContactID2,$ContactID3,$ContactID4]
     },
     {
         Name     => "Search: Field OrganisationID / Operator IN / Value [\$OrganisationID1,\$OrganisationID3]",
@@ -1260,7 +1554,7 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => ['1',$ContactID1,$ContactID2,$ContactID3]
+        Expected => ['1',$ContactID1,$ContactID2,$ContactID3,$ContactID4]
     },
     {
         Name     => "Search: Field OrganisationIDs / Operator IN / Value [\$OrganisationID1,\$OrganisationID3]",
@@ -1312,7 +1606,7 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => ['1',$ContactID1,$ContactID3]
+        Expected => ['1',$ContactID1,$ContactID3,$ContactID4]
     },
     {
         Name     => "Search: Field PrimaryOrganisationID / Operator IN / Value [\$OrganisationID1,\$OrganisationID3]",
@@ -1364,7 +1658,7 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => ['1',$ContactID1,$ContactID2,$ContactID3]
+        Expected => ['1',$ContactID1,$ContactID2,$ContactID3,$ContactID4]
     },
     {
         Name     => "Search: Field Organisation / Operator IN / Value \$OrgaData[0]->{Name}",
@@ -1520,7 +1814,7 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => ['1',$ContactID1,$ContactID2,$ContactID3]
+        Expected => ['1',$ContactID1,$ContactID2,$ContactID3,$ContactID4]
     },
     {
         Name     => "Search: Field OrganisationNumber / Operator IN / Value \$OrgaData[1]->{Number}",
@@ -1663,7 +1957,7 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => ['1',$ContactID2,$ContactID3]
+        Expected => ['1',$ContactID2,$ContactID3,$ContactID4]
     },
     {
         Name     => "Search: Field PrimaryOrganisation / Operator IN / Value \$OrgaData[1]->{Name}",
@@ -1832,7 +2126,7 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => ['1',$ContactID2,$ContactID3]
+        Expected => ['1',$ContactID2,$ContactID3,$ContactID4]
     },
     {
         Name     => "Search: Field PrimaryOrganisationNumber / Operator IN / Value \$OrgaData[0]->{Number}",
@@ -1963,6 +2257,188 @@ my @IntegrationSearchTests = (
             ]
         },
         Expected => [$ContactID1]
+    },
+    {
+        Name     => "Search: Field OrganisationID / Operator EMPTY / Value 1",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'OrganisationID',
+                    Operator => 'EMPTY',
+                    Value    => 1
+                }
+            ]
+        },
+        Expected => [$ContactID4]
+    },
+    {
+        Name     => "Search: Field OrganisationID / Operator EMPTY / Value 0",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'OrganisationID',
+                    Operator => 'EMPTY',
+                    Value    => 0
+                }
+            ]
+        },
+        Expected => [1,$ContactID1,$ContactID2,$ContactID3]
+    },
+    {
+        Name     => "Search: Field OrganisationIDs / Operator EMPTY / Value 1",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'OrganisationIDs',
+                    Operator => 'EMPTY',
+                    Value    => 1
+                }
+            ]
+        },
+        Expected => [$ContactID4]
+    },
+    {
+        Name     => "Search: Field OrganisationIDs / Operator EMPTY / Value 0",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'OrganisationIDs',
+                    Operator => 'EMPTY',
+                    Value    => 0
+                }
+            ]
+        },
+        Expected => [1,$ContactID1,$ContactID2,$ContactID3]
+    },
+    {
+        Name     => "Search: Field Organisation / Operator EMPTY / Value 1",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Organisation',
+                    Operator => 'EMPTY',
+                    Value    => 1
+                }
+            ]
+        },
+        Expected => [$ContactID4]
+    },
+    {
+        Name     => "Search: Field Organisation / Operator EMPTY / Value 0",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Organisation',
+                    Operator => 'EMPTY',
+                    Value    => 0
+                }
+            ]
+        },
+        Expected => [1,$ContactID1,$ContactID2,$ContactID3]
+    },
+    {
+        Name     => "Search: Field OrganisationNumber / Operator EMPTY / Value 1",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'OrganisationNumber',
+                    Operator => 'EMPTY',
+                    Value    => 1
+                }
+            ]
+        },
+        Expected => [$ContactID4]
+    },
+    {
+        Name     => "Search: Field OrganisationNumber / Operator EMPTY / Value 0",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'OrganisationNumber',
+                    Operator => 'EMPTY',
+                    Value    => 0
+                }
+            ]
+        },
+        Expected => [1,$ContactID1,$ContactID2,$ContactID3]
+    },
+    {
+        Name     => "Search: Field PrimaryOrganisationID / Operator EMPTY / Value 1",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'PrimaryOrganisationID',
+                    Operator => 'EMPTY',
+                    Value    => 1
+                }
+            ]
+        },
+        Expected => [$ContactID4]
+    },
+    {
+        Name     => "Search: Field PrimaryOrganisationID / Operator EMPTY / Value 0",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'PrimaryOrganisationID',
+                    Operator => 'EMPTY',
+                    Value    => 0
+                }
+            ]
+        },
+        Expected => [1,$ContactID1,$ContactID2,$ContactID3]
+    },
+    {
+        Name     => "Search: Field PrimaryOrganisationNumber / Operator EMPTY / Value 1",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'PrimaryOrganisationNumber',
+                    Operator => 'EMPTY',
+                    Value    => 1
+                }
+            ]
+        },
+        Expected => [$ContactID4]
+    },
+    {
+        Name     => "Search: Field PrimaryOrganisationNumber / Operator EMPTY / Value 0",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'PrimaryOrganisationNumber',
+                    Operator => 'EMPTY',
+                    Value    => 0
+                }
+            ]
+        },
+        Expected => [1,$ContactID1,$ContactID2,$ContactID3]
+    },
+    {
+        Name     => "Search: Field PrimaryOrganisation / Operator EMPTY / Value 1",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'PrimaryOrganisation',
+                    Operator => 'EMPTY',
+                    Value    => 1
+                }
+            ]
+        },
+        Expected => [$ContactID4]
+    },
+    {
+        Name     => "Search: Field PrimaryOrganisation / Operator EMPTY / Value 0",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'PrimaryOrganisation',
+                    Operator => 'EMPTY',
+                    Value    => 0
+                }
+            ]
+        },
+        Expected => [1,$ContactID1,$ContactID2,$ContactID3]
     }
 );
 for my $Test ( @IntegrationSearchTests ) {
@@ -1989,7 +2465,7 @@ my @IntegrationSortTests = (
                 Field => 'OrganisationID'
             }
         ],
-        Expected => ['1',$ContactID1,$ContactID2,$ContactID3]
+        Expected => $OrderByNull eq 'LAST' ? ['1',$ContactID1,$ContactID2,$ContactID3,$ContactID4] : [$ContactID4,'1',$ContactID1,$ContactID2,$ContactID3]
     },
     {
         Name     => 'Sort: Field OrganisationID / Direction ascending',
@@ -1999,7 +2475,7 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => ['1',$ContactID1,$ContactID2,$ContactID3]
+        Expected => $OrderByNull eq 'LAST' ? ['1',$ContactID1,$ContactID2,$ContactID3,$ContactID4] : [$ContactID4,'1',$ContactID1,$ContactID2,$ContactID3]
     },
     {
         Name     => 'Sort: Field OrganisationID / Direction descending',
@@ -2009,7 +2485,7 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Expected => [$ContactID1,$ContactID3,$ContactID2,'1']
+        Expected => $OrderByNull eq 'LAST' ? [$ContactID4,$ContactID1,$ContactID3,$ContactID2,'1'] : [$ContactID1,$ContactID3,$ContactID2,'1',$ContactID4]
     },
     {
         Name     => 'Sort: Field OrganisationIDs',
@@ -2018,7 +2494,7 @@ my @IntegrationSortTests = (
                 Field => 'OrganisationIDs'
             }
         ],
-        Expected => ['1',$ContactID1,$ContactID2,$ContactID3]
+        Expected => $OrderByNull eq 'LAST' ? ['1',$ContactID1,$ContactID2,$ContactID3,$ContactID4] : [$ContactID4,'1',$ContactID1,$ContactID2,$ContactID3]
     },
     {
         Name     => 'Sort: Field OrganisationIDs / Direction ascending',
@@ -2028,7 +2504,7 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => ['1',$ContactID1,$ContactID2,$ContactID3]
+        Expected => $OrderByNull eq 'LAST' ? ['1',$ContactID1,$ContactID2,$ContactID3,$ContactID4] : [$ContactID4,'1',$ContactID1,$ContactID2,$ContactID3]
     },
     {
         Name     => 'Sort: Field OrganisationIDs / Direction descending',
@@ -2038,7 +2514,7 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Expected => [$ContactID1,$ContactID3,$ContactID2,'1']
+        Expected => $OrderByNull eq 'LAST' ? [$ContactID4,$ContactID1,$ContactID3,$ContactID2,'1'] : [$ContactID1,$ContactID3,$ContactID2,'1',$ContactID4]
     },
     {
         Name     => 'Sort: Field Organisation',
@@ -2047,7 +2523,7 @@ my @IntegrationSortTests = (
                 Field => 'Organisation'
             }
         ],
-        Expected => ['1',$ContactID1,$ContactID3,$ContactID2]
+        Expected => $OrderByNull eq 'LAST' ? ['1',$ContactID1,$ContactID3,$ContactID2,$ContactID4] : [$ContactID4,'1',$ContactID1,$ContactID3,$ContactID2]
     },
     {
         Name     => 'Sort: Field Organisation / Direction ascending',
@@ -2057,7 +2533,7 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => ['1',$ContactID1,$ContactID3,$ContactID2]
+        Expected => $OrderByNull eq 'LAST' ? ['1',$ContactID1,$ContactID3,$ContactID2,$ContactID4] : [$ContactID4,'1',$ContactID1,$ContactID3,$ContactID2]
     },
     {
         Name     => 'Sort: Field Organisation / Direction descending',
@@ -2067,7 +2543,7 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Expected => [$ContactID2,$ContactID1,$ContactID3,'1']
+        Expected => $OrderByNull eq 'LAST' ? [$ContactID4,$ContactID2,$ContactID1,$ContactID3,'1'] : [$ContactID2,$ContactID1,$ContactID3,'1',$ContactID4]
     },
     {
         Name     => 'Sort: Field OrganisationNumber',
@@ -2076,7 +2552,7 @@ my @IntegrationSortTests = (
                 Field => 'OrganisationNumber'
             }
         ],
-        Expected => [$ContactID1,$ContactID2,$ContactID3,'1']
+        Expected => $OrderByNull eq 'LAST' ? [$ContactID1,$ContactID2,$ContactID3,'1',$ContactID4] : [$ContactID4,$ContactID1,$ContactID2,$ContactID3,'1']
     },
     {
         Name     => 'Sort: Field OrganisationNumber / Direction ascending',
@@ -2086,7 +2562,7 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => [$ContactID1,$ContactID2,$ContactID3,'1']
+        Expected => $OrderByNull eq 'LAST' ? [$ContactID1,$ContactID2,$ContactID3,'1',$ContactID4] : [$ContactID4,$ContactID1,$ContactID2,$ContactID3,'1']
     },
     {
         Name     => 'Sort: Field OrganisationNumber / Direction descending',
@@ -2096,7 +2572,7 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Expected => ['1',$ContactID1,$ContactID3,$ContactID2]
+        Expected => $OrderByNull eq 'LAST' ? [$ContactID4,'1',$ContactID1,$ContactID3,$ContactID2] : ['1',$ContactID1,$ContactID3,$ContactID2,$ContactID4]
     },
     {
         Name     => 'Sort: Field PrimaryOrganisationID',
@@ -2105,7 +2581,7 @@ my @IntegrationSortTests = (
                 Field => 'PrimaryOrganisationID'
             }
         ],
-        Expected => ['1',$ContactID1,$ContactID2,$ContactID3]
+        Expected => $OrderByNull eq 'LAST' ? ['1',$ContactID1,$ContactID2,$ContactID3,$ContactID4] : [$ContactID4,'1',$ContactID1,$ContactID2,$ContactID3]
     },
     {
         Name     => 'Sort: Field PrimaryOrganisationID / Direction ascending',
@@ -2115,7 +2591,7 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => ['1',$ContactID1,$ContactID2,$ContactID3]
+        Expected => $OrderByNull eq 'LAST' ? ['1',$ContactID1,$ContactID2,$ContactID3,$ContactID4] : [$ContactID4,'1',$ContactID1,$ContactID2,$ContactID3]
     },
     {
         Name     => 'Sort: Field PrimaryOrganisationID / Direction descending',
@@ -2125,7 +2601,7 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Expected => [$ContactID3,$ContactID2,$ContactID1,'1']
+        Expected => $OrderByNull eq 'LAST' ? [$ContactID4,$ContactID3,$ContactID2,$ContactID1,'1'] : [$ContactID3,$ContactID2,$ContactID1,'1',$ContactID4]
     },
     {
         Name     => 'Sort: Field PrimaryOrganisation',
@@ -2134,7 +2610,7 @@ my @IntegrationSortTests = (
                 Field => 'PrimaryOrganisation'
             }
         ],
-        Expected => ['1',$ContactID3,$ContactID1,$ContactID2]
+        Expected => $OrderByNull eq 'LAST' ? ['1',$ContactID3,$ContactID1,$ContactID2,$ContactID4] : [$ContactID4,'1',$ContactID3,$ContactID1,$ContactID2]
     },
     {
         Name     => 'Sort: Field PrimaryOrganisation / Direction ascending',
@@ -2144,7 +2620,7 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => ['1',$ContactID3,$ContactID1,$ContactID2]
+        Expected => $OrderByNull eq 'LAST' ? ['1',$ContactID3,$ContactID1,$ContactID2,$ContactID4] : [$ContactID4,'1',$ContactID3,$ContactID1,$ContactID2]
     },
     {
         Name     => 'Sort: Field PrimaryOrganisation / Direction descending',
@@ -2154,7 +2630,7 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Expected => [$ContactID2,$ContactID1,$ContactID3,'1']
+        Expected => $OrderByNull eq 'LAST' ? [$ContactID4,$ContactID2,$ContactID1,$ContactID3,'1'] : [$ContactID2,$ContactID1,$ContactID3,'1',$ContactID4]
     },
     {
         Name     => 'Sort: Field PrimaryOrganisationNumber',
@@ -2163,7 +2639,7 @@ my @IntegrationSortTests = (
                 Field => 'PrimaryOrganisationNumber'
             }
         ],
-        Expected => [$ContactID1,$ContactID2,$ContactID3,'1']
+        Expected => $OrderByNull eq 'LAST' ? [$ContactID1,$ContactID2,$ContactID3,'1',$ContactID4] : [$ContactID4,$ContactID1,$ContactID2,$ContactID3,'1']
     },
     {
         Name     => 'Sort: Field PrimaryOrganisationNumber / Direction ascending',
@@ -2173,7 +2649,7 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => [$ContactID1,$ContactID2,$ContactID3,'1']
+        Expected => $OrderByNull eq 'LAST' ? [$ContactID1,$ContactID2,$ContactID3,'1',$ContactID4] : [$ContactID4,$ContactID1,$ContactID2,$ContactID3,'1']
     },
     {
         Name     => 'Sort: Field PrimaryOrganisationNumber / Direction descending',
@@ -2183,7 +2659,7 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Expected => ['1',$ContactID3,$ContactID2,$ContactID1]
+        Expected => $OrderByNull eq 'LAST' ? [$ContactID4,'1',$ContactID3,$ContactID2,$ContactID1] : ['1',$ContactID3,$ContactID2,$ContactID1,$ContactID4]
     },
 );
 for my $Test ( @IntegrationSortTests ) {

@@ -34,45 +34,33 @@ sub GetSupportedAttributes {
 
     return {
         AccountedTime => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EMPTY','EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
+            ValueType      => 'NUMERIC'
         }
     };
 }
 
-sub Search {
+sub AttributePrepare {
     my ( $Self, %Param ) = @_;
 
-    # check params
-    return if ( !$Self->_CheckSearchParams( %Param ) );
-
-    my $Condition = $Self->_GetCondition(
-        Operator  => $Param{Search}->{Operator},
-        Column    => 'st.accounted_time',
-        Value     => $Param{Search}->{Value},
-        ValueType => 'NUMERIC',
-        NULLValue => 1,
-        Silent    => $Param{Silent}
+    my %Attribute = (
+        Column => 'st.accounted_time',
     );
-    return if ( !$Condition );
+    if (
+        defined $Param{PrepareType}
+        && $Param{PrepareType} eq 'Condition'
+    ) {
+        $Attribute{ConditionDef} = {
+            ValueType => 'NUMERIC',
+            NULLValue => 1
+        };
+    }
 
-    return {
-        Where => [ $Condition ]
-    };
-}
-
-sub Sort {
-    my ( $Self, %Param ) = @_;
-
-    # check params
-    return if ( !$Self->_CheckSortParams( %Param ) );
-
-    return {
-        Select  => [ 'st.accounted_time' ],
-        OrderBy => [ 'st.accounted_time' ]
-    };
+    return \%Attribute;
 }
 
 1;

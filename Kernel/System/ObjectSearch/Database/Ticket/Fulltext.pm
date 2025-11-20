@@ -12,7 +12,7 @@ use strict;
 use warnings;
 
 use base qw(
-    Kernel::System::ObjectSearch::Database::CommonAttribute
+    Kernel::System::ObjectSearch::Database::CommonFulltext
 );
 
 our $ObjectManagerDisabled = 1;
@@ -28,108 +28,6 @@ Kernel::System::ObjectSearch::Database::Ticket::Fulltext - attribute module for 
 =over 4
 
 =cut
-
-sub GetSupportedAttributes {
-    my ( $Self, %Param ) = @_;
-
-    return {
-        Fulltext => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['LIKE']
-        }
-    };
-}
-
-sub Search {
-    my ( $Self, %Param ) = @_;
-
-    # check params
-    return if ( !$Self->_CheckSearchParams( %Param ) );
-
-
-    # check if static search should be used. Only if search for ArticleID is NOT used and static search index is active
-    my $IsStaticSearch = 0;
-    my $SearchIndexModule = $Kernel::OM->Get('Config')->Get('Ticket::SearchIndexModule');
-    if ( $SearchIndexModule =~ /::StaticDB$/ ) {
-        $IsStaticSearch = 1;
-    }
-
-    # check for needed joins
-    my @SQLJoin = ();
-    my $TableAliasPrefix = '';
-    my @Columns = (
-        'st.tn',
-        'st.title'
-    );
-    my @StaticColumns = ();
-    if ( $IsStaticSearch ) {
-        $TableAliasPrefix = 's_';
-        if ( !$Param{Flags}->{JoinMap}->{StaticArticle} ) {
-            my $JoinString = 'LEFT OUTER JOIN article_search s_ta ON s_ta.ticket_id = st.id';
-
-            # restrict search from customers to customer visible articles
-            if ( $Param{UserType} eq 'Customer' ) {
-                $JoinString .= ' AND s_ta.customer_visible = 1';
-            }
-            push( @SQLJoin, $JoinString );
-
-            $Param{Flags}->{JoinMap}->{StaticArticle} = 1;
-
-            # add static search columns
-            push(
-                @StaticColumns,
-                $TableAliasPrefix . 'ta.a_to',
-                $TableAliasPrefix . 'ta.a_cc',
-                $TableAliasPrefix . 'ta.a_from',
-                $TableAliasPrefix . 'ta.a_body',
-                $TableAliasPrefix . 'ta.a_subject'
-            );
-        }
-    }
-    else {
-        if ( !$Param{Flags}->{JoinMap}->{Article} ) {
-            my $JoinString = 'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id';
-
-            # restrict search from customers to customer visible articles
-            if ( $Param{UserType} eq 'Customer' ) {
-                $JoinString .= ' AND ta.customer_visible = 1';
-            }
-            push( @SQLJoin, $JoinString );
-
-            $Param{Flags}->{JoinMap}->{Article} = 1;
-
-            # add search columns
-            push(
-                @Columns,
-                $TableAliasPrefix . 'ta.a_to',
-                $TableAliasPrefix . 'ta.a_cc',
-                $TableAliasPrefix . 'ta.a_from',
-                $TableAliasPrefix . 'ta.a_body',
-                $TableAliasPrefix . 'ta.a_subject'
-            );
-        }
-    }
-
-    # fixed search in the  following columns:
-    # Ticketnumber and Title
-    # inlcudes related columns of other tables:
-    # table article: To, Cc, From, Body and Subject
-    my $Condition = $Self->_FulltextCondition(
-        Value          => $Param{Search}->{Value},
-        Columns        => \@Columns,
-        StaticColumns  => \@StaticColumns,
-        Silent         => $Param{Silent},
-        IsStaticSearch => $IsStaticSearch
-    );
-
-    return if ( !$Condition );
-
-    return {
-        Join  => \@SQLJoin,
-        Where => [$Condition]
-    };
-}
 
 1;
 

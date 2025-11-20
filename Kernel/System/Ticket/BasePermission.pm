@@ -149,7 +149,7 @@ sub BasePermissionRelevantObjectIDList {
         $CombinedPermissions{$Permission->{Target}} |= $Permission->{Value};
     }
 
-    my @QueueIDs;
+    my @QueueIDs = ();
 
     TARGET:
     foreach my $Target ( keys %CombinedPermissions ) {
@@ -173,8 +173,6 @@ sub BasePermissionRelevantObjectIDList {
             }
         }
     }
-
-    return if !@QueueIDs;
 
     @QueueIDs = sort( $Kernel::OM->Get('Main')->GetUnique( @QueueIDs ) );
 

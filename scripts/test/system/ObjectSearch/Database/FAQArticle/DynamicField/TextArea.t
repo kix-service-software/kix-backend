@@ -69,7 +69,7 @@ $Self->IsDeeply(
     {
         IsSearchable => 1,
         IsSortable   => 1,
-        Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE'],
+        Operators    => ['EMPTY','EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE'],
         ValueType    => ''
     },
     'GetSupportedAttributes provides expected data'
@@ -258,6 +258,40 @@ my @SearchTests = (
                 $CaseSensitive ? 'LOWER(dfv_left0.value_text) LIKE \'test\'' : 'dfv_left0.value_text LIKE \'test\''
             ]
         }
+    },
+    {
+        Name         => 'Search: valid search / Field DynamicField_UnitTest / Operator EMPTY / Value 1',
+        Search       => {
+            Field    => 'DynamicField_UnitTest',
+            Operator => 'EMPTY',
+            Value    => 1
+        },
+        Expected     => {
+            'IsRelative' => undef,
+            'Join'       => [
+                'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = f.id AND dfv_left0.field_id = ' . $DynamicFieldID
+            ],
+            'Where'      => [
+                '(dfv_left0.value_text = \'\' OR dfv_left0.value_text IS NULL)'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field DynamicField_UnitTest / Operator EMPTY / Value 0',
+        Search       => {
+            Field    => 'DynamicField_UnitTest',
+            Operator => 'EMPTY',
+            Value    => 0
+        },
+        Expected     => {
+            'IsRelative' => undef,
+            'Join'       => [
+                'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = f.id AND dfv_left0.field_id = ' . $DynamicFieldID
+            ],
+            'Where'      => [
+                '(dfv_left0.value_text != \'\' AND dfv_left0.value_text IS NOT NULL)'
+            ]
+        }
     }
 );
 for my $Test ( @SearchTests ) {
@@ -332,7 +366,7 @@ my $ObjectSearch = $Kernel::OM->Get('ObjectSearch');
 # begin transaction on database
 $Helper->BeginWork();
 
-## prepare test organisations ##
+## prepare test faq articles ##
 # first ticket
 my $FAQArticleID1   = $Kernel::OM->Get('FAQ')->FAQAdd(
         Title       => $Helper->GetRandomID(),
@@ -346,7 +380,7 @@ my $FAQArticleID1   = $Kernel::OM->Get('FAQ')->FAQAdd(
 );
 $Self->True(
     $FAQArticleID1,
-    'Created first organisation'
+    'Created first faq article'
 );
 my $ValueSet1 = $Kernel::OM->Get('DynamicField::Backend')->ValueSet(
     DynamicFieldConfig => $DynamicFieldConfig,
@@ -356,7 +390,7 @@ my $ValueSet1 = $Kernel::OM->Get('DynamicField::Backend')->ValueSet(
 );
 $Self->True(
     $ValueSet1,
-    'Dynamic field value set for first organisation'
+    'Dynamic field value set for first faq article'
 );
 # second ticket
 my $FAQArticleID2   = $Kernel::OM->Get('FAQ')->FAQAdd(
@@ -371,7 +405,7 @@ my $FAQArticleID2   = $Kernel::OM->Get('FAQ')->FAQAdd(
 );
 $Self->True(
     $FAQArticleID2,
-    'Created second organisation'
+    'Created second faq article'
 );
 my $ValueSet2 = $Kernel::OM->Get('DynamicField::Backend')->ValueSet(
     DynamicFieldConfig => $DynamicFieldConfig,
@@ -381,7 +415,7 @@ my $ValueSet2 = $Kernel::OM->Get('DynamicField::Backend')->ValueSet(
 );
 $Self->True(
     $ValueSet2,
-    'Dynamic field value set for first organisation'
+    'Dynamic field value set for second faq article'
 );
 # third ticket
 my $FAQArticleID3   = $Kernel::OM->Get('FAQ')->FAQAdd(
@@ -396,7 +430,12 @@ my $FAQArticleID3   = $Kernel::OM->Get('FAQ')->FAQAdd(
 );
 $Self->True(
     $FAQArticleID3,
-    'Created third organisation without df value'
+    'Created third faq article without df value'
+);
+
+# discard faq article object to process events
+$Kernel::OM->ObjectsDiscard(
+    Objects => ['FAQArticle'],
 );
 
 # test Search
@@ -578,6 +617,32 @@ my @IntegrationSearchTests = (
                     Field    => 'DynamicField_UnitTest',
                     Operator => 'LIKE',
                     Value    => 'test*'
+                }
+            ]
+        },
+        Expected => [$FAQArticleID1,$FAQArticleID2]
+    },
+    {
+        Name     => 'Search: Field DynamicField_UnitTest / Operator EMPTY / Value 1',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DynamicField_UnitTest',
+                    Operator => 'EMPTY',
+                    Value    => 1
+                }
+            ]
+        },
+        Expected => [$FAQArticleID3]
+    },
+    {
+        Name     => 'Search: Field DynamicField_UnitTest / Operator EMPTY / Value 0',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DynamicField_UnitTest',
+                    Operator => 'EMPTY',
+                    Value    => 0
                 }
             ]
         },

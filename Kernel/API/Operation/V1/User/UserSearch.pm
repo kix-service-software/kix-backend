@@ -87,7 +87,7 @@ sub Run {
     if ( IsHashRefWithData( $Self->{Search}->{User} ) ) {
         foreach my $SearchType ( keys %{ $Self->{Search}->{User} } ) {
             foreach my $SearchItem ( @{ $Self->{Search}->{User}->{$SearchType} } ) {
-                if ( $SearchItem->{Field} =~ /^(UserLogin|UserID|Search|IsAgent|IsCustomer|IsOutOfOffice|ValidID|Preferences\..+|RoleIDs)$/ ) {
+                if ( $SearchItem->{Field} =~ /^(UserLogin|UserID|UserIDs|Search|IsAgent|IsCustomer|IsOutOfOffice|ValidID|Preferences\..+|RoleIDs)$/ ) {
                     $UserSearch{$SearchType} //= [];
                     push(@{$UserSearch{$SearchType}}, $SearchItem);
                 }
@@ -268,11 +268,20 @@ sub _GetSearchParam {
     elsif ( $Param{SearchItem}->{Field} eq 'ValidID' ) {
         $SearchParam{ValidID} = $Value;
     }
-    elsif ( $Param{SearchItem}->{Field} eq 'UserIDs' ) {
-        $SearchParam{UserIDs} = $Value;
-    }
     elsif ( $Param{SearchItem}->{Field} eq 'UserID' ) {
         $SearchParam{SearchUserID} = $Value;
+    }
+    elsif (
+        $Param{SearchItem}->{Field} eq 'UserIDs'
+        && (
+            $Param{SearchItem}->{Operator} eq 'NE'
+            || $Param{SearchItem}->{Operator} eq '!IN'
+        )
+    ) {
+        $SearchParam{NotUserIDs} = $Value;
+    }
+    elsif ( $Param{SearchItem}->{Field} eq 'UserIDs' ) {
+        $SearchParam{UserIDs} = $Value;
     }
     elsif ( $Param{SearchItem}->{Field} eq 'HasPermission' ) {
         $SearchParam{HasPermission} = $Value;

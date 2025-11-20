@@ -29,7 +29,7 @@ $Self->Is(
 );
 
 # check supported methods
-for my $Method ( qw(GetSupportedAttributes Search Sort) ) {
+for my $Method ( qw(GetSupportedAttributes AttributePrepare Select Search Sort) ) {
     $Self->True(
         $AttributeObject->can($Method),
         'Attribute object can "' . $Method . '"'
@@ -42,15 +42,19 @@ $Self->IsDeeply(
     $AttributeList,
     {
         LockID => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','GT','GTE','LT','LTE'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN','GT','GTE','LT','LTE'],
+            ValueType      => 'NUMERIC'
         },
         Lock => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         }
     },
     'GetSupportedAttributes provides expected data'
@@ -391,10 +395,10 @@ my @SortTests = (
         Expected  => {
             'Join'    => [],
             'OrderBy' => [
-                'st.ticket_lock_id'
+                'SortAttr0'
             ],
             'Select'  => [
-                'st.ticket_lock_id'
+                'st.ticket_lock_id AS SortAttr0'
             ]
         }
     },
@@ -408,10 +412,10 @@ my @SortTests = (
                 'LEFT OUTER JOIN translation_language tl0 ON tl0.pattern_id = tlp0.id AND tl0.language = \'en\''
             ],
             'OrderBy' => [
-                'TranslateLock'
+                'SortAttr0'
             ],
             'Select'  => [
-                'LOWER(COALESCE(tl0.value, tl.name)) AS TranslateLock'
+                'LOWER(COALESCE(tl0.value, tl.name)) AS SortAttr0'
             ]
         }
     }

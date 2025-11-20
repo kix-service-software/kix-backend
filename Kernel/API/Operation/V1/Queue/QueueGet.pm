@@ -69,6 +69,7 @@ one or more ticket entries in one call.
     my $Result = $OperationObject->Run(
         Data => {
             QueueID => 123       # comma separated in case of multiple or arrayref (depending on transport)
+            QueueList => {}      # used internally as pre-cached data from QueueSearch operation
             include => '...',    # Optional, 0 as default. Include additional objects
                                  # (supported: TicketStats, Tickets)
             expand  => 0,        # Optional, 0 as default. Expand referenced objects
@@ -126,6 +127,11 @@ sub Run {
     my ( $Self, %Param ) = @_;
 
     my @QueueList;
+    my %QueueListReverse = ();
+    
+    if ( IsHashRefWithData($Param{Data}->{QueueList}) ) {
+        %QueueListReverse = reverse %{$Param{Data}->{QueueList}}
+    }
 
     # get data of all relevant queues (due to performance)
     my $QueueDataRef = $Kernel::OM->Get('Queue')->QueueListGet(
@@ -171,7 +177,7 @@ sub Run {
         my $ParentName = join(q{::}, @QueueParts);
 
         if ( $ParentName ) {
-            if ( !$QueueDataListByName{$ParentName} ) {
+            if ( !$QueueDataListByName{$ParentName} && !$QueueListReverse{$ParentName} ) {
                 my $ParentQueueID = $Kernel::OM->Get('Queue')->QueueLookup(
                     Queue => $ParentName
                 );
@@ -179,58 +185,12 @@ sub Run {
                 $QueueData{ParentID} = 0 + $ParentQueueID;
 
             } else {
-                $QueueData{ParentID} = 0 + $QueueDataListByName{$ParentName}->{QueueID};
+                $QueueData{ParentID} = 0 + ($QueueDataListByName{$ParentName}->{QueueID} || $QueueListReverse{$ParentName});
             }
         }
         else {
             $QueueData{ParentID} = undef;
         }
-
-        # include Tickets if requested
-        if ( $Param{Data}->{include}->{Tickets} ) {
-            # execute ticket search
-            my @TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
-                ObjectType => 'Ticket',
-                Search     => {
-                    AND => [
-                        {
-                            Field    => 'QueueID',
-                            Operator => 'EQ',
-                            Value    => $QueueID,
-                        }
-                    ]
-                },
-                UserID   => $Self->{Authorization}->{UserID},
-                UserType => $Self->{Authorization}->{UserType},
-                Result   => 'ARRAY',
-            );
-            $QueueData{Tickets} = \@TicketIDs;
-
-            # inform API caching about a new dependency
-            $Self->AddCacheDependency(Type => 'Ticket');
-        }
-
-        # include TicketStats if requested
-        if ( $Param{Data}->{include}->{TicketStats} ) {
-
-            if ( $Param{Data}->{'TicketStats.StateType'} =~ /^(Open|Viewable)$/ ) {
-                # get Stats from TicketIndex
-                if ( !IsHashRef($Self->{QueueTicketStats}) ) {
-                    my %QueueStats = $Kernel::OM->Get('Ticket')->TicketIndexGetQueueStats();
-                    $Self->{QueueTicketStats} = \%QueueStats;
-                }
-                $QueueData{TicketStats} = $Self->{QueueTicketStats}->{$QueueID} || { TotalCount => 0, LockCount => 0 };
-            }
-            else {
-                $QueueData{TicketStats} = $Self->GetTicketStatsFromTicketSearch(
-                    QueueID => $QueueID,
-                );
-            }
-
-            # inform API caching about a new dependency
-            $Self->AddCacheDependency(Type => 'Ticket');
-        }
-
         # add
         push(@QueueList, \%QueueData);
     }
@@ -245,84 +205,6 @@ sub Run {
     return $Self->_Success(
         Queue => \@QueueList,
     );
-}
-
-sub GetTicketStatsFromTicketSearch {
-    my ( $Self, %Param ) = @_;
-
-    my $TicketStatsFilter;
-    if ( $Param{Data}->{'TicketStats.StateType'} ) {
-        $TicketStatsFilter = {
-            Field    => 'StateType',
-            Operator => 'IN',
-            Value    => [ split(/,/, $Param{Data}->{'TicketStats.StateType'}) ],
-        };
-    }
-    elsif ( $Param{Data}->{'TicketStats.StateID'} ) {
-        $TicketStatsFilter = {
-            Field    => 'StateID',
-            Operator => 'IN',
-            Value    => [ split(/,/, $Param{Data}->{'TicketStats.StateID'}) ],
-        };
-    }
-
-    # execute ticket searches
-    my %TicketStats;
-    my @Filter;
-
-    # locked tickets
-    @Filter = (
-        {
-            Field    => 'QueueID',
-            Operator => 'EQ',
-            Value    => $Param{QueueID},
-        },
-        {
-            Field    => 'LockID',
-            Operator => 'EQ',
-            Value    => '2',
-        },
-    );
-    if ( IsHashRefWithData($TicketStatsFilter) ) {
-        push(@Filter, $TicketStatsFilter);
-    }
-    $TicketStats{LockCount} = $Kernel::OM->Get('ObjectSearch')->Search(
-        ObjectType => 'Ticket',
-        Search     => {
-            AND => \@Filter
-        },
-        UserID   => $Self->{Authorization}->{UserID},
-        UserType => $Self->{Authorization}->{UserType},
-        Result   => 'COUNT',
-    );
-
-    # all relevant tickets
-    @Filter = (
-        {
-            Field    => 'QueueID',
-            Operator => 'EQ',
-            Value    => $Param{QueueID},
-        },
-    );
-    if ( IsHashRefWithData($TicketStatsFilter) ) {
-        push(@Filter, $TicketStatsFilter);
-    }
-    $TicketStats{TotalCount} = $Kernel::OM->Get('ObjectSearch')->Search(
-        ObjectType => 'Ticket',
-        Search     => {
-            AND => \@Filter
-        },
-        UserID   => $Self->{Authorization}->{UserID},
-        UserType => $Self->{Authorization}->{UserType},
-        Result   => 'COUNT',
-    );
-
-    # force numeric values
-    foreach my $Key (keys %TicketStats) {
-        $TicketStats{$Key} = 0 + $TicketStats{$Key};
-    }
-
-    return \%TicketStats;
 }
 
 1;

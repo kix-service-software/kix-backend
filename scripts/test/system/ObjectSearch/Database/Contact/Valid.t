@@ -29,7 +29,7 @@ $Self->Is(
 );
 
 # check supported methods
-for my $Method ( qw(GetSupportedAttributes Search Sort) ) {
+for my $Method ( qw(GetSupportedAttributes AttributePrepare Select Search Sort) ) {
     $Self->True(
         $AttributeObject->can($Method),
         'Attribute object can "' . $Method . q{"}
@@ -43,15 +43,19 @@ $Self->IsDeeply(
     $AttributeList,
     {
         Valid => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN']
         },
         ValidID => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN'],
+            ValueType      => 'NUMERIC'
         }
     },
     'GetSupportedAttributes provides expected data'
@@ -127,10 +131,11 @@ my @SearchTests = (
             Value    => '1'
         },
         Expected     => {
-            'Join'  => [],
-            'Where' => [
+            'Where'      => [
                 'c.valid_id = 1'
-            ]
+            ],
+            'IsRelative' => undef,
+            'Join'       => []
         }
     },
     {
@@ -141,10 +146,11 @@ my @SearchTests = (
             Value    => '1'
         },
         Expected     => {
-            'Join'  => [],
             'Where' => [
                 'c.valid_id <> 1'
-            ]
+            ],
+            'IsRelative' => undef,
+            'Join'       => []
         }
     },
     {
@@ -155,10 +161,11 @@ my @SearchTests = (
             Value    => ['1']
         },
         Expected     => {
-            'Join'  => [],
             'Where' => [
                 'c.valid_id IN (1)'
-            ]
+            ],
+            'IsRelative' => undef,
+            'Join'       => []
         }
     },
     {
@@ -169,10 +176,11 @@ my @SearchTests = (
             Value    => ['1']
         },
         Expected     => {
-            'Join'  => [],
             'Where' => [
                 'c.valid_id NOT IN (1)'
-            ]
+            ],
+            'IsRelative' => undef,
+            'Join'       => []
         }
     },
     {
@@ -272,10 +280,10 @@ my @SortTests = (
         Expected  => {
             'Join'    => [],
             'OrderBy' => [
-                'c.valid_id'
+                'SortAttr0'
             ],
             'Select'  => [
-                'c.valid_id'
+                'c.valid_id AS SortAttr0'
             ]
         }
     },
@@ -289,10 +297,10 @@ my @SortTests = (
                 'LEFT OUTER JOIN translation_language tl0 ON tl0.pattern_id = tlp0.id AND tl0.language = \'en\''
             ],
             'OrderBy' => [
-                'TranslateValid'
+                'SortAttr0'
             ],
             'Select'  => [
-                'LOWER(COALESCE(tl0.value, cv.name)) AS TranslateValid'
+                'LOWER(COALESCE(tl0.value, cv.name)) AS SortAttr0'
             ]
         }
     }

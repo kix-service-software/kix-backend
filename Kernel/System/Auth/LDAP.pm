@@ -31,7 +31,6 @@ sub new {
 
     # Debug 0=off 1=on
     $Self->{Debug}            = $Param{Config}->{Debug} || 0;
-    $Self->{Die}              = $Param{Config}->{Die} // 1;
     $Self->{Host}             = $Param{Config}->{Host} || '';
     $Self->{BaseDN}           = $Param{Config}->{BaseDN} || '';
     $Self->{UID}              = $Param{Config}->{UID} || '';
@@ -41,6 +40,7 @@ sub new {
     $Self->{AuthAttr}         = $Param{Config}->{AuthAttr} || $Self->{UID};     # optional Auth attribute
     $Self->{AccessAttr}       = $Param{Config}->{AccessAttr} || 'memberUid';
     $Self->{UserAttr}         = $Param{Config}->{UserAttr} || 'DN';
+    $Self->{UserSuffix}       = $Param{Config}->{UserSuffix} || '';
     $Self->{DestCharset}      = $Param{Config}->{Charset} || 'utf-8';
     $Self->{AlwaysFilter}     = $Param{Config}->{AlwaysFilter} || '';
     $Self->{Params}           = $Param{Config}->{Params} || {};

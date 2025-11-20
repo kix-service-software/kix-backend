@@ -34,19 +34,18 @@ sub GetSupportedAttributes {
 
     return {
         WatcherUserID => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
+            ValueType      => 'NUMERIC'
         }
     };
 }
 
-sub Search {
+sub AttributePrepare {
     my ( $Self, %Param ) = @_;
-
-    # check params
-    return if ( !$Self->_CheckSearchParams( %Param ) );
 
     # check for needed joins
     my @SQLJoin = ();
@@ -56,22 +55,20 @@ sub Search {
         $Param{Flags}->{JoinMap}->{TicketWatcher} = 1;
     }
 
-    # prepare condition
-    my $Condition = $Self->_GetCondition(
-        Operator  => $Param{Search}->{Operator},
-        Column    => 'tw_left.user_id',
-        Value     => $Param{Search}->{Value},
-        ValueType => 'NUMERIC',
-        NULLValue => 1,
-        Silent    => $Param{Silent}
+    my %Attribute = (
+        Column => 'tw_left.user_id',
+        SQLDef => {
+            Join  => \@SQLJoin
+        }
     );
-    return if ( !$Condition );
+    if ( $Param{PrepareType} eq 'Condition' ) {
+        $Attribute{ConditionDef} = {
+            ValueType => 'NUMERIC',
+            NULLValue => 1
+        };
+    }
 
-    # return search def
-    return {
-        Join  => \@SQLJoin,
-        Where => [ $Condition ]
-    };
+    return \%Attribute;
 }
 
 1;

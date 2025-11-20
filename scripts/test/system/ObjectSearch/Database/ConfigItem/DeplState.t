@@ -57,6 +57,11 @@ $Self->IsDeeply(
             IsSearchable => 1,
             IsSortable   => 1,
             Operators    => ['EQ', 'NE', 'IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+        },
+        DeplStateType => {
+            IsSearchable => 1,
+            IsSortable   => 0,
+            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         }
     },
     'GetSupportedAttributes provides expected data'
@@ -360,7 +365,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'INNER JOIN general_catalog cids ON cids.id = ci.cur_depl_state_id AND general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
+                'INNER JOIN general_catalog cids ON cids.id = ci.cur_depl_state_id AND cids.general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
             ],
             'Where' => [
                 'cids.name = \'Test\''
@@ -376,7 +381,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'INNER JOIN general_catalog cids ON cids.id = ci.cur_depl_state_id AND general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
+                'INNER JOIN general_catalog cids ON cids.id = ci.cur_depl_state_id AND cids.general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
             ],
             'Where' => [
                 'cids.name != \'Test\''
@@ -392,7 +397,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'INNER JOIN general_catalog cids ON cids.id = ci.cur_depl_state_id AND general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
+                'INNER JOIN general_catalog cids ON cids.id = ci.cur_depl_state_id AND cids.general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
             ],
             'Where' => [
                 'cids.name IN (\'Test\')'
@@ -408,7 +413,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'INNER JOIN general_catalog cids ON cids.id = ci.cur_depl_state_id AND general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
+                'INNER JOIN general_catalog cids ON cids.id = ci.cur_depl_state_id AND cids.general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
             ],
             'Where' => [
                 'cids.name NOT IN (\'Test\')'
@@ -424,7 +429,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'INNER JOIN general_catalog cids ON cids.id = ci.cur_depl_state_id AND general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
+                'INNER JOIN general_catalog cids ON cids.id = ci.cur_depl_state_id AND cids.general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
             ],
             'Where' => [
                 'cids.name LIKE \'Test%\''
@@ -440,7 +445,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'INNER JOIN general_catalog cids ON cids.id = ci.cur_depl_state_id AND general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
+                'INNER JOIN general_catalog cids ON cids.id = ci.cur_depl_state_id AND cids.general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
             ],
             'Where' => [
                 'cids.name LIKE \'%Test\''
@@ -456,7 +461,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'INNER JOIN general_catalog cids ON cids.id = ci.cur_depl_state_id AND general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
+                'INNER JOIN general_catalog cids ON cids.id = ci.cur_depl_state_id AND cids.general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
             ],
             'Where' => [
                 'cids.name LIKE \'%Test%\''
@@ -472,10 +477,154 @@ my @SearchTests = (
         },
         Expected     => {
             'Join' => [
-                'INNER JOIN general_catalog cids ON cids.id = ci.cur_depl_state_id AND general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
+                'INNER JOIN general_catalog cids ON cids.id = ci.cur_depl_state_id AND cids.general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
             ],
             'Where' => [
                 'cids.name LIKE \'Test\''
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field DeplStateType / Operator EQ',
+        Search       => {
+            Field    => 'DeplStateType',
+            Operator => 'EQ',
+            Value    => 'Test'
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT OUTER JOIN general_catalog_preferences cidst ON cidst.general_catalog_id = ci.cur_depl_state_id AND cidst.pref_key = \'Functionality\''
+            ],
+            'Where' => [
+                'cidst.pref_value = \'Test\''
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field DeplStateType / Operator EQ / Value empty string',
+        Search       => {
+            Field    => 'DeplStateType',
+            Operator => 'EQ',
+            Value    => ''
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT OUTER JOIN general_catalog_preferences cidst ON cidst.general_catalog_id = ci.cur_depl_state_id AND cidst.pref_key = \'Functionality\''
+            ],
+            'Where' => [
+                '(cidst.pref_value = \'\' OR cidst.pref_value IS NULL)'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field DeplStateType / Operator NE',
+        Search       => {
+            Field    => 'DeplStateType',
+            Operator => 'NE',
+            Value    => 'Test'
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT OUTER JOIN general_catalog_preferences cidst ON cidst.general_catalog_id = ci.cur_depl_state_id AND cidst.pref_key = \'Functionality\''
+            ],
+            'Where' => [
+                '(cidst.pref_value != \'Test\' OR cidst.pref_value IS NULL)'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field DeplStateType / Operator IN',
+        Search       => {
+            Field    => 'DeplStateType',
+            Operator => 'IN',
+            Value    => ['Test']
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT OUTER JOIN general_catalog_preferences cidst ON cidst.general_catalog_id = ci.cur_depl_state_id AND cidst.pref_key = \'Functionality\''
+            ],
+            'Where' => [
+                'cidst.pref_value IN (\'Test\')'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field DeplStateType / Operator !IN',
+        Search       => {
+            Field    => 'DeplStateType',
+            Operator => '!IN',
+            Value    => ['Test']
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT OUTER JOIN general_catalog_preferences cidst ON cidst.general_catalog_id = ci.cur_depl_state_id AND cidst.pref_key = \'Functionality\''
+            ],
+            'Where' => [
+                'cidst.pref_value NOT IN (\'Test\')'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field DeplStateType / Operator STARTSWITH',
+        Search       => {
+            Field    => 'DeplStateType',
+            Operator => 'STARTSWITH',
+            Value    => 'Test'
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT OUTER JOIN general_catalog_preferences cidst ON cidst.general_catalog_id = ci.cur_depl_state_id AND cidst.pref_key = \'Functionality\''
+            ],
+            'Where' => [
+                'cidst.pref_value LIKE \'Test%\''
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field DeplStateType / Operator ENDSWITH',
+        Search       => {
+            Field    => 'DeplStateType',
+            Operator => 'ENDSWITH',
+            Value    => 'Test'
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT OUTER JOIN general_catalog_preferences cidst ON cidst.general_catalog_id = ci.cur_depl_state_id AND cidst.pref_key = \'Functionality\''
+            ],
+            'Where' => [
+                'cidst.pref_value LIKE \'%Test\''
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field DeplStateType / Operator CONTAINS',
+        Search       => {
+            Field    => 'DeplStateType',
+            Operator => 'CONTAINS',
+            Value    => 'Test'
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT OUTER JOIN general_catalog_preferences cidst ON cidst.general_catalog_id = ci.cur_depl_state_id AND cidst.pref_key = \'Functionality\''
+            ],
+            'Where' => [
+                'cidst.pref_value LIKE \'%Test%\''
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field DeplStateType / Operator LIKE',
+        Search       => {
+            Field    => 'DeplStateType',
+            Operator => 'LIKE',
+            Value    => 'Test'
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT OUTER JOIN general_catalog_preferences cidst ON cidst.general_catalog_id = ci.cur_depl_state_id AND cidst.pref_key = \'Functionality\''
+            ],
+            'Where' => [
+                'cidst.pref_value LIKE \'Test\''
             ]
         }
     },
@@ -796,7 +945,7 @@ my @SearchTests = (
         Expected     => {
             'Join' => [
                 'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
-                'INNER JOIN general_catalog civds ON civds.id = civ.depl_state_id AND general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
+                'INNER JOIN general_catalog civds ON civds.id = civ.depl_state_id AND civds.general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
             ],
             'Where' => [
                 'civds.name = \'Test\''
@@ -816,7 +965,7 @@ my @SearchTests = (
         Expected     => {
             'Join' => [
                 'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
-                'INNER JOIN general_catalog civds ON civds.id = civ.depl_state_id AND general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
+                'INNER JOIN general_catalog civds ON civds.id = civ.depl_state_id AND civds.general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
             ],
             'Where' => [
                 'civds.name != \'Test\''
@@ -836,7 +985,7 @@ my @SearchTests = (
         Expected     => {
             'Join' => [
                 'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
-                'INNER JOIN general_catalog civds ON civds.id = civ.depl_state_id AND general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
+                'INNER JOIN general_catalog civds ON civds.id = civ.depl_state_id AND civds.general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
             ],
             'Where' => [
                 'civds.name IN (\'Test\')'
@@ -856,7 +1005,7 @@ my @SearchTests = (
         Expected     => {
             'Join' => [
                 'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
-                'INNER JOIN general_catalog civds ON civds.id = civ.depl_state_id AND general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
+                'INNER JOIN general_catalog civds ON civds.id = civ.depl_state_id AND civds.general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
             ],
             'Where' => [
                 'civds.name NOT IN (\'Test\')'
@@ -876,7 +1025,7 @@ my @SearchTests = (
         Expected     => {
             'Join' => [
                 'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
-                'INNER JOIN general_catalog civds ON civds.id = civ.depl_state_id AND general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
+                'INNER JOIN general_catalog civds ON civds.id = civ.depl_state_id AND civds.general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
             ],
             'Where' => [
                 'civds.name LIKE \'Test%\''
@@ -896,7 +1045,7 @@ my @SearchTests = (
         Expected     => {
             'Join' => [
                 'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
-                'INNER JOIN general_catalog civds ON civds.id = civ.depl_state_id AND general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
+                'INNER JOIN general_catalog civds ON civds.id = civ.depl_state_id AND civds.general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
             ],
             'Where' => [
                 'civds.name LIKE \'%Test\''
@@ -916,7 +1065,7 @@ my @SearchTests = (
         Expected     => {
             'Join' => [
                 'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
-                'INNER JOIN general_catalog civds ON civds.id = civ.depl_state_id AND general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
+                'INNER JOIN general_catalog civds ON civds.id = civ.depl_state_id AND civds.general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
             ],
             'Where' => [
                 'civds.name LIKE \'%Test%\''
@@ -936,10 +1085,190 @@ my @SearchTests = (
         Expected     => {
             'Join' => [
                 'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
-                'INNER JOIN general_catalog civds ON civds.id = civ.depl_state_id AND general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
+                'INNER JOIN general_catalog civds ON civds.id = civ.depl_state_id AND civds.general_catalog_class = \'ITSM::ConfigItem::DeploymentState\''
             ],
             'Where' => [
                 'civds.name LIKE \'Test\''
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field DeplStateType / Operator EQ / PreviousVersionSearch',
+        Search       => {
+            Field    => 'DeplStateType',
+            Operator => 'EQ',
+            Value    => 'Test'
+        },
+        Flags        => {
+            PreviousVersionSearch => 1
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
+                'LEFT OUTER JOIN general_catalog_preferences civdst ON civdst.general_catalog_id = civ.depl_state_id AND civdst.pref_key = \'Functionality\''
+            ],
+            'Where' => [
+                'civdst.pref_value = \'Test\''
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field DeplStateType / Operator EQ / Value empty string / PreviousVersionSearch',
+        Search       => {
+            Field    => 'DeplStateType',
+            Operator => 'EQ',
+            Value    => ''
+        },
+        Flags        => {
+            PreviousVersionSearch => 1
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
+                'LEFT OUTER JOIN general_catalog_preferences civdst ON civdst.general_catalog_id = civ.depl_state_id AND civdst.pref_key = \'Functionality\''
+            ],
+            'Where' => [
+                '(civdst.pref_value = \'\' OR civdst.pref_value IS NULL)'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field DeplStateType / Operator NE / PreviousVersionSearch',
+        Search       => {
+            Field    => 'DeplStateType',
+            Operator => 'NE',
+            Value    => 'Test'
+        },
+        Flags        => {
+            PreviousVersionSearch => 1
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
+                'LEFT OUTER JOIN general_catalog_preferences civdst ON civdst.general_catalog_id = civ.depl_state_id AND civdst.pref_key = \'Functionality\''
+            ],
+            'Where' => [
+                '(civdst.pref_value != \'Test\' OR civdst.pref_value IS NULL)'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field DeplStateType / Operator IN / PreviousVersionSearch',
+        Search       => {
+            Field    => 'DeplStateType',
+            Operator => 'IN',
+            Value    => ['Test']
+        },
+        Flags        => {
+            PreviousVersionSearch => 1
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
+                'LEFT OUTER JOIN general_catalog_preferences civdst ON civdst.general_catalog_id = civ.depl_state_id AND civdst.pref_key = \'Functionality\''
+            ],
+            'Where' => [
+                'civdst.pref_value IN (\'Test\')'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field DeplStateType / Operator !IN / PreviousVersionSearch',
+        Search       => {
+            Field    => 'DeplStateType',
+            Operator => '!IN',
+            Value    => ['Test']
+        },
+        Flags        => {
+            PreviousVersionSearch => 1
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
+                'LEFT OUTER JOIN general_catalog_preferences civdst ON civdst.general_catalog_id = civ.depl_state_id AND civdst.pref_key = \'Functionality\''
+            ],
+            'Where' => [
+                'civdst.pref_value NOT IN (\'Test\')'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field DeplStateType / Operator STARTSWITH / PreviousVersionSearch',
+        Search       => {
+            Field    => 'DeplStateType',
+            Operator => 'STARTSWITH',
+            Value    => 'Test'
+        },
+        Flags        => {
+            PreviousVersionSearch => 1
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
+                'LEFT OUTER JOIN general_catalog_preferences civdst ON civdst.general_catalog_id = civ.depl_state_id AND civdst.pref_key = \'Functionality\''
+            ],
+            'Where' => [
+                'civdst.pref_value LIKE \'Test%\''
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field DeplStateType / Operator ENDSWITH / PreviousVersionSearch',
+        Search       => {
+            Field    => 'DeplStateType',
+            Operator => 'ENDSWITH',
+            Value    => 'Test'
+        },
+        Flags        => {
+            PreviousVersionSearch => 1
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
+                'LEFT OUTER JOIN general_catalog_preferences civdst ON civdst.general_catalog_id = civ.depl_state_id AND civdst.pref_key = \'Functionality\''
+            ],
+            'Where' => [
+                'civdst.pref_value LIKE \'%Test\''
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field DeplStateType / Operator CONTAINS / PreviousVersionSearch',
+        Search       => {
+            Field    => 'DeplStateType',
+            Operator => 'CONTAINS',
+            Value    => 'Test'
+        },
+        Flags        => {
+            PreviousVersionSearch => 1
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
+                'LEFT OUTER JOIN general_catalog_preferences civdst ON civdst.general_catalog_id = civ.depl_state_id AND civdst.pref_key = \'Functionality\''
+            ],
+            'Where' => [
+                'civdst.pref_value LIKE \'%Test%\''
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field DeplStateType / Operator LIKE / PreviousVersionSearch',
+        Search       => {
+            Field    => 'DeplStateType',
+            Operator => 'LIKE',
+            Value    => 'Test'
+        },
+        Flags        => {
+            PreviousVersionSearch => 1
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
+                'LEFT OUTER JOIN general_catalog_preferences civdst ON civdst.general_catalog_id = civ.depl_state_id AND civdst.pref_key = \'Functionality\''
+            ],
+            'Where' => [
+                'civdst.pref_value LIKE \'Test\''
             ]
         }
     }
@@ -1002,7 +1331,7 @@ my @SortTests = (
         Attribute => 'DeplState',
         Expected  => {
             'Join'    => [
-                'LEFT OUTER JOIN general_catalog cids ON cids.id = ci.cur_depl_state_id AND general_catalog_class = \'ITSM::ConfigItem::DeploymentState\'',
+                'LEFT OUTER JOIN general_catalog cids ON cids.id = ci.cur_depl_state_id AND cids.general_catalog_class = \'ITSM::ConfigItem::DeploymentState\'',
                 'LEFT OUTER JOIN translation_pattern tlp0 ON tlp0.value = cids.name',
                 'LEFT OUTER JOIN translation_language tl0 ON tl0.pattern_id = tlp0.id AND tl0.language = \'en\''
             ],
@@ -1013,6 +1342,11 @@ my @SortTests = (
                 'LOWER(COALESCE(tl0.value, cids.name)) AS TranslateDeplState'
             ]
         }
+    },
+    {
+        Name      => 'Sort: Attribute "DeplStateType"',
+        Attribute => 'DeplStateType',
+        Expected  => undef
     }
 );
 for my $Test ( @SortTests ) {
@@ -1066,10 +1400,11 @@ my $ClassRef = $Kernel::OM->Get('GeneralCatalog')->ItemGet(
 my $ItemDataRef1 = $Kernel::OM->Get('GeneralCatalog')->ItemGet(
     Class         => 'ITSM::ConfigItem::DeploymentState',
     Name          => 'Maintenance',
-    NoPreferences => 1
+    NoPreferences => 0
 );
-my $DeplStateID1   = $ItemDataRef1->{ItemID};
-my $DeplStateName1 = $ItemDataRef1->{Name};
+my $DeplStateID1            = $ItemDataRef1->{ItemID};
+my $DeplStateName1          = $ItemDataRef1->{Name};
+my $DeplStateFunctionality1 = $ItemDataRef1->{Functionality};
 $Self->True(
     $DeplStateID1,
     'DeplState 1 has id'
@@ -1084,13 +1419,19 @@ $Self->Is(
     'Wartung',
     'DeplState 1 has expected translation (de)'
 );
+$Self->Is(
+    $DeplStateFunctionality1,
+    'productive',
+    'DeplState 1 has expected functionality'
+);
 my $ItemDataRef2 = $Kernel::OM->Get('GeneralCatalog')->ItemGet(
     Class         => 'ITSM::ConfigItem::DeploymentState',
     Name          => 'Production',
-    NoPreferences => 1
+    NoPreferences => 0
 );
-my $DeplStateID2   = $ItemDataRef2->{ItemID};
-my $DeplStateName2 = $ItemDataRef2->{Name};
+my $DeplStateID2            = $ItemDataRef2->{ItemID};
+my $DeplStateName2          = $ItemDataRef2->{Name};
+my $DeplStateFunctionality2 = $ItemDataRef2->{Functionality};
 $Self->True(
     $DeplStateID2,
     'DeplState 2 has id'
@@ -1105,13 +1446,19 @@ $Self->Is(
     'Produktiv',
     'DeplState 2 has expected translation (de)'
 );
+$Self->Is(
+    $DeplStateFunctionality2,
+    'productive',
+    'DeplState 2 has expected functionality'
+);
 my $ItemDataRef3 = $Kernel::OM->Get('GeneralCatalog')->ItemGet(
     Class         => 'ITSM::ConfigItem::DeploymentState',
     Name          => 'Retired',
-    NoPreferences => 1
+    NoPreferences => 0
 );
-my $DeplStateID3   = $ItemDataRef3->{ItemID};
-my $DeplStateName3 = $ItemDataRef3->{Name};
+my $DeplStateID3            = $ItemDataRef3->{ItemID};
+my $DeplStateName3          = $ItemDataRef3->{Name};
+my $DeplStateFunctionality3 = $ItemDataRef3->{Functionality};
 $Self->True(
     $DeplStateID3,
     'DeplState 3 has id'
@@ -1125,6 +1472,11 @@ $Self->Is(
     $TranslationsDE{ $DeplStateName3 },
     'Außer Dienst',
     'DeplState 3 has expected translation (de)'
+);
+$Self->Is(
+    $DeplStateFunctionality3,
+    'postproductive',
+    'DeplState 3 has expected functionality'
 );
 
 ## prepare test assets ##
@@ -1545,6 +1897,149 @@ my @IntegrationSearchTests = (
                     Field    => 'DeplState',
                     Operator => 'LIKE',
                     Value    => $DeplStateName3
+                }
+            ]
+        },
+        Expected => [$ConfigItemID2]
+    },
+    {
+        Name     => 'Search: Field DeplStateType / Operator EQ / Value $DeplStateFunctionality1',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DeplStateType',
+                    Operator => 'EQ',
+                    Value    => $DeplStateFunctionality1
+                }
+            ]
+        },
+        Expected => [$ConfigItemID1]
+    },
+    {
+        Name     => 'Search: Field DeplStateType / Operator NE / Value $DeplStateFunctionality1',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DeplStateType',
+                    Operator => 'NE',
+                    Value    => $DeplStateFunctionality1
+                }
+            ]
+        },
+        Expected => [$ConfigItemID2,$ConfigItemID3]
+    },
+    {
+        Name     => 'Search: Field DeplStateType / Operator IN / Value [$DeplStateFunctionality1,$DeplStateFunctionality3]',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DeplStateType',
+                    Operator => 'IN',
+                    Value    => [$DeplStateFunctionality1,$DeplStateFunctionality3]
+                }
+            ]
+        },
+        Expected => [$ConfigItemID1,$ConfigItemID2]
+    },
+    {
+        Name     => 'Search: Field DeplStateType / Operator !IN / Value [$DeplStateFunctionality1,$DeplStateFunctionality3]',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DeplStateType',
+                    Operator => '!IN',
+                    Value    => [$DeplStateFunctionality1,$DeplStateFunctionality3]
+                }
+            ]
+        },
+        Expected => []
+    },
+    {
+        Name     => 'Search: Field DeplStateType / Operator STARTSWITH / Value $DeplStateFunctionality3',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DeplStateType',
+                    Operator => 'STARTSWITH',
+                    Value    => $DeplStateFunctionality3
+                }
+            ]
+        },
+        Expected => [$ConfigItemID2]
+    },
+    {
+        Name     => 'Search: Field DeplStateType / Operator STARTSWITH / Value substr($DeplStateFunctionality3,0,4)',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DeplStateType',
+                    Operator => 'STARTSWITH',
+                    Value    => substr($DeplStateFunctionality3,0,4)
+                }
+            ]
+        },
+        Expected => [$ConfigItemID2]
+    },
+    {
+        Name     => 'Search: Field DeplStateType / Operator ENDSWITH / Value $DeplStateFunctionality1',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DeplStateType',
+                    Operator => 'ENDSWITH',
+                    Value    => $DeplStateFunctionality1
+                }
+            ]
+        },
+        Expected => [$ConfigItemID1,$ConfigItemID2]
+    },
+    {
+        Name     => 'Search: Field DeplStateType / Operator ENDSWITH / Value substr($DeplStateFunctionality1,-5)',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DeplStateType',
+                    Operator => 'ENDSWITH',
+                    Value    => substr($DeplStateFunctionality1,-5)
+                }
+            ]
+        },
+        Expected => [$ConfigItemID1,$ConfigItemID2]
+    },
+    {
+        Name     => 'Search: Field DeplStateType / Operator CONTAINS / Value $DeplStateFunctionality1',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DeplStateType',
+                    Operator => 'CONTAINS',
+                    Value    => $DeplStateFunctionality1
+                }
+            ]
+        },
+        Expected => [$ConfigItemID1,$ConfigItemID2]
+    },
+    {
+        Name     => 'Search: Field DeplStateType / Operator CONTAINS / Value substr($DeplStateFunctionality1,2,-2)',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DeplStateType',
+                    Operator => 'CONTAINS',
+                    Value    => substr($DeplStateFunctionality1,2,-2)
+                }
+            ]
+        },
+        Expected => [$ConfigItemID1,$ConfigItemID2]
+    },
+    {
+        Name     => 'Search: Field DeplStateType / Operator LIKE / Value $DeplStateFunctionality3',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DeplStateType',
+                    Operator => 'LIKE',
+                    Value    => $DeplStateFunctionality3
                 }
             ]
         },
@@ -2004,6 +2499,193 @@ my @IntegrationSearchTests = (
                     Field    => 'DeplState',
                     Operator => 'LIKE',
                     Value    => $DeplStateName3
+                }
+            ]
+        },
+        Expected => [$ConfigItemID2]
+    },
+    {
+        Name     => 'Search: Field DeplStateType / Operator EQ / Value $DeplStateFunctionality2 / PreviousVersionSearch',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'PreviousVersionSearch',
+                    Value    => 1
+                },
+                {
+                    Field    => 'DeplStateType',
+                    Operator => 'EQ',
+                    Value    => $DeplStateFunctionality2
+                }
+            ]
+        },
+        Expected => [$ConfigItemID1,$ConfigItemID2]
+    },
+    {
+        Name     => 'Search: Field DeplStateType / Operator NE / Value $DeplStateFunctionality2 / PreviousVersionSearch',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'PreviousVersionSearch',
+                    Value    => 1
+                },
+                {
+                    Field    => 'DeplStateType',
+                    Operator => 'NE',
+                    Value    => $DeplStateFunctionality2
+                }
+            ]
+        },
+        Expected => [$ConfigItemID2,$ConfigItemID3]
+    },
+    {
+        Name     => 'Search: Field DeplStateType / Operator IN / Value [$DeplStateFunctionality1,$DeplStateFunctionality3] / PreviousVersionSearch',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'PreviousVersionSearch',
+                    Value    => 1
+                },
+                {
+                    Field    => 'DeplStateType',
+                    Operator => 'IN',
+                    Value    => [$DeplStateFunctionality1,$DeplStateFunctionality3]
+                }
+            ]
+        },
+        Expected => [$ConfigItemID1,$ConfigItemID2]
+    },
+    {
+        Name     => 'Search: Field DeplStateType / Operator !IN / Value [$DeplStateFunctionality1,$DeplStateFunctionality3] / PreviousVersionSearch',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'PreviousVersionSearch',
+                    Value    => 1
+                },
+                {
+                    Field    => 'DeplStateType',
+                    Operator => '!IN',
+                    Value    => [$DeplStateFunctionality1,$DeplStateFunctionality3]
+                }
+            ]
+        },
+        Expected => []
+    },
+    {
+        Name     => 'Search: Field DeplStateType / Operator STARTSWITH / Value $DeplStateFunctionality3 / PreviousVersionSearch',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'PreviousVersionSearch',
+                    Value    => 1
+                },
+                {
+                    Field    => 'DeplStateType',
+                    Operator => 'STARTSWITH',
+                    Value    => $DeplStateFunctionality3
+                }
+            ]
+        },
+        Expected => [$ConfigItemID2]
+    },
+    {
+        Name     => 'Search: Field DeplStateType / Operator STARTSWITH / Value substr($DeplStateFunctionality3,0,4) / PreviousVersionSearch',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'PreviousVersionSearch',
+                    Value    => 1
+                },
+                {
+                    Field    => 'DeplStateType',
+                    Operator => 'STARTSWITH',
+                    Value    => substr($DeplStateFunctionality3,0,4)
+                }
+            ]
+        },
+        Expected => [$ConfigItemID2]
+    },
+    {
+        Name     => 'Search: Field DeplStateType / Operator ENDSWITH / Value $DeplStateFunctionality1 / PreviousVersionSearch',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'PreviousVersionSearch',
+                    Value    => 1
+                },
+                {
+                    Field    => 'DeplStateType',
+                    Operator => 'ENDSWITH',
+                    Value    => $DeplStateFunctionality1
+                }
+            ]
+        },
+        Expected => [$ConfigItemID1,$ConfigItemID2]
+    },
+    {
+        Name     => 'Search: Field DeplStateType / Operator ENDSWITH / Value substr($DeplStateFunctionality1,-5) / PreviousVersionSearch',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'PreviousVersionSearch',
+                    Value    => 1
+                },
+                {
+                    Field    => 'DeplStateType',
+                    Operator => 'ENDSWITH',
+                    Value    => substr($DeplStateFunctionality1,-5)
+                }
+            ]
+        },
+        Expected => [$ConfigItemID1,$ConfigItemID2]
+    },
+    {
+        Name     => 'Search: Field DeplStateType / Operator CONTAINS / Value $DeplStateFunctionality1 / PreviousVersionSearch',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'PreviousVersionSearch',
+                    Value    => 1
+                },
+                {
+                    Field    => 'DeplStateType',
+                    Operator => 'CONTAINS',
+                    Value    => $DeplStateFunctionality1
+                }
+            ]
+        },
+        Expected => [$ConfigItemID1,$ConfigItemID2]
+    },
+    {
+        Name     => 'Search: Field DeplStateType / Operator CONTAINS / Value substr($DeplStateFunctionality1,2,-2) / PreviousVersionSearch',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'PreviousVersionSearch',
+                    Value    => 1
+                },
+                {
+                    Field    => 'DeplStateType',
+                    Operator => 'CONTAINS',
+                    Value    => substr($DeplStateFunctionality1,2,-2)
+                }
+            ]
+        },
+        Expected => [$ConfigItemID1,$ConfigItemID2]
+    },
+    {
+        Name     => 'Search: Field DeplStateType / Operator LIKE / Value $DeplStateFunctionality3 / PreviousVersionSearch',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'PreviousVersionSearch',
+                    Value    => 1
+                },
+                {
+                    Field    => 'DeplStateType',
+                    Operator => 'LIKE',
+                    Value    => $DeplStateFunctionality3
                 }
             ]
         },

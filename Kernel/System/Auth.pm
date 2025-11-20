@@ -866,15 +866,8 @@ sub Auth {
             return if ( $UserData{ValidID} != 1 );
 
             # set user to invalid-temporarily if max failed logins reached
-            my $Config = $Kernel::OM->Get('Config')->Get('PreferencesGroups');
-            my $PasswordMaxLoginFailed;
-            if (
-                $Config
-                && $Config->{Password}
-                && $Config->{Password}->{PasswordMaxLoginFailed}
-            ) {
-                $PasswordMaxLoginFailed = $Config->{Password}->{PasswordMaxLoginFailed};
-            }
+            my $PasswordMaxLoginFailed = $Kernel::OM->Get('Config')->Get('Authentication::MaxLoginFailed');
+
             # skip if config is not set
             return if ( !$PasswordMaxLoginFailed );
 

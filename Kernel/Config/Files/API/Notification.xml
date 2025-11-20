@@ -10,6 +10,8 @@
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">NotificationID</Item>
                 <Item Key="ResponseSchema">NotificationResponse</Item>
+                <Item Key="CacheType">API_notificationevents</Item>
+                <Item Key="CacheTypeDependency">NotificationEvent</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -21,6 +23,8 @@
                 <Item Key="Module">Kernel::API::Operation::V1::Notification::NotificationSearch</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">NotificationCollectionResponse</Item>
+                <Item Key="CacheType">API_notificationevents</Item>
+                <Item Key="CacheTypeDependency">NotificationEvent</Item>
             </Hash>
         </Setting>
     </ConfigItem>

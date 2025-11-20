@@ -14,3 +14,29 @@ Feature: POST request to the /system/users resource
      When added a user with roles
      Then the response code is 201
 #     Then the response object is UserPostPatchResponse
+
+  Scenario: added a user with no login
+    When added a user with no login
+    Then the response code is 400
+
+  Scenario: added a user with the same login
+    When added a user with the same login
+    Then the response code is 201
+    When added a user with the same login
+    Then the response code is 409
+    And the response object is Error
+    And the error code is "Object.AlreadyExists"
+    And the error message is "Cannot create user. Another user with same login already exists."
+
+  Scenario: added a user with no password policy
+    When added a user with no password policy
+    Then the response code is 400
+    And the error code is "Validator.Failed"
+    And the error message is "Password has to be at least 6 characters long. It needs at least 2 upper case, 2 lower case and 1 digit."
+
+
+
+
+
+
+

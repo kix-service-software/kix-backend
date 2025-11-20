@@ -187,6 +187,40 @@ sub Run {
         }
     }
 
+    # check if we have to update or create the user
+    my $CreatedUserID;
+    if ( $Contact->{User} ) {
+        my $Result;
+        if ( $Contact->{AssignedUserID} ) {
+            $Result = $Self->ExecOperation(
+                OperationType => 'V1::User::UserUpdate',
+                Data          => {
+                    UserID => $Contact->{AssignedUserID},
+                    User   => $Contact->{User}
+                }
+            );
+        }
+        else {
+            $Result = $Self->ExecOperation(
+                OperationType => 'V1::User::UserCreate',
+                Data          => {
+                    User => $Contact->{User}
+                }
+            );
+            if ( $Result->{Success} ) {
+                $CreatedUserID = $Result->{Data}->{UserID};
+            }
+        }
+
+        if ( !$Result->{Success} ) {
+            return $Self->_Error(
+                %{$Result},
+            )
+        }
+
+        $Contact->{AssignedUserID} = $Result->{Data}->{UserID};
+    }
+
     # update Contact
     my $Success = $Kernel::OM->Get('Contact')->ContactUpdate(
         %ContactData,
@@ -195,6 +229,13 @@ sub Run {
         UserID          => $Self->{Authorization}->{UserID},
     );
     if ( !$Success ) {
+        if ( $CreatedUserID ) {
+            # remove newly created user
+            $Kernel::OM->Get('User')->DeleteNewlyCreatedUser(
+                UserID       => $CreatedUserID,
+                ChangeUserID => $Self->{Authorization}->{UserID}
+            );
+        }
         return $Self->_Error(
             Code    => 'Object.UnableToUpdate',
             Message => 'Could not update contact, please contact the system administrator',

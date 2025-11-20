@@ -137,22 +137,19 @@ sub ValueValidate {
     return $Success;
 }
 
-sub SearchSQLSearchFieldGet {
+sub SQLParameterGet {
     my ( $Self, %Param ) = @_;
 
-    return {
-        Column          => "$Param{TableAlias}.value_text",
-        CaseInsensitive => 1
-    };
-}
+    my $SQLParameter = $Self->SUPER::SQLParameterGet( %Param );
 
-sub SearchSQLSortFieldGet {
-    my ( $Self, %Param ) = @_;
+    if (
+        $Param{ParameterType}
+        && $Param{ParameterType} eq 'Condition'
+    ) {
+        $SQLParameter->{ConditionDef}->{CaseInsensitive} = 1;
+    }
 
-    return {
-        Select  => ["$Param{TableAlias}.value_text"],
-        OrderBy => ["$Param{TableAlias}.value_text"]
-    };
+    return $SQLParameter;
 }
 
 sub DisplayValueRender {

@@ -1630,6 +1630,7 @@
                 <Item Key="Unsubscribe" Translatable="1">Removed subscription for user "%s".</Item>
                 <Item Key="ArticleDelete" Translatable="1">Article ID %s - %s deleted.</Item>
                 <Item Key="ArticleDynamicFieldUpdate" Translatable="1">Updated: %s=%s;%s=%s;%s=%s;</Item>
+                <Item Key="ArticleSend" Translatable="1">Article send. To: %s / Cc: %s / Bcc: %s</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -1893,22 +1894,6 @@
                 <Item Key="Icon">fa fa-envelope</Item>
                 <Item Key="Prio">100</Item>
                 <Item Key="AgentEnabledByDefault">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="PreferencesGroups###NotificationEvent" Required="0" Valid="1">
-        <Description Translatable="1">Transport selection for ticket notifications.</Description>
-        <Group>Ticket</Group>
-        <SubGroup>Frontend::Agent::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::NotificationEvent</Item>
-                <Item Key="Column">Notification Settings</Item>
-                <Item Key="Label" Translatable="1">Ticket notifications</Item>
-                <Item Key="Desc" Translatable="1">Choose for which kind of ticket changes you want to receive notifications.</Item>
-                <Item Key="PrefKey">AdminNotifcationEventTransport</Item>
-                <Item Key="Prio">8000</Item>
-                <Item Key="Active">1</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -2814,7 +2799,7 @@ Thanks for your help!
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###900-NotificationToOutOfOfficeSubstitute" Required="0" Valid="0">
+    <ConfigItem AccessLevel="internal" Name="Ticket::EventModulePost###900-NotificationToOutOfOfficeSubstitute" Required="0" Valid="1">
         <Description Translatable="1">Sends all agent's notifications to its configured out of office substitute while agent is out of office.</Description>
         <Group>Ticket</Group>
         <SubGroup>Core::Ticket</SubGroup>

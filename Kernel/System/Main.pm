@@ -1255,12 +1255,23 @@ sub ResolveValueByKey {
     return $Data;
 }
 
+=item FilterObjectList()
+
+filter a list of objects
+
+    my $Value = $MainObject->FilterObjectList(
+        Data   => [],
+        Filter => {},            # API filter expression
+        Strict => 0|1,           # optional, returns undef in case of a non-existing filter property
+    );
+=cut
+
 sub FilterObjectList {
     my ($Self, %Param) = @_;
     my @FilteredResult;
 
     # without useful data, we've got nothing to do
-    return @FilteredResult if !IsArrayRefWithData($Param{Data});
+    return [] if !IsArrayRefWithData($Param{Data});
 
     my $Filter = $Param{Filter} || {};
 
@@ -1294,17 +1305,19 @@ sub FilterObjectList {
                                 if ( exists( $ObjectItem->{$SubObject} ) ) {
 
                                     # execute filter on sub-structure
-                                    my @FilteredData = $Self->FilterObjectList(
+                                    my $FilteredData = $Self->FilterObjectList(
                                         Data   => $SubData,
                                         Filter => {
                                             OR => [
                                                 \%SubFilter
                                             ]
-                                        }
+                                        },
+                                        Strict => $Param{Strict},
                                     );
+                                    return if !$FilteredData;
 
                                     # check filtered SubData
-                                    if ( !IsArrayRefWithData( \@FilteredData ) ) {
+                                    if ( !IsArrayRefWithData( $FilteredData ) ) {
                                         # the filter didn't match the sub-structure
                                         $FilterMatch = 0;
                                     }
@@ -1313,6 +1326,14 @@ sub FilterObjectList {
                                     # the sub-structure attribute doesn't exist, ignore this item
                                     $FilterMatch = 0;
                                 }
+                            }
+                            elsif ($Param{Strict}) {
+                                # filtered attribute not found and strict behaviour enabled - return an error
+                                $Kernel::OM->Get('Log')->Log(
+                                    Priority => 'error',
+                                    Message  => "Unsupported filter property \"$FilterItem->{Field}\"!"
+                                );
+                                return;
                             }
                             else {
                                 # filtered attribute not found, ignore this item
@@ -1530,7 +1551,7 @@ sub FilterObjectList {
         }
     }
 
-    return @FilteredResult;
+    return \@FilteredResult;
 }
 
 =item GetUnique()
@@ -1726,127 +1747,46 @@ sub ApplyVariableFilters {
 
     return $Param{Data} if !$Param{FilterExpression};
 
+    if ( !defined( $Self->{VariableFilters} ) ) {
+        $Self->_LoadVariableFilterHandler();
+    }
+
     my @Filters = split(/\|/, $Param{FilterExpression});
 
     my $Value = $Param{Data};
 
-    foreach my $Filter ( @Filters ) {
+    for my $Filter ( @Filters ) {
         # cleanup leading and trailing spaces
         $Filter =~ s/^\s+|\s+$//;
 
         # skip empty filter
         next if !$Filter;
 
-        if ( $Filter =~ /^(?:JSON|ToJSON)$/i ) {
-            if ( defined( $Value ) ) {
-                $Value = $Kernel::OM->Get('JSON')->Encode(
-                    Data => $Value
-                );
-                $Value =~ s/^"//;
-                $Value =~ s/"$//;
-            }
-            else {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "\"$Filter\" need defined data!"
-                );
-            }
-        }
-        elsif ( $Filter =~ /^FromJSON$/i ) {
-            if ( IsStringWithData( $Value ) ) {
-                $Value = $Kernel::OM->Get('JSON')->Decode(
-                    Data => $Value
-                );
-            }
-            else {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "\"$Filter\" need string with data!"
-                );
-            }
-        }
-        elsif ( $Filter =~ /^jq\((.*)\)$/i ) {
-            my $JqExpression = $1;
-            if ( $JqExpression ) {
-                if ( IsStringWithData( $Value ) ) {
-                    $JqExpression =~ s/\s+::\s+/|/g;
-                    $JqExpression =~ s/&quot;/"/g;
+        $Filter =~ s/(?<filter>.+?)\((?<parameter>.+)\)/$+{filter}/;
+        my $Parameter = $+{parameter};
 
-                    $Value = $Kernel::OM->Get('JSON')->Jq(
-                        Data   => $Value,
-                        Filter => $JqExpression,
-                    );
-                }
-                else {
-                    $Kernel::OM->Get('Log')->Log(
-                        Priority => 'error',
-                        Message  => "\"$Filter\" need string with data!"
-                    );
-                }
-            }
-            else {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "\"$Filter\" has no jq expression!"
-                );
-            }
+        # check for stored variable filter value
+        if ( $Parameter && $Parameter =~ m/^<VariableFilterValue([1-9][0-9]*)>$/xms ) {
+            my $VariableFilterValueIndex = $1;
+            $Parameter = $Self->ResolveValueByKey(
+                Key  => $VariableFilterValueIndex,
+                Data => $Self->{VariableFilterValue},
+            );
         }
-        elsif ( $Filter =~ /^(?:base64|ToBase64)$/i ) {
-            if ( defined( $Value ) ) {
-                $Value = MIME::Base64::encode_base64($Value);
-                $Value =~ s/\n//g;
-            }
-            else {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "\"$Filter\" need defined data!"
-                );
-            }
+        if ( !$Self->{VariableFilters}->{ lc( $Filter ) } ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Unknown filter \"$Filter\"!"
+            );
+            return $Value;
         }
-        elsif ( $Filter =~ /^FromBase64$/i ) {
-            if ( IsStringWithData( $Value ) ) {
-                $Value = MIME::Base64::decode_base64($Value);
-            }
-            else {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "\"$Filter\" need string with data!"
-                );
-            }
-        }
-        else {
-            $Filter =~ s/(?<filter>.+?)\((?<parameter>.+)\)/$+{filter}/;
-            my $Parameter = $+{parameter};
 
-            # check for stored variable filter value
-            if ( $Parameter && $Parameter =~ m/^<VariableFilterValue([1-9][0-9]*)>$/xms ) {
-                my $VariableFilterValueIndex = $1;
-                $Parameter = $Self->ResolveValueByKey(
-                    Key  => $VariableFilterValueIndex,
-                    Data => $Self->{VariableFilterValue},
-                );
-            }
-
-            if ( !$Self->{VariableFilters}->{$Filter} ) {
-                # try to load the filter handler
-                $Self->_LoadVariableFilterHandler(
-                    Name => $Filter
-                );
-            }
-            if ( !$Self->{VariableFilters}->{$Filter} ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Unknown filter \"$Filter\"!"
-                );
-                return $Value;
-            }
-
-            $Value = $Self->{VariableFilters}->{$Filter}->(
-                $Self,
-                Value     => $Value,
-                Parameter => $Parameter
-            )
-        }
+        $Value = $Self->{VariableFilters}->{ lc( $Filter ) }->(
+            $Self,
+            Filter    => $Filter,
+            Value     => $Value,
+            Parameter => $Parameter
+        );
     }
 
     return $Value;
@@ -1983,68 +1923,56 @@ sub GetAssignedSearchParams {
 sub _LoadVariableFilterHandler {
     my ( $Self, %Param ) = @_;
 
-    $Self->{VariableFilters} //= {};
+    $Self->{VariableFilters} = {};
 
     my $VariableFilters = $Kernel::OM->Get('Config')->Get('Automation::VariableFilter');
-    if ( !IsHashRefWithData($VariableFilters) ) {
+    if ( !IsHashRefWithData( $VariableFilters ) ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => "No variable filter handlers registered!"
-        );
-        next;
-    }
-
-    my $Name = (split('\.', $Param{Name}, 2))[0];
-
-    if (!$VariableFilters->{$Name}) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "No filter handler for filter \"$Param{Name}\" registered!"
-        );
-        next;
-    }
-    return if !$Self->Require($VariableFilters->{$Name});
-
-    my $Module = $VariableFilters->{$Name}->new( %{$Self} );
-    if ( !$Module ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Unable to create instance of $VariableFilters->{Name}!"
+            Message  => "No variable filter handlers registered, or invalid configuration!"
         );
         return;
     }
 
-    if ( !$Module->can('GetFilterHandler') ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Module \"$VariableFilters->{$Name}\" cannot \"GetFilterHandler\"!"
-        );
-        next;
-    }
-
-    my %Handler = $Module->GetFilterHandler();
-
-    for my $HandlerName ( keys %Handler ) {
-        next if (!$HandlerName);
-        if (
-            !$Handler{$HandlerName} ||
-            ref $Handler{$HandlerName} ne 'CODE'
-        ) {
+    FILTER:
+    for my $FilterRegistry ( sort( keys ( %{ $VariableFilters } ) ) ) {
+        if ( !$Self->Require( $VariableFilters->{ $FilterRegistry } ) ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "$HandlerName is no function!"
+                Message  => "Unable to require $VariableFilters->{ $FilterRegistry }!"
             );
-            next;
+            next FILTER;
         }
-        $Self->{VariableFilters}->{$HandlerName} = $Handler{$HandlerName};
+        my $Module = $VariableFilters->{ $FilterRegistry }->new( %{ $Self } );
+        if ( !$Module ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Unable to create instance of \"$VariableFilters->{ $FilterRegistry }\"!"
+            );
+            next FILTER;
+        }
 
-        # TODO: better solution needed for filtername with mismatching name
-        # check filtername
-        if (
-            $HandlerName ne $Param{Name}
-            && lc( $HandlerName ) eq lc( $Param{Name} )
-        ) {
-            $Self->{VariableFilters}->{ $Param{Name} } = $Handler{ $HandlerName };
+        if ( !$Module->can('GetFilterHandler') ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Module \"$VariableFilters->{ $FilterRegistry }\" cannot \"GetFilterHandler\"!"
+            );
+            next FILTER;
+        }
+
+        my %Handler = $Module->GetFilterHandler();
+
+        for my $HandlerName ( keys( %Handler ) ) {
+            next FILTER if ( !$HandlerName );
+
+            if ( ref( $Handler{ $HandlerName } ) ne 'CODE' ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "\"$HandlerName\" of Module \"$VariableFilters->{ $FilterRegistry }\" is no function!"
+                );
+                next FILTER;
+            }
+            $Self->{VariableFilters}->{ lc( $HandlerName ) } = $Handler{ $HandlerName };
         }
     }
 }

@@ -60,7 +60,7 @@
     Given 8 of clientregistrations
     When I query the collection of clientregistration with offset 2
     Then the response code is 200
-    And the response contains 7 items of type "ClientRegistration"
+    And the response contains 8 items of type "ClientRegistration"
     When delete all this clientregistrations
     Then the response code is 204
     And the response has no content

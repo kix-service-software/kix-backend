@@ -49,9 +49,11 @@ BEGIN {
 
 _LockPID();
 _Autostart();
+$Kernel::OM->ObjectsDiscard();
 
 my $App = CGI::Emulate::PSGI->handler(
     sub {
+        my $StartTime = Time::HiRes::time();
 
         # Cleanup values from previous requests.
         CGI::initialize_globals();
@@ -64,11 +66,11 @@ my $App = CGI::Emulate::PSGI->handler(
             DB::enable_profile()
         }
 
-        my $StartTime = time();
-
         # run the request
         eval {
-            my $Provider = Kernel::API::Provider->new();
+            my $Provider = Kernel::API::Provider->new(
+                ExecutionStartTime => $StartTime
+            );
             $Provider->Run();
             $Kernel::OM->CleanUp();
 #            do "$Bin/$ENV{SCRIPT_NAME}";
@@ -84,10 +86,7 @@ my $App = CGI::Emulate::PSGI->handler(
 );
 
 sub _LockPID {
-    # create ConfigObject
-    my $ConfigObject = $Kernel::OM->Get('Config');
-
-    my $PIDDir  = $ConfigObject->Get('Home') . '/var/run/';
+    my $PIDDir  = $Kernel::OM->Get('Config')->Get('Home') . '/var/run/';
     my $PIDFile = $PIDDir . "service.pid";
     my $PIDFH;
 

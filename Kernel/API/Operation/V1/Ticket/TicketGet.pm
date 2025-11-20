@@ -61,6 +61,53 @@ sub ParameterDefinition {
     }
 }
 
+=item PreRun()
+
+some code to run before actual execution
+
+    my $Success = $CommonObject->PreRun(
+        ...
+    );
+
+    returns:
+
+    $Success = {
+        Success => 1,                     # if everything is OK
+    }
+
+    $Success = {
+        Code    => 'Forbidden',           # if error
+        Message => 'Error description',
+    }
+
+=cut
+
+sub PreRun {
+    my ( $Self, %Param ) = @_;
+
+    # filter ticket ids for customer
+    if ($Param{Data}->{TicketID}) {
+        my @TicketIDs = $Self->_FilterCustomerUserVisibleObjectIds(
+            ObjectType             => 'Ticket',
+            ObjectIDList           => $Param{Data}->{TicketID},
+            RelevantOrganisationID => $Param{Data}->{RelevantOrganisationID},
+            LogFiltered => 1
+        );
+        if (@TicketIDs) {
+            $Param{Data}->{TicketID} = \@TicketIDs;
+        } else {
+            return $Self->_Error(
+                Code => 'Forbidden',
+                Message => @{$Param{Data}->{TicketID}} == 1 ?
+                "Could not access Ticket with id $Param{Data}->{TicketID}->[0]" :
+                "Could not access any Ticket"
+            );
+        }
+    }
+
+    return $Self->_Success();
+}
+
 =item Run()
 
 perform TicketGet Operation. This function is able to return

@@ -29,7 +29,7 @@ $Self->Is(
 );
 
 # check supported methods
-for my $Method ( qw(GetSupportedAttributes Search Sort) ) {
+for my $Method ( qw(GetSupportedAttributes AttributePrepare Select Search Sort) ) {
     $Self->True(
         $AttributeObject->can($Method),
         'Attribute object can "' . $Method . '"'
@@ -42,21 +42,35 @@ $Self->IsDeeply(
     $AttributeList,
     {
         QueueID => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','GT','GTE','LT','LTE'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN','GT','GTE','LT','LTE'],
+            ValueType      => 'NUMERIC'
         },
         Queue => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
         MyQueues => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EQ'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 0,
+            Operators      => ['EQ'],
+            ValueType      => 'NUMERIC'
+        },
+        HistoricMyQueues => {
+            IsFulltextable => 0,
+            IsSearchable   => 1,
+            IsSelectable   => 0,
+            IsSortable     => 0,
+            Operators      => ['EQ'],
+            ValueType      => 'NUMERIC'
         }
     },
     'GetSupportedAttributes provides expected data'
@@ -420,6 +434,54 @@ my @SearchTests = (
                 '(st.queue_id NOT IN (1) OR st.queue_id IN (1))'
             ]
         }
+    },
+    {
+        Name         => 'Search: valid search / Field HistoricMyQueues / Operator EQ / Value 1',
+        Search       => {
+            Field    => 'HistoricMyQueues',
+            Operator => 'EQ',
+            Value    => '1'
+        },
+        Expected     => {
+            'Join'  => [
+                'INNER JOIN ticket_history th ON th.ticket_id = st.id'
+            ],
+            'Where' => [
+                'th.queue_id IN (1)'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field HistoricMyQueues / Operator EQ / Value 0',
+        Search       => {
+            Field    => 'HistoricMyQueues',
+            Operator => 'EQ',
+            Value    => '0'
+        },
+        Expected     => {
+            'Join'  => [
+                'INNER JOIN ticket_history th ON th.ticket_id = st.id'
+            ],
+            'Where' => [
+                'th.queue_id NOT IN (1)'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field HistoricMyQueues / Operator EQ / Value [0,1]',
+        Search       => {
+            Field    => 'HistoricMyQueues',
+            Operator => 'EQ',
+            Value    => ['0','1']
+        },
+        Expected     => {
+            'Join'  => [
+                'INNER JOIN ticket_history th ON th.ticket_id = st.id'
+            ],
+            'Where' => [
+                '(th.queue_id NOT IN (1) OR th.queue_id IN (1))'
+            ]
+        }
     }
 );
 for my $Test ( @SearchTests ) {
@@ -479,6 +541,54 @@ my @SearchTestsSpecial = (
                 '(1=1 OR 1=0)'
             ]
         }
+    },
+    {
+        Name         => 'Search: valid search / Field HistoricMyQueues / Operator EQ / Value 1',
+        Search       => {
+            Field    => 'HistoricMyQueues',
+            Operator => 'EQ',
+            Value    => '1'
+        },
+        Expected     => {
+            'Join'  => [
+                'INNER JOIN ticket_history th ON th.ticket_id = st.id'
+            ],
+            'Where' => [
+                '1=0'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field HistoricMyQueues / Operator EQ / Value 0',
+        Search       => {
+            Field    => 'HistoricMyQueues',
+            Operator => 'EQ',
+            Value    => '0'
+        },
+        Expected     => {
+            'Join'  => [
+                'INNER JOIN ticket_history th ON th.ticket_id = st.id'
+            ],
+            'Where' => [
+                '1=1'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field HistoricMyQueues / Operator EQ / Value [0,1]',
+        Search       => {
+            Field    => 'HistoricMyQueues',
+            Operator => 'EQ',
+            Value    => ['0','1']
+        },
+        Expected     => {
+            'Join'  => [
+                'INNER JOIN ticket_history th ON th.ticket_id = st.id'
+            ],
+            'Where' => [
+                '(1=1 OR 1=0)'
+            ]
+        }
     }
 );
 for my $Test ( @SearchTestsSpecial ) {
@@ -513,10 +623,10 @@ my @SortTests = (
         Expected  => {
             'Join'    => [],
             'OrderBy' => [
-                'st.queue_id'
+                'SortAttr0'
             ],
             'Select'  => [
-                'st.queue_id'
+                'st.queue_id AS SortAttr0'
             ]
         }
     },
@@ -530,16 +640,21 @@ my @SortTests = (
                 'LEFT OUTER JOIN translation_language tl0 ON tl0.pattern_id = tlp0.id AND tl0.language = \'en\''
             ],
             'OrderBy' => [
-                'TranslateQueue'
+                'SortAttr0'
             ],
             'Select'  => [
-                'LOWER(COALESCE(tl0.value, tq.name)) AS TranslateQueue'
+                'LOWER(COALESCE(tl0.value, tq.name)) AS SortAttr0'
             ]
         }
     },
     {
         Name      => 'Sort: Attribute "MyQueues" is not sortable',
         Attribute => 'MyQueues',
+        Expected  => undef
+    },
+    {
+        Name      => 'Sort: Attribute "HistoricMyQueues" is not sortable',
+        Attribute => 'HistoricMyQueues',
         Expected  => undef
     }
 );
@@ -957,6 +1072,32 @@ my @IntegrationSearchTests = (
             'AND' => [
                 {
                     Field    => 'MyQueues',
+                    Operator => 'EQ',
+                    Value    => 0
+                }
+            ]
+        },
+        Expected => [$TicketID2,$TicketID3]
+    },
+    {
+        Name     => 'Search: Field HistoricMyQueues / Operator EQ / Value 1',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'HistoricMyQueues',
+                    Operator => 'EQ',
+                    Value    => 1
+                }
+            ]
+        },
+        Expected => [$TicketID1]
+    },
+    {
+        Name     => 'Search: Field HistoricMyQueues / Operator EQ / Value 0',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'HistoricMyQueues',
                     Operator => 'EQ',
                     Value    => 0
                 }

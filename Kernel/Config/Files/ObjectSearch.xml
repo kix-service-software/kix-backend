@@ -29,6 +29,17 @@
         <Setting>
             <Hash>
                 <Item Key="Module">ObjectSearch::Database::Ticket</Item>
+                <Item Key="FulltextAttributes">
+                    <Array>
+                        <Item>TicketNumber</Item>
+                        <Item>Title</Item>
+                        <Item>To</Item>
+                        <Item>Cc</Item>
+                        <Item>From</Item>
+                        <Item>Subject</Item>
+                        <Item>Body</Item>
+                    </Array>
+                </Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -59,6 +70,22 @@
         <Setting>
             <Hash>
                 <Item Key="Module">ObjectSearch::Database::Contact</Item>
+                <Item Key="FulltextAttributes">
+                    <Array>
+                        <Item>Firstname</Item>
+                        <Item>Lastname</Item>
+                        <Item>Phone</Item>
+                        <Item>Mobile</Item>
+                        <Item>Email</Item>
+                        <Item>Email1</Item>
+                        <Item>Email2</Item>
+                        <Item>Email3</Item>
+                        <Item>Email4</Item>
+                        <Item>Email5</Item>
+                        <Item>Organisation</Item>
+                        <Item>OrganisationNumber</Item>
+                    </Array>
+                </Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -79,6 +106,15 @@
         <Setting>
             <Hash>
                 <Item Key="Module">ObjectSearch::Database::Article</Item>
+                <Item Key="FulltextAttributes">
+                    <Array>
+                        <Item>From</Item>
+                        <Item>To</Item>
+                        <Item>Cc</Item>
+                        <Item>Subject</Item>
+                        <Item>Body</Item>
+                    </Array>
+                </Item>
             </Hash>
         </Setting>
     </ConfigItem>

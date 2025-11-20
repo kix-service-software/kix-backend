@@ -110,6 +110,8 @@ sub Run {
     if ( exists $UserData{Preferences}->{$Preference->{ID}} ) {
         return $Self->_Error(
             Code => 'Object.AlreadyExists',
+            Message => "Cannot add preference '$Preference->{ID}', because it already exists.",
+
         );
     }
 

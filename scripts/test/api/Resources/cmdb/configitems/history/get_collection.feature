@@ -10,7 +10,7 @@ Feature: GET request to the /cmdb/configitems/:ConfigItemID/history resource
     Then the response code is 201
     When I query the cmdb collection of configitem historys 1
     Then the response code is 200
-#    And the response object is ConfigItemHistoryCollectionResponse
+    And the response object is ConfigItemHistoryCollectionResponse
     When I delete this configitem
     Then the response code is 204
     And the response has no content

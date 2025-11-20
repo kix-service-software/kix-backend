@@ -29,7 +29,7 @@ $Self->Is(
 );
 
 # check supported methods
-for my $Method ( qw(GetSupportedAttributes Search Sort) ) {
+for my $Method ( qw(GetSupportedAttributes AttributePrepare Select Search Sort) ) {
     $Self->True(
         $AttributeObject->can($Method),
         'Attribute object can "' . $Method . '"'
@@ -42,16 +42,20 @@ $Self->IsDeeply(
     $AttributeList,
     {
         ContactID => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE'],
+            ValueType      => 'NUMERIC'
         },
         ID => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE'],
+            ValueType      => 'NUMERIC'
         }
     },
     'GetSupportedAttributes provides expected data'
@@ -359,16 +363,16 @@ my @SortTests = (
         Name      => 'Sort: Attribute "ContactID"',
         Attribute => 'ContactID',
         Expected  => {
-            'Select'  => ['c.id'],
-            'OrderBy' => ['c.id']
+            'Select'  => ['c.id AS SortAttr0'],
+            'OrderBy' => ['SortAttr0']
         }
     },
     {
         Name      => 'Sort: Attribute "ID"',
         Attribute => 'ID',
         Expected  => {
-            'Select'  => ['c.id'],
-            'OrderBy' => ['c.id']
+            'Select'  => ['c.id AS SortAttr0'],
+            'OrderBy' => ['SortAttr0']
         }
     }
 );

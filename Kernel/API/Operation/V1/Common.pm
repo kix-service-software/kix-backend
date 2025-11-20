@@ -238,8 +238,9 @@ sub RunOperation {
 
     # prepare data
     $Result = $Self->PrepareData(
-        Data       => $Param{Data},
-        Parameters => $Parameters,
+        Data                => $Param{Data},
+        Parameters          => $Parameters,
+        PermissionCheckOnly => $Param{PermissionCheckOnly},
     );
 
     # check result
@@ -664,40 +665,46 @@ sub PrepareData {
 
         foreach my $Parameter ( sort keys %Parameters ) {
 
-            # check requirement
-            if ( $Parameters{$Parameter}->{Required} && !defined( $Data{$Parameter} ) ) {
-                $Result->{Success} = 0;
-                $Result->{Message} = "Required parameter $Parameter is missing or undefined!";
-                last;
-            }
-            elsif ( $Parameters{$Parameter}->{RequiredIfNot} && ref( $Parameters{$Parameter}->{RequiredIfNot} ) eq 'ARRAY' ) {
-                my $AltParameterHasValue = 0;
-                foreach my $AltParameter ( @{ $Parameters{$Parameter}->{RequiredIfNot} } ) {
-                    if ( exists( $Data{$AltParameter} ) && defined( $Data{$AltParameter} ) ) {
-                        $AltParameterHasValue = 1;
+            # skip requirement check for query parameter on permission check
+            if (
+                !$Param{PermissionCheckOnly}
+                || !$Parameters{$Parameter}->{QueryParameter}
+            ) {
+                # check requirement
+                if ( $Parameters{$Parameter}->{Required} && !defined( $Data{$Parameter} ) ) {
+                    $Result->{Success} = 0;
+                    $Result->{Message} = "Required parameter $Parameter is missing or undefined!";
+                    last;
+                }
+                elsif ( $Parameters{$Parameter}->{RequiredIfNot} && ref( $Parameters{$Parameter}->{RequiredIfNot} ) eq 'ARRAY' ) {
+                    my $AltParameterHasValue = 0;
+                    foreach my $AltParameter ( @{ $Parameters{$Parameter}->{RequiredIfNot} } ) {
+                        if ( exists( $Data{$AltParameter} ) && defined( $Data{$AltParameter} ) ) {
+                            $AltParameterHasValue = 1;
+                            last;
+                        }
+                    }
+                    if ( !exists( $Data{$Parameter} ) && !$AltParameterHasValue ) {
+                        $Result->{Success} = 0;
+                        $Result->{Message} = "Required parameter $Parameter or " . ( join( " or ", @{ $Parameters{$Parameter}->{RequiredIfNot} } ) ) . " is missing or undefined!";
                         last;
                     }
                 }
-                if ( !exists( $Data{$Parameter} ) && !$AltParameterHasValue ) {
-                    $Result->{Success} = 0;
-                    $Result->{Message} = "Required parameter $Parameter or " . ( join( " or ", @{ $Parameters{$Parameter}->{RequiredIfNot} } ) ) . " is missing or undefined!";
-                    last;
-                }
-            }
 
-            # check complex requirement (required if another parameter has value)
-            if ( $Parameters{$Parameter}->{RequiredIf} && ref( $Parameters{$Parameter}->{RequiredIf} ) eq 'ARRAY' ) {
-                my $OtherParameterHasValue = 0;
-                foreach my $OtherParameter ( @{ $Parameters{$Parameter}->{RequiredIf} } ) {
-                    if ( exists( $Data{$OtherParameter} ) && defined( $Data{$OtherParameter} ) ) {
-                        $OtherParameterHasValue = 1;
+                # check complex requirement (required if another parameter has value)
+                if ( $Parameters{$Parameter}->{RequiredIf} && ref( $Parameters{$Parameter}->{RequiredIf} ) eq 'ARRAY' ) {
+                    my $OtherParameterHasValue = 0;
+                    foreach my $OtherParameter ( @{ $Parameters{$Parameter}->{RequiredIf} } ) {
+                        if ( exists( $Data{$OtherParameter} ) && defined( $Data{$OtherParameter} ) ) {
+                            $OtherParameterHasValue = 1;
+                            last;
+                        }
+                    }
+                    if ( !exists( $Data{$Parameter} ) && $OtherParameterHasValue ) {
+                        $Result->{Success} = 0;
+                        $Result->{Message} = "Required parameter $Parameter is missing!";
                         last;
                     }
-                }
-                if ( !exists( $Data{$Parameter} ) && $OtherParameterHasValue ) {
-                    $Result->{Success} = 0;
-                    $Result->{Message} = "Required parameter $Parameter is missing!";
-                    last;
                 }
             }
 
@@ -1369,9 +1376,12 @@ sub _Success {
                 $StartTime = Time::HiRes::time();
             }
 
-            $Self->_ApplyFilter(
+            my $Result = $Self->_ApplyFilter(
                 Data => \%Param,
             );
+            if ( IsHashRefWithData($Result) && exists $Result->{Success} && !$Result->{Success} ) {
+                return $Result;
+            }
 
             if ( $Self->{Debug} ) {
                 $Self->_Debug($Self->{LevelIndent}, sprintf("filtering took %i ms", TimeDiff($StartTime)));
@@ -1798,6 +1808,7 @@ sub _ValidateFilter {
     }
 
     my %OperatorTypeMapping = (
+        'EMPTY'      => { 'NUMERIC' => 1, 'STRING' => 1, 'DATE'     => 1, 'DATETIME' => 1 },
         'EQ'         => { 'NUMERIC' => 1, 'STRING' => 1, 'DATE'     => 1, 'DATETIME' => 1 },
         'NE'         => { 'NUMERIC' => 1, 'STRING' => 1, 'DATE'     => 1, 'DATETIME' => 1 },
         'LT'         => { 'NUMERIC' => 1, 'DATE'   => 1, 'DATETIME' => 1 },
@@ -1835,7 +1846,27 @@ sub _ValidateFilter {
         );
     }
 
+    my $Strict = $Kernel::OM->Get('Config')->Get('API::StrictSearching');
+
+    my %SearchDef;
     foreach my $Object ( keys %{$FilterDef} ) {
+
+        if ( $Param{Type} eq 'search' && $Strict ) {
+            # get the StateType data
+            my $AttributeList = $Kernel::OM->Get('ObjectSearch')->GetSupportedAttributes(
+                ObjectType => $Object
+            );
+            if ( IsArrayRefWithData($AttributeList) ) {
+                ATTRIBUTE:
+                foreach my $Attribute ( @{$AttributeList} ) {
+                    next ATTRIBUTE if !$Attribute->{IsSearchable};
+                    $SearchDef{$Object}->{$Attribute->{Property}} = $Attribute;
+                    $SearchDef{$Object}->{$Attribute->{Property}}->{Operators} = { map {$_ => 1} @{$Attribute->{Operators}} };
+                }
+            }
+        }
+
+        my $SupportedAttributes = $SearchDef{$Object};
 
         # do we have a object definition ?
         if ( !IsHashRefWithData( $FilterDef->{$Object} ) ) {
@@ -1886,8 +1917,21 @@ sub _ValidateFilter {
                     );
                 }
 
+                if ( $Strict && IsHashRefWithData($SupportedAttributes) && !IsHashRefWithData($SupportedAttributes->{$Filter->{Field}}) ) {
+                    return $Self->_Error(
+                        Code    => 'BadRequest',
+                        Message => "Search field \"$Filter->{Field}\" not supported for $Object!",
+                    );
+                }
+
                 # check if filter Operator is valid
-                if (
+                if ( $Strict && IsHashRefWithData($SupportedAttributes) && !$SupportedAttributes->{$Filter->{Field}}->{Operators}->{$Filter->{Operator}} ) {
+                    return $Self->_Error(
+                        Code    => 'BadRequest',
+                        Message => "Search operator \"$Filter->{Operator}\" not supported for property \"$Filter->{Field}\" of $Object!",
+                    );
+                }
+                elsif (
                     !$Filter->{Operator}
                     || !$OperatorTypeMapping{$Filter->{Operator}}
                 ) {
@@ -1898,6 +1942,14 @@ sub _ValidateFilter {
                 }
 
                 # check if type is valid
+                # don't go for strict type checking right now, because that might cause a lot of trouble
+                # if ( $Strict && IsHashRefWithData($SupportedAttributes) && $Filter->{Type} ne $SupportedAttributes->{$Filter->{Field}}->{Type} ) {
+                #     return $Self->_Error(
+                #         Code    => 'BadRequest',
+                #         Message => "Type \"$Filter->{Type}\" not supported for property \"$Filter->{Field}\" of $Object!",
+                #     );
+                # }
+                # elsif ( !$ValidTypes{ $Filter->{Type} } ) {
                 if ( !$ValidTypes{ $Filter->{Type} } ) {
                     return $Self->_Error(
                         Code    => 'BadRequest',
@@ -1906,34 +1958,36 @@ sub _ValidateFilter {
                 }
 
                 # check if combination of filter Operator and type is valid
-                if ( !$OperatorTypeMapping{ $Filter->{Operator} }->{ $Filter->{Type} } ) {
+                if ( !$Strict && !$OperatorTypeMapping{ $Filter->{Operator} }->{ $Filter->{Type} } ) {
                     return $Self->_Error(
                         Code    => 'BadRequest',
                         Message => "Type $Filter->{Type} not valid for operator $Filter->{Operator} in $Object.$Filter->{Field}!",
                     );
                 }
 
-                # check DATE value
-                if (
-                    $Filter->{Type} eq 'DATE'
-                    && $Filter->{Value} !~ /^(\d{4}-\d{2}-\d{2}(\s*([-+]\d+\w\s*)*)|\s*([-+]\d+\w\s*?)*)$/
-                    && $Filter->{Value} !~ /^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(\s*([-+]\d+\w\s*)*)|\s*([-+]\d+\w\s*?)*)$/
-                ) {
-                    return $Self->_Error(
-                        Code    => 'BadRequest',
-                        Message => "Invalid date value $Filter->{Value} in $Object.$Filter->{Field}!",
-                    );
-                }
+                if ( $Filter->{Operator} ne 'EMPTY' ) {
+                    # check DATE value
+                    if (
+                        $Filter->{Type} eq 'DATE'
+                        && $Filter->{Value} !~ /^(\d{4}-\d{2}-\d{2}(\s*([-+]\d+\w\s*)*)|\s*([-+]\d+\w\s*?)*)$/
+                        && $Filter->{Value} !~ /^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(\s*([-+]\d+\w\s*)*)|\s*([-+]\d+\w\s*?)*)$/
+                    ) {
+                        return $Self->_Error(
+                            Code    => 'BadRequest',
+                            Message => "Invalid date value $Filter->{Value} in $Object.$Filter->{Field}!",
+                        );
+                    }
 
-                # check DATETIME value
-                if (
-                    $Filter->{Type} eq 'DATETIME'
-                    && $Filter->{Value} !~ /^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(\s*([-+]\d+\w\s*)*)|\s*([-+]\d+\w\s*?)*)$/
-                ) {
-                    return $Self->_Error(
-                        Code    => 'BadRequest',
-                        Message => "Invalid datetime value $Filter->{Value} in $Object.$Filter->{Field}!",
-                    );
+                    # check DATETIME value
+                    if (
+                        $Filter->{Type} eq 'DATETIME'
+                        && $Filter->{Value} !~ /^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(\s*([-+]\d+\w\s*)*)|\s*([-+]\d+\w\s*?)*)$/
+                    ) {
+                        return $Self->_Error(
+                            Code    => 'BadRequest',
+                            Message => "Invalid datetime value $Filter->{Value} in $Object.$Filter->{Field}!",
+                        );
+                    }
                 }
             }
         }
@@ -1994,25 +2048,37 @@ sub _ApplyFilter {
             }
 
             # filter each contained hash
-            my @FilteredResult = $Kernel::OM->Get('Main')->FilterObjectList(
+            my $FilteredResult = $Kernel::OM->Get('Main')->FilterObjectList(
                 Data   => $ObjectData,
                 Filter => $Filter->{$FilterObject},
+                Strict => $Kernel::OM->Get('Config')->Get('API::StrictFiltering'),
             );
+            if ( !$FilteredResult ) {
+                # get the last error log entry as the message
+                my $Message = $Kernel::OM->Get('Log')->GetLogEntry(
+                    Type => 'error',
+                    What => 'Message',
+                );
+                return $Self->_Error(
+                    Code    => 'BadRequest',
+                    Message => "Error in filter expression ($Message)!",
+                );
+            }
 
             if ( $Param{IsPermissionFilter} && IsHashRefWithData( $Param{Data}->{$Object} ) ) {
 
                 # if we are in the permission filter mode and have prepared something in the beginning, check if we have an item in the filtered result
                 # if not, the item cannot be read
-                $Param{Data}->{$Object} = $FilteredResult[0];
-                $Result{$Object} = scalar @FilteredResult;
+                $Param{Data}->{$Object} = $FilteredResult->[0];
+                $Result{$Object} = scalar @{$FilteredResult};
 
                 if ( $Self->{Debug} ) {
                     $Self->_Debug($Self->{LevelIndent}, sprintf("filtered result contains %i objects", $Result{$Object}));
                 }
             }
             else {
-                $Param{Data}->{$Object} = \@FilteredResult;
-                $Result{$Object} = scalar @FilteredResult;
+                $Param{Data}->{$Object} = $FilteredResult;
+                $Result{$Object} = scalar @{$FilteredResult};
             }
             if ( ref $Param{Data}->{$Object} eq 'ARRAY' && $Self->{Debug} ) {
                 $Self->_Debug($Self->{LevelIndent}, sprintf("filtered result contains %i objects", scalar @{$Param{Data}->{$Object}}));
@@ -3137,7 +3203,8 @@ sub _CheckBasePermission {
     if ( $Self->can('ExecuteBasePermissionModules') ) {
         $Self->ExecuteBasePermissionModules(
             %Param,
-            Filter => \%Filter
+            Filter     => \%Filter,
+            Permission => $PermissionName,
         );
     }
 
@@ -3902,6 +3969,13 @@ sub _ReplaceVariablesInPermission {
                     $Contact{RelevantOrganisationID} = 'NOT_ALLOWED';
                 }
 
+                if ( !IsArrayRefWithData($Contact{OrganisationIDs}) ) {
+                    # it's a contact without an assigned organisation
+                    # explicitely push an undef value here, to generate a correct permission condition value
+                    # otherwise it's the condition "undef IN []" which fails
+                    push @{$Contact{OrganisationIDs}}, undef;
+                }
+
                 $User{Contact} = \%Contact;
             }
 
@@ -4197,6 +4271,7 @@ filters ids for current customer user if necessary
     @FilteredObjectIDList = $Self->_FilterCustomerUserVisibleObjectIds(
         ObjectType   => 'Ticket'
         ObjectIDList => \@ObjectIDList,
+        LogFiltered  => 1                   # optional, default 0
         ...                                 # optional additional params
     )
 
@@ -4225,16 +4300,32 @@ sub _FilterCustomerUserVisibleObjectIds {
             my %ItemIDsHash = map { $_ => 1 } @{$ItemIDs};
             my @Result;
             for my $ObjectID ( @ObjectIDList ) {
-                push(@Result, 0 + $ObjectID) if $ItemIDsHash{$ObjectID};
+                if ($ItemIDsHash{$ObjectID}) {
+                    push(@Result, 0 + $ObjectID);
+                } elsif ($Param{LogFiltered}) {
+                    $Kernel::OM->Get('Log')->Log(
+                        Priority => 'notice',
+                        Message  => "No access for $Param{ObjectType} with id $ObjectID" 
+                    );
+                }
             }
             @ObjectIDList = @Result;
         } else {
             @ObjectIDList = ();
+            if ($Param{LogFiltered}) {
+                for my $ObjectID ( @ObjectIDList ) {
+                    $Kernel::OM->Get('Log')->Log(
+                        Priority => 'notice',
+                        Message  => "No access for $Param{ObjectType} with id $ObjectID" 
+                    );
+                }
+            }
         }
     }
 
     return @ObjectIDList;
 }
+
 =item _GetCustomerUserVisibleObjectIds()
 
 returns object ids for current customer user if necessary
@@ -4294,22 +4385,25 @@ sub _GetCustomerUserVisibleObjectIds {
             $Self->AddCacheDependency(Type => 'ObjectSearch_' . $CacheObjectType);
 
             if ($Param{ObjectType} eq 'ConfigItem') {
+                my @ANDSearch = (
+                    {
+                        Field => 'AssignedContact',
+                        Operator => 'EQ',
+                        Type     => 'NUMERIC',
+                        Value    => $ContactData{ID}
+                    },
+                );
+                if ( $ContactData{RelevantOrganisationID} || $ContactData{PrimaryOrganisationID} ) {
+                    push @ANDSearch, {
+                        Field => 'AssignedOrganisation',
+                        Operator => 'IN',
+                        Type     => 'NUMERIC',
+                        Value    => $ContactData{RelevantOrganisationID} || $ContactData{PrimaryOrganisationID}
+                    };
+                }
                 my @IDs = $Kernel::OM->Get('ObjectSearch')->Search(
                     Search => {
-                        AND => [
-                            {
-                                Field => 'AssignedContact',
-                                Operator => 'EQ',
-                                Type     => 'NUMERIC',
-                                Value    => $ContactData{ID}
-                            },
-                            {
-                                Field => 'AssignedOrganisation',
-                                Operator => 'IN',
-                                Type     => 'NUMERIC',
-                                Value    => $ContactData{RelevantOrganisationID} || $ContactData{PrimaryOrganisationID}
-                            }
-                        ]
+                        AND => \@ANDSearch
                     },
                     Result     => 'ARRAY',
                     ObjectType => 'ConfigItem',

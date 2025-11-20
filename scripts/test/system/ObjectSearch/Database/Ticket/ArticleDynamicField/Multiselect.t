@@ -37,6 +37,9 @@ $Self->IsDeeply(
     'GetSupportedAttributes provides expected data before creation of test field'
 );
 
+# get handling of order by null
+my $OrderByNull = $Kernel::OM->Get('DB')->GetDatabaseFunction('OrderByNull') || '';
+
 # begin transaction on database
 $Helper->BeginWork();
 
@@ -69,10 +72,12 @@ my $AttributeList = $AttributeObject->GetSupportedAttributes();
 $Self->IsDeeply(
     $AttributeList->{'DynamicField_UnitTest'},
     {
-        IsSearchable => 1,
-        IsSortable   => 0,
-        Operators    => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE','STARTSWITH','ENDSWITH','CONTAINS','LIKE'],
-        ValueType    => ''
+        IsSelectable   => 0,
+        IsSearchable   => 1,
+        IsSortable     => 0,
+        IsFulltextable => 1,
+        Operators      => ['EMPTY','EQ','NE','IN','!IN','LT','LTE','GT','GTE','STARTSWITH','ENDSWITH','CONTAINS','LIKE'],
+        ValueType      => ''
     },
     'GetSupportedAttributes provides expected data'
 );
@@ -153,244 +158,280 @@ for my $UserType ( qw(Agent Customer) ) {
         $JoinArticleSuffix = ' AND ta.customer_visible = 1'
     }
     my @JoinTests = (
-    {
-        Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator EQ',
-        Search       => {
-            Field    => 'DynamicField_UnitTest',
-            Operator => 'EQ',
-            Value    => 'Test'
+        {
+            Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator EQ',
+            Search       => {
+                Field    => 'DynamicField_UnitTest',
+                Operator => 'EQ',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
+                    'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = ta.id AND dfv_left0.field_id = ' . $DynamicFieldID
+                ],
+                'Where' => [
+                    'dfv_left0.value_text = \'Test\''
+                ]
+            }
         },
-        Expected     => {
-            'Join' => [
-                'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
-                'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = ta.id AND dfv_left0.field_id = ' . $DynamicFieldID
-            ],
-            'Where' => [
-                'dfv_left0.value_text = \'Test\''
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator EQ / Value empty string',
-        Search       => {
-            Field    => 'DynamicField_UnitTest',
-            Operator => 'EQ',
-            Value    => ''
+        {
+            Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator EQ / Value empty string',
+            Search       => {
+                Field    => 'DynamicField_UnitTest',
+                Operator => 'EQ',
+                Value    => ''
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
+                    'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = ta.id AND dfv_left0.field_id = ' . $DynamicFieldID
+                ],
+                'Where' => [
+                    '(dfv_left0.value_text = \'\' OR dfv_left0.value_text IS NULL)'
+                ]
+            }
         },
-        Expected     => {
-            'Join' => [
-                'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
-                'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = ta.id AND dfv_left0.field_id = ' . $DynamicFieldID
-            ],
-            'Where' => [
-                '(dfv_left0.value_text = \'\' OR dfv_left0.value_text IS NULL)'
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator NE',
-        Search       => {
-            Field    => 'DynamicField_UnitTest',
-            Operator => 'NE',
-            Value    => 'Test'
+        {
+            Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator NE',
+            Search       => {
+                Field    => 'DynamicField_UnitTest',
+                Operator => 'NE',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
+                    'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = ta.id AND dfv_left0.field_id = ' . $DynamicFieldID
+                ],
+                'Where' => [
+                    '(dfv_left0.value_text != \'Test\' OR dfv_left0.value_text IS NULL)'
+                ]
+            }
         },
-        Expected     => {
-            'Join' => [
-                'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
-                'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = ta.id AND dfv_left0.field_id = ' . $DynamicFieldID
-            ],
-            'Where' => [
-                '(dfv_left0.value_text != \'Test\' OR dfv_left0.value_text IS NULL)'
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator NE / Value empty string',
-        Search       => {
-            Field    => 'DynamicField_UnitTest',
-            Operator => 'NE',
-            Value    => ''
+        {
+            Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator NE / Value empty string',
+            Search       => {
+                Field    => 'DynamicField_UnitTest',
+                Operator => 'NE',
+                Value    => ''
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
+                    'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = ta.id AND dfv_left0.field_id = ' . $DynamicFieldID
+                ],
+                'Where' => [
+                    'dfv_left0.value_text != \'\''
+                ]
+            }
         },
-        Expected     => {
-            'Join' => [
-                'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
-                'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = ta.id AND dfv_left0.field_id = ' . $DynamicFieldID
-            ],
-            'Where' => [
-                'dfv_left0.value_text != \'\''
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator IN',
-        Search       => {
-            Field    => 'DynamicField_UnitTest',
-            Operator => 'IN',
-            Value    => ['Test']
+        {
+            Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator IN',
+            Search       => {
+                Field    => 'DynamicField_UnitTest',
+                Operator => 'IN',
+                Value    => ['Test']
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
+                    'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = ta.id AND dfv_left0.field_id = ' . $DynamicFieldID
+                ],
+                'Where' => [
+                    'dfv_left0.value_text IN (\'Test\')'
+                ]
+            }
         },
-        Expected     => {
-            'Join' => [
-                'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
-                'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = ta.id AND dfv_left0.field_id = ' . $DynamicFieldID
-            ],
-            'Where' => [
-                'dfv_left0.value_text IN (\'Test\')'
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator !IN',
-        Search       => {
-            Field    => 'DynamicField_UnitTest',
-            Operator => '!IN',
-            Value    => ['Test']
+        {
+            Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator !IN',
+            Search       => {
+                Field    => 'DynamicField_UnitTest',
+                Operator => '!IN',
+                Value    => ['Test']
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
+                    'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = ta.id AND dfv_left0.field_id = ' . $DynamicFieldID
+                ],
+                'Where' => [
+                    'dfv_left0.value_text NOT IN (\'Test\')'
+                ]
+            }
         },
-        Expected     => {
-            'Join' => [
-                'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
-                'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = ta.id AND dfv_left0.field_id = ' . $DynamicFieldID
-            ],
-            'Where' => [
-                'dfv_left0.value_text NOT IN (\'Test\')'
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator LT',
-        Search       => {
-            Field    => 'DynamicField_UnitTest',
-            Operator => 'LT',
-            Value    => 'Test'
+        {
+            Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator LT',
+            Search       => {
+                Field    => 'DynamicField_UnitTest',
+                Operator => 'LT',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
+                    'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = ta.id AND dfv_left0.field_id = ' . $DynamicFieldID
+                ],
+                'Where' => [
+                    'dfv_left0.value_text < \'Test\''
+                ]
+            }
         },
-        Expected     => {
-            'Join' => [
-                'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
-                'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = ta.id AND dfv_left0.field_id = ' . $DynamicFieldID
-            ],
-            'Where' => [
-                'dfv_left0.value_text < \'Test\''
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator LTE',
-        Search       => {
-            Field    => 'DynamicField_UnitTest',
-            Operator => 'LTE',
-            Value    => 'Test'
+        {
+            Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator LTE',
+            Search       => {
+                Field    => 'DynamicField_UnitTest',
+                Operator => 'LTE',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
+                    'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = ta.id AND dfv_left0.field_id = ' . $DynamicFieldID
+                ],
+                'Where' => [
+                    'dfv_left0.value_text <= \'Test\''
+                ]
+            }
         },
-        Expected     => {
-            'Join' => [
-                'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
-                'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = ta.id AND dfv_left0.field_id = ' . $DynamicFieldID
-            ],
-            'Where' => [
-                'dfv_left0.value_text <= \'Test\''
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator GT',
-        Search       => {
-            Field    => 'DynamicField_UnitTest',
-            Operator => 'GT',
-            Value    => 'Test'
+        {
+            Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator GT',
+            Search       => {
+                Field    => 'DynamicField_UnitTest',
+                Operator => 'GT',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
+                    'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = ta.id AND dfv_left0.field_id = ' . $DynamicFieldID
+                ],
+                'Where' => [
+                    'dfv_left0.value_text > \'Test\''
+                ]
+            }
         },
-        Expected     => {
-            'Join' => [
-                'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
-                'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = ta.id AND dfv_left0.field_id = ' . $DynamicFieldID
-            ],
-            'Where' => [
-                'dfv_left0.value_text > \'Test\''
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator GTE',
-        Search       => {
-            Field    => 'DynamicField_UnitTest',
-            Operator => 'GTE',
-            Value    => 'Test'
+        {
+            Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator GTE',
+            Search       => {
+                Field    => 'DynamicField_UnitTest',
+                Operator => 'GTE',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
+                    'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = ta.id AND dfv_left0.field_id = ' . $DynamicFieldID
+                ],
+                'Where' => [
+                    'dfv_left0.value_text >= \'Test\''
+                ]
+            }
         },
-        Expected     => {
-            'Join' => [
-                'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
-                'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = ta.id AND dfv_left0.field_id = ' . $DynamicFieldID
-            ],
-            'Where' => [
-                'dfv_left0.value_text >= \'Test\''
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator STARTSWITH',
-        Search       => {
-            Field    => 'DynamicField_UnitTest',
-            Operator => 'STARTSWITH',
-            Value    => 'Test'
+        {
+            Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator STARTSWITH',
+            Search       => {
+                Field    => 'DynamicField_UnitTest',
+                Operator => 'STARTSWITH',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
+                    'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = ta.id AND dfv_left0.field_id = ' . $DynamicFieldID
+                ],
+                'Where' => [
+                    'dfv_left0.value_text LIKE \'Test%\''
+                ]
+            }
         },
-        Expected     => {
-            'Join' => [
-                'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
-                'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = ta.id AND dfv_left0.field_id = ' . $DynamicFieldID
-            ],
-            'Where' => [
-                'dfv_left0.value_text LIKE \'Test%\''
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator ENDSWITH',
-        Search       => {
-            Field    => 'DynamicField_UnitTest',
-            Operator => 'ENDSWITH',
-            Value    => 'Test'
+        {
+            Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator ENDSWITH',
+            Search       => {
+                Field    => 'DynamicField_UnitTest',
+                Operator => 'ENDSWITH',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
+                    'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = ta.id AND dfv_left0.field_id = ' . $DynamicFieldID
+                ],
+                'Where' => [
+                    'dfv_left0.value_text LIKE \'%Test\''
+                ]
+            }
         },
-        Expected     => {
-            'Join' => [
-                'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
-                'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = ta.id AND dfv_left0.field_id = ' . $DynamicFieldID
-            ],
-            'Where' => [
-                'dfv_left0.value_text LIKE \'%Test\''
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator CONTAINS',
-        Search       => {
-            Field    => 'DynamicField_UnitTest',
-            Operator => 'CONTAINS',
-            Value    => 'Test'
+        {
+            Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator CONTAINS',
+            Search       => {
+                Field    => 'DynamicField_UnitTest',
+                Operator => 'CONTAINS',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
+                    'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = ta.id AND dfv_left0.field_id = ' . $DynamicFieldID
+                ],
+                'Where' => [
+                    'dfv_left0.value_text LIKE \'%Test%\''
+                ]
+            }
         },
-        Expected     => {
-            'Join' => [
-                'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
-                'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = ta.id AND dfv_left0.field_id = ' . $DynamicFieldID
-            ],
-            'Where' => [
-                'dfv_left0.value_text LIKE \'%Test%\''
-            ]
-        }
-    },
-    {
-        Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator LIKE',
-        Search       => {
-            Field    => 'DynamicField_UnitTest',
-            Operator => 'LIKE',
-            Value    => 'Test'
+        {
+            Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator LIKE',
+            Search       => {
+                Field    => 'DynamicField_UnitTest',
+                Operator => 'LIKE',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
+                    'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = ta.id AND dfv_left0.field_id = ' . $DynamicFieldID
+                ],
+                'Where' => [
+                    'dfv_left0.value_text LIKE \'Test\''
+                ]
+            }
         },
-        Expected     => {
-            'Join' => [
-                'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
-                'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = ta.id AND dfv_left0.field_id = ' . $DynamicFieldID
-            ],
-            'Where' => [
-                'dfv_left0.value_text LIKE \'Test\''
-            ]
+        {
+            Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator EMPTY / date value',
+            Search       => {
+                Field    => 'DynamicField_UnitTest',
+                Operator => 'EMPTY',
+                Value    => 1
+            },
+            Expected     => {
+                'IsRelative' => undef,
+                'Join'       => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
+                    'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = ta.id AND dfv_left0.field_id = ' . $DynamicFieldID
+                ],
+                'Where'      => [
+                    '(dfv_left0.value_text = \'\' OR dfv_left0.value_text IS NULL)'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: valid search / UserType ' . $UserType . ' / Field DynamicField_UnitTest / Operator EMPTY / empty value',
+            Search       => {
+                Field    => 'DynamicField_UnitTest',
+                Operator => 'EMPTY',
+                Value    => 0
+            },
+            Expected     => {
+                'IsRelative' => undef,
+                'Join'       => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
+                    'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = ta.id AND dfv_left0.field_id = ' . $DynamicFieldID
+                ],
+                'Where'      => [
+                    '(dfv_left0.value_text != \'\' AND dfv_left0.value_text IS NOT NULL)'
+                ]
+            }
         }
-    }
     );
     for my $Test ( @JoinTests ) {
         my $Result = $AttributeObject->Search(
@@ -794,6 +835,88 @@ my @IntegrationSearchTests = (
                     Field    => 'DynamicField_UnitTest',
                     Operator => 'LIKE',
                     Value    => 'Test*'
+                }
+            ]
+        },
+        Expected => [$TicketID1,$TicketID2]
+    },
+    {
+        Name     => 'Search: UserType Customer / Field DynamicField_UnitTest / Operator EMPTY / Value 1',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DynamicField_UnitTest',
+                    Operator => 'EMPTY',
+                    Value    => 1
+                }
+            ]
+        },
+        UserType => 'Customer',
+        Expected => [$TicketID2,$TicketID3]
+    },
+    {
+        Name     => 'Search: UserType Customer / Field DynamicField_UnitTest / Operator EMPTY / Value 0',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DynamicField_UnitTest',
+                    Operator => 'EMPTY',
+                    Value    => 0
+                }
+            ]
+        },
+        UserType => 'Customer',
+        Expected => [$TicketID1]
+    },
+    {
+        Name     => 'Search: UserType Agent / Field DynamicField_UnitTest / Operator EMPTY / Value 1',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DynamicField_UnitTest',
+                    Operator => 'EMPTY',
+                    Value    => 1
+                }
+            ]
+        },
+        UserType => 'Agent',
+        Expected => [$TicketID3]
+    },
+    {
+        Name     => 'Search: UserType Agent / Field DynamicField_UnitTest / Operator EMPTY / Value 0',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DynamicField_UnitTest',
+                    Operator => 'EMPTY',
+                    Value    => 0
+                }
+            ]
+        },
+        UserType => 'Agent',
+        Expected => [$TicketID1,$TicketID2]
+    },
+    {
+        Name     => 'Search: Field DynamicField_UnitTest / Operator EMPTY / Value 1',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DynamicField_UnitTest',
+                    Operator => 'EMPTY',
+                    Value    => 1
+                }
+            ]
+        },
+        Expected => [$TicketID3]
+    },
+    {
+        Name     => 'Search: Field DynamicField_UnitTest / Operator EMPTY / Value 0',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DynamicField_UnitTest',
+                    Operator => 'EMPTY',
+                    Value    => 0
                 }
             ]
         },

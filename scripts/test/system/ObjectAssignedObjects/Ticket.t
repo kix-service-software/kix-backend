@@ -51,14 +51,17 @@ $Helper->Rollback();
 sub _PrepareData {
 
     # create customer user
-    my $CustomerContactID = $Helper->TestContactCreate(
+    my $CustomerLogin = $Helper->TestUserCreate(
         Roles => [ 'Ticket Agent' ],
     );
     $Self->True(
-        $CustomerContactID,
-        'CustomerContactCreate',
+        $CustomerLogin,
+        'TestUserCreate - Customer',
     );
-    my %CustomerContact = $ContactObject->ContactGet(ID => $CustomerContactID);
+    my $CustomerUserID = $UserObject->UserLookup(
+        UserLogin => $CustomerLogin,
+    );
+    my %CustomerContact = $ContactObject->ContactGet(UserID => $CustomerUserID);
     my %CustomerUser    = $UserObject->GetUserData(UserID => $CustomerContact{AssignedUserID});
     if (IsHashRefWithData(\%CustomerUser)) {
         $CustomerContact{User} = \%CustomerUser;
@@ -69,14 +72,17 @@ sub _PrepareData {
     }
 
     # create other user
-    my $OtherContactID = $Helper->TestContactCreate(
+    my $OtherLogin = $Helper->TestUserCreate(
         Roles => [ 'Ticket Agent' ],
     );
     $Self->True(
-        $OtherContactID,
-        'OtherContactCreate',
+        $OtherLogin,
+        'TestUserCreate - Other',
     );
-    my %OtherContact = $ContactObject->ContactGet(ID => $OtherContactID);
+    my $OtherUserID = $UserObject->UserLookup(
+        UserLogin => $OtherLogin,
+    );
+    my %OtherContact = $ContactObject->ContactGet(UserID => $OtherUserID);
 
     # create tickets
     # 1) create a ticket with ContactID, OrgansiationID of CustomerContact
@@ -87,7 +93,7 @@ sub _PrepareData {
         Priority       => '3 normal',
         State          => 'closed',
         OrganisationID => $CustomerContact{PrimaryOrganisationID},
-        ContactID      => $CustomerContactID,
+        ContactID      => $CustomerContact{ID},
         OwnerID        => 1,
         UserID         => 1,
     );
@@ -104,7 +110,7 @@ sub _PrepareData {
         Priority       => '3 normal',
         State          => 'closed',
         OrganisationID => $OtherContact{PrimaryOrganisationID},
-        ContactID      => $CustomerContactID,
+        ContactID      => $CustomerContact{ID},
         OwnerID        => 1,
         UserID         => 1,
     );
@@ -121,7 +127,7 @@ sub _PrepareData {
         Priority       => '3 normal',
         State          => 'closed',
         OrganisationID => $CustomerContact{PrimaryOrganisationID},
-        ContactID      => $OtherContactID,
+        ContactID      => $OtherContact{ID},
         OwnerID        => 1,
         UserID         => 1,
     );
@@ -138,7 +144,7 @@ sub _PrepareData {
         Priority       => '3 normal',
         State          => 'closed',
         OrganisationID => $OtherContact{PrimaryOrganisationID},
-        ContactID      => $OtherContactID,
+        ContactID      => $OtherContact{ID},
         OwnerID        => $CustomerContact{AssignedUserID},
         UserID         => 1,
     );
@@ -210,7 +216,7 @@ sub _PrepareData {
             SelectionTicketID   => $SelectionTicketID
         },
         CustomerContact => \%CustomerContact,
-        OtherContactID  => $OtherContactID,
+        OtherContactID  => $OtherContact{ID},
         DFName          => $DFName,
         DFValue         => $DFValue
     );
