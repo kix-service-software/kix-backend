@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -46,7 +46,7 @@ sub Run {
 
     my $PrintObject = $Kernel::OM->Get('HTMLToPDF');
 
-    $Self->Print("<yellow>Inspect Convert Definition...</yellow>\n");
+    $Self->Print("<yellow>Inspect Convert Definition...</yellow>\n\n");
 
     my $Name = $Self->GetOption('name') || q{};
     my $ID   = $Self->GetOption('id')   || q{};
@@ -62,9 +62,19 @@ sub Run {
         UserID => 1
     );
 
-    print STDOUT Data::Dumper::Dumper(\%Data);
+    if ( !%Data ) {
+        $Self->Print("<red>No template found!</red>\n");
+        return $Self->ExitCodeError();
+    }
 
-    $Self->Print("<green>Done.</green>\n");
+    my $JSONStr = $Kernel::OM->Get('JSON')->Encode(
+        Data   => \%Data,
+        Pretty => 1
+    );
+
+    $Self->Print($JSONStr);
+
+    $Self->Print("\n\n<green>Done.</green>\n");
     return $Self->ExitCodeOk();
 }
 

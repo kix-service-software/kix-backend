@@ -12,7 +12,7 @@ use strict;
 use warnings;
 
 use base qw(
-    Kernel::System::ObjectSearch::Database::CommonAttribute
+    Kernel::System::ObjectSearch::Database::CommonFulltext
 );
 
 our $ObjectManagerDisabled = 1;
@@ -28,41 +28,6 @@ Kernel::System::ObjectSearch::Database::Article::Fulltext - attribute module for
 =over 4
 
 =cut
-
-sub GetSupportedAttributes {
-    my ( $Self, %Param ) = @_;
-
-    return {
-        Fulltext => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['LIKE']
-        }
-    };
-}
-
-sub Search {
-    my ( $Self, %Param ) = @_;
-
-    # check params
-    return if ( !$Self->_CheckSearchParams( %Param ) );
-
-    # fixed search in the  following columns:
-    # To, Cc, From, Body and Subject
-    my $Condition = $Self->_FulltextCondition(
-        Value   => $Param{Search}->{Value},
-        Columns => [
-           'a.a_from', 'a.a_to', 'a.a_cc', 'a.a_subject', 'a.a_body',
-        ],
-        Silent  => $Param{Silent}
-    );
-
-    return if ( !$Condition );
-
-    return {
-        Where => [ $Condition ]
-    };
-}
 
 1;
 

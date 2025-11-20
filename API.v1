@@ -174,9 +174,12 @@
 /system/ticket/priorities/:PriorityID                                                      | PATCH            | V1::Priority::PriorityUpdate                     |
 /system/ticket/queues                                                                      | GET              | V1::Queue::QueueSearch                           |
 /system/ticket/queues                                                                      | POST             | V1::Queue::QueueCreate                           |
+/system/ticket/queues/ticketstats                                                          | GET              | V1::Queue::QueueTicketStatsSearch                |
 /system/ticket/queues/:QueueID                                                             | DELETE           | V1::Queue::QueueDelete                           |
 /system/ticket/queues/:QueueID                                                             | GET              | V1::Queue::QueueGet                              |
 /system/ticket/queues/:QueueID                                                             | PATCH            | V1::Queue::QueueUpdate                           |
+/system/ticket/queues/:QueueID/tickets                                                     | GET              | V1::Queue::QueueTicketSearch                     |
+/system/ticket/queues/:QueueID/ticketstats                                                 | GET              | V1::Queue::QueueTicketStatsGet                   |
 /system/ticket/queues/followuptypes                                                        | GET              | V1::Queue::FollowUpTypeSearch                    |
 /system/ticket/states                                                                      | GET              | V1::TicketState::TicketStateSearch               |
 /system/ticket/states                                                                      | POST             | V1::TicketState::TicketStateCreate               |

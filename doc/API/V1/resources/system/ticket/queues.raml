@@ -4,9 +4,18 @@
   /followuptypes:
     description: !include ../../../descriptions/resources/system/ticket/queues/followuptypes.md
     type: { collection-readonly: { typeName: FollowUpType } }
+  /ticketstats:
+    description: !include ../../descriptions/resources/system/ticket/queues/ticketstats.md
+    type: { collection-readonly: { typeName: TicketStatsCollection } }
   /{queueId}:
     type: { item: { typeName: Queue } }
     uriParameters:
       queueId:
         displayName: QueueID
         type: integer
+    /tickets:
+      description: !include ../../descriptions/resources/system/ticket/queues/tickets.md
+      type: { collection-readonly: { typeName: Tickets } }
+    /ticketstats:
+      description: !include ../../descriptions/resources/system/ticket/queues/queueticketstats.md
+      type: { item-readonly: { typeName: TicketStats } }

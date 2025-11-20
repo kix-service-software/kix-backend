@@ -31,6 +31,8 @@
         padding: 0.5rem 0;
         border-collapse: separate;
         border-spacing: 0;
+        border: 0;
+        margin: 0;
     }
     .[% Data.ID %] > thead > tr > th {
         padding: 0 0.2rem 0 0;
@@ -41,10 +43,12 @@
         white-space: nowrap;
         position: relative;
         text-align: left;
+        border: 0;
     }
     .[% Data.ID %] > tbody > tr > td {
         vertical-align: middle;
         padding: 0.2rem;
+        border: 0;
 [% IF Data.Style.Size %]
         line-height: [% Data.Style.Size | html %];
         font-size: [% Data.Style.Size | html %];

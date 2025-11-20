@@ -20,6 +20,7 @@ use base qw(
 use Term::ANSIColor ();
 use FileHandle;
 use Time::HiRes qw(time);
+use Kernel::System::PerfLog qw(TimeDiff);
 
 use Kernel::System::ObjectManager;
 
@@ -317,8 +318,8 @@ sub Run {
             }
         }
     }
-    my $Time = $Kernel::OM->Get('Time')->SystemTime() - $StartTime;
-    $ResultSummary{TimeTaken} = $Time;
+
+    $ResultSummary{TimeTaken} = sprintf('%.3f', (TimeDiff($StartTime)/1000));
     $ResultSummary{Time}      = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
         SystemTime => $Kernel::OM->Get('Time')->SystemTime(),
     );

@@ -163,7 +163,7 @@ sub Run {
                     XMLDataGet => 1,
                 );
 
-                my $Data = $Version->{Data};
+                my $Data = $Kernel::OM->Get('Storable')->Clone($Version->{Data});
                 if ( !IsHashRefWithData($Data) ) {
                     $Data = $Self->ConvertDataToExternal(
                         ClassID    => $ConfigItem->{ClassID},
@@ -298,6 +298,17 @@ sub _PrepareData {
                 $ResultItem->{DisplayValue} = $Self->_GetDisplayValue(
                     Item  => $DefItem,
                     Value => $Data->{ $ItemKey }->{ $ItemKey },
+                );
+            }
+            # check if we have a special handling method to extract the content
+            elsif ( $Self->{AttributeTypeModules}->{ $DefItem->{Input}->{Type} }->can('GetHashContentAttributes') ) {
+                my @HashContentAttributes = $Self->{AttributeTypeModules}->{ $DefItem->{Input}->{Type} }->GetHashContentAttributes();
+                for my $Attribute ( @HashContentAttributes ) {
+                    $ResultItem->{Value}->{ $Attribute } = delete( $Data->{ $ItemKey }->{ $Attribute } );
+                }
+                $ResultItem->{DisplayValue} = $Self->_GetDisplayValue(
+                    Item  => $DefItem,
+                    Value => $ResultItem->{Value},
                 );
             }
             if ( defined( $DefItem->{Sub} ) ) {

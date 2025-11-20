@@ -71,7 +71,7 @@ $Self->IsDeeply(
         IsSearchable   => 1,
         IsSortable     => 1,
         IsFulltextable => 0,
-        Operators      => ['EQ','NE','GT','GTE','LT','LTE'],
+        Operators      => ['EMPTY','EQ','NE','GT','GTE','LT','LTE'],
         ValueType      => 'DATE'
     },
     'GetSupportedAttributes provides expected data'
@@ -144,6 +144,40 @@ my @SearchTests = (
             Value    => '1'
         },
         Expected     => undef
+    },
+    {
+        Name         => 'Search: valid search / Field DynamicField_UnitTest / Operator EMPTY / date value',
+        Search       => {
+            Field    => 'DynamicField_UnitTest',
+            Operator => 'EMPTY',
+            Value    => '2014-01-01'
+        },
+        Expected     => {
+            'IsRelative' => undef,
+            'Join'       => [
+                'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = c.id AND dfv_left0.field_id = ' . $DynamicFieldID
+            ],
+            'Where'      => [
+                'dfv_left0.value_date IS NULL'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field DynamicField_UnitTest / Operator EMPTY / empty value',
+        Search       => {
+            Field    => 'DynamicField_UnitTest',
+            Operator => 'EMPTY',
+            Value    => ''
+        },
+        Expected     => {
+            'IsRelative' => undef,
+            'Join'       => [
+                'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = c.id AND dfv_left0.field_id = ' . $DynamicFieldID
+            ],
+            'Where'      => [
+                'dfv_left0.value_date IS NOT NULL'
+            ]
+        }
     },
     {
         Name         => 'Search: valid search / Field DynamicField_UnitTest / Operator EQ',
@@ -512,8 +546,8 @@ my $ObjectSearch = $Kernel::OM->Get('ObjectSearch');
 # begin transaction on database
 $Helper->BeginWork();
 
-## prepare test organisations ##
-# first ticket
+## prepare test contacts ##
+# first contact
 my $ContactID1   = $Kernel::OM->Get('Contact')->ContactAdd(
     Firstname => $Helper->GetRandomID(),
     Lastname  => $Helper->GetRandomID(),
@@ -522,7 +556,7 @@ my $ContactID1   = $Kernel::OM->Get('Contact')->ContactAdd(
 );
 $Self->True(
     $ContactID1,
-    'Created first organisation'
+    'Created first contact'
 );
 my $ValueSet1 = $Kernel::OM->Get('DynamicField::Backend')->ValueSet(
     DynamicFieldConfig => $DynamicFieldConfig,
@@ -532,9 +566,9 @@ my $ValueSet1 = $Kernel::OM->Get('DynamicField::Backend')->ValueSet(
 );
 $Self->True(
     $ValueSet1,
-    'Dynamic field value set for first organisation'
+    'Dynamic field value set for first contact'
 );
-# second ticket
+# second contact
 my $ContactID2   = $Kernel::OM->Get('Contact')->ContactAdd(
     Firstname => $Helper->GetRandomID(),
     Lastname  => $Helper->GetRandomID(),
@@ -543,7 +577,7 @@ my $ContactID2   = $Kernel::OM->Get('Contact')->ContactAdd(
 );
 $Self->True(
     $ContactID2,
-    'Created second organisation'
+    'Created second contact'
 );
 my $ValueSet2 = $Kernel::OM->Get('DynamicField::Backend')->ValueSet(
     DynamicFieldConfig => $DynamicFieldConfig,
@@ -555,7 +589,7 @@ $Self->True(
     $ValueSet2,
     'Dynamic field value set for second organisation'
 );
-# third ticket
+# third contact
 my $ContactID3   = $Kernel::OM->Get('Contact')->ContactAdd(
     Firstname => $Helper->GetRandomID(),
     Lastname  => $Helper->GetRandomID(),
@@ -564,7 +598,7 @@ my $ContactID3   = $Kernel::OM->Get('Contact')->ContactAdd(
 );
 $Self->True(
     $ContactID3,
-    'Created third organisation without df value'
+    'Created third contact without df value'
 );
 
 # discard contact object to process events
@@ -574,6 +608,32 @@ $Kernel::OM->ObjectsDiscard(
 
 # test Search
 my @IntegrationSearchTests = (
+    {
+        Name     => 'Search: Field DynamicField_UnitTest / Operator EMPTY / Value 1',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DynamicField_UnitTest',
+                    Operator => 'EMPTY',
+                    Value    => 1
+                }
+            ]
+        },
+        Expected => [1,$ContactID3]
+    },
+    {
+        Name     => 'Search: Field DynamicField_UnitTest / Operator EMPTY / Value 0',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DynamicField_UnitTest',
+                    Operator => 'EMPTY',
+                    Value    => 0
+                }
+            ]
+        },
+        Expected => [$ContactID1,$ContactID2]
+    },
     {
         Name     => 'Search: Field DynamicField_UnitTest / Operator EQ / Value 2014-01-02',
         Search   => {
@@ -823,6 +883,7 @@ my @IntegrationSearchTests = (
     }
 );
 for my $Test ( @IntegrationSearchTests ) {
+
     my @Result = $ObjectSearch->Search(
         ObjectType => 'Contact',
         Result     => 'ARRAY',

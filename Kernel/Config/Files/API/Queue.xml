@@ -12,7 +12,6 @@
                 <Item Key="ResponseSchema">QueueResponse</Item>
                 <Item Key="CacheType">API_queues</Item>
                 <Item Key="CacheTypeDependency">Queue</Item>
-                <Item Key="AdditionalUriParameters">TicketStats.StateType, TicketStats.StateID</Item>
                 <Item Key="RelevantBasePermissions">Base::Ticket</Item>
             </Hash>
         </Setting>
@@ -64,6 +63,44 @@
             </Hash>
         </Setting>
     </ConfigItem>
+    
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Queue::QueueTicketSearch" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">QueueTicketSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Queue::QueueTicketSearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="CacheType">API_queue_ticketids</Item>
+                <Item Key="CacheTypeDependency">Ticket,Queue</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Queue::QueueTicketStatsSearch" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">QueueTicketStatsSearch</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Queue::QueueTicketStatsSearch</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="CacheType">API_queue_ticketstats</Item>
+                <Item Key="CacheTypeDependency">Ticket,Queue</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Queue::QueueTicketStatsGet" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the operation layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Name">QueueTicketStatsGet</Item>
+                <Item Key="Module">Kernel::API::Operation::V1::Queue::QueueTicketStatsGet</Item>
+                <Item Key="APIVersion">V1</Item>
+                <Item Key="CacheType">API_queue_ticketstats</Item>
+                <Item Key="CacheTypeDependency">Ticket,Queue</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
 
     <ConfigItem AccessLevel="internal" Name="API::Operation::Module###V1::Queue::FollowUpTypeSearch" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the operation layer.</Description>
@@ -88,7 +125,7 @@
         </Setting>
     </ConfigItem>
 
-    <ConfigItem AccessLevel="internal" Name="API::Operation::GenericExpand###Queue.Tickets" Required="0" Valid="1">
+    <ConfigItem AccessLevel="internal" Name="API::Operation::GenericExpand###Queue.TicketIDs" Required="0" Valid="1">
         <Description Translatable="1">Defines a generic expand available for all GET (including SEARCH) operations.</Description>
         <Setting>
             <Hash>

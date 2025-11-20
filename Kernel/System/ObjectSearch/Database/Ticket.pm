@@ -81,6 +81,9 @@ sub GetPermissionDef {
         }
     }
 
+    # set default permission
+    $Param{Permission} ||= 'READ';
+
     # init collection for permission search parts
     my @PermissionSearchParts = ();
 
@@ -89,7 +92,7 @@ sub GetPermissionDef {
         %Param,
         Types        => ['Base::Ticket'],
         UsageContext => $Param{UserType},
-        Permission   => $Param{Permission} || 'READ',
+        Permission   => $Param{Permission},
     );
     # user has no base permission in this context, nothing to prepare
     if(
@@ -147,7 +150,7 @@ sub GetPermissionDef {
         $BackendObject->{Config} = $PermissionModules->{ $PermissionModule };
 
         my $Result = $BackendObject->Run(
-            %Param, 
+            %Param,
             BasePermissionQueueIDs => $QueueIDs,
             UserID                 => $Param{UserID},
             ReturnType             => 'ObjectSearch',

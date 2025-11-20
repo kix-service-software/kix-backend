@@ -78,7 +78,7 @@ sub Search {
     my @SQLJoin = ();
     if ( $Param{Search}->{Field} eq 'Class' ) {
         if ( !$Param{Flags}->{JoinMap}->{ConfigItemClass} ) {
-            push( @SQLJoin, 'INNER JOIN general_catalog cic ON cic.id = ci.class_id AND general_catalog_class = \'ITSM::ConfigItem::Class\'' );
+            push( @SQLJoin, 'INNER JOIN general_catalog cic ON cic.id = ci.class_id AND cic.general_catalog_class = \'ITSM::ConfigItem::Class\'' );
 
             $Param{Flags}->{JoinMap}->{ConfigItemClass} = 1;
         }
@@ -113,7 +113,7 @@ sub Sort {
     my @SQLJoin = ();
     if ( $Param{Attribute} eq 'Class' ) {
         if ( !$Param{Flags}->{JoinMap}->{ConfigItemClass} ) {
-            push( @SQLJoin, 'INNER JOIN general_catalog cic ON cic.id = ci.class_id AND general_catalog_class = \'ITSM::ConfigItem::Class\'' );
+            push( @SQLJoin, 'INNER JOIN general_catalog cic ON cic.id = ci.class_id AND cic.general_catalog_class = \'ITSM::ConfigItem::Class\'' );
 
             $Param{Flags}->{JoinMap}->{ConfigItemClass} = 1;
         }

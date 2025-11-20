@@ -243,7 +243,7 @@ sub AttributePrepare {
         my $PreferencesObject = $Kernel::OM->Get($GeneratorModule);
 
         if ( !$Param{Flags}->{JoinMap}->{TicketResponsibleOutOfOfficeSubstitute} ) {
-            push( @SQLJoin, "LEFT OUTER JOIN $PreferencesObject->{PreferencesTable} trupooosub ON trupooosub.$PreferencesObject->{PreferencesTableUserID} = st.user_id AND trupooosub.$PreferencesObject->{PreferencesTableKey} = 'OutOfOfficeSubstitute'" );
+            push( @SQLJoin, "LEFT OUTER JOIN $PreferencesObject->{PreferencesTable} trupooosub ON trupooosub.$PreferencesObject->{PreferencesTableUserID} = st.responsible_user_id AND trupooosub.$PreferencesObject->{PreferencesTableKey} = 'OutOfOfficeSubstitute'" );
 
             $Param{Flags}->{JoinMap}->{TicketResponsibleOutOfOfficeSubstitute} = 1;
         }
@@ -318,8 +318,8 @@ sub Search {
             );
 
             if ( !$Param{Flags}->{JoinMap}->{TicketResponsibleOutOfOffice} ) {
-                push( @SQLJoin, "LEFT OUTER JOIN $PreferencesObject->{PreferencesTable} $AttributeMapping{AliasStart} ON $AttributeMapping{AliasStart}.$PreferencesObject->{PreferencesTableUserID} = st.user_id AND $AttributeMapping{AliasStart}.$PreferencesObject->{PreferencesTableKey} = 'OutOfOfficeStart'" );
-                push( @SQLJoin, "LEFT OUTER JOIN $PreferencesObject->{PreferencesTable} $AttributeMapping{AliasEnd} ON $AttributeMapping{AliasEnd}.$PreferencesObject->{PreferencesTableUserID} = st.user_id AND $AttributeMapping{AliasEnd}.$PreferencesObject->{PreferencesTableKey} = 'OutOfOfficeEnd'" );
+                push( @SQLJoin, "LEFT OUTER JOIN $PreferencesObject->{PreferencesTable} $AttributeMapping{AliasStart} ON $AttributeMapping{AliasStart}.$PreferencesObject->{PreferencesTableUserID} = st.responsible_user_id AND $AttributeMapping{AliasStart}.$PreferencesObject->{PreferencesTableKey} = 'OutOfOfficeStart'" );
+                push( @SQLJoin, "LEFT OUTER JOIN $PreferencesObject->{PreferencesTable} $AttributeMapping{AliasEnd} ON $AttributeMapping{AliasEnd}.$PreferencesObject->{PreferencesTableUserID} = st.responsible_user_id AND $AttributeMapping{AliasEnd}.$PreferencesObject->{PreferencesTableKey} = 'OutOfOfficeEnd'" );
 
                 $Param{Flags}->{JoinMap}->{TicketResponsibleOutOfOffice} = 1;
             }

@@ -42,9 +42,11 @@ $Self->IsDeeply(
     $AttributeList,
     {
         'ArticleFlag.Seen' => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EQ','NE']
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 0,
+            IsSelectable   => 0,
+            Operators      => ['EQ','NE']
         }
     },
     'GetSupportedAttributes provides expected data'

@@ -157,7 +157,7 @@ my @GetPermissionDefTests = (
             Join    => [],
             OrderBy => [],
             Select  => [],
-            Where   => [ '(1=0)' ]
+            Where   => [ '(1=0 OR 1=0)' ]
         }
     },
     {
@@ -172,7 +172,7 @@ my @GetPermissionDefTests = (
             Join    => [],
             OrderBy => [],
             Select  => [],
-            Where   => [ '(st.queue_id IN (1))' ]
+            Where   => [ '(st.queue_id IN (1) OR 1=0)' ]
         }
     }
 );

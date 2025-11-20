@@ -39,7 +39,8 @@ for my $Method ( qw(GetSupportedAttributes FulltextSearch) ) {
 # check GetSupportedAttributes
 my $AttributeList = $AttributeObject->GetSupportedAttributes();
 $Self->IsDeeply(
-    $AttributeList, {
+    $AttributeList,
+    {
         Fulltext => {
             IsSelectable   => 0,
             IsSearchable   => 1,
@@ -178,6 +179,9 @@ for my $Test ( @FulltextSearchTests ) {
     );
 }
 
+# check Sort
+# attributes of this backend are not sortable
+
 ### Integration Test ###
 # discard current object search object
 $Kernel::OM->ObjectsDiscard(
@@ -283,7 +287,7 @@ $Self->True(
     'Created fourth contact'
 );
 
-# discard ticket object to process events
+# discard contact object to process events
 $Kernel::OM->ObjectsDiscard(
     Objects => ['Contact'],
 );

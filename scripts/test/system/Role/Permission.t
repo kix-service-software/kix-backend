@@ -35,6 +35,25 @@ for my $UserCount ( 0 .. 2 ) {
 }
 my @UserIDs = values %UserIDByUserLogin;
 
+my @InitialRoleIDs = $RoleObject->UserRoleList(
+    UserID => $UserIDs[0]
+);
+$Self->Is(
+    scalar( @InitialRoleIDs ),
+    1,
+    "UserRoleList() - user ID $UserIDs[0] should be assigned to context role"
+);
+
+@InitialRoleIDs = $RoleObject->UserRoleList(
+    UserID             => $UserIDs[0],
+    IgnoreContextRoles => 1
+);
+$Self->Is(
+    scalar( @InitialRoleIDs ),
+    0,
+    "UserRoleList() - user ID $UserIDs[0] should be assigned to no role beside context role"
+);
+
 # create test roles
 my %RoleIDByRoleName;
 my $RoleNameRandomPartBase = $Helper->GetRandomID();
@@ -221,6 +240,49 @@ for my $PermissionTest (@PermissionTests) {
                 "RoleUserDelete() - remove user ID $UserID from role ID $RoleID"
             );
         }
+    }
+
+    # check if the all users are removed from the roles (RoleUserGet)
+    for my $RoleID ( @{ $PermissionTest->{RoleIDs} } ) {
+        my %UserList = $RoleObject->RoleUserList(
+            RoleID => $RoleID,
+        );
+
+        for my $UserID ( @{ $PermissionTest->{UserIDs} } ) {
+            $Self->False(
+                $UserList{$UserID},
+                "RoleUserList() - user ID $UserID should not be assigned to role ID $RoleID after deletion"
+            );
+        }
+    }
+
+    # add users to roles
+    for my $UserID ( @{ $PermissionTest->{UserIDs} } ) {
+        for my $RoleID ( @{ $PermissionTest->{RoleIDs} } ) {
+            my $Success = $RoleObject->RoleUserAdd(
+                RoleID       => $RoleID,
+                AssignUserID => $UserID,
+                UserID       => 1,
+            );
+
+            $Self->True(
+                $Success,
+                "RoleUserAdd() - assign user ID $UserID to role ID $RoleID "
+            );
+        }
+    }
+
+    # remove users from roles with one call
+    for my $UserID ( @{ $PermissionTest->{UserIDs} } ) {
+        my $Success = $RoleObject->RoleUserDelete(
+            RoleIDs => $PermissionTest->{RoleIDs},
+            UserID  => $UserID,
+        );
+
+        $Self->True(
+            $Success,
+            "RoleUserDelete() - remove user ID $UserID from role IDs " . join( ',', @{ $PermissionTest->{RoleIDs} } )
+        );
     }
 
     # check if the all users are removed from the roles (RoleUserGet)

@@ -13,7 +13,6 @@ use utf8;
 use vars (qw($Self));
 
 # get helper object
-
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
 my $AttributeModule = 'Kernel::System::ObjectSearch::Database::Ticket::Fulltext';
@@ -40,7 +39,8 @@ for my $Method ( qw(GetSupportedAttributes FulltextSearch) ) {
 # check GetSupportedAttributes
 my $AttributeList = $AttributeObject->GetSupportedAttributes();
 $Self->IsDeeply(
-    $AttributeList, {
+    $AttributeList,
+    {
         Fulltext => {
             IsSelectable   => 0,
             IsSearchable   => 1,
@@ -58,6 +58,12 @@ my $Escape = "\\";
 if ( $QuoteBack ) {
     $Escape =~ s/\\/$QuoteBack\\/g;
 }
+
+# Quoting single quote character
+my $QuoteSingle = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteSingle');
+
+# Quoting semicolon character
+my $QuoteSemicolon = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteSemicolon');
 
 # check if database is casesensitive
 my $CaseSensitive = $Kernel::OM->Get('DB')->GetDatabaseFunction('CaseSensitive');
@@ -173,6 +179,9 @@ for my $Test ( @FulltextSearchTests ) {
     );
 }
 
+# check Sort
+# attributes of this backend are not sortable
+
 ### Integration Test ###
 # discard current object search object
 $Kernel::OM->ObjectsDiscard(
@@ -245,6 +254,8 @@ $Self->True(
     $TicketID1,
     'Created first ticket'
 );
+
+# first article
 my $ArticleID1 = $Kernel::OM->Get('Ticket')->ArticleCreate(
     TicketID        => $TicketID1,
     ChannelID       => $ChannelID1,
@@ -284,6 +295,8 @@ $Self->True(
     $TicketID2,
     'Created second ticket'
 );
+
+# second article
 my $ArticleID2 = $Kernel::OM->Get('Ticket')->ArticleCreate(
     TicketID        => $TicketID2,
     ChannelID       => $ChannelID2,
@@ -369,7 +382,7 @@ my $DefaultCnf = $Kernel::OM->Get('Config')->Get('ObjectSearch::Database::Object
 # test Search
 my @IntegrationSearchTests = (
     {
-        Name     => "Search: Field Fulltext | Operator LIKE | Value \$To1",
+        Name     => "Search: Field Fulltext | Operator LIKE | FulltextAttributes: Default | Value \$To1",
         Search   => {
             'AND' => [
                 {
@@ -382,7 +395,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID1,$TicketID2]
     },
     {
-        Name     => "Search: Field Fulltext | Operator LIKE | Value substr(\$To1,0,4)",
+        Name     => "Search: Field Fulltext | Operator LIKE | FulltextAttributes: Default | Value substr(\$To1,0,4)",
         Search   => {
             'AND' => [
                 {
@@ -395,7 +408,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID1,$TicketID2]
     },
     {
-        Name     => "Search: Field Fulltext | Operator LIKE | Value \"\$Body1\"",
+        Name     => "Search: Field Fulltext | Operator LIKE | FulltextAttributes: Default | Value \"\$Body1\"",
         Search   => {
             'AND' => [
                 {
@@ -408,7 +421,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID1,$TicketID2,$TicketID3]
     },
     {
-        Name     => "Search: Field Fulltext | Operator LIKE | Value \"substr(\$Body1,-5)\"",
+        Name     => "Search: Field Fulltext | Operator LIKE | FulltextAttributes: Default |  Value \"substr(\$Body1,-5)\"",
         Search   => {
             'AND' => [
                 {
@@ -421,7 +434,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID1,$TicketID2,$TicketID3]
     },
     {
-        Name     => "Search: Field Fulltext | Operator LIKE | Value \$Title2",
+        Name     => "Search: Field Fulltext | Operator LIKE | FulltextAttributes: Default | Value \$Title2",
         Search   => {
             'AND' => [
                 {
@@ -434,7 +447,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID2]
     },
     {
-        Name     => "Search: Field Fulltext | Operator LIKE | Value \"\$Title2\"",
+        Name     => "Search: Field Fulltext | Operator LIKE | FulltextAttributes: Default | Value \"\$Title2\"",
         Search   => {
             'AND' => [
                 {
@@ -447,7 +460,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID2]
     },
     {
-        Name     => "Search: Field Fulltext | Operator LIKE | Value \"substr(\$Title2,2,-2)\"",
+        Name     => "Search: Field Fulltext | Operator LIKE | FulltextAttributes: Default | Value \"substr(\$Title2,2,-2)\"",
         Search   => {
             'AND' => [
                 {
@@ -460,7 +473,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID1,$TicketID2,$TicketID3]
     },
     {
-        Name     => "Search: Field Fulltext | Operator LIKE | Value \$Subject2",
+        Name     => "Search: Field Fulltext | Operator LIKE | FulltextAttributes: Default | Value \$Subject2",
         Search   => {
             'AND' => [
                 {
@@ -473,7 +486,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID2]
     },
     {
-        Name     => "Search: Field Fulltext | Operator LIKE | Value \"\$Subject2\"",
+        Name     => "Search: Field Fulltext | Operator LIKE | FulltextAttributes: Default | Value \"\$Subject2\"",
         Search   => {
             'AND' => [
                 {
@@ -486,7 +499,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID2]
     },
     {
-        Name     => "Search: Field Fulltext | Operator LIKE | Value \$To2",
+        Name     => "Search: Field Fulltext | Operator LIKE | FulltextAttributes: Default | Value \$To2",
         Search   => {
             'AND' => [
                 {
@@ -499,7 +512,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID1, $TicketID2]
     },
     {
-        Name     => "Search: Field Fulltext | Operator LIKE | Value \"substr(\$To2,0,4)\"",
+        Name     => "Search: Field Fulltext | Operator LIKE | FulltextAttributes: Default | Value \"substr(\$To2,0,4)\"",
         Search   => {
             'AND' => [
                 {
@@ -512,7 +525,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID1, $TicketID2]
     },
     {
-        Name     => "Search: Field Fulltext | Operator LIKE | Value \"\$Body2\"",
+        Name     => "Search: Field Fulltext | Operator LIKE | FulltextAttributes: Default | Value \"\$Body2\"",
         Search   => {
             'AND' => [
                 {
@@ -525,7 +538,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID1,$TicketID2,$TicketID3]
     },
     {
-        Name     => "Search: Field Fulltext | Operator LIKE | Value \"substr(\$Body2,-5)\"",
+        Name     => "Search: Field Fulltext | Operator LIKE | FulltextAttributes: Default | Value \"substr(\$Body2,-5)\"",
         Search   => {
             'AND' => [
                 {
@@ -538,7 +551,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID1,$TicketID2,$TicketID3]
     },
     {
-        Name     => "Search: Field Fulltext | Operator LIKE | Value \$Title3",
+        Name     => "Search: Field Fulltext | Operator LIKE | FulltextAttributes: Default | Value \$Title3",
         Search   => {
             'AND' => [
                 {
@@ -551,7 +564,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID3]
     },
     {
-        Name     => "Search: Field Fulltext | Operator LIKE | Value \"\$Title3\"",
+        Name     => "Search: Field Fulltext | Operator LIKE | FulltextAttributes: Default | Value \"\$Title3\"",
         Search   => {
             'AND' => [
                 {
@@ -564,7 +577,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID3]
     },
     {
-        Name     => "Search: Field Fulltext | Operator LIKE | Value \"substr(\$Title3,2,-2)\"",
+        Name     => "Search: Field Fulltext | Operator LIKE | FulltextAttributes: Default | Value \"substr(\$Title3,2,-2)\"",
         Search   => {
             'AND' => [
                 {
@@ -577,7 +590,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID1, $TicketID2, $TicketID3]
     },
     {
-        Name     => "Search: Field Fulltext | Operator LIKE | Value \"\$Subject1\"",
+        Name     => "Search: Field Fulltext | Operator LIKE | FulltextAttributes: Default | Value \"\$Subject1\"",
         Search   => {
             'AND' => [
                 {
@@ -625,7 +638,7 @@ my @IntegrationSearchTests = (
         Expected => []
     },
     {
-        Name     => "Search: Field Fulltext | Operator LIKE | FulltextAttributes: Email | Value \$To1",
+        Name     => "Search: Field Fulltext | Operator LIKE | FulltextAttributes: To,Cc | Value \$To1",
         ConfigSet => {
             %{$DefaultCnf},
             Ticket => {
@@ -648,7 +661,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID1]
     },
     {
-        Name     => "Search: Field Fulltext | Operator LIKE | FulltextAttributes: Email | Value \$From3",
+        Name     => "Search: Field Fulltext | Operator LIKE | FulltextAttributes: To,Cc | Value \$From3",
         Search   => {
             'AND' => [
                 {
@@ -662,7 +675,6 @@ my @IntegrationSearchTests = (
     }
 );
 for my $Test ( @IntegrationSearchTests ) {
-
     if ( IsHashRefWithData($Test->{ConfigSet}) ) {
         $Kernel::OM->Get('Config')->Set(
             Key   => 'ObjectSearch::Database::ObjectType',
@@ -692,7 +704,7 @@ for my $Test ( @IntegrationSearchTests ) {
         Result     => 'ARRAY',
         Search     => $Test->{Search},
         UserType   => 'Agent',
-        UserID     => 1,
+        UserID     => 1
     );
     $Self->IsDeeply(
         \@Result,

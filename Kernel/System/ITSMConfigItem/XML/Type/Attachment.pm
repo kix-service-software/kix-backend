@@ -80,23 +80,31 @@ get the xml data of a version
 sub ValueLookup {
     my ( $Self, %Param ) = @_;
 
-    # return empty string, when false value (undef, 0, empty string) is given
-    return q{} if ( !$Param{Value} );
+    my $AttachmentID;
+    if ( IsStringWithData( $Param{Value} ) ) {
+        $AttachmentID = $Param{Value};
+    }
+    elsif (
+        IsHashRefWithData( $Param{Value} )
+        && IsStringWithData( $Param{Value}->{AttachmentID} )
+    ) {
+        $AttachmentID = $Param{Value}->{AttachmentID};
+    }
 
-    # return undef value, if given value is not a string
-    return if ( !IsString( $Param{Value} ) );
+    # return empty string, when false value (undef, 0, empty string) is given
+    return q{} if ( !$AttachmentID );
 
     # return given value, if given value is not a number
-    return $Param{Value} if ( $Param{Value} =~ /\D/ );
+    return $AttachmentID if ( $AttachmentID =~ /\D/ );
 
     # get saved properties (attachment directory info)
     my %AttDirData = $Kernel::OM->Get('ITSMConfigItem')->AttachmentStorageGetDirectory(
-        ID => $Param{Value},
+        ID => $AttachmentID,
     );
     if (!%AttDirData) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => "Unable to find attachment with ID $Param{Value} in attachment storage!"
+            Message  => "Unable to find attachment with ID $AttachmentID in attachment storage!"
         );
         return;
     }

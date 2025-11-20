@@ -106,6 +106,15 @@
         <Setting>
             <Hash>
                 <Item Key="Module">ObjectSearch::Database::Article</Item>
+                <Item Key="FulltextAttributes">
+                    <Array>
+                        <Item>From</Item>
+                        <Item>To</Item>
+                        <Item>Cc</Item>
+                        <Item>Subject</Item>
+                        <Item>Body</Item>
+                    </Array>
+                </Item>
             </Hash>
         </Setting>
     </ConfigItem>

@@ -365,7 +365,7 @@
             <Hash>
                 <Item Key="Module">Kernel::API::Validator::UserPasswordValidator</Item>
                 <Item Key="Validates">UserPw</Item>
-                <Item Key="ConsiderOperationRegEx">User(Create|Update)</Item>
+                <Item Key="ConsiderOperationRegEx">(Contact|User)(Create|Update)</Item>
                 <Item Key="IgnoreOperationRegEx"></Item>
                 <Item Key="Config">
                     <Hash>
