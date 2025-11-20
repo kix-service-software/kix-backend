@@ -439,6 +439,17 @@ sub HandleTicketUnsubscribe {
     return 1;
 }
 
+sub HandleTicketQueueUpdate {
+    my ($Self, %Param) = @_;
+
+    $Kernel::OM->Get('User')->UpdateUserCounterObject(
+        Category => 'Ticket',
+        ObjectID => $Param{Ticket}->{TicketID}
+    );
+
+    return 1;
+}
+
 1;
 
 =back

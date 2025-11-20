@@ -555,7 +555,7 @@
         <Setting>
             <Hash>
                 <Item Key="Module">Kernel::System::Ticket::Event::UpdateUserCounters</Item>
-                <Item Key="Event">(TicketCreate|TicketDelete|TicketStateUpdate|TicketFlagSet|TicketFlagDelete|TicketLockUpdate|TicketOwnerUpdate|TicketSubscribe|TicketUnsubscribe)</Item>
+                <Item Key="Event">(TicketCreate|TicketDelete|TicketStateUpdate|TicketFlagSet|TicketFlagDelete|TicketLockUpdate|TicketOwnerUpdate|TicketSubscribe|TicketUnsubscribe|TicketQueueUpdate)</Item>
             </Hash>
         </Setting>
     </ConfigItem>
