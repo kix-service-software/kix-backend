@@ -225,7 +225,13 @@ sub VersionListAll {
     # extract those and use it for the query
     if ( IsArrayRefWithData( $Param{ConfigItemIDs} ) ) {
         my @ConfigItemIDs = grep { $_ =~ /^\d+$/ } @{ $Param{ConfigItemIDs} };
-        $SQL .= ' AND configitem_id IN (' . join ', ', @ConfigItemIDs . ')';
+        while ( @ConfigItemIDs ) {
+            # remove section in the array
+            my @ValuesPart = splice( @ConfigItemIDs, 0, 900 );
+
+            # add condition part
+            $SQL .= ' AND configitem_id IN (' . join( ', ', @ValuesPart ) . ')';
+        }
     }
 
     my @BindParameter;
