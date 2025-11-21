@@ -11,6 +11,8 @@ package Kernel::System::ObjectSearch::Database::FAQArticle::General;
 use strict;
 use warnings;
 
+use Kernel::System::VariableCheck qw(:all);
+
 use base qw(
     Kernel::System::ObjectSearch::Database::CommonAttribute
 );
@@ -75,6 +77,10 @@ sub Search {
     if (
         $Param{Search}->{Field} eq 'Keywords'
         && $Param{Search}->{Operator} eq 'IN'
+        && (
+            IsArrayRefWithData( $Param{Search}->{Value} )
+            || IsStringWithData( $Param{Search}->{Value} )
+        )
     ) {
         $Operator = 'CONTAINS';
     }
