@@ -20,42 +20,43 @@ use base qw(Kernel::System::Console::BaseCommand);
 our @ObjectDependencies = (
     'GeneralCatalog',
     'ITSMConfigItem',
+    'ObjectSearch',
     'Time',
 );
 
 sub Configure {
     my ( $Self, %Param ) = @_;
 
-    $Self->Description('Delete config items (all, by class (and deployment state) or by number).');
+    $Self->Description('Delete assets (by number, by class and deployment state, or all), or their versions.');
     $Self->AddOption(
         Name        => 'all',
-        Description => "Delete all config items",
+        Description => "Delete all assets",
         Required    => 0,
         HasValue    => 0,
     );
     $Self->AddArgument(
         Name        => 'accept',
-        Description => "Accept delete all or cancel.",
+        Description => "Accept deletion of assets. (--asset-number always accepts deletion) ",
         Required    => 0,
         ValueRegex  => qr/(y|n)/smx,
     );
     $Self->AddOption(
         Name        => 'class',
-        Description => "Delete all config items of this class.",
+        Description => "Delete all assets of this class.",
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,
     );
     $Self->AddOption(
         Name        => 'deployment-state',
-        Description => "Delete all config items with this deployment state (ONLY TOGETHER with the --class parameter)",
+        Description => "Delete all assets with this deployment state (ONLY TOGETHER with the --class parameter)",
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/.*/smx,
     );
     $Self->AddOption(
-        Name        => 'configitem-number',
-        Description => "Delete listed config items",
+        Name        => 'asset-number',
+        Description => "Delete given asset(s)",
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/\d+/smx,
@@ -63,20 +64,20 @@ sub Configure {
     );
     $Self->AddOption(
         Name        => 'all-old-versions',
-        Description => "Delete all config item versions except the newest version",
+        Description => "Delete all asset versions except the newest version",
         Required    => 0,
         HasValue    => 0,
     );
     $Self->AddOption(
         Name        => 'all-but-keep-last-versions',
-        Description => "Delete all config item versions but keep the last XX versions",
+        Description => "Delete all asset versions but keep the last XX versions",
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/\d+/smx,
     );
     $Self->AddOption(
         Name        => 'all-older-than-days-versions',
-        Description => "Delete all config item versions older than XX days",
+        Description => "Delete all asset versions older than XX days (24h)",
         Required    => 0,
         HasValue    => 1,
         ValueRegex  => qr/\d+/smx,
@@ -89,162 +90,87 @@ sub PreRun {
     my ( $Self, %Param ) = @_;
 
     my $All               = $Self->GetOption('all');
-    my $Class             = $Self->GetOption('class')                        // q{};
-    my @ConfigItemNumbers = @{ $Self->GetOption('configitem-number')         // [] };
-    my $DeploymentState   = $Self->GetOption('deployment-state')             // q{};
-    my $AllOldVersions    = $Self->GetOption('all-old-versions')             // q{};
-    my $AllButKeepLast    = $Self->GetOption('all-but-keep-last-versions')   // q{};
-    my $AllOlderThanDays  = $Self->GetOption('all-older-than-days-versions') // q{};
+    my $Class             = $Self->GetOption('class')            // q{};
+    my @ConfigItemNumbers = @{ $Self->GetOption('asset-number')  // [] };
+    my $DeploymentState   = $Self->GetOption('deployment-state') // q{};
 
     if (
         !$All
         && !$Class
-        && !@ConfigItemNumbers
-        && !$DeploymentState
-        && !$AllOldVersions
-        && !$AllButKeepLast
-        && !$AllOlderThanDays
-        )
-    {
+        && !IsArrayRefWithData( \@ConfigItemNumbers )
+    ) {
         die
-            "Please provide option --all, --class, --configitem-number, --all-old-versions, --all-but-keep-last-versions or --all-older-than-days-versions."
-            . " For more details use --help\n";
+            "Please provide option --all, --class, or --asset-number.\n"
+            . "For more details use --help\n";
     }
 
     if ( $DeploymentState && !$Class ) {
         die
-            "Deleting all config items with this deployment state is posible ONLY TOGETHER with the --class parameter. \nFor more details use --help\n";
+            "Restriction of relevant deployment state is possible ONLY TOGETHER with the --class parameter.\n"
+            . "For more details use --help\n";
     }
 
     return;
-
 }
 
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    $Self->Print("<yellow>Deleting config items...</yellow>\n\n");
-
     my $All               = $Self->GetOption('all');
     my $Class             = $Self->GetOption('class')                        // q{};
-    my @ConfigItemNumbers = @{ $Self->GetOption('configitem-number')         // [] };
+    my @ConfigItemNumbers = @{ $Self->GetOption('asset-number')              // [] };
     my $DeploymentState   = $Self->GetOption('deployment-state')             // q{};
     my $AllOldVersions    = $Self->GetOption('all-old-versions')             // q{};
     my $AllButKeepLast    = $Self->GetOption('all-but-keep-last-versions')   // q{};
     my $AllOlderThanDays  = $Self->GetOption('all-older-than-days-versions') // q{};
 
-    # delete all config items
-    if ($All) {
+    # init variable
+    my @ConfigItemIDs;
 
-        # get all config items ids
-        my @ConfigItemIDs = $Kernel::OM->Get('ObjectSearch')->Search(
-            ObjectType => 'ConfigItem',
-            Result     => 'ARRAY',
-            UserID     => 1,
-            UserType   => 'Agent'
-        );
-
-        # get number of config items
-        my $CICount = scalar @ConfigItemIDs;
-
-        # if there are any CI to delete
-        if ($CICount) {
-
-            $Self->Print("<yellow>Are you sure that you want to delete ALL $CICount config items?</yellow>\n");
-            $Self->Print("<yellow>This is irrevocable. [y/n] </yellow>\n");
-            my $Confirmation = $Self->GetArgument('accept');
-            chomp( $Confirmation = lc <STDIN> ) if !defined $Confirmation;
-
-            # if the user confirms the deletion
-            if ( $Confirmation eq 'y' ) {
-
-                # delete config items
-                $Self->Print("<green>Deleting all config items...</green>\n");
-                $Self->DeleteConfigItems( ConfigItemIDs => \@ConfigItemIDs );
-            }
-            else {
-                $Self->Print("<yellow>Command delete was canceled</yellow>\n");
-                return $Self->ExitCodeOk();
-            }
-        }
-        else {
-            $Self->Print("<yellow>There are NO config items to delete.</yellow>\n");
-        }
-    }
-
-    # delete listed config items
-    elsif ( IsArrayRefWithData( \@ConfigItemNumbers ) ) {
-
-        my @ConfigItemIDs;
-
-        for my $ConfigItemNumber (@ConfigItemNumbers) {
-
-            # checks the validity of the config item id
+    # get relevant assets
+    if ( @ConfigItemNumbers ) {
+        for my $ConfigItemNumber ( @ConfigItemNumbers ) {
+            # checks the validity of the asset number
             my $ID = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemLookup(
                 ConfigItemNumber => $ConfigItemNumber,
             );
-
-            if ($ID) {
-                push @ConfigItemIDs, $ID;
+            if ( $ID ) {
+                push( @ConfigItemIDs, $ID );
             }
             else {
-                $Self->Print("<yellow>Unable to find config item $ConfigItemNumber.</yellow>\n");
+                $Self->Print("<yellow>Unable to find asset $ConfigItemNumber.</yellow>\n");
             }
         }
-
-        # delete config items (if any valid number was given)
-        if (@ConfigItemIDs) {
-            $Self->Print("<yellow>Deleting specified config items...</yellow>\n");
-            $Self->DeleteConfigItems( ConfigItemIDs => \@ConfigItemIDs );
-        }
     }
-
-    # delete config items that belong to the class
-    elsif ($Class) {
-
-        my @ConfigItemIDs;
-
-        # get class list
+    elsif ( $Class ) {
+        # get class list and inverted list for lookup
         my $ClassList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
             Class => 'ITSM::ConfigItem::Class',
             Valid => 0,
         );
+        my %ClassName2ID = reverse( %{ $ClassList } );
 
-        # invert the hash to have the classes names as keys
-        my %ClassName2ID = reverse %{$ClassList};
-
-        if ( $ClassName2ID{$Class} ) {
-            my @SearchParam;
-            my $ID = $ClassName2ID{$Class};
-
+        if ( $ClassName2ID{ $Class } ) {
             # define the search param for the class search
-            push(
-                @SearchParam,
+            my @SearchParam = (
                 {
                     Field    => 'ClassID',
                     Operator => 'IN',
                     Type     => 'NUMERIC',
-                    Value    => [$ID]
+                    Value    => [ $ClassName2ID{ $Class } ]
                 }
             );
 
-            # also a deployment state is given
-            if ($DeploymentState) {
-
-                # get deployment state list
-                my $DeploymentStateList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
+            # handle given depl state
+            if ( $DeploymentState ) {
+                # get deployment state list and inverted list for lookup
+                my $DeplStateList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
                     Class => 'ITSM::ConfigItem::DeploymentState',
+                    Valid => 0,
                 );
+                my %DeplState2ID = reverse( %{ $DeplStateList } );
 
-                # invert the hash to have the deployment state names as keys
-                my %DeploymentState2ID = reverse %{$DeploymentStateList};
-
-                # if the deployment state is valid
-                if ( $DeploymentState2ID{$DeploymentState} ) {
-
-                    # get the deployment state id
-                    my $DeplStateID = $DeploymentState2ID{$DeploymentState};
-
+                if ( $DeplState2ID{ $DeploymentState } ) {
                     # add search parameter
                     push(
                         @SearchParam,
@@ -252,7 +178,7 @@ sub Run {
                             Field    => 'DeplStateID',
                             Operator => 'IN',
                             Type     => 'NUMERIC',
-                            Value    => [$DeplStateID]
+                            Value    => [ $DeplState2ID{ $DeploymentState } ]
                         }
                     );
                 }
@@ -262,7 +188,7 @@ sub Run {
                 }
             }
 
-            # get ids of this class (and maybe deployment state) config items
+            # get ids of this class (and maybe deployment state) assetss
             @ConfigItemIDs = $Kernel::OM->Get('ObjectSearch')->Search(
                 ObjectType => 'ConfigItem',
                 Result     => 'ARRAY',
@@ -277,141 +203,139 @@ sub Run {
             $Self->PrintError("Unable to find class name $Class.");
             return $Self->ExitCodeError();
         }
-
-        # delete config items (if any valid number was given)
-        if (@ConfigItemIDs) {
-            $Self->Print("<yellow>Deleting config items that belong to the class $Class...</yellow>\n");
-            $Self->DeleteConfigItems( ConfigItemIDs => \@ConfigItemIDs );
-        }
-        else {
-            $Self->Print("<yellow>There are no config items that belong to the class $Class...</yellow>\n");
-        }
-    }
-
-    # delete versions older than xx days from all config items
-    elsif ($AllOlderThanDays) {
-
-        my $SystemTime = $Kernel::OM->Get('Time')->SystemTime();
-        my $OlderDate = $SystemTime - ( 60 * 60 * 24 * $AllOlderThanDays );
-        $OlderDate = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
-            SystemTime => $OlderDate,
-        );
-
-        my $VersionsOlderDate = $Kernel::OM->Get('ITSMConfigItem')->VersionListAll(
-            OlderDate => $OlderDate,
-        );
-
-        # We need to get all versions to make sure that at least one version remains
-        # -> if one version of a configitem is younger than the amount of days,
-        #    we can delete all Versions received by the "OlderDate" query
-        # -> if no version is younger than the amount of days
-        #    we have to keep one version of the "OlderDate" query result
-        my $VersionsAll = $Kernel::OM->Get('ITSMConfigItem')->VersionListAll();
-
-        my @VersionsToDelete;
-
-        CONFIGITEMID:
-        for my $ConfigItemID ( sort keys %{$VersionsOlderDate} ) {
-
-            # number of found older versions of this CI
-            my $NumberOfOlderVersions = scalar keys %{ $VersionsOlderDate->{$ConfigItemID} };
-
-            # number of all versions of this CI
-            my $NumberOfAllVersions = scalar keys %{ $VersionsAll->{$ConfigItemID} };
-
-            # next if there are no older versions
-            next CONFIGITEMID if !$NumberOfOlderVersions;
-
-            # next if there is only one or zero of all versions
-            next CONFIGITEMID if $NumberOfAllVersions <= 1;
-
-            # if the amount of Versions we have to delete
-            # is exactly the same as the amount of AllVersions
-            # we have to keep the last one
-            # in order to keep the system working
-            #
-            # -> so let's start counting at "1" instead of "0"
-            # in order to stop deleting before we reach the newest version
-            my $Count = 0;
-            if ( $NumberOfOlderVersions == $NumberOfAllVersions ) {
-                $Count = 1;
-            }
-
-            # make sure that the versions are numerically sorted
-            for my $Version ( sort { $a <=> $b } keys %{ $VersionsOlderDate->{$ConfigItemID} } ) {
-
-                if ( $Count < $NumberOfOlderVersions ) {
-                    push @VersionsToDelete, $Version;
-                }
-                $Count++;
-            }
-        }
-
-        $Self->DeleteConfigItemVersions(
-            VersionIDs => \@VersionsToDelete,
-            UserID     => 1,
-        );
-    }
-
-    # delete all config item versions except the newest version
-    elsif ($AllOldVersions) {
-
-        my $VersionsAll = $Kernel::OM->Get('ITSMConfigItem')->VersionListAll();
-
-        my @VersionsToDelete;
-        if ( IsHashRefWithData($VersionsAll) ) {
-
-            CONFIGITEMID:
-            for my $ConfigItemID ( sort keys %{$VersionsAll} ) {
-
-                next CONFIGITEMID if !IsHashRefWithData( $VersionsAll->{$ConfigItemID} );
-
-                # make sure that the versions are numerically sorted
-                my @ReducedVersions = sort { $a <=> $b } keys %{ $VersionsAll->{$ConfigItemID} };
-
-                # remove the last (newest) version
-                pop @ReducedVersions;
-
-                push @VersionsToDelete, @ReducedVersions;
-            }
-        }
-
-        $Self->DeleteConfigItemVersions(
-            VersionIDs => \@VersionsToDelete,
-            UserID     => 1,
-        );
-    }
-
-    # delete all config item versions but keep the last XX versions
-    elsif ($AllButKeepLast) {
-
-        my $VersionsAll = $Kernel::OM->Get('ITSMConfigItem')->VersionListAll();
-
-        my @VersionsToDelete;
-
-        if ( IsHashRefWithData($VersionsAll) ) {
-
-            CONFIGITEMID:
-            for my $ConfigItemID ( sort keys %{$VersionsAll} ) {
-
-                next CONFIGITEMID if !IsHashRefWithData( $VersionsAll->{$ConfigItemID} );
-
-                # make sure that the versions are numerically reverse sorted
-                my @ReducedVersions = reverse sort { $a <=> $b } keys %{ $VersionsAll->{$ConfigItemID} };
-
-                my $Count = 0;
-                @ReducedVersions = grep { $Count++; $Count > $AllButKeepLast } @ReducedVersions;
-                push @VersionsToDelete, @ReducedVersions;
-            }
-        }
-
-        $Self->DeleteConfigItemVersions(
-            VersionIDs => \@VersionsToDelete,
-            UserID     => 1,
-        );
     }
     else {
-        $Self->PrintError("No config item for delete.");
+        @ConfigItemIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+            ObjectType => 'ConfigItem',
+            Result     => 'ARRAY',
+            UserID     => 1,
+            UserType   => 'Agent'
+        );
+    }
+
+    if ( !@ConfigItemIDs ) {
+        $Self->Print("<yellow>No assets to handle.</yellow>\n");
+        return $Self->ExitCodeOk();
+    }
+    else {
+        $Self->Print("<yellow>" . scalar( @ConfigItemIDs ) . " asset(s) to handle.</yellow>\n");
+    }
+
+    # handle version deletions
+    if (
+        $AllOlderThanDays
+        || $AllOldVersions
+        || $AllButKeepLast
+    ) {
+        # get version list
+        my $VersionList = $Kernel::OM->Get('ITSMConfigItem')->VersionListAll(
+            ConfigItemIDs => \@ConfigItemIDs
+        );
+        if ( IsHashRefWithData( $VersionList ) ) {
+            # prepare versions to delete
+            my @VersionsToDelete;
+            if ($AllOlderThanDays) {
+                # get versions before given days
+                my $OlderSystemTime = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
+                    String => '-' . $AllOlderThanDays . 'd',
+                );
+                my $OlderDate = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
+                    SystemTime => $OlderSystemTime,
+                );
+                my $VersionsOlderDate = $Kernel::OM->Get('ITSMConfigItem')->VersionListAll(
+                    ConfigItemIDs => \@ConfigItemIDs,
+                    OlderDate     => $OlderDate,
+                );
+
+                CONFIGITEMID:
+                for my $ConfigItemID ( sort( keys( %{ $VersionsOlderDate } ) ) ) {
+                    # number of found older versions of this CI
+                    my $NumberOfOlderVersions = scalar( keys( %{ $VersionsOlderDate->{ $ConfigItemID } } ) );
+                    next CONFIGITEMID if !$NumberOfOlderVersions;
+
+                    # number of all versions of this CI
+                    my $NumberOfAllVersions = scalar( keys( %{ $VersionList->{ $ConfigItemID } } ) );
+                    next CONFIGITEMID if ( $NumberOfAllVersions <= 1 );
+
+                    # if the amount of Versions we have to delete
+                    # is exactly the same as the amount of AllVersions
+                    # we have to keep the last one
+                    # in order to keep the system working
+                    #
+                    # -> so let's start counting at "1" instead of "0"
+                    # in order to stop deleting before we reach the newest version
+                    my $Count = 0;
+                    if ( $NumberOfOlderVersions == $NumberOfAllVersions ) {
+                        $Count = 1;
+                    }
+
+                    # make sure that the versions are numerically sorted
+                    for my $Version ( sort { $a <=> $b }( keys( %{ $VersionsOlderDate->{ $ConfigItemID } } ) ) ) {
+                        if ( $Count < $NumberOfOlderVersions ) {
+                            push @VersionsToDelete, $Version;
+                        }
+                        $Count++;
+                    }
+                }
+            }
+            else {
+                my $KeepLastCount = 1;
+                if ( $AllButKeepLast ) {
+                    $KeepLastCount = $AllButKeepLast;
+                }
+                CONFIGITEMID:
+                for my $ConfigItemID ( sort( keys( %{ $VersionList } ) ) ) {
+                    next CONFIGITEMID if ( !IsHashRefWithData( $VersionList->{ $ConfigItemID } ) );
+
+                    # make sure that the versions are numerically reverse sorted
+                    my @ReducedVersions = reverse( sort { $a <=> $b }( keys( %{ $VersionList->{ $ConfigItemID } } ) ) );
+
+                    my $Count = 0;
+                    @ReducedVersions = grep { $Count++; $Count > $KeepLastCount } @ReducedVersions;
+                    push( @VersionsToDelete, @ReducedVersions );
+                }
+            }
+
+            if ( @VersionsToDelete ) {
+                $Self->_DeleteConfigItemVersions(
+                    VersionIDs => \@VersionsToDelete,
+                );
+            }
+            else {
+                $Self->Print("<yellow>No versions to handle.</yellow>\n");
+                return $Self->ExitCodeOk();
+            }
+        }
+        else {
+            $Self->Print("<yellow>No versions to handle.</yellow>\n");
+            return $Self->ExitCodeOk();
+        }
+    }
+    # handle asset deletion
+    else {
+        my $Confirmation;
+        if ( @ConfigItemNumbers ) {
+            $Confirmation = 'y';
+        }
+        else {
+            $Confirmation = $Self->GetArgument('accept');
+
+            if ( !defined( $Confirmation ) ) {
+                $Self->Print("<yellow>Are you sure that you want to delete ALL " . scalar( @ConfigItemIDs ) . " config items?</yellow>\n");
+                $Self->Print("<yellow>This is irrevocable. [y/n] </yellow>\n");
+                chomp( $Confirmation = lc <STDIN> );
+            }
+        }
+
+
+        # if the user confirms the deletion
+        if ( $Confirmation eq 'y' ) {
+            $Self->_DeleteConfigItems( ConfigItemIDs => \@ConfigItemIDs );
+        }
+        else {
+            $Self->Print("<yellow>Command delete was canceled</yellow>\n");
+            return $Self->ExitCodeOk();
+        }
     }
 
     # show successfull output
@@ -419,39 +343,42 @@ sub Run {
     return $Self->ExitCodeOk();
 }
 
-sub DeleteConfigItems {
-
+sub _DeleteConfigItems {
     my ( $Self, %Param ) = @_;
 
-    my $DeletedCI;
-    my @ConfigItemNumbers = @{ $Self->GetOption('configitem-number') // [] };
+    # check needed stuff
+    return if ( !IsArrayRefWithData( $Param{ConfigItemIDs} ) );
 
-    # delete specified config items
+    $Self->Print("<yellow>Deleting " . scalar( @{ $Param{ConfigItemIDs} } ) . " asset(s).</yellow>\n");
+
+    my $DeletedCI;
+
+    # delete given assets
     for my $ConfigItemID ( @{ $Param{ConfigItemIDs} } ) {
-        my $True = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemDelete(
+        my $Success = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemDelete(
             ConfigItemID => $ConfigItemID,
             UserID       => 1,
         );
-        if ( !$True ) {
-            $Self->PrintError("Unable to delete config item with id $ConfigItemID.");
+        if ( !$Success ) {
+            $Self->PrintError("Unable to delete asset with id $ConfigItemID.");
         }
         else {
             $DeletedCI++;
         }
     }
 
-    $Self->Print("<green>Deleted $DeletedCI config item(s).</green>\n\n");
+    $Self->Print("<green>Deleted $DeletedCI asset(s).</green>\n\n");
 
     return 1;
 }
 
-sub DeleteConfigItemVersions {
+sub _DeleteConfigItemVersions {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    return if !IsArrayRefWithData( $Param{VersionIDs} );
+    return if ( !IsArrayRefWithData( $Param{VersionIDs} ) );
 
-    $Self->Print("<green>Deleting config item versions.</green>\n\n");
+    $Self->Print("<yellow>Deleting " . scalar( @{ $Param{VersionIDs} } ) . " asset version(s).</yellow>\n");
 
     $Kernel::OM->Get('ITSMConfigItem')->VersionDelete(
         VersionIDs => $Param{VersionIDs},
@@ -462,10 +389,6 @@ sub DeleteConfigItemVersions {
 }
 
 1;
-
-
-
-
 
 =back
 
