@@ -53,7 +53,7 @@ $Self->True(
     "Disable Agent Self Notify On Action",
 );
 
-# disable asynchron notification
+# disable asynchronous notifications
 $Kernel::OM->Get('Config')->Set(
     Key   => 'TicketNotification::SendAsynchronously',
     Value => 0,
@@ -152,6 +152,25 @@ $Self->True(
     "ArticleCreate() successful for Article ID $ArticleID",
 );
 
+# create ticket
+my $TicketID2 = $Kernel::OM->Get('Ticket')->TicketCreate(
+    Title          => 'Ticket One Title',
+    QueueID        => 1,
+    Lock           => 'unlock',
+    Priority       => '3 normal',
+    State          => 'new',
+    OrganisationID => 'example.com',
+    OwnerID        => $UserID,
+    ContactID      => $UserContactData{ID},
+    UserID         => 1,
+);
+
+# sanity check
+$Self->True(
+    $TicketID,
+    "TicketCreate() successful for Ticket ID $TicketID2",
+);
+
 # create a dynamic field
 my $FieldID = $Kernel::OM->Get('DynamicField')->DynamicFieldAdd(
     Name       => "DFT1$RandomID",
@@ -195,8 +214,10 @@ my @Tests = (
         },
         ExpectedResults => [
             {
-                ToArray => [ $UserContactData{Email} ],
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
+                Email => {
+                    ToArray => [ $UserContactData{Email} ],
+                    Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
+                }
             },
         ],
     },
@@ -210,12 +231,16 @@ my @Tests = (
         },
         ExpectedResults => [
             {
-                ToArray => [ $UserContactData{Email} ],
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
+                Email => {
+                    ToArray => [ $UserContactData{Email} ],
+                    Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
+                }
             },
             {
-                ToArray => ['test@kixexample.com'],
-                Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
+                Email => {
+                    ToArray => ['test@kixexample.com'],
+                    Body    => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
+                }
             },
         ],
     },
@@ -238,8 +263,33 @@ my @Tests = (
         },
         ExpectedResults => [
             {
-                ToArray => [ 'customerOne@example.com', 'customerTwo@example.com' ],
-                Body => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
+                Email => {
+                    ToArray => [ 'customerOne@example.com', 'customerTwo@example.com' ],
+                    Body => "JobName $TicketID Kernel::System::Email::Test $UserContactData{Firstname}=\n",
+                }
+            },
+        ],
+        JustToRealCustomer => 0,
+    },
+    {
+        TicketID => $TicketID2,
+        Name => 'Recipient Customer - create article',
+        Data => {
+            Events        => [ 'TicketDynamicFieldUpdate_DFT1' . $RandomID . 'Update' ],
+            Recipients    => ['Customer'],
+            Transports    => ['Email'],
+            CreateArticle => [ 1 ],
+        },
+        ExpectedResults => [
+            {
+                Email => {
+                    ToArray => [ $UserContactData{Email} ],
+                    Body    => "JobName $TicketID2 Kernel::System::Email::Test $UserContactData{Firstname}=\n",
+                },
+                Article => {
+                    Channel         => 'email',
+                    CustomerVisible => 1
+                }
             },
         ],
         JustToRealCustomer => 0,
@@ -292,7 +342,7 @@ for my $Test (@Tests) {
     my $Result = $Kernel::OM->Get('Kernel::System::Ticket::Event::NotificationEvent')->Run(
         Event => 'TicketDynamicFieldUpdate_DFT1' . $RandomID . 'Update',
         Data  => {
-            TicketID => $TicketID,
+            TicketID => $Test->{TicketID} || $TicketID,
         },
         Config => {},
         UserID => 1,
@@ -306,7 +356,9 @@ for my $Test (@Tests) {
     my $Emails = $TestEmailObject->EmailsGet();
 
     # remove not needed data
+    my $Index = 0;
     for my $Email ( @{$Emails} ) {
+
         for my $Attribute (qw(From Header)) {
             delete $Email->{$Attribute};
         }
@@ -318,16 +370,38 @@ for my $Test (@Tests) {
             # at the moment we are not able to check the HTML body
             delete $Email->{Body};
         }
+
+        $Self->IsDeeply(
+            $Email,
+            $Test->{ExpectedResults}->[$Index]->{Email},
+            "$Test->{Name} - email $Index - Recipients",
+        );
+
+        # check created article 
+        if ( IsHashRefWithData($Test->{ExpectedResults}->[$Index]->{Article}) ) {
+            my @ArticleIndex = $Kernel::OM->Get('Ticket')->ArticleGet(
+                TicketID          => $Test->{TicketID} || $TicketID,,
+                ArticleSenderType => 'system',
+                Order             => 'DESC',
+                Limit             => 1,
+            );
+            $Self->True(
+                @ArticleIndex,
+                "$Test->{Name} - article created",
+            );
+            if ( @ArticleIndex ) {
+                foreach my $Property ( sort keys %{$Test->{ExpectedResults}->[0]->{Article}} ) {
+                    $Self->Is(
+                        $ArticleIndex[0]->{$Property},
+                        $Test->{ExpectedResults}->[0]->{Article}->{$Property},
+                        "$Test->{Name} - article property \"$Property\"",
+                    );
+                }
+            }
+        }
+
+        $Index++;
     }
-
-    my @EmailSorted           = sort { $a->{ToArray}->[0] cmp $b->{ToArray}->[0] } @{$Emails};
-    my @ExpectedResultsSorted = sort { $a->{ToArray}->[0] cmp $b->{ToArray}->[0] } @{ $Test->{ExpectedResults} };
-
-    $Self->IsDeeply(
-        \@EmailSorted,
-        \@ExpectedResultsSorted,
-        "$Test->{Name} - Recipients",
-    );
 
     # delete notification event
     my $NotificationDelete = $Kernel::OM->Get('NotificationEvent')->NotificationDelete(
