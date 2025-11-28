@@ -866,8 +866,9 @@ sub ContactUpdate {
         );
 
         if (
-            !%OrgData
-            || $OrgData{ValidID} != 1
+            !%OrgData ||
+             # accept already set organisations even if invalid
+            ($OrgData{ValidID} != 1 && $Param{PrimaryOrganisationID} != $Contact{PrimaryOrganisationID})
         ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
@@ -879,6 +880,7 @@ sub ContactUpdate {
     }
 
     if (IsArrayRefWithData($Param{OrganisationIDs})) {
+        my %CurrentOrgs = map {$_ => 1} @{$Contact{OrganisationIDs}};
         foreach my $OrgID (@{$Param{OrganisationIDs}}) {
             next if ($OrgaIDs{$OrgID});
 
@@ -886,8 +888,9 @@ sub ContactUpdate {
                 ID => $OrgID,
             );
             if (
-                !%OrgData
-                || $OrgData{ValidID} != 1
+                !%OrgData ||
+                # accept already set organisations even if invalid
+                ($OrgData{ValidID} != 1 && !$CurrentOrgs{$OrgID})
             ) {
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
