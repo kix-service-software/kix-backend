@@ -31,7 +31,7 @@ Feature: POST request /contacts resource
     And the response has no content
 
   Scenario: added a contact with umlauts
-#    Given a organisation
+    Given a organisation
     When added a contact with umlauts
     Then the response content
     Then the response code is 201
