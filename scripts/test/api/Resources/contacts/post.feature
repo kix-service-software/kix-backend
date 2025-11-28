@@ -33,7 +33,6 @@ Feature: POST request /contacts resource
   Scenario: added a contact with umlauts
     Given a organisation
     When added a contact with umlauts
-    Then the response content
     Then the response code is 201
     Then the response object is ContactPostPatchResponse
     When I delete this contact
