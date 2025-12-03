@@ -1702,7 +1702,7 @@
         <Data Key="content_type" Type="Quote">text/html</Data>
         <Data Key="language" Type="Quote">en</Data>
         <Data Key="subject" Type="Quote"><![CDATA[Owner assigned: <KIX_TICKET_Title>]]></Data>
-        <Data Key="text" Type="Quote"><![CDATA[<p>You have been assigned as ticket owner: <a href="&lt;KIX_CONFIG_HttpType&gt;://&lt;KIX_CONFIG_FQDN_Frontend&gt;/tickets/&lt;KIX_TICKET_TicketID&gt;">[&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</a></p>]]></Data>
+        <Data Key="text" Type="Quote"><![CDATA[<p>New ticket owner: <KIX_OWNER_Firstname> <KIX_OWNER_Lastname> (<KIX_OWNER_UserLogin>)</p><br/><br/><p>number: <a href="&lt;KIX_CONFIG_HttpType&gt;://&lt;KIX_CONFIG_FQDN_Frontend&gt;/tickets/&lt;KIX_TICKET_TicketID&gt;">[&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</a></p><br/><br/><p>Title:&nbsp;&lt;KIX_TICKET_Title&gt;</p>]]></Data>
     </Insert>
     <Insert Table="notification_event_message">
         <Data Key="id" Type="AutoIncrement">6</Data>
@@ -1792,7 +1792,7 @@
         <Data Key="content_type" Type="Quote">text/html</Data>
         <Data Key="language" Type="Quote">de</Data>
         <Data Key="subject" Type="Quote"><![CDATA[Bearbeiter zugeordnet: <KIX_TICKET_Title>]]></Data>
-        <Data Key="text" Type="Quote"><![CDATA[<p>Ihnen wurde die Bearbeitung dieses Tickets &uuml;bertragen: <a href="&lt;KIX_CONFIG_HttpType&gt;://&lt;KIX_CONFIG_FQDN_Frontend&gt;/tickets/&lt;KIX_TICKET_TicketID&gt;">[&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</a></p><br/><br/><p>Titel:&nbsp;&lt;KIX_TICKET_Title&gt;</p>]]></Data>
+        <Data Key="text" Type="Quote"><![CDATA[<p>Neuer Ticketbearbeiter: <KIX_OWNER_Firstname> <KIX_OWNER_Lastname> (<KIX_OWNER_UserLogin>)</p><br/><br/><p>Nummer: <a href="&lt;KIX_CONFIG_HttpType&gt;://&lt;KIX_CONFIG_FQDN_Frontend&gt;/tickets/&lt;KIX_TICKET_TicketID&gt;">[&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</a></p><br/><br/><p>Titel:&nbsp;&lt;KIX_TICKET_Title&gt;</p>]]></Data>
     </Insert>
     <Insert Table="notification_event_message">
         <Data Key="id" Type="AutoIncrement">19</Data>
