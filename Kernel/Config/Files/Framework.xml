@@ -1064,7 +1064,7 @@
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="TicketStateWorkflow::PostmasterFollowUpState" Required="1" Valid="1">
-        <Description Translatable="1">The state if a ticket got a follow-up (use _PREVIOUS_ as placeholder for the very last state in ticket history before current).</Description>
+        <Description Translatable="1">Mapping of follow-up ticket states with key:value configuration ("key":"value"). Key can be a combination of current ticket type and state (e.g. "Incident:::pending reminder"), or only a state (e.g. "closed"). Combination of type and state has higher priority. Value is the new ticket state to set. You can use _PREVIOUS_ as placeholder for the very last state in ticket history before current (e.g. "Incident:::pending reminder":"_PREVIOUS_" or "closed":"_PREVIOUS_").</Description>
         <Group>Framework</Group>
         <SubGroup>Core::PostMaster</SubGroup>
         <Setting>

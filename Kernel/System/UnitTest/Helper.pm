@@ -643,6 +643,47 @@ sub HTTPRequestOverwriteUnset {
     return;
 }
 
+sub ObjectsDiscard {
+    my ( $Self, %Param ) = @_;
+
+    # process transaction event handler
+    EVENTHANDLERS:
+    for my $EventHandler ( @{ $Kernel::OM->{EventHandlers} } ) {
+        # since the event handlers are weak references,
+        # they might be undef by now.
+        next EVENTHANDLERS if !defined $EventHandler;
+        if ( $EventHandler->EventHandlerHasQueuedTransactions() ) {
+            $EventHandler->EventHandlerTransaction();
+        }
+    }
+
+    my $DatabaseHandle;
+    # when Rollback is used, prevent early rollback
+    if ( $Self->{RollbackDB} ) {
+        # get current handle
+        $DatabaseHandle = $Kernel::OM->Get('DB')->{dbh};
+        
+        # remove handle reference from current object
+        $Kernel::OM->Get('DB')->{dbh} = undef;
+    }
+
+    # discard objects passing given params
+    $Kernel::OM->ObjectsDiscard( %Param );
+
+    # restore database handle
+    if ( $Self->{RollbackDB} ) {
+        $Kernel::OM->Get('DB')->{dbh} = $DatabaseHandle;
+
+        $Kernel::OM->Get('Cache')->CleanUp(
+            Type => $Kernel::OM->Get('SysConfig')->{CacheType},
+        );
+        $Kernel::OM->Get('Config')->{Config} = $Kernel::OM->Get('Config')->GetLocalConfig() || {};
+        $Kernel::OM->Get('Config')->LoadSysConfig();
+    }
+
+    return 1;
+}
+
 # See http://perldoc.perl.org/5.10.0/perlsub.html#Overriding-Built-in-Functions
 BEGIN {
     *CORE::GLOBAL::time = sub {
@@ -727,22 +768,30 @@ sub ConfigSettingChange {
 
     my $Valid = $Param{Valid} // 1;
     my $Key   = $Param{Key};
-    my $Value = $Param{Value};
+    my $Value = $Valid ? $Param{Value} : undef;
 
     die "Need 'Key'" if !defined $Key;
-
-    # set in SysConfig
-    $Kernel::OM->Get('SysConfig')->ValueSet(
-        Name   => $Key,
-        Value  => $Valid ? $Value : undef,
-        UserID => 1,
-        Silent => $Param{Silent},
+    
+    my %OptionData = $Kernel::OM->Get('SysConfig')->OptionGet(
+        Name => $Key,
     );
+    if ( %OptionData ) {
+        my $ValidID = 1;
+        if ( !$Valid ) {
+            $ValidID = 2;
+        }
+        my $Result = $Kernel::OM->Get('SysConfig')->OptionUpdate(
+            %OptionData,
+            Value   => $Value,
+            ValidID => $ValidID,
+            UserID => 1,
+        );
+    }
 
     # set in Config
     $Kernel::OM->Get('Config')->Set(
         Key   => $Param{Key},
-        Value => $Valid ? $Value : undef,
+        Value => $Value,
     );
 
     $Self->{SysConfigChanged} = 1;
