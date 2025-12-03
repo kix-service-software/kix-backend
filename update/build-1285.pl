@@ -66,7 +66,8 @@ sub _RemoveSLAPermission {
     );
     if($SLAPermissionID) {
         my $Result = $Kernel::OM->Get('Role')->PermissionDelete(
-            ID => $SLAPermissionID
+            ID     => $SLAPermissionID,
+            UserID => 1,
         );
     }
 
@@ -88,7 +89,8 @@ sub _RemoveSLAPermission {
     );
     if($SLAPermissionID) {
         $SLAPermissionID = $Kernel::OM->Get('Role')->PermissionDelete(
-            ID => $SLAPermissionID
+            ID     => $SLAPermissionID,
+            UserID => 1,
         );
     }
 

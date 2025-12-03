@@ -77,7 +77,8 @@ sub _UpdateCustomerRole {
 
         if ($PermissionID) {
             my $Success = $RoleObject->PermissionDelete(
-                ID      => $PermissionID,
+                ID     => $PermissionID,
+                UserID => 1,
             );
 
             if (!$Success) {
