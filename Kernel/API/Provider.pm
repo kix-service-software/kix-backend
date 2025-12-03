@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -194,12 +194,12 @@ sub Run {
 
     # read request content
     my $ProcessedRequest = $Self->ProcessRequest();
-    
+
     # save for metrics and later use
     $Self->{ProcessedRequest} = $ProcessedRequest;
     $Self->{RequestMethod}    = $Self->{ProcessedRequest}->{RequestMethod};
     $Self->{RequestURI}       = $Self->{ProcessedRequest}->{RequestURI};
-    
+
     if ( $Self->{Debug} && $Self->{LogRequestHeaders} ) {
         use Data::Dumper;
         $Self->_Debug('', "Request Headers: ".Data::Dumper::Dumper($ProcessedRequest->{Headers}));
@@ -310,11 +310,9 @@ sub Run {
         }
 
         # add information about sub-resources
-        my $CurrentRoute = $ProcessedRequest->{Route};
-        $CurrentRoute = '' if $CurrentRoute eq '/';
-        my @ChildResources = grep(/^$CurrentRoute\/([:a-zA-Z_]+)$/g, values %{$ProcessedRequest->{ResourceOperationRouteMapping}});
-        if ( @ChildResources ) {
-            $Data->{Resources} = \@ChildResources;
+        if ( IsHashRefWithData( $ProcessedRequest->{OptionsRouteMapping} ) ) {
+            my @OptionsRoutes = sort keys %{ $ProcessedRequest->{OptionsRouteMapping} };
+            $Data->{Resources} = \@OptionsRoutes;
         }
 
         if ( $Self->{Debug} && $Self->{LogResponseContent} ) {
@@ -450,8 +448,8 @@ sub _GenerateErrorResponse {
 
     $Self->_MetricAdd(
         Metric   => $Param{Metric},
-        Response => $FunctionResult, 
-    );  
+        Response => $FunctionResult,
+    );
 
     return;
 }
