@@ -1,8 +1,8 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema",
-    "$id": "DataSource.json",
+    "$id": "ReportDataSource.json",
     "type": "object",
-    "description": "The report data source object.",
+    "description": "The report report data source object.",
     "properties": {
         "Description": {
             "type": "string",

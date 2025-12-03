@@ -1,0 +1,15 @@
+{
+    "DataSource": {
+        "Description": "Allows to retrieve report data based on an SQL statement.",
+        "DisplayName": "Generic SQL",
+        "Name": "GenericSQL",
+        "Options": {
+            "SQL": {
+                "Description": "The SQL statement. You can use column aliases.",
+                "Label": "SQL",
+                "Name": "SQL",
+                "Required": 1
+            }
+        }
+    }
+}

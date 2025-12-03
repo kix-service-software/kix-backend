@@ -320,8 +320,8 @@
                 <Item Key="Name">ConfigItemGraphCreate</Item>
                 <Item Key="Module">Kernel::API::Operation::V1::CMDB::ConfigItemGraphCreate</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="RequestSchema">ConfigItemGraphPostRequest</Item>
-                <Item Key="ResponseSchema">ConfigItemGraphPostResponse</Item>
+                <Item Key="RequestSchema">ConfigItemLinkGraphPostRequest</Item>
+                <Item Key="ResponseSchema">ConfigItemLinkGraphPostResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>

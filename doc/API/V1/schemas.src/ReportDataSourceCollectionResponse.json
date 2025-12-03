@@ -1,13 +1,13 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "DataSourceCollectionResponse.json",
+  "$id": "ReportDataSourceCollectionResponse.json",
   "type": "object",
-  "description": "A list of data sources.",
+  "description": "A list of report data sources.",
   "properties": {
     "DataSource": {
       "type": "array",
       "items": {
-        "$ref": "DataSource.json"
+        "$ref": "ReportDataSource.json"
       }
     }
   },

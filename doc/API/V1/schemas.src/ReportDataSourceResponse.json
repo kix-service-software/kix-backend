@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "ReportDataSourceResponse.json",
+  "type": "object",
+  "description": "A response for a report data source GET request.",
+  "properties": {
+    "DataSource": {
+      "$ref": "ReportDataSource.json"
+    }
+  },
+  "required": [
+    "DataSource"
+  ]
+}
