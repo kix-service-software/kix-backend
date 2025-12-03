@@ -53,7 +53,7 @@ sub _UpdateTicketAgentRole {
                     my $Success = $RoleObject->PermissionDelete(
                         ID      => $PermissionID,
                         UserID  => 1
-                    );            
+                    );
                 }
             }
 

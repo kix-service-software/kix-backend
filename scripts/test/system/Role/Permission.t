@@ -309,7 +309,8 @@ for my $PermissionTest (@PermissionTests) {
             );
 
             my $Success = $RoleObject->PermissionDelete(
-                ID => $PermissionID
+                ID     => $PermissionID,
+                UserID => 1,
             );
 
             $Self->True(

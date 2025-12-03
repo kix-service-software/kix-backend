@@ -76,7 +76,8 @@ sub Run {
     $Self->Print("<yellow>Delete permission $Self->{PermissionID} from role $Self->{RoleName}...</yellow>\n");
 
     my $Result = $Kernel::OM->Get('Role')->PermissionDelete(
-        ID => $Self->{PermissionID},
+        ID     => $Self->{PermissionID},
+        UserID => 1,
     );
 
     if ($Result) {

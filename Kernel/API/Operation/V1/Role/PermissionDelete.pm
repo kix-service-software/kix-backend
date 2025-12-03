@@ -99,7 +99,8 @@ sub Run {
 
         # delete permission
         my $Success = $Kernel::OM->Get('Role')->PermissionDelete(
-            ID  => $PermissionID,
+            ID     => $PermissionID,
+            UserID => $Self->{Authorization}->{UserID},
         );
 
         if ( !$Success ) {

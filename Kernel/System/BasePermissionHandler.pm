@@ -150,7 +150,7 @@ sub UpdateBasePermissions {
     foreach my $Permission ( values %AssignedPermissions ) {
         my $Success = $RoleObject->PermissionDelete(
             ID     => $Permission->{ID},
-            UserID => $Param{UserID}
+            UserID => $Param{UserID},
         );
         if ( !$Success ) {
             $Kernel::OM->Get('Log')->Log(
