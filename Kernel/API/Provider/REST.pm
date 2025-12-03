@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -140,11 +140,11 @@ sub ProcessRequest {
 
     my $Operation;
     my %URIData;
-    
+
     my %Headers;
     HEADER:
     foreach my $Key ( keys %ENV ) {
-        next HEADER if $Key !~ /^HTTP_/; 
+        next HEADER if $Key !~ /^HTTP_/;
         next HEADER if $Key =~ /^HTTP_(PROXY|HOST)/;
         my $Header = $Key;
         $Header =~ s/^HTTP_//g;
@@ -287,16 +287,16 @@ sub ProcessRequest {
         my $Base = $RouteMapping{Route};
         $Base =~ s{(/:[^\/]+)}{}xmsg;
 
-        next if !( 
+        next if !(
             eval { qr/^ $BaseRoute /xms }
             && $Base =~ m{^ $BaseRoute }xms
         );
 
-        next if !( 
+        next if !(
             eval { qr/^ $RouteRegEx $/xms }
             && $RequestURI =~ m{^ $RouteRegEx $}xms
         );
-        
+
         # only add if we didn't have a match upto now
         next if exists $AvailableMethods{$RouteMapping{RequestMethod}->[0]};
 
@@ -327,20 +327,47 @@ sub ProcessRequest {
     my %ResourceOperationRouteMapping = (
         $Operation => $CurrentRoute
     );
+
+    # special options route mapping includes pseudo routes
+    my %OptionsRouteMapping;
+
     for my $Op ( sort keys %{ $Self->{TransportConfig}->{RouteOperationMapping} } ) {
         # ignore invalid config
         next if !IsHashRefWithData( $Self->{TransportConfig}->{RouteOperationMapping}->{$Op} );
         # ignore non-search or -get operations
         next if $Op !~ /(Search|Get)$/;
+
+        my $Route = $Self->{TransportConfig}->{RouteOperationMapping}->{$Op}->{Route};
+
         # ignore anything that has nothing to do with the current Ops route
-        if ( $CurrentRoute ne '/' && "$Self->{TransportConfig}->{RouteOperationMapping}->{$Op}->{Route}/" !~ /^$CurrentRoute\// ) {
+        if ( $CurrentRoute ne '/' && "$Route/" !~ /^$CurrentRoute\// ) {
             next;
         }
-        elsif ( $CurrentRoute eq '/' && "$Self->{TransportConfig}->{RouteOperationMapping}->{$Op}->{Route}/" !~ /^$CurrentRoute[:a-zA-Z_]+\/$/g ) {
-            next;
+        elsif ( $CurrentRoute eq '/' ) {
+            if ( "$Route/" !~ /^\/[:0-9a-zA-Z_-]+\/$/g ) {
+                my ( $Pseudo ) = "$Route/"  =~ /^(\/[^:][0-9a-zA-Z_]+)\//g;
+                if (
+                    $Pseudo
+                    && !$OptionsRouteMapping{$Pseudo}
+                ){
+                    $OptionsRouteMapping{$Pseudo} = 1;
+                }
+                next;
+            } elsif ( !$OptionsRouteMapping{$Route} ) {
+                $OptionsRouteMapping{$Route} = 1;
+            }
+        }
+        else {
+            my ( $Route ) = "$Route/"  =~ /^($CurrentRoute\/[:0-9a-zA-Z_]+)/g;
+            if (
+                $Route
+                && !$OptionsRouteMapping{$Route}
+            ){
+                $OptionsRouteMapping{$Route} = 1;
+            }
         }
 
-        $ResourceOperationRouteMapping{$Op} = $Self->{TransportConfig}->{RouteOperationMapping}->{$Op}->{Route};
+        $ResourceOperationRouteMapping{$Op} = $Route;
     }
 
     # determine parent mapping as well
@@ -384,15 +411,16 @@ sub ProcessRequest {
     # no length provided, return the information we have
     if ( !$Length ) {
         return $Self->_Success(
-            Route          => $CurrentRoute,
-            RequestURI     => $RequestURI,
-            Operation      => $Operation,
-            AvailableMethods => \%AvailableMethods,
-            RequestMethod  => $RequestMethod,
+            Route                         => $CurrentRoute,
+            RequestURI                    => $RequestURI,
+            Operation                     => $Operation,
+            AvailableMethods              => \%AvailableMethods,
+            RequestMethod                 => $RequestMethod,
             ResourceOperationRouteMapping => \%ResourceOperationRouteMapping,
-            ParentMethodOperationMapping => \%ParentMethodOperationMapping,
-            Headers   => \%Headers,
-            Data      => {
+            ParentMethodOperationMapping  => \%ParentMethodOperationMapping,
+            OptionsRouteMapping           => \%OptionsRouteMapping,
+            Headers                       => \%Headers,
+            Data                          => {
                 %URIData,
             },
         );
@@ -510,6 +538,7 @@ sub ProcessRequest {
         RequestMethod                 => $RequestMethod,
         ResourceOperationRouteMapping => \%ResourceOperationRouteMapping,
         ParentMethodOperationMapping  => \%ParentMethodOperationMapping,
+        OptionsRouteMapping           => \%OptionsRouteMapping,
         Headers                       => \%Headers,
         Data                          => $ReturnData,
     );
