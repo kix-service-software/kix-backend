@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<database Name="kix">
+
+    <TableAlter Name="users">
+        <ColumnAdd Name="outofoffice_start" Required="false" Type="DATE"/>
+        <ColumnAdd Name="outofoffice_end" Required="false" Type="DATE"/>
+        <ColumnAdd Name="outofoffice_substitute" Required="false" Type="INTEGER"/>
+        <ForeignKeyCreate ForeignTable="users">
+            <Reference Local="outofoffice_substitute" Foreign="id"/>
+        </ForeignKeyCreate>
+        <IndexCreate Name="users_ooo_substitute">
+            <IndexColumn Name="outofoffice_substitute"/>
+        </IndexCreate>
+    </TableAlter>
+
+</database>
