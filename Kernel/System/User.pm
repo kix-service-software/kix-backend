@@ -749,34 +749,17 @@ sub UserSearch {
     }
 
     if ( defined( $Param{IsOutOfOffice} ) ) {
-        # get user preferences config
-        my $GeneratorModule = $Kernel::OM->Get('Config')->Get('User::PreferencesModule')
-            || 'Kernel::System::User::Preferences::DB';
-
-        # get generator preferences module
-        my $PreferencesObject = $Kernel::OM->Get($GeneratorModule);
-
         my $CurrDate = $Kernel::OM->Get('Time')->CurrentTimestamp();
-        $CurrDate =~ s/^(\d{4}-\d{2}-\d{2}).+$/$1/;
+        $CurrDate =~ s/^(\d{4}-\d{2}-\d{2}).+$/$1 00:00:00/;
 
         # handle true value
         if ( $Param{IsOutOfOffice} ) {
-            # join the relevant preference table
-            $SQL .= <<"END";
- JOIN $PreferencesObject->{PreferencesTable} upooos ON upooos.$PreferencesObject->{PreferencesTableUserID} = u.id AND upooos.$PreferencesObject->{PreferencesTableKey} = 'OutOfOfficeStart'
- JOIN $PreferencesObject->{PreferencesTable} upoooe ON upoooe.$PreferencesObject->{PreferencesTableUserID} = u.id AND upoooe.$PreferencesObject->{PreferencesTableKey} = 'OutOfOfficeEnd'
-END
-            push(@Where,"( upooos.$PreferencesObject->{PreferencesTableValue} <= ? AND upoooe.$PreferencesObject->{PreferencesTableValue} >= ? )");
+            push(@Where,"( u.outofoffice_start <= ? AND u.outofoffice_end >= ? )");
             push(@Bind, \$CurrDate, \$CurrDate);
         }
         # handle false value
         else {
-            # join the relevant preference table
-            $SQL .= <<"END";
- LEFT OUTER JOIN $PreferencesObject->{PreferencesTable} upooos ON upooos.$PreferencesObject->{PreferencesTableUserID} = u.id AND upooos.$PreferencesObject->{PreferencesTableKey} = 'OutOfOfficeStart'
- LEFT OUTER JOIN $PreferencesObject->{PreferencesTable} upoooe ON upoooe.$PreferencesObject->{PreferencesTableUserID} = u.id AND upoooe.$PreferencesObject->{PreferencesTableKey} = 'OutOfOfficeEnd'
-END
-            push(@Where,"( upooos.$PreferencesObject->{PreferencesTableValue} IS NULL OR upooos.$PreferencesObject->{PreferencesTableValue} > ? OR upoooe.$PreferencesObject->{PreferencesTableValue} IS NULL OR upoooe.$PreferencesObject->{PreferencesTableValue} < ? )");
+            push(@Where,"( u.outofoffice_start IS NULL OR u.outofoffice_start > ? OR u.outofoffice_end IS NULL OR u.outofoffice_end < ? )");
             push(@Bind, \$CurrDate, \$CurrDate);
         }
     }

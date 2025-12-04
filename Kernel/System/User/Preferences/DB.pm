@@ -66,35 +66,49 @@ sub SetPreferences {
         }
     }
 
-    # prepare multiple values (i.e. MyQueues, MyServices, ...)
-    my @Values;
-    if ( IsArrayRefWithData($Param{Value}) ) {
-        @Values = @{$Param{Value}};
-    }
-    else {
-        push @Values, ($Param{Value} // '');
-    }
-
     my $DBObject = $Kernel::OM->Get('DB');
 
-    # delete old data
-    return if !$DBObject->Do(
-        SQL => "
-            DELETE FROM $Self->{PreferencesTable}
-            WHERE $Self->{PreferencesTableUserID} = ?
-                AND $Self->{PreferencesTableKey} = ?",
-        Bind => [ \$Param{UserID}, \$Param{Key} ],
-    );
+    if ( $Param{Key} =~ /^OutOfOffice/ ) {
+        my %OOOPrefKeyMapping = (
+            'OutOfOfficeStart'      => 'outofoffice_start',
+            'OutOfOfficeEnd'        => 'outofoffice_end',
+            'OutOfOfficeSubstitute' => 'outofoffice_substitute',
+        );
+        # handle OOO pseudo prefs
+        return if !$DBObject->Do(
+            SQL => "UPDATE users SET $OOOPrefKeyMapping{$Param{Key}} = ? WHERE id = ?",
+            Bind => [ \$Param{Value}, \$Param{UserID} ],
+        );
+    }
+    else {
+        # prepare multiple values (i.e. MyQueues, MyServices, ...)
+        my @Values;
+        if ( IsArrayRefWithData($Param{Value}) ) {
+            @Values = @{$Param{Value}};
+        }
+        else {
+            push @Values, ($Param{Value} // '');
+        }
 
-    foreach my $Value ( @Values ) {
-        # insert new data
+        # delete old data
         return if !$DBObject->Do(
             SQL => "
-                INSERT INTO $Self->{PreferencesTable}
-                ($Self->{PreferencesTableUserID}, $Self->{PreferencesTableKey}, $Self->{PreferencesTableValue})
-                VALUES (?, ?, ?)",
-            Bind => [ \$Param{UserID}, \$Param{Key}, \$Value ],
+                DELETE FROM $Self->{PreferencesTable}
+                WHERE $Self->{PreferencesTableUserID} = ?
+                    AND $Self->{PreferencesTableKey} = ?",
+            Bind => [ \$Param{UserID}, \$Param{Key} ],
         );
+
+        foreach my $Value ( @Values ) {
+            # insert new data
+            return if !$DBObject->Do(
+                SQL => "
+                    INSERT INTO $Self->{PreferencesTable}
+                    ($Self->{PreferencesTableUserID}, $Self->{PreferencesTableKey}, $Self->{PreferencesTableValue})
+                    VALUES (?, ?, ?)",
+                Bind => [ \$Param{UserID}, \$Param{Key}, \$Value ],
+            );
+        }
     }
 
     # delete cache
@@ -171,6 +185,22 @@ sub GetPreferences {
         }
     }
 
+    # get pseudo OOO prefs from user
+    return if !$DBObject->Prepare(
+        SQL => "
+            SELECT outofoffice_start, outofoffice_end, outofoffice_substitute
+            FROM users
+            WHERE id = ?",
+        Bind => [ \$Param{UserID} ],
+    );
+
+    # fetch the result
+    while ( my @Row = $DBObject->FetchrowArray() ) {
+        $Data{OutOfOfficeStart}      = $Row[0];
+        $Data{OutOfOfficeEnd}        = $Row[1];
+        $Data{OutOfOfficeSubstitute} = $Row[2];
+    }
+
     # set cache
     $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
@@ -196,6 +226,8 @@ sub DeletePreferences {
         }
     }
 
+    my $Key = $Param{Key}   || '';
+
     my $DBObject = $Kernel::OM->Get('DB');
 
     my $SQL = "DELETE FROM $Self->{PreferencesTable} WHERE $Self->{PreferencesTableUserID} = ?";
@@ -203,8 +235,8 @@ sub DeletePreferences {
         \$Param{UserID}
     );
 
-    if ( $Param{Key} ) {
-        push @Bind, \$Param{Key};
+    if ( $Key ) {
+        push @Bind, \$Key;
         $SQL .= " AND $Self->{PreferencesTableKey} = ?";
     }
 
@@ -214,6 +246,26 @@ sub DeletePreferences {
         Bind => \@Bind,
     );
 
+    # delete pseudo OOO prefs from user
+    if ( !$Key ) {
+        return if !$DBObject->Do(
+            SQL  => "UPDATE users SET outofoffice_start = NULL, outofoffice_end = NULL, outofoffice_substitute = NULL WHERE id = ?",
+            Bind => [ \$Param{UserID} ],
+        );
+    }
+    elsif ( $Key =~ /^OutOfOffice/ ) {
+        my %OOOPrefKeyMapping = (
+            'OutOfOfficeStart'      => 'outofoffice_start',
+            'OutOfOfficeEnd'        => 'outofoffice_end',
+            'OutOfOfficeSubstitute' => 'outofoffice_substitute',
+        );
+        # handle OOO pseudo prefs
+        return if !$DBObject->Do(
+            SQL => "UPDATE users SET $OOOPrefKeyMapping{$Key} = NULL WHERE id = ?",
+            Bind => [ \$Param{UserID} ],
+        );
+    }
+
     # delete cache
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
@@ -221,7 +273,7 @@ sub DeletePreferences {
 
     # TODO: find another solution to delete caches depending on user language
     # trigger special cache delete for cached transaltions/localisation
-    if ( $Param{Key} eq 'UserLanguage' ) {
+    if ( $Key eq 'UserLanguage' ) {
         $Kernel::OM->Get('Cache')->CleanUp(
             Type => 'UserLanguage',
         );
@@ -229,7 +281,7 @@ sub DeletePreferences {
 
     # TODO: find another solution to delete caches depending on 'MyQueues'
     # trigger special cache delete for cached ticket searches
-    if ( $Param{Key} eq 'MyQueues' ) {
+    if ( $Key eq 'MyQueues' ) {
         $Kernel::OM->Get('Cache')->CleanUp(
             Type => 'ObjectSearch_Ticket',
         );
@@ -246,33 +298,65 @@ sub SearchPreferences {
 
     my $DBObject = $Kernel::OM->Get('DB');
 
-    my $Lower = '';
-    if ( $DBObject->GetDatabaseFunction('CaseSensitive') ) {
-        $Lower = 'LOWER';
-    }
-
-    my $SQL = "
-        SELECT $Self->{PreferencesTableUserID}, $Self->{PreferencesTableValue}
-        FROM $Self->{PreferencesTable}
-        WHERE $Self->{PreferencesTableKey} = ?";
-    my @Bind = ( \$Key );
-
-    if ( $Value ne '' ) {
-        $SQL .= " AND $Lower($Self->{PreferencesTableValue}) LIKE $Lower(?)";
-        push @Bind, \$Value;
-    }
-
-    # get preferences
-    return if !$DBObject->Prepare(
-        SQL   => $SQL,
-        Bind  => \@Bind,
-        Limit => $Param{Limit},
-    );
-
-    # fetch the result
     my %UserID;
-    while ( my @Row = $DBObject->FetchrowArray() ) {
-        $UserID{ $Row[0] } = $Row[1];
+
+    if ( $Key =~ /^OutOfOffice/ ) {
+        my %OOOPrefKeyMapping = (
+            'OutOfOfficeStart'      => 'outofoffice_start',
+            'OutOfOfficeEnd'        => 'outofoffice_end',
+            'OutOfOfficeSubstitute' => 'outofoffice_substitute',
+        );
+
+        my @Bind;
+        my $SQL = "SELECT id, $OOOPrefKeyMapping{$Key} FROM users WHERE ";
+        if ( $Value ne '' ) {
+            $SQL .= "$OOOPrefKeyMapping{$Key} = ?";
+            push @Bind, \$Value;
+        }
+        else {
+            $SQL .= "$OOOPrefKeyMapping{$Key} IS NOT NULL";
+        }
+
+        # get preferences
+        return if !$DBObject->Prepare(
+            SQL   => $SQL,
+            Bind  => \@Bind,
+            Limit => $Param{Limit},
+        );
+
+        # fetch the result
+        while ( my @Row = $DBObject->FetchrowArray() ) {
+            $UserID{ $Row[0] } = $Row[1];
+        }
+    }
+    else {
+        my $Lower = '';
+        if ( $DBObject->GetDatabaseFunction('CaseSensitive') ) {
+            $Lower = 'LOWER';
+        }
+
+        my $SQL = "
+            SELECT $Self->{PreferencesTableUserID}, $Self->{PreferencesTableValue}
+            FROM $Self->{PreferencesTable}
+            WHERE $Self->{PreferencesTableKey} = ?";
+        my @Bind = ( \$Key );
+
+        if ( $Value ne '' ) {
+            $SQL .= " AND $Lower($Self->{PreferencesTableValue}) LIKE $Lower(?)";
+            push @Bind, \$Value;
+        }
+
+        # get preferences
+        return if !$DBObject->Prepare(
+            SQL   => $SQL,
+            Bind  => \@Bind,
+            Limit => $Param{Limit},
+        );
+
+        # fetch the result
+        while ( my @Row = $DBObject->FetchrowArray() ) {
+            $UserID{ $Row[0] } = $Row[1];
+        }
     }
 
     return %UserID;
