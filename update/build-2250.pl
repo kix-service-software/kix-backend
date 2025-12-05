@@ -22,7 +22,7 @@ use Kernel::System::VariableCheck qw(:all);
 # create object manager
 local $Kernel::OM = Kernel::System::ObjectManager->new(
     'Log' => {
-        LogPrefix => 'framework_update-to-build-2240',
+        LogPrefix => 'framework_update-to-build-2250',
     },
 );
 
