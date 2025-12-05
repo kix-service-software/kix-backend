@@ -22,7 +22,7 @@ use Kernel::System::VariableCheck qw(:all);
 # create object manager
 local $Kernel::OM = Kernel::System::ObjectManager->new(
     'Log' => {
-        LogPrefix => 'framework_update-to-build-2239',
+        LogPrefix => 'framework_update-to-build-2240',
     },
 );
 
@@ -38,14 +38,19 @@ sub _MigrateOOOPrefs {
     my $DBObject = $Kernel::OM->Get('DB');
 
     $DBObject->Prepare(
-        SQL => "SELECT user_id, preferences_key, preferences_value FROM user_preferences WHERE preferences_key IN ('OutOfOfficeStart', 'OutOfOfficeEnd', 'OutOfOfficeSubstitute')",
+        SQL => "SELECT user_id, preferences_key, preferences_value FROM user_preferences WHERE "
+             . "preferences_key IN ('OutOfOfficeStart', 'OutOfOfficeEnd', 'OutOfOfficeSubstitute') AND "
+             . "preferences_value IS NOT NULL OR preferences_value != ''",
     );
 
     my $Data = $DBObject->FetchAllArrayRef(
         Columns => [ 'UserID', 'Key', 'Value' ]
     );
 
+    ROW:
     foreach my $Row ( @{$Data || []} ) {
+        next if !$Row->{Value};
+
         my $Success = $Kernel::OM->Get('User')->SetPreferences(
             Key    => $Row->{Key},
             Value  => $Row->{Value},
