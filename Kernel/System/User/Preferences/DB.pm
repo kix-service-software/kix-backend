@@ -74,10 +74,13 @@ sub SetPreferences {
             'OutOfOfficeEnd'        => 'outofoffice_end',
             'OutOfOfficeSubstitute' => 'outofoffice_substitute',
         );
+        my $Value = $Param{Value};
+        $Value = undef if !$Value || $Value eq 'NaN-NaN-NaN';
+
         # handle OOO pseudo prefs
         return if !$DBObject->Do(
             SQL => "UPDATE users SET $OOOPrefKeyMapping{$Param{Key}} = ? WHERE id = ?",
-            Bind => [ \$Param{Value}, \$Param{UserID} ],
+            Bind => [ \$Value, \$Param{UserID} ],
         );
     }
     else {
@@ -194,11 +197,11 @@ sub GetPreferences {
         Bind => [ \$Param{UserID} ],
     );
 
-    # fetch the result
+    # fetch the result (NULL values mean the pref is treated as not existent)
     while ( my @Row = $DBObject->FetchrowArray() ) {
-        $Data{OutOfOfficeStart}      = $Row[0];
-        $Data{OutOfOfficeEnd}        = $Row[1];
-        $Data{OutOfOfficeSubstitute} = $Row[2];
+        $Data{OutOfOfficeStart}      = $Row[0] if $Row[0];
+        $Data{OutOfOfficeEnd}        = $Row[1] if $Row[1];
+        $Data{OutOfOfficeSubstitute} = $Row[2] if $Row[2];
     }
 
     # set cache
