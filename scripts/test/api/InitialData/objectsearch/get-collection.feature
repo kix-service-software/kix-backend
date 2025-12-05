@@ -8,7 +8,6 @@
   Scenario: get the list of existing objectsearch ticket SupportedAttributes
     When I query the collection of objectsearch ticket SupportedAttributes
     Then the response code is 200
-    Then the response content is
     And the response contains 88 items of type "SupportedAttributes"
     And the response contains the following items of type SupportedAttributes
       | IsSearchable | IsSortable | ObjectSpecifics | ObjectType | Property                                  | ValueType |
@@ -72,7 +71,7 @@
       | 1            | 1          |                 | Ticket     | OwnerID                                   | NUMERIC   |
       | 1            | 1          |                 | Ticket     | OwnerName                                 | TEXTUAL   |
       | 1            | 0          |                 | Ticket     | OwnerOutOfOffice                          | NUMERIC   |
-      | 1            | 0          |                 | Ticket     | OwnerOutOfOfficeSubstitute                | TEXTUAL   |
+      | 1            | 0          |                 | Ticket     | OwnerOutOfOfficeSubstitute                | NUMERIC   |
       | 1            | 1          |                 | Ticket     | PendingTime                               | DATETIME  |
       | 1            | 1          |                 | Ticket     | Priority                                  | TEXTUAL   |
       | 1            | 1          |                 | Ticket     | PriorityID                                | NUMERIC   |
@@ -83,7 +82,7 @@
       | 1            | 1          |                 | Ticket     | ResponsibleID                             | NUMERIC   |
       | 1            | 1          |                 | Ticket     | ResponsibleName                           | TEXTUAL   |
       | 1            | 0          |                 | Ticket     | ResponsibleOutOfOffice                    | NUMERIC   |
-      | 1            | 0          |                 | Ticket     | ResponsibleOutOfOfficeSubstitute          | TEXTUAL   |
+      | 1            | 0          |                 | Ticket     | ResponsibleOutOfOfficeSubstitute          | NUMERIC   |
       | 1            | 0          |                 | Ticket     | SenderType                                | TEXTUAL   |
       | 1            | 0          |                 | Ticket     | SenderTypeID                              | NUMERIC   |
       | 1            | 1          |                 | Ticket     | State                                     | TEXTUAL   |
