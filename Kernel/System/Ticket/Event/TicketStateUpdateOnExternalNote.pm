@@ -58,19 +58,30 @@ sub Run {
     # handle only events with given TicketID
     return 1 if ( !$Param{Data}->{TicketID} );
 
-    # make sure cache allows CacheInMemory
+    # remember CacheInMemory state
+    my $CacheInMemory = $Kernel::OM->Get('Cache')->{CacheInMemory};
+
+    # enable CacheInMemory
     $Kernel::OM->Get('Cache')->Configure(
         CacheInMemory  => 1,
     );
 
     # reset protection: check if state was just set, dont reset directly
-    return 1 if $Kernel::OM->Get('Cache')->Get(
+    my $ResetProtection = $Kernel::OM->Get('Cache')->Get(
         Type           => 'TicketStateUpdateOnExternalNote',
         Key            => 'ResetProtection::' . $Param{Data}->{TicketID},
         CacheInMemory  => 1,
         CacheInBackend => 0,
         NoStatsUpdate  => 1,
     );
+    if ( $ResetProtection ) {
+        # restore CacheInMemory
+        $Kernel::OM->Get('Cache')->Configure(
+            CacheInMemory  => $CacheInMemory,
+        );
+
+        return 1;
+    }
 
     # register state update and ticket create for reset protection
     if (
@@ -87,8 +98,18 @@ sub Run {
             NoStatsUpdate  => 1,
         );
 
+        # restore CacheInMemory
+        $Kernel::OM->Get('Cache')->Configure(
+            CacheInMemory  => $CacheInMemory,
+        );
+
         return 1;
     }
+
+    # restore CacheInMemory
+    $Kernel::OM->Get('Cache')->Configure(
+        CacheInMemory  => $CacheInMemory,
+    );
 
     # check preconditions
     return 1 if ( $Param{Event} ne 'ArticleCreate' );
