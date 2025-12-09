@@ -634,7 +634,7 @@ sub CreateArticle {
 
     my $TicketObject = $Kernel::OM->Get('Ticket');
 
-    my $Channel = 'note';
+    my $Channel = 'email';
     if ( IsArrayRefWithData( $Param{Notification}->{Data}->{Channel} ) ) {
         $Channel = $Param{Notification}->{Data}->{Channel}->[0];
     }
