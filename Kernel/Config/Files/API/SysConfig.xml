@@ -24,7 +24,7 @@
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ResponseSchema">SysConfigOptionCollectionResponse</Item>
                 <Item Key="CacheType">API_sysconfig</Item>
-                <Item Key="CacheTypeDependency">SysConfig</Item>                
+                <Item Key="CacheTypeDependency">SysConfig</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -88,7 +88,7 @@
                 <Item Key="Module">Kernel::API::Operation::V1::SysConfig::SysConfigOptionDefinitionCreate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">SysConfigOptionDefinitionPostRequest</Item>
-                <Item Key="ResponseSchema">SysConfigOptionDefinitionPostResponse</Item>
+                <Item Key="ResponseSchema">SysConfigOptionDefinitionPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -100,7 +100,7 @@
                 <Item Key="Module">Kernel::API::Operation::V1::SysConfig::SysConfigOptionDefinitionUpdate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">SysConfigOptionDefinitionPatchRequest</Item>
-                <Item Key="ResponseSchema">SysConfigOptionDefinitionPatchResponse</Item>
+                <Item Key="ResponseSchema">SysConfigOptionDefinitionPostPatchResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>

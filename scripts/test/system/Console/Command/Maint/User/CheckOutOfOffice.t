@@ -146,6 +146,16 @@ my @TestData = (
         },
         Expected => 1,
         Name     => "Check: OutOfOffice / SetPreference: YES / Reset: YES / Value: [\$Dates[4],\$Dates[5]]/ User: \$UserID1"
+    },
+    {
+        Data => {
+            Start      => $Dates[4],
+            End        => $Dates[5],
+            Substitute => 1,
+            UserID     => $UserID1
+        },
+        Expected => 1,
+        Name     => "Check: OutOfOffice / SetPreference: YES / Reset: YES / Value: [\$Dates[4],\$Dates[5], 1]/ User: \$UserID1"
     }
 );
 
@@ -174,21 +184,61 @@ for my $Test ( @TestData ) {
             $Success,
             "SetPreference: OutOfOfficeEnd / Value $Test->{End} / UserID $Test->{UserID}"
         );
+
+        if ( $Test->{Data}->{Substitute} ) {
+            $Success = $Kernel::OM->Get('User')->SetPreferences(
+                Key    => 'OutOfOfficeSubstitute',
+                Value  => $Test->{Data}->{Substitute},
+                UserID => $Test->{Data}->{UserID}
+            );
+
+            $Self->True(
+                $Success,
+                "SetPreference: OutOfOfficeSubstitute / Value $Test->{Substitute} / UserID $Test->{UserID}"
+            );
+        }
+
+        # get pseudo OOO prefs from user
+        $Kernel::OM->Get('DB')->Prepare(
+            SQL => "
+                SELECT outofoffice_start, outofoffice_end, outofoffice_substitute
+                FROM users
+                WHERE id = ?",
+            Bind => [ \$Test->{Data}->{UserID} ],
+        );
+
+        # fetch the result
+        my %OutOfOffice;
+        while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
+            $OutOfOffice{Start}      = $Row[0];
+            $OutOfOffice{End}        = $Row[1];
+            $OutOfOffice{Substitute} = $Row[2];
+        }
+
+        $Self->Is(
+            $OutOfOffice{Start},
+            $Test->{Data}->{Start},
+            "pseudo OutOfOffice Preferences on user: OutOfOfficeStart / UserID $Test->{UserID}"
+        );
+
+        $Self->Is(
+            $OutOfOffice{End},
+            $Test->{Data}->{End},
+            "pseudo OutOfOffice Preferences on user: OutOfOfficeEnd / UserID $Test->{UserID}"
+        );
+
+        if ( $Test->{Data}->{Substitute} ) {
+        $Self->Is(
+            $OutOfOffice{Substitute},
+            $Test->{Data}->{Substitute},
+            "pseudo OutOfOffice Preferences on user: OutOfOfficeSubstitute / UserID $Test->{UserID}"
+        );
+        }
     }
 
     $CommandObject->Execute();
 
-    my %Result = $Kernel::OM->Get('User')->SearchPreferences(
-        Key => 'OutOfOfficeEnd'
-    );
 
-    my $Count = %Result ? scalar(keys %Result) : 0;
-
-    $Self->Is(
-        $Count,
-        $Test->{Expected},
-        $Test->{Name}
-    );
 }
 
 # rollback transaction on database

@@ -32,7 +32,7 @@
                 <Item Key="Module">Kernel::API::Operation::V1::Migration::MigrationCreate</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="RequestSchema">MigrationPostRequest</Item>
-                <Item Key="ResponseSchema">MigrationPostPatchResponse</Item>
+                <Item Key="ResponseSchema">MigrationPostResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>

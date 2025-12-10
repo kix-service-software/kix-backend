@@ -70,7 +70,8 @@ sub GetSupportedAttributes {
             IsSearchable   => 1,
             IsSortable     => 0,
             IsFulltextable => 0,
-            Operators      => ['EMPTY','EQ','NE','IN','!IN','GT','GTE','LT','LTE']
+            Operators      => ['EMPTY','EQ','NE','IN','!IN','GT','GTE','LT','LTE'],
+            ValueType      => 'NUMERIC'
         },
         ResponsibleID => {
             IsSelectable   => 1,
@@ -107,7 +108,8 @@ sub GetSupportedAttributes {
             IsSearchable   => 1,
             IsSortable     => 0,
             IsFulltextable => 0,
-            Operators      => ['EMPTY','EQ','NE','IN','!IN','GT','GTE','LT','LTE']
+            Operators      => ['EMPTY','EQ','NE','IN','!IN','GT','GTE','LT','LTE'],
+            ValueType      => 'NUMERIC'
         },
         TicketOutOfOfficeSubstitute => {
             IsSelectable   => 0,
@@ -143,8 +145,9 @@ sub AttributePrepare {
             }
         },
         OwnerOutOfOfficeSubstitute => {
-            # column is set while preparing join
+            Column       => 'tou.outofoffice_substitute',
             ConditionDef => {
+                ValueType => 'NUMERIC',
                 NULLValue => 1
             }
         },
@@ -167,8 +170,9 @@ sub AttributePrepare {
             }
         },
         ResponsibleOutOfOfficeSubstitute => {
-            # column is set while preparing join
+            Column       => 'tru.outofoffice_substitute',
             ConditionDef => {
+                ValueType => 'NUMERIC',
                 NULLValue => 1
             }
         }
@@ -219,36 +223,18 @@ sub AttributePrepare {
         }
     }
     elsif ( $Param{Attribute} eq 'OwnerOutOfOfficeSubstitute' ) {
-        # get user preferences config
-        my $GeneratorModule = $Kernel::OM->Get('Config')->Get('User::PreferencesModule')
-            || 'Kernel::System::User::Preferences::DB';
+        if ( !$Param{Flags}->{JoinMap}->{TicketOwner} ) {
+            push( @SQLJoin, 'INNER JOIN users tou ON tou.id = st.user_id' );
 
-        # get generator preferences module
-        my $PreferencesObject = $Kernel::OM->Get($GeneratorModule);
-
-        if ( !$Param{Flags}->{JoinMap}->{TicketOwnerOutOfOfficeSubstitute} ) {
-            push( @SQLJoin, "LEFT OUTER JOIN $PreferencesObject->{PreferencesTable} toupooosub ON toupooosub.$PreferencesObject->{PreferencesTableUserID} = st.user_id AND toupooosub.$PreferencesObject->{PreferencesTableKey} = 'OutOfOfficeSubstitute'" );
-
-            $Param{Flags}->{JoinMap}->{TicketOwnerOutOfOfficeSubstitute} = 1;
+            $Param{Flags}->{JoinMap}->{TicketOwner} = 1;
         }
-
-        $AttributeDefinition{ $Param{Attribute} }->{Column} = 'toupooosub.' . $PreferencesObject->{PreferencesTableValue}
     }
     elsif ( $Param{Attribute} eq 'ResponsibleOutOfOfficeSubstitute' ) {
-        # get user preferences config
-        my $GeneratorModule = $Kernel::OM->Get('Config')->Get('User::PreferencesModule')
-            || 'Kernel::System::User::Preferences::DB';
+        if ( !$Param{Flags}->{JoinMap}->{TicketResponsible} ) {
+            push( @SQLJoin, 'INNER JOIN users tru ON tru.id = st.responsible_user_id' );
 
-        # get generator preferences module
-        my $PreferencesObject = $Kernel::OM->Get($GeneratorModule);
-
-        if ( !$Param{Flags}->{JoinMap}->{TicketResponsibleOutOfOfficeSubstitute} ) {
-            push( @SQLJoin, "LEFT OUTER JOIN $PreferencesObject->{PreferencesTable} trupooosub ON trupooosub.$PreferencesObject->{PreferencesTableUserID} = st.responsible_user_id AND trupooosub.$PreferencesObject->{PreferencesTableKey} = 'OutOfOfficeSubstitute'" );
-
-            $Param{Flags}->{JoinMap}->{TicketResponsibleOutOfOfficeSubstitute} = 1;
+            $Param{Flags}->{JoinMap}->{TicketResponsible} = 1;
         }
-
-        $AttributeDefinition{ $Param{Attribute} }->{Column} = 'trupooosub.' . $PreferencesObject->{PreferencesTableValue}
     }
 
     my %Attribute = (
@@ -281,60 +267,36 @@ sub Search {
 
         # check for needed joins
         my @SQLJoin = ();
-        my %AttributeMapping;
+        my $TableAlias;
         if ( $Param{Search}->{Field} eq 'OwnerOutOfOffice' ) {
-            # get user preferences config
-            my $GeneratorModule = $Kernel::OM->Get('Config')->Get('User::PreferencesModule')
-                || 'Kernel::System::User::Preferences::DB';
+            if ( !$Param{Flags}->{JoinMap}->{TicketOwner} ) {
+                push( @SQLJoin, 'INNER JOIN users tou ON tou.id = st.user_id' );
 
-            # get generator preferences module
-            my $PreferencesObject = $Kernel::OM->Get($GeneratorModule);
-
-            %AttributeMapping = (
-                AliasStart => 'toupooos',
-                AliasEnd   => 'toupoooe',
-                ColumnName => $PreferencesObject->{PreferencesTableValue}
-            );
-
-            if ( !$Param{Flags}->{JoinMap}->{TicketOwnerOutOfOffice} ) {
-                push( @SQLJoin, "LEFT OUTER JOIN $PreferencesObject->{PreferencesTable} $AttributeMapping{AliasStart} ON $AttributeMapping{AliasStart}.$PreferencesObject->{PreferencesTableUserID} = st.user_id AND $AttributeMapping{AliasStart}.$PreferencesObject->{PreferencesTableKey} = 'OutOfOfficeStart'" );
-                push( @SQLJoin, "LEFT OUTER JOIN $PreferencesObject->{PreferencesTable} $AttributeMapping{AliasEnd} ON $AttributeMapping{AliasEnd}.$PreferencesObject->{PreferencesTableUserID} = st.user_id AND $AttributeMapping{AliasEnd}.$PreferencesObject->{PreferencesTableKey} = 'OutOfOfficeEnd'" );
-
-                $Param{Flags}->{JoinMap}->{TicketOwnerOutOfOffice} = 1;
+                $Param{Flags}->{JoinMap}->{TicketOwner} = 1;
             }
+
+            $TableAlias = 'tou';
         }
         elsif ( $Param{Search}->{Field} eq 'ResponsibleOutOfOffice' ) {
-            # get user preferences config
-            my $GeneratorModule = $Kernel::OM->Get('Config')->Get('User::PreferencesModule')
-                || 'Kernel::System::User::Preferences::DB';
+            if ( !$Param{Flags}->{JoinMap}->{TicketResponsible} ) {
+                push( @SQLJoin, 'INNER JOIN users tru ON tru.id = st.responsible_user_id' );
 
-            # get generator preferences module
-            my $PreferencesObject = $Kernel::OM->Get($GeneratorModule);
-
-            %AttributeMapping = (
-                AliasStart => 'trupooos',
-                AliasEnd   => 'trupoooe',
-                ColumnName => $PreferencesObject->{PreferencesTableValue}
-            );
-
-            if ( !$Param{Flags}->{JoinMap}->{TicketResponsibleOutOfOffice} ) {
-                push( @SQLJoin, "LEFT OUTER JOIN $PreferencesObject->{PreferencesTable} $AttributeMapping{AliasStart} ON $AttributeMapping{AliasStart}.$PreferencesObject->{PreferencesTableUserID} = st.responsible_user_id AND $AttributeMapping{AliasStart}.$PreferencesObject->{PreferencesTableKey} = 'OutOfOfficeStart'" );
-                push( @SQLJoin, "LEFT OUTER JOIN $PreferencesObject->{PreferencesTable} $AttributeMapping{AliasEnd} ON $AttributeMapping{AliasEnd}.$PreferencesObject->{PreferencesTableUserID} = st.responsible_user_id AND $AttributeMapping{AliasEnd}.$PreferencesObject->{PreferencesTableKey} = 'OutOfOfficeEnd'" );
-
-                $Param{Flags}->{JoinMap}->{TicketResponsibleOutOfOffice} = 1;
+                $Param{Flags}->{JoinMap}->{TicketResponsible} = 1;
             }
+
+            $TableAlias = 'tru';
         }
 
         # prepare condition
         my $Condition;
 
         # prepare column for start and end date
-        my $StartColumn = $AttributeMapping{AliasStart} . '.' . $AttributeMapping{ColumnName};
-        my $EndColumn   = $AttributeMapping{AliasEnd} . '.' . $AttributeMapping{ColumnName};
+        my $StartColumn = $TableAlias . '.outofoffice_start';
+        my $EndColumn   = $TableAlias . '.outofoffice_end';
 
         # get current date
         my $CurrDate = $Kernel::OM->Get('Time')->CurrentTimestamp();
-        $CurrDate =~ s/^(\d{4}-\d{2}-\d{2}).+$/$1/;
+        $CurrDate =~ s/^(\d{4}-\d{2}-\d{2}).+$/$1 00:00:00/;
 
         my $Values = [];
         if ( !IsArrayRef( $Param{Search}->{Value} ) ) {
@@ -349,18 +311,22 @@ sub Search {
             # prepare condition for true value
             if ( $Value ) {
                 my $StartCondition = $Self->_GetCondition(
-                    Operator => 'LTE',
-                    Column   => $StartColumn,
-                    Value    => $CurrDate,
-                    Silent   => $Param{Silent}
+                    Operator  => 'LTE',
+                    Column    => $StartColumn,
+                    Value     => $CurrDate,
+                    NULLValue => 1,
+                    ValueType => 'DATE',
+                    Silent    => $Param{Silent}
                 );
                 return if ( !$StartCondition );
 
                 my $EndCondition = $Self->_GetCondition(
-                    Operator => 'GTE',
-                    Column   => $EndColumn,
-                    Value    => $CurrDate,
-                    Silent   => $Param{Silent}
+                    Operator  => 'GTE',
+                    Column    => $EndColumn,
+                    Value     => $CurrDate,
+                    NULLValue => 1,
+                    ValueType => 'DATE',
+                    Silent    => $Param{Silent}
                 );
                 return if ( !$EndCondition );
 
@@ -372,18 +338,22 @@ sub Search {
             # prepare condition for false value
             else {
                 my $StartCondition = $Self->_GetCondition(
-                    Operator => 'GT',
-                    Column   => $StartColumn,
-                    Value    => $CurrDate,
-                    Silent   => $Param{Silent}
+                    Operator  => 'GT',
+                    Column    => $StartColumn,
+                    Value     => $CurrDate,
+                    NULLValue => 1,
+                    ValueType => 'DATE',
+                    Silent    => $Param{Silent}
                 );
                 return if ( !$StartCondition );
 
                 my $EndCondition = $Self->_GetCondition(
-                    Operator => 'LT',
-                    Column   => $EndColumn,
-                    Value    => $CurrDate,
-                    Silent   => $Param{Silent}
+                    Operator  => 'LT',
+                    Column    => $EndColumn,
+                    Value     => $CurrDate,
+                    NULLValue => 1,
+                    ValueType => 'DATE',
+                    Silent    => $Param{Silent}
                 );
                 return if ( !$EndCondition );
 
@@ -416,71 +386,51 @@ sub Search {
         && $Param{Search}->{Field} eq 'TicketOutOfOfficeSubstitute'
     ) {
         my @SQLJoin = ();
+        if ( !$Param{Flags}->{JoinMap}->{TicketOwnerORResponsible} ) {
+            push( @SQLJoin, 'INNER JOIN users toru ON toru.id = st.user_id OR toru.id = st.responsible_user_id' );
 
-        my $OwnerOutOfOfficeCondition = $Self->Search(
-            %Param,
-            Search => {
-                Field    => 'OwnerOutOfOffice',
-                Operator => 'EQ',
-                Value    => [1]
-            }
-        );
-        return if ( !$OwnerOutOfOfficeCondition );
-        if ( IsArrayRefWithData( $OwnerOutOfOfficeCondition->{Join} ) ) {
-            push( @SQLJoin, @{ $OwnerOutOfOfficeCondition->{Join} } );
+            $Param{Flags}->{JoinMap}->{TicketOwnerORResponsible} = 1;
         }
 
-        my $OwnerOutOfOfficeSubstituteCondition = $Self->Search(
-            %Param,
-            Search => {
-                Field    => 'OwnerOutOfOfficeSubstitute',
-                Operator => $Param{Search}->{Operator},
-                Value    => $Param{Search}->{Value}
-            }
-        );
-        return if ( !$OwnerOutOfOfficeSubstituteCondition );
-        if ( IsArrayRefWithData( $OwnerOutOfOfficeSubstituteCondition->{Join} ) ) {
-            push( @SQLJoin, @{ $OwnerOutOfOfficeSubstituteCondition->{Join} } );
-        }
+        # get current date
+        my $CurrDate = $Kernel::OM->Get('Time')->CurrentTimestamp();
+        $CurrDate =~ s/^(\d{4}-\d{2}-\d{2}).+$/$1 00:00:00/;
 
-        my $ResponsibleOutOfOfficeCondition = $Self->Search(
-            %Param,
-            Search => {
-                Field    => 'ResponsibleOutOfOffice',
-                Operator => 'EQ',
-                Value    => [1]
-            }
+        my $SubstituteCondition = $Self->_GetCondition(
+            Operator  => $Param{Search}->{Operator},
+            Column    => 'toru.outofoffice_substitute',
+            Value     => $Param{Search}->{Value},
+            NULLValue => 1,
+            ValueType => 'NUMERIC',
+            Silent    => $Param{Silent}
         );
-        return if ( !$ResponsibleOutOfOfficeCondition );
-        if ( IsArrayRefWithData( $ResponsibleOutOfOfficeCondition->{Join} ) ) {
-            push( @SQLJoin, @{ $ResponsibleOutOfOfficeCondition->{Join} } );
-        }
+        return if ( !$SubstituteCondition );
 
-        my $ResponsibleOutOfOfficeSubstituteCondition = $Self->Search(
-            %Param,
-            Search => {
-                Field    => 'ResponsibleOutOfOfficeSubstitute',
-                Operator => $Param{Search}->{Operator},
-                Value    => $Param{Search}->{Value}
-            }
+        my $StartCondition = $Self->_GetCondition(
+            Operator  => 'LTE',
+            Column    => 'toru.outofoffice_start',
+            Value     => $CurrDate,
+            NULLValue => 1,
+            ValueType => 'DATE',
+            Silent    => $Param{Silent}
         );
-        return if ( !$ResponsibleOutOfOfficeSubstituteCondition );
-        if ( IsArrayRefWithData( $ResponsibleOutOfOfficeSubstituteCondition->{Join} ) ) {
-            push( @SQLJoin, @{ $ResponsibleOutOfOfficeSubstituteCondition->{Join} } );
-        }
+        return if ( !$StartCondition );
 
-        
+        my $EndCondition = $Self->_GetCondition(
+            Operator  => 'GTE',
+            Column    => 'toru.outofoffice_end',
+            Value     => $CurrDate,
+            NULLValue => 1,
+            ValueType => 'DATE',
+            Silent    => $Param{Silent}
+        );
+        return if ( !$EndCondition );
 
         # return search def
         return {
             Join       => \@SQLJoin,
             Where      => [
-                '(('
-                . $OwnerOutOfOfficeCondition->{Where}[0]
-                . ' AND ' . $OwnerOutOfOfficeSubstituteCondition->{Where}[0]
-                . ') OR (' . $ResponsibleOutOfOfficeCondition->{Where}[0]
-                . ' AND ' . $ResponsibleOutOfOfficeSubstituteCondition->{Where}[0]
-                . '))'
+                '(' . $SubstituteCondition . ' AND ' . $StartCondition . ' AND ' . $EndCondition . ')'
             ],
             IsRelative => 1
         };

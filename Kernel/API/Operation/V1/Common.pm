@@ -4961,7 +4961,7 @@ sub _AddSchemaAndExamples {
                 );
             } else {
                 $Kernel::OM->Get('Log')->Log(
-                    Priority => 'notice',
+                    Priority => 'debug',
                     Message  => "$Type Example for '$Object' not found!"
                 );
             }
@@ -4985,7 +4985,7 @@ sub _AddSchemaAndExamples {
                 );
             } else {
                 $Kernel::OM->Get('Log')->Log(
-                    Priority => 'notice',
+                    Priority => 'debug',
                     Message  => "$Type Schema for '$Object' not found!"
                 );
             }

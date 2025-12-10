@@ -8,7 +8,7 @@
                 <Item Key="Name">TemplateSearch</Item>
                 <Item Key="Module">Kernel::API::Operation::V1::ImportExport::TemplateSearch</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="ResponseSchema">TemplateCollectionResponse</Item>
+                <Item Key="ResponseSchema">ImportExportTemplateCollectionResponse</Item>
                 <Item Key="CacheType">API_import_export_templates</Item>
                 <Item Key="CacheTypeDependency">ImportExportTemplate</Item>
             </Hash>

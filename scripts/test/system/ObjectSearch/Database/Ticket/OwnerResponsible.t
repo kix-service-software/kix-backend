@@ -76,7 +76,8 @@ $Self->IsDeeply(
             IsSearchable   => 1,
             IsSelectable   => 0,
             IsSortable     => 0,
-            Operators      => ['EMPTY','EQ','NE','IN','!IN','GT','GTE','LT','LTE']
+            Operators      => ['EMPTY','EQ','NE','IN','!IN','GT','GTE','LT','LTE'],
+            ValueType      => 'NUMERIC'
         },
         ResponsibleID => {
             IsSelectable   => 1,
@@ -113,7 +114,8 @@ $Self->IsDeeply(
             IsSearchable   => 1,
             IsSelectable   => 0,
             IsSortable     => 0,
-            Operators      => ['EMPTY','EQ','NE','IN','!IN','GT','GTE','LT','LTE']
+            Operators      => ['EMPTY','EQ','NE','IN','!IN','GT','GTE','LT','LTE'],
+            ValueType      => 'NUMERIC'
         },
         TicketOutOfOfficeSubstitute => {
             IsFulltextable => 0,
@@ -622,11 +624,10 @@ my @SearchTests = (
         },
         Expected     => {
             'Join'       => [
-                'LEFT OUTER JOIN user_preferences toupooos ON toupooos.user_id = st.user_id AND toupooos.preferences_key = \'OutOfOfficeStart\'',
-                'LEFT OUTER JOIN user_preferences toupoooe ON toupoooe.user_id = st.user_id AND toupoooe.preferences_key = \'OutOfOfficeEnd\''
+                'INNER JOIN users tou ON tou.id = st.user_id'
             ],
             'Where'      => [
-                '(toupooos.preferences_value <= \'2014-01-01\' AND toupoooe.preferences_value >= \'2014-01-01\')'
+                '(tou.outofoffice_start <= \'2014-01-01 00:00:00\' AND tou.outofoffice_end >= \'2014-01-01 00:00:00\')'
             ],
             'IsRelative' => 1
         }
@@ -640,11 +641,10 @@ my @SearchTests = (
         },
         Expected     => {
             'Join'       => [
-                'LEFT OUTER JOIN user_preferences toupooos ON toupooos.user_id = st.user_id AND toupooos.preferences_key = \'OutOfOfficeStart\'',
-                'LEFT OUTER JOIN user_preferences toupoooe ON toupoooe.user_id = st.user_id AND toupoooe.preferences_key = \'OutOfOfficeEnd\''
+                'INNER JOIN users tou ON tou.id = st.user_id'
             ],
             'Where'      => [
-                '(toupooos.preferences_value > \'2014-01-01\' OR toupoooe.preferences_value < \'2014-01-01\' OR toupooos.preferences_value IS NULL OR toupoooe.preferences_value IS NULL)'
+                '(tou.outofoffice_start > \'2014-01-01 00:00:00\' OR tou.outofoffice_end < \'2014-01-01 00:00:00\' OR tou.outofoffice_start IS NULL OR tou.outofoffice_end IS NULL)'
             ],
             'IsRelative' => 1
         }
@@ -658,11 +658,10 @@ my @SearchTests = (
         },
         Expected     => {
             'Join'       => [
-                'LEFT OUTER JOIN user_preferences toupooos ON toupooos.user_id = st.user_id AND toupooos.preferences_key = \'OutOfOfficeStart\'',
-                'LEFT OUTER JOIN user_preferences toupoooe ON toupoooe.user_id = st.user_id AND toupoooe.preferences_key = \'OutOfOfficeEnd\''
+                'INNER JOIN users tou ON tou.id = st.user_id'
             ],
             'Where'      => [
-                '((toupooos.preferences_value > \'2014-01-01\' OR toupoooe.preferences_value < \'2014-01-01\' OR toupooos.preferences_value IS NULL OR toupoooe.preferences_value IS NULL) OR (toupooos.preferences_value <= \'2014-01-01\' AND toupoooe.preferences_value >= \'2014-01-01\'))'
+                '((tou.outofoffice_start > \'2014-01-01 00:00:00\' OR tou.outofoffice_end < \'2014-01-01 00:00:00\' OR tou.outofoffice_start IS NULL OR tou.outofoffice_end IS NULL) OR (tou.outofoffice_start <= \'2014-01-01 00:00:00\' AND tou.outofoffice_end >= \'2014-01-01 00:00:00\'))'
             ],
             'IsRelative' => 1
         }
@@ -676,10 +675,10 @@ my @SearchTests = (
         },
         Expected     => {
             'Join'       => [
-                'LEFT OUTER JOIN user_preferences toupooosub ON toupooosub.user_id = st.user_id AND toupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+                'INNER JOIN users tou ON tou.id = st.user_id'
             ],
             'Where'      => [
-                'toupooosub.preferences_value = \'1\''
+                'tou.outofoffice_substitute = 1'
             ],
             'IsRelative' => undef
         }
@@ -693,10 +692,10 @@ my @SearchTests = (
         },
         Expected     => {
             'Join'       => [
-                'LEFT OUTER JOIN user_preferences toupooosub ON toupooosub.user_id = st.user_id AND toupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+                'INNER JOIN users tou ON tou.id = st.user_id'
             ],
             'Where'      => [
-                '(toupooosub.preferences_value != \'1\' OR toupooosub.preferences_value IS NULL)'
+                '(tou.outofoffice_substitute <> 1 OR tou.outofoffice_substitute IS NULL)'
             ],
             'IsRelative' => undef
         }
@@ -710,10 +709,10 @@ my @SearchTests = (
         },
         Expected     => {
             'Join'       => [
-                'LEFT OUTER JOIN user_preferences toupooosub ON toupooosub.user_id = st.user_id AND toupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+                'INNER JOIN users tou ON tou.id = st.user_id'
             ],
             'Where'      => [
-                'toupooosub.preferences_value IN (\'1\')'
+                'tou.outofoffice_substitute IN (1)'
             ],
             'IsRelative' => undef
         }
@@ -727,10 +726,10 @@ my @SearchTests = (
         },
         Expected     => {
              'Join'      => [
-                'LEFT OUTER JOIN user_preferences toupooosub ON toupooosub.user_id = st.user_id AND toupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+                'INNER JOIN users tou ON tou.id = st.user_id'
             ],
             'Where'      => [
-                'toupooosub.preferences_value NOT IN (\'1\')'
+                'tou.outofoffice_substitute NOT IN (1)'
             ],
             'IsRelative' => undef
         }
@@ -744,10 +743,10 @@ my @SearchTests = (
         },
         Expected     => {
             'Join'       => [
-                'LEFT OUTER JOIN user_preferences toupooosub ON toupooosub.user_id = st.user_id AND toupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+                'INNER JOIN users tou ON tou.id = st.user_id'
             ],
             'Where'      => [
-                'toupooosub.preferences_value < \'1\''
+                'tou.outofoffice_substitute < 1'
             ],
             'IsRelative' => undef
         }
@@ -761,10 +760,10 @@ my @SearchTests = (
         },
         Expected     => {
             'Join'       => [
-                'LEFT OUTER JOIN user_preferences toupooosub ON toupooosub.user_id = st.user_id AND toupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+                'INNER JOIN users tou ON tou.id = st.user_id'
             ],
             'Where'      => [
-                'toupooosub.preferences_value > \'1\''
+                'tou.outofoffice_substitute > 1'
             ],
             'IsRelative' => undef
         }
@@ -778,10 +777,10 @@ my @SearchTests = (
         },
         Expected     => {
             'Join'       => [
-                'LEFT OUTER JOIN user_preferences toupooosub ON toupooosub.user_id = st.user_id AND toupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+                'INNER JOIN users tou ON tou.id = st.user_id'
             ],
             'Where'      => [
-                'toupooosub.preferences_value <= \'1\''
+                'tou.outofoffice_substitute <= 1'
             ],
             'IsRelative' => undef
         }
@@ -795,10 +794,10 @@ my @SearchTests = (
         },
         Expected     => {
             'Join'       => [
-                'LEFT OUTER JOIN user_preferences toupooosub ON toupooosub.user_id = st.user_id AND toupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+                'INNER JOIN users tou ON tou.id = st.user_id'
             ],
             'Where'      => [
-                'toupooosub.preferences_value >= \'1\''
+                'tou.outofoffice_substitute >= 1'
             ],
             'IsRelative' => undef
         }
@@ -812,10 +811,10 @@ my @SearchTests = (
         },
         Expected     => {
             'Join'       => [
-                'LEFT OUTER JOIN user_preferences toupooosub ON toupooosub.user_id = st.user_id AND toupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+                'INNER JOIN users tou ON tou.id = st.user_id'
             ],
             'Where'      => [
-                '(toupooosub.preferences_value = \'\' OR toupooosub.preferences_value IS NULL)'
+                'tou.outofoffice_substitute IS NULL'
             ],
             'IsRelative' => undef
         }
@@ -829,10 +828,10 @@ my @SearchTests = (
         },
         Expected     => {
             'Join'       => [
-                'LEFT OUTER JOIN user_preferences toupooosub ON toupooosub.user_id = st.user_id AND toupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+                'INNER JOIN users tou ON tou.id = st.user_id'
             ],
             'Where'      => [
-                '(toupooosub.preferences_value != \'\' AND toupooosub.preferences_value IS NOT NULL)'
+                'tou.outofoffice_substitute IS NOT NULL'
             ],
             'IsRelative' => undef
         }
@@ -1246,11 +1245,10 @@ my @SearchTests = (
         },
         Expected     => {
             'Join'       => [
-                'LEFT OUTER JOIN user_preferences trupooos ON trupooos.user_id = st.responsible_user_id AND trupooos.preferences_key = \'OutOfOfficeStart\'',
-                'LEFT OUTER JOIN user_preferences trupoooe ON trupoooe.user_id = st.responsible_user_id AND trupoooe.preferences_key = \'OutOfOfficeEnd\''
+                'INNER JOIN users tru ON tru.id = st.responsible_user_id'
             ],
             'Where'      => [
-                '(trupooos.preferences_value <= \'2014-01-01\' AND trupoooe.preferences_value >= \'2014-01-01\')'
+                '(tru.outofoffice_start <= \'2014-01-01 00:00:00\' AND tru.outofoffice_end >= \'2014-01-01 00:00:00\')'
             ],
             'IsRelative' => 1
         }
@@ -1264,11 +1262,10 @@ my @SearchTests = (
         },
         Expected     => {
             'Join'       => [
-                'LEFT OUTER JOIN user_preferences trupooos ON trupooos.user_id = st.responsible_user_id AND trupooos.preferences_key = \'OutOfOfficeStart\'',
-                'LEFT OUTER JOIN user_preferences trupoooe ON trupoooe.user_id = st.responsible_user_id AND trupoooe.preferences_key = \'OutOfOfficeEnd\''
+                'INNER JOIN users tru ON tru.id = st.responsible_user_id'
             ],
             'Where'      => [
-                '(trupooos.preferences_value > \'2014-01-01\' OR trupoooe.preferences_value < \'2014-01-01\' OR trupooos.preferences_value IS NULL OR trupoooe.preferences_value IS NULL)'
+                '(tru.outofoffice_start > \'2014-01-01 00:00:00\' OR tru.outofoffice_end < \'2014-01-01 00:00:00\' OR tru.outofoffice_start IS NULL OR tru.outofoffice_end IS NULL)'
             ],
             'IsRelative' => 1
         }
@@ -1282,11 +1279,10 @@ my @SearchTests = (
         },
         Expected     => {
             'Join'       => [
-                'LEFT OUTER JOIN user_preferences trupooos ON trupooos.user_id = st.responsible_user_id AND trupooos.preferences_key = \'OutOfOfficeStart\'',
-                'LEFT OUTER JOIN user_preferences trupoooe ON trupoooe.user_id = st.responsible_user_id AND trupoooe.preferences_key = \'OutOfOfficeEnd\''
+                'INNER JOIN users tru ON tru.id = st.responsible_user_id'
             ],
             'Where'      => [
-                '((trupooos.preferences_value > \'2014-01-01\' OR trupoooe.preferences_value < \'2014-01-01\' OR trupooos.preferences_value IS NULL OR trupoooe.preferences_value IS NULL) OR (trupooos.preferences_value <= \'2014-01-01\' AND trupoooe.preferences_value >= \'2014-01-01\'))'
+                '((tru.outofoffice_start > \'2014-01-01 00:00:00\' OR tru.outofoffice_end < \'2014-01-01 00:00:00\' OR tru.outofoffice_start IS NULL OR tru.outofoffice_end IS NULL) OR (tru.outofoffice_start <= \'2014-01-01 00:00:00\' AND tru.outofoffice_end >= \'2014-01-01 00:00:00\'))'
             ],
             'IsRelative' => 1
         }
@@ -1300,10 +1296,10 @@ my @SearchTests = (
         },
         Expected     => {
             'Join'       => [
-                'LEFT OUTER JOIN user_preferences trupooosub ON trupooosub.user_id = st.responsible_user_id AND trupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+                'INNER JOIN users tru ON tru.id = st.responsible_user_id'
             ],
             'Where'      => [
-                'trupooosub.preferences_value = \'1\''
+                'tru.outofoffice_substitute = 1'
             ],
             'IsRelative' => undef
         }
@@ -1317,10 +1313,10 @@ my @SearchTests = (
         },
         Expected     => {
             'Join'       => [
-                'LEFT OUTER JOIN user_preferences trupooosub ON trupooosub.user_id = st.responsible_user_id AND trupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+                'INNER JOIN users tru ON tru.id = st.responsible_user_id'
             ],
             'Where'      => [
-                '(trupooosub.preferences_value != \'1\' OR trupooosub.preferences_value IS NULL)'
+                '(tru.outofoffice_substitute <> 1 OR tru.outofoffice_substitute IS NULL)'
             ],
             'IsRelative' => undef
         }
@@ -1334,10 +1330,10 @@ my @SearchTests = (
         },
         Expected     => {
             'Join'       => [
-                'LEFT OUTER JOIN user_preferences trupooosub ON trupooosub.user_id = st.responsible_user_id AND trupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+                'INNER JOIN users tru ON tru.id = st.responsible_user_id'
             ],
             'Where'      => [
-                'trupooosub.preferences_value IN (\'1\')'
+                'tru.outofoffice_substitute IN (1)'
             ],
             'IsRelative' => undef
         }
@@ -1351,10 +1347,10 @@ my @SearchTests = (
         },
         Expected     => {
              'Join'      => [
-                'LEFT OUTER JOIN user_preferences trupooosub ON trupooosub.user_id = st.responsible_user_id AND trupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+                'INNER JOIN users tru ON tru.id = st.responsible_user_id'
             ],
             'Where'      => [
-                'trupooosub.preferences_value NOT IN (\'1\')'
+                'tru.outofoffice_substitute NOT IN (1)'
             ],
             'IsRelative' => undef
         }
@@ -1368,10 +1364,10 @@ my @SearchTests = (
         },
         Expected     => {
             'Join'       => [
-                'LEFT OUTER JOIN user_preferences trupooosub ON trupooosub.user_id = st.responsible_user_id AND trupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+                'INNER JOIN users tru ON tru.id = st.responsible_user_id'
             ],
             'Where'      => [
-                'trupooosub.preferences_value < \'1\''
+                'tru.outofoffice_substitute < 1'
             ],
             'IsRelative' => undef
         }
@@ -1385,10 +1381,10 @@ my @SearchTests = (
         },
         Expected     => {
             'Join'       => [
-                'LEFT OUTER JOIN user_preferences trupooosub ON trupooosub.user_id = st.responsible_user_id AND trupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+                'INNER JOIN users tru ON tru.id = st.responsible_user_id'
             ],
             'Where'      => [
-                'trupooosub.preferences_value > \'1\''
+                'tru.outofoffice_substitute > 1'
             ],
             'IsRelative' => undef
         }
@@ -1402,10 +1398,10 @@ my @SearchTests = (
         },
         Expected     => {
             'Join'       => [
-                'LEFT OUTER JOIN user_preferences trupooosub ON trupooosub.user_id = st.responsible_user_id AND trupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+                'INNER JOIN users tru ON tru.id = st.responsible_user_id'
             ],
             'Where'      => [
-                'trupooosub.preferences_value <= \'1\''
+                'tru.outofoffice_substitute <= 1'
             ],
             'IsRelative' => undef
         }
@@ -1419,10 +1415,10 @@ my @SearchTests = (
         },
         Expected     => {
             'Join'       => [
-                'LEFT OUTER JOIN user_preferences trupooosub ON trupooosub.user_id = st.responsible_user_id AND trupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+                'INNER JOIN users tru ON tru.id = st.responsible_user_id'
             ],
             'Where'      => [
-                'trupooosub.preferences_value >= \'1\''
+                'tru.outofoffice_substitute >= 1'
             ],
             'IsRelative' => undef
         }
@@ -1436,10 +1432,10 @@ my @SearchTests = (
         },
         Expected     => {
             'Join'       => [
-                'LEFT OUTER JOIN user_preferences trupooosub ON trupooosub.user_id = st.responsible_user_id AND trupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+                'INNER JOIN users tru ON tru.id = st.responsible_user_id'
             ],
             'Where'      => [
-                '(trupooosub.preferences_value = \'\' OR trupooosub.preferences_value IS NULL)'
+                'tru.outofoffice_substitute IS NULL'
             ],
             'IsRelative' => undef
         }
@@ -1453,10 +1449,10 @@ my @SearchTests = (
         },
         Expected     => {
             'Join'       => [
-                'LEFT OUTER JOIN user_preferences trupooosub ON trupooosub.user_id = st.responsible_user_id AND trupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+                'INNER JOIN users tru ON tru.id = st.responsible_user_id'
             ],
             'Where'      => [
-                '(trupooosub.preferences_value != \'\' AND trupooosub.preferences_value IS NOT NULL)'
+                'tru.outofoffice_substitute IS NOT NULL'
             ],
             'IsRelative' => undef
         }
@@ -1470,15 +1466,10 @@ my @SearchTests = (
         },
         Expected     => {
             'Join'       => [
-                'LEFT OUTER JOIN user_preferences toupooos ON toupooos.user_id = st.user_id AND toupooos.preferences_key = \'OutOfOfficeStart\'',
-                'LEFT OUTER JOIN user_preferences toupoooe ON toupoooe.user_id = st.user_id AND toupoooe.preferences_key = \'OutOfOfficeEnd\'',
-                'LEFT OUTER JOIN user_preferences toupooosub ON toupooosub.user_id = st.user_id AND toupooosub.preferences_key = \'OutOfOfficeSubstitute\'',
-                'LEFT OUTER JOIN user_preferences trupooos ON trupooos.user_id = st.responsible_user_id AND trupooos.preferences_key = \'OutOfOfficeStart\'',
-                'LEFT OUTER JOIN user_preferences trupoooe ON trupoooe.user_id = st.responsible_user_id AND trupoooe.preferences_key = \'OutOfOfficeEnd\'',
-                'LEFT OUTER JOIN user_preferences trupooosub ON trupooosub.user_id = st.responsible_user_id AND trupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+               'INNER JOIN users toru ON toru.id = st.user_id OR toru.id = st.responsible_user_id'
             ],
             'Where'      => [
-                '(((toupooos.preferences_value <= \'2014-01-01\' AND toupoooe.preferences_value >= \'2014-01-01\') AND toupooosub.preferences_value = \'1\') OR ((trupooos.preferences_value <= \'2014-01-01\' AND trupoooe.preferences_value >= \'2014-01-01\') AND trupooosub.preferences_value = \'1\'))'
+                '(toru.outofoffice_substitute = 1 AND toru.outofoffice_start <= \'2014-01-01 00:00:00\' AND toru.outofoffice_end >= \'2014-01-01 00:00:00\')'
             ],
             'IsRelative' => 1
         }
@@ -1492,15 +1483,10 @@ my @SearchTests = (
         },
         Expected     => {
             'Join'       => [
-                'LEFT OUTER JOIN user_preferences toupooos ON toupooos.user_id = st.user_id AND toupooos.preferences_key = \'OutOfOfficeStart\'',
-                'LEFT OUTER JOIN user_preferences toupoooe ON toupoooe.user_id = st.user_id AND toupoooe.preferences_key = \'OutOfOfficeEnd\'',
-                'LEFT OUTER JOIN user_preferences toupooosub ON toupooosub.user_id = st.user_id AND toupooosub.preferences_key = \'OutOfOfficeSubstitute\'',
-                'LEFT OUTER JOIN user_preferences trupooos ON trupooos.user_id = st.responsible_user_id AND trupooos.preferences_key = \'OutOfOfficeStart\'',
-                'LEFT OUTER JOIN user_preferences trupoooe ON trupoooe.user_id = st.responsible_user_id AND trupoooe.preferences_key = \'OutOfOfficeEnd\'',
-                'LEFT OUTER JOIN user_preferences trupooosub ON trupooosub.user_id = st.responsible_user_id AND trupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+               'INNER JOIN users toru ON toru.id = st.user_id OR toru.id = st.responsible_user_id'
             ],
             'Where'      => [
-                '(((toupooos.preferences_value <= \'2014-01-01\' AND toupoooe.preferences_value >= \'2014-01-01\') AND (toupooosub.preferences_value != \'1\' OR toupooosub.preferences_value IS NULL)) OR ((trupooos.preferences_value <= \'2014-01-01\' AND trupoooe.preferences_value >= \'2014-01-01\') AND (trupooosub.preferences_value != \'1\' OR trupooosub.preferences_value IS NULL)))'
+                '((toru.outofoffice_substitute <> 1 OR toru.outofoffice_substitute IS NULL) AND toru.outofoffice_start <= \'2014-01-01 00:00:00\' AND toru.outofoffice_end >= \'2014-01-01 00:00:00\')'
             ],
             'IsRelative' => 1
         }
@@ -1514,15 +1500,10 @@ my @SearchTests = (
         },
         Expected     => {
             'Join'       => [
-                'LEFT OUTER JOIN user_preferences toupooos ON toupooos.user_id = st.user_id AND toupooos.preferences_key = \'OutOfOfficeStart\'',
-                'LEFT OUTER JOIN user_preferences toupoooe ON toupoooe.user_id = st.user_id AND toupoooe.preferences_key = \'OutOfOfficeEnd\'',
-                'LEFT OUTER JOIN user_preferences toupooosub ON toupooosub.user_id = st.user_id AND toupooosub.preferences_key = \'OutOfOfficeSubstitute\'',
-                'LEFT OUTER JOIN user_preferences trupooos ON trupooos.user_id = st.responsible_user_id AND trupooos.preferences_key = \'OutOfOfficeStart\'',
-                'LEFT OUTER JOIN user_preferences trupoooe ON trupoooe.user_id = st.responsible_user_id AND trupoooe.preferences_key = \'OutOfOfficeEnd\'',
-                'LEFT OUTER JOIN user_preferences trupooosub ON trupooosub.user_id = st.responsible_user_id AND trupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+               'INNER JOIN users toru ON toru.id = st.user_id OR toru.id = st.responsible_user_id'
             ],
             'Where'      => [
-                '(((toupooos.preferences_value <= \'2014-01-01\' AND toupoooe.preferences_value >= \'2014-01-01\') AND toupooosub.preferences_value IN (\'1\')) OR ((trupooos.preferences_value <= \'2014-01-01\' AND trupoooe.preferences_value >= \'2014-01-01\') AND trupooosub.preferences_value IN (\'1\')))'
+                '(toru.outofoffice_substitute IN (1) AND toru.outofoffice_start <= \'2014-01-01 00:00:00\' AND toru.outofoffice_end >= \'2014-01-01 00:00:00\')'
             ],
             'IsRelative' => 1
         }
@@ -1536,15 +1517,10 @@ my @SearchTests = (
         },
         Expected     => {
              'Join'      => [
-                'LEFT OUTER JOIN user_preferences toupooos ON toupooos.user_id = st.user_id AND toupooos.preferences_key = \'OutOfOfficeStart\'',
-                'LEFT OUTER JOIN user_preferences toupoooe ON toupoooe.user_id = st.user_id AND toupoooe.preferences_key = \'OutOfOfficeEnd\'',
-                'LEFT OUTER JOIN user_preferences toupooosub ON toupooosub.user_id = st.user_id AND toupooosub.preferences_key = \'OutOfOfficeSubstitute\'',
-                'LEFT OUTER JOIN user_preferences trupooos ON trupooos.user_id = st.responsible_user_id AND trupooos.preferences_key = \'OutOfOfficeStart\'',
-                'LEFT OUTER JOIN user_preferences trupoooe ON trupoooe.user_id = st.responsible_user_id AND trupoooe.preferences_key = \'OutOfOfficeEnd\'',
-                'LEFT OUTER JOIN user_preferences trupooosub ON trupooosub.user_id = st.responsible_user_id AND trupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+               'INNER JOIN users toru ON toru.id = st.user_id OR toru.id = st.responsible_user_id'
             ],
             'Where'      => [
-                '(((toupooos.preferences_value <= \'2014-01-01\' AND toupoooe.preferences_value >= \'2014-01-01\') AND toupooosub.preferences_value NOT IN (\'1\')) OR ((trupooos.preferences_value <= \'2014-01-01\' AND trupoooe.preferences_value >= \'2014-01-01\') AND trupooosub.preferences_value NOT IN (\'1\')))'
+                '(toru.outofoffice_substitute NOT IN (1) AND toru.outofoffice_start <= \'2014-01-01 00:00:00\' AND toru.outofoffice_end >= \'2014-01-01 00:00:00\')'
             ],
             'IsRelative' => 1
         }
@@ -1558,15 +1534,10 @@ my @SearchTests = (
         },
         Expected     => {
             'Join'       => [
-                'LEFT OUTER JOIN user_preferences toupooos ON toupooos.user_id = st.user_id AND toupooos.preferences_key = \'OutOfOfficeStart\'',
-                'LEFT OUTER JOIN user_preferences toupoooe ON toupoooe.user_id = st.user_id AND toupoooe.preferences_key = \'OutOfOfficeEnd\'',
-                'LEFT OUTER JOIN user_preferences toupooosub ON toupooosub.user_id = st.user_id AND toupooosub.preferences_key = \'OutOfOfficeSubstitute\'',
-                'LEFT OUTER JOIN user_preferences trupooos ON trupooos.user_id = st.responsible_user_id AND trupooos.preferences_key = \'OutOfOfficeStart\'',
-                'LEFT OUTER JOIN user_preferences trupoooe ON trupoooe.user_id = st.responsible_user_id AND trupoooe.preferences_key = \'OutOfOfficeEnd\'',
-                'LEFT OUTER JOIN user_preferences trupooosub ON trupooosub.user_id = st.responsible_user_id AND trupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+               'INNER JOIN users toru ON toru.id = st.user_id OR toru.id = st.responsible_user_id'
             ],
             'Where'      => [
-                '(((toupooos.preferences_value <= \'2014-01-01\' AND toupoooe.preferences_value >= \'2014-01-01\') AND toupooosub.preferences_value < \'1\') OR ((trupooos.preferences_value <= \'2014-01-01\' AND trupoooe.preferences_value >= \'2014-01-01\') AND trupooosub.preferences_value < \'1\'))'
+                '(toru.outofoffice_substitute < 1 AND toru.outofoffice_start <= \'2014-01-01 00:00:00\' AND toru.outofoffice_end >= \'2014-01-01 00:00:00\')'
             ],
             'IsRelative' => 1
         }
@@ -1580,15 +1551,10 @@ my @SearchTests = (
         },
         Expected     => {
             'Join'       => [
-                'LEFT OUTER JOIN user_preferences toupooos ON toupooos.user_id = st.user_id AND toupooos.preferences_key = \'OutOfOfficeStart\'',
-                'LEFT OUTER JOIN user_preferences toupoooe ON toupoooe.user_id = st.user_id AND toupoooe.preferences_key = \'OutOfOfficeEnd\'',
-                'LEFT OUTER JOIN user_preferences toupooosub ON toupooosub.user_id = st.user_id AND toupooosub.preferences_key = \'OutOfOfficeSubstitute\'',
-                'LEFT OUTER JOIN user_preferences trupooos ON trupooos.user_id = st.responsible_user_id AND trupooos.preferences_key = \'OutOfOfficeStart\'',
-                'LEFT OUTER JOIN user_preferences trupoooe ON trupoooe.user_id = st.responsible_user_id AND trupoooe.preferences_key = \'OutOfOfficeEnd\'',
-                'LEFT OUTER JOIN user_preferences trupooosub ON trupooosub.user_id = st.responsible_user_id AND trupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+               'INNER JOIN users toru ON toru.id = st.user_id OR toru.id = st.responsible_user_id'
             ],
             'Where'      => [
-                '(((toupooos.preferences_value <= \'2014-01-01\' AND toupoooe.preferences_value >= \'2014-01-01\') AND toupooosub.preferences_value > \'1\') OR ((trupooos.preferences_value <= \'2014-01-01\' AND trupoooe.preferences_value >= \'2014-01-01\') AND trupooosub.preferences_value > \'1\'))'
+                '(toru.outofoffice_substitute > 1 AND toru.outofoffice_start <= \'2014-01-01 00:00:00\' AND toru.outofoffice_end >= \'2014-01-01 00:00:00\')'
             ],
             'IsRelative' => 1
         }
@@ -1602,15 +1568,10 @@ my @SearchTests = (
         },
         Expected     => {
             'Join'       => [
-                'LEFT OUTER JOIN user_preferences toupooos ON toupooos.user_id = st.user_id AND toupooos.preferences_key = \'OutOfOfficeStart\'',
-                'LEFT OUTER JOIN user_preferences toupoooe ON toupoooe.user_id = st.user_id AND toupoooe.preferences_key = \'OutOfOfficeEnd\'',
-                'LEFT OUTER JOIN user_preferences toupooosub ON toupooosub.user_id = st.user_id AND toupooosub.preferences_key = \'OutOfOfficeSubstitute\'',
-                'LEFT OUTER JOIN user_preferences trupooos ON trupooos.user_id = st.responsible_user_id AND trupooos.preferences_key = \'OutOfOfficeStart\'',
-                'LEFT OUTER JOIN user_preferences trupoooe ON trupoooe.user_id = st.responsible_user_id AND trupoooe.preferences_key = \'OutOfOfficeEnd\'',
-                'LEFT OUTER JOIN user_preferences trupooosub ON trupooosub.user_id = st.responsible_user_id AND trupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+               'INNER JOIN users toru ON toru.id = st.user_id OR toru.id = st.responsible_user_id'
             ],
             'Where'      => [
-                '(((toupooos.preferences_value <= \'2014-01-01\' AND toupoooe.preferences_value >= \'2014-01-01\') AND toupooosub.preferences_value <= \'1\') OR ((trupooos.preferences_value <= \'2014-01-01\' AND trupoooe.preferences_value >= \'2014-01-01\') AND trupooosub.preferences_value <= \'1\'))'
+                '(toru.outofoffice_substitute <= 1 AND toru.outofoffice_start <= \'2014-01-01 00:00:00\' AND toru.outofoffice_end >= \'2014-01-01 00:00:00\')'
             ],
             'IsRelative' => 1
         }
@@ -1624,15 +1585,10 @@ my @SearchTests = (
         },
         Expected     => {
             'Join'       => [
-                'LEFT OUTER JOIN user_preferences toupooos ON toupooos.user_id = st.user_id AND toupooos.preferences_key = \'OutOfOfficeStart\'',
-                'LEFT OUTER JOIN user_preferences toupoooe ON toupoooe.user_id = st.user_id AND toupoooe.preferences_key = \'OutOfOfficeEnd\'',
-                'LEFT OUTER JOIN user_preferences toupooosub ON toupooosub.user_id = st.user_id AND toupooosub.preferences_key = \'OutOfOfficeSubstitute\'',
-                'LEFT OUTER JOIN user_preferences trupooos ON trupooos.user_id = st.responsible_user_id AND trupooos.preferences_key = \'OutOfOfficeStart\'',
-                'LEFT OUTER JOIN user_preferences trupoooe ON trupoooe.user_id = st.responsible_user_id AND trupoooe.preferences_key = \'OutOfOfficeEnd\'',
-                'LEFT OUTER JOIN user_preferences trupooosub ON trupooosub.user_id = st.responsible_user_id AND trupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+               'INNER JOIN users toru ON toru.id = st.user_id OR toru.id = st.responsible_user_id'
             ],
             'Where'      => [
-                '(((toupooos.preferences_value <= \'2014-01-01\' AND toupoooe.preferences_value >= \'2014-01-01\') AND toupooosub.preferences_value >= \'1\') OR ((trupooos.preferences_value <= \'2014-01-01\' AND trupoooe.preferences_value >= \'2014-01-01\') AND trupooosub.preferences_value >= \'1\'))'
+                '(toru.outofoffice_substitute >= 1 AND toru.outofoffice_start <= \'2014-01-01 00:00:00\' AND toru.outofoffice_end >= \'2014-01-01 00:00:00\')'
             ],
             'IsRelative' => 1
         }
@@ -1646,15 +1602,10 @@ my @SearchTests = (
         },
         Expected     => {
             'Join'       => [
-                'LEFT OUTER JOIN user_preferences toupooos ON toupooos.user_id = st.user_id AND toupooos.preferences_key = \'OutOfOfficeStart\'',
-                'LEFT OUTER JOIN user_preferences toupoooe ON toupoooe.user_id = st.user_id AND toupoooe.preferences_key = \'OutOfOfficeEnd\'',
-                'LEFT OUTER JOIN user_preferences toupooosub ON toupooosub.user_id = st.user_id AND toupooosub.preferences_key = \'OutOfOfficeSubstitute\'',
-                'LEFT OUTER JOIN user_preferences trupooos ON trupooos.user_id = st.responsible_user_id AND trupooos.preferences_key = \'OutOfOfficeStart\'',
-                'LEFT OUTER JOIN user_preferences trupoooe ON trupoooe.user_id = st.responsible_user_id AND trupoooe.preferences_key = \'OutOfOfficeEnd\'',
-                'LEFT OUTER JOIN user_preferences trupooosub ON trupooosub.user_id = st.responsible_user_id AND trupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+               'INNER JOIN users toru ON toru.id = st.user_id OR toru.id = st.responsible_user_id'
             ],
             'Where'      => [
-                '(((toupooos.preferences_value <= \'2014-01-01\' AND toupoooe.preferences_value >= \'2014-01-01\') AND (toupooosub.preferences_value = \'\' OR toupooosub.preferences_value IS NULL)) OR ((trupooos.preferences_value <= \'2014-01-01\' AND trupoooe.preferences_value >= \'2014-01-01\') AND (trupooosub.preferences_value = \'\' OR trupooosub.preferences_value IS NULL)))'
+                '(toru.outofoffice_substitute IS NULL AND toru.outofoffice_start <= \'2014-01-01 00:00:00\' AND toru.outofoffice_end >= \'2014-01-01 00:00:00\')'
             ],
             'IsRelative' => 1
         }
@@ -1668,15 +1619,10 @@ my @SearchTests = (
         },
         Expected     => {
             'Join'       => [
-                'LEFT OUTER JOIN user_preferences toupooos ON toupooos.user_id = st.user_id AND toupooos.preferences_key = \'OutOfOfficeStart\'',
-                'LEFT OUTER JOIN user_preferences toupoooe ON toupoooe.user_id = st.user_id AND toupoooe.preferences_key = \'OutOfOfficeEnd\'',
-                'LEFT OUTER JOIN user_preferences toupooosub ON toupooosub.user_id = st.user_id AND toupooosub.preferences_key = \'OutOfOfficeSubstitute\'',
-                'LEFT OUTER JOIN user_preferences trupooos ON trupooos.user_id = st.responsible_user_id AND trupooos.preferences_key = \'OutOfOfficeStart\'',
-                'LEFT OUTER JOIN user_preferences trupoooe ON trupoooe.user_id = st.responsible_user_id AND trupoooe.preferences_key = \'OutOfOfficeEnd\'',
-                'LEFT OUTER JOIN user_preferences trupooosub ON trupooosub.user_id = st.responsible_user_id AND trupooosub.preferences_key = \'OutOfOfficeSubstitute\''
+               'INNER JOIN users toru ON toru.id = st.user_id OR toru.id = st.responsible_user_id'
             ],
             'Where'      => [
-                '(((toupooos.preferences_value <= \'2014-01-01\' AND toupoooe.preferences_value >= \'2014-01-01\') AND (toupooosub.preferences_value != \'\' AND toupooosub.preferences_value IS NOT NULL)) OR ((trupooos.preferences_value <= \'2014-01-01\' AND trupoooe.preferences_value >= \'2014-01-01\') AND (trupooosub.preferences_value != \'\' AND trupooosub.preferences_value IS NOT NULL)))'
+                '(toru.outofoffice_substitute IS NOT NULL AND toru.outofoffice_start <= \'2014-01-01 00:00:00\' AND toru.outofoffice_end >= \'2014-01-01 00:00:00\')'
             ],
             'IsRelative' => 1
         }
