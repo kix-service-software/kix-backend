@@ -38,7 +38,6 @@ $Self->Is(
 
 # check command with option --all and argument --accept n ( cancel deleting all config item)
 $ExitCode = $CommandObject->Execute( '--all', 'n' );
-
 $Self->Is(
     $ExitCode,
     0,
@@ -48,84 +47,86 @@ $Self->Is(
 # check command with class options (invalid class)
 my $RandomClass = 'TestClass' . $Helper->GetRandomID();
 $ExitCode = $CommandObject->Execute( '--class', $RandomClass );
-
 $Self->Is(
     $ExitCode,
     1,
     "Option 'class' (but class $RandomClass doesn't exist) ",
 );
 
-# get general catalog object
-my $GeneralCatalogObject = $Kernel::OM->Get('GeneralCatalog');
-
 # add test general catalog item
-my $GeneralCatalogItemID = $GeneralCatalogObject->ItemAdd(
+my $ClassID = $Kernel::OM->Get('GeneralCatalog')->ItemAdd(
     Class   => 'ITSM::ConfigItem::Class',
     Name    => $RandomClass,
     ValidID => 1,
     Comment => 'Comment',
     UserID  => 1,
 );
-
 $Self->True(
-    $GeneralCatalogItemID,
-    "Test general catalog item is created - $GeneralCatalogItemID ",
+    $ClassID,
+    "Test class created",
 );
 
-# get ConfigItem object
-my $ConfigItemObject = $Kernel::OM->Get('ITSMConfigItem');
-
 # get 'Planned' deployment state IDs
-my $PlannedDeplStateDataRef = $GeneralCatalogObject->ItemGet(
+my $PlannedDeplStateDataRef = $Kernel::OM->Get('GeneralCatalog')->ItemGet(
     Class => 'ITSM::ConfigItem::DeploymentState',
     Name  => 'Planned',
 );
 my $PlannedDeplStateID = $PlannedDeplStateDataRef->{ItemID};
+$Self->True(
+    $PlannedDeplStateID,
+    "General catalog item for depl state 'Planned' exists",
+);
+
+# get 'Production' deployment state IDs
+my $ProductionDeplStateDataRef = $Kernel::OM->Get('GeneralCatalog')->ItemGet(
+    Class => 'ITSM::ConfigItem::DeploymentState',
+    Name  => 'Production',
+);
+my $ProductionDeplStateID = $ProductionDeplStateDataRef->{ItemID};
+$Self->True(
+    $ProductionDeplStateID,
+    "General catalog item for depl state 'Production' exists",
+);
 
 my @ConfigItemNumbers;
-my $ConfigItemID;
-
-for ( 1 .. 10 ) {
-
+for my $AssetCount ( 1 .. 10 ) {
     # create ConfigItem number
-    my $ConfigItemNumber = $ConfigItemObject->ConfigItemNumberCreate(
-        ClassID => $GeneralCatalogItemID,
+    my $ConfigItemNumber = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemNumberCreate(
+        ClassID => $ClassID,
     );
 
     # add test ConfigItem
-    $ConfigItemID = $ConfigItemObject->ConfigItemAdd(
+    my $ConfigItemID = $Kernel::OM->Get('ITSMConfigItem')->ConfigItemAdd(
         Number  => $ConfigItemNumber,
-        ClassID => $GeneralCatalogItemID,
+        ClassID => $ClassID,
         UserID  => 1,
     );
+    $Self->True(
+        $ConfigItemID,
+        "Asset $ConfigItemID created",
+    );
+    push( @ConfigItemNumbers, $ConfigItemNumber );
 
-    push @ConfigItemNumbers, $ConfigItemNumber;
-
-    # add new versions for the last added in previous loop
-    my $ConfigItemName = 'TestConfigItem' . $Helper->GetRandomID();
-
-    COUNT:
-    for my $Count ( 1 .. 50 ) {
-
-        my $VersionID = $ConfigItemObject->VersionAdd(
-            Name         => $ConfigItemName . '-' . $Count,
+    VERSION:
+    for my $VersionCount ( 1 .. 50 ) {
+        my $VersionID = $Kernel::OM->Get('ITSMConfigItem')->VersionAdd(
+            Name         => 'TestConfigItem-' . $AssetCount . '-' . $VersionCount,
             DefinitionID => 1,
-            DeplStateID  => $PlannedDeplStateID,
+            DeplStateID  => $AssetCount > 5 ? $ProductionDeplStateID : $PlannedDeplStateID,     # 5 assets with 'Planned' and 5 with 'Production'
             InciStateID  => 1,
             UserID       => 1,
             ConfigItemID => $ConfigItemID,
         );
-
         $Self->True(
             $VersionID,
-            "Version $Count for config item $ConfigItemID is created - $ConfigItemName",
+            " Version $VersionCount created",
         );
 
         # discard config item object to process events
         $Kernel::OM->ObjectsDiscard( Objects => ['ITSMConfigItem'] );
 
-        # change the date into past for the first 20 versions
-        next COUNT if $Count > 10;
+        # change the date into past for the first 10 versions
+        next VERSION if ( $VersionCount > 10 );
 
         # insert new version
         my $Success = $Kernel::OM->Get('DB')->Do(
@@ -138,126 +139,188 @@ for ( 1 .. 10 ) {
         );
     }
 
-    # check command with all-older-than-days-versions options (delete all versions older than one day)
-    $ExitCode = $CommandObject->Execute( '--all-older-than-days-versions', 1 );
-
-    $Self->Is(
-        $ExitCode,
-        0,
-        "Exit code: Options --all-older-than-days-versions 1",
-    );
-
-    # discard config item object to process events
-    $Kernel::OM->ObjectsDiscard( Objects => ['ITSMConfigItem'] );
-
-    # get the list of remaining versions of this config item
-    my $VersionList = $ConfigItemObject->VersionList(
+    # get the list of versions of this config item
+    my $VersionList = $Kernel::OM->Get('ITSMConfigItem')->VersionList(
         ConfigItemID => $ConfigItemID,
     );
-
-    # result should only be 40 versions now
     $Self->Is(
         scalar @{$VersionList},
-        40,
-        "Number of remaining versions after running command with Options --all-older-than-days-versions 1",
+        50,
+        'Initial version count',
     );
 
-    # check command with all-but-keep-last-versions options (delete all versions but keep the last 30 versions)
-    $ExitCode = $CommandObject->Execute( '--all-but-keep-last-versions', 30 );
-
-    $Self->Is(
-        $ExitCode,
-        0,
-        "Exit code: Options --all-but-keep-last-versions 30",
+    # prepare tests
+    my @VersionTests = (
+        {
+            Options => [ '--all-older-than-days-versions', 1 ],
+            Count   => 40
+        },
+        {
+            Options => [ '--all-but-keep-last-versions', 30 ],
+            Count   => 30
+        },
+        {
+            Options => [ '--all-old-versions' ],
+            Count   => 1
+        }
     );
 
-    # discard config item object to process events
-    $Kernel::OM->ObjectsDiscard( Objects => ['ITSMConfigItem'] );
+    # only for first asset
+    if ( $AssetCount == 1 ) {
+        # check failed execution with missing asset selection option
+        for my $Test ( @VersionTests ) {
+            $ExitCode = $CommandObject->Execute( @{ $Test->{Options} } );
+            $Self->Is(
+                $ExitCode,
+                1,
+                'Exit code: Options "' . join( ' ', @{ $Test->{Options} } ) . '"',
+            );
 
-    # get the list of remaining versions of this config item
-    $VersionList = $ConfigItemObject->VersionList(
-        ConfigItemID => $ConfigItemID,
-    );
+            $VersionList = $Kernel::OM->Get('ITSMConfigItem')->VersionList(
+                ConfigItemID => $ConfigItemID,
+            );
+            $Self->Is(
+                scalar @{$VersionList},
+                50,
+                'Version count: Options "' . join( ' ', @{ $Test->{Options} } ) . '"',
+            );
+        }
 
-    # result should only be 40 versions now
-    $Self->Is(
-        scalar @{$VersionList},
-        30,
-        "Number of remaining versions after running command with Options --all-but-keep-last-versions 30",
-    );
+        # check failed execution with deployment-state but without class
+        $ExitCode = $CommandObject->Execute( '--all', '--deployment-state', 'Planned' );
+        $Self->Is(
+            $ExitCode,
+            1,
+            'Exit code: Options "--all --deployment-state Planned"',
+        );
 
-    # check command with all-old-versions options (delete all old versions except the last one)
-    $ExitCode = $CommandObject->Execute('--all-old-versions');
+        $VersionList = $Kernel::OM->Get('ITSMConfigItem')->VersionList(
+            ConfigItemID => $ConfigItemID,
+        );
+        $Self->Is(
+            scalar @{$VersionList},
+            50,
+            'Version count: Options "--all --deployment-state Planned"',
+        );
+    }
 
-    $Self->Is(
-        $ExitCode,
-        0,
-        "Exit code: Options --all-old-versions",
-    );
+    my @AssetSelectionOptions;
+    if ( $AssetCount > 8 ) {
+        @AssetSelectionOptions = ( '--all' );
+    }
+    elsif ( $AssetCount > 6 ) {
+        @AssetSelectionOptions = ( '--class', $RandomClass );
+    }
+    elsif ( $AssetCount > 4 ) {
+        @AssetSelectionOptions = ( '--class', $RandomClass, '--deployment-state', $AssetCount > 5 ? 'Production' : 'Planned' );
+    }
+    else {
+        @AssetSelectionOptions = ( '--asset-number', $ConfigItemNumber );
+    }
 
-    # discard config item object to process events
-    $Kernel::OM->ObjectsDiscard( Objects => ['ITSMConfigItem'] );
+    for my $Test ( @VersionTests ) {
+        my @Options = (
+            @AssetSelectionOptions,  @{ $Test->{Options} }
+        );
 
-    # get the list of remaining versions of this config item
-    $VersionList = $ConfigItemObject->VersionList(
-        ConfigItemID => $ConfigItemID,
-    );
+        $ExitCode = $CommandObject->Execute( @Options );
+        $Self->Is(
+            $ExitCode,
+            0,
+            'Exit code: Options "' . join( ' ', @Options ) . '"',
+        );
 
-    # result should only be 40 versions now
-    $Self->Is(
-        scalar @{$VersionList},
-        1,
-        "Number of remaining versions after running command with Options --all-old-versions",
-    );
+        # discard config item object to process events
+        $Kernel::OM->ObjectsDiscard( Objects => ['ITSMConfigItem'] );
+
+        $VersionList = $Kernel::OM->Get('ITSMConfigItem')->VersionList(
+            ConfigItemID => $ConfigItemID,
+        );
+        $Self->Is(
+            scalar @{$VersionList},
+            $Test->{Count},
+            'Version count: Options "' . join( ' ', @Options ) . '"',
+        );
+    }
 }
 
-# check command with class options ($RandomClass class) and deployment-state 'Planned'
-$ExitCode = $CommandObject->Execute( '--class', $RandomClass, '--deployment-state', 'Planned' );
 
+my $AssetCount = $Kernel::OM->Get('ObjectSearch')->Search(
+    ObjectType => 'ConfigItem',
+    Search     => {
+        AND => [
+            {
+                Field    => 'ClassID',
+                Operator => 'IN',
+                Type     => 'NUMERIC',
+                Value    => [ $ClassID ]
+            }
+        ]
+    },
+    UserID   => 1,
+    UserType => 'Agent',
+    Result   => 'COUNT',
+);
 $Self->Is(
-    $ExitCode,
-    0,
-    "Exit code: Options --class $RandomClass --deployment-state' Planned",
+    $AssetCount,
+    10,
+    'Initial asset count',
 );
 
-# discard config item object to process events
-$Kernel::OM->ObjectsDiscard( Objects => ['ITSMConfigItem'] );
-
-# check command with configitem-number options
-$ExitCode = $CommandObject->Execute(
-    '--configitem-number', $ConfigItemNumbers[0], '--configitem-number',
-    $ConfigItemNumbers[1]
+# prepare tests
+my @AssetTests = (
+    {
+        Options => [ '--asset-number', $ConfigItemNumbers[0], '--asset-number', $ConfigItemNumbers[1] ],
+        Count   => 8
+    },
+    {
+        Options => [ '--class', $RandomClass, '--deployment-state', 'Planned', 'y' ],
+        Count   => 5
+    },
+    {
+        Options => [ '--all', 'y' ],
+        Count   => 0
+    }
 );
 
-$Self->Is(
-    $ExitCode,
-    0,
-    "Exit code: Options --configitem-number",
-);
+for my $Test ( @AssetTests ) {
+    $ExitCode = $CommandObject->Execute( @{ $Test->{Options} } );
+    $Self->Is(
+        $ExitCode,
+        0,
+        'Exit code: Options "' . join( ' ', @{ $Test->{Options} } ) . '"',
+    );
 
-# discard config item object to process events
-$Kernel::OM->ObjectsDiscard( Objects => ['ITSMConfigItem'] );
+    # discard config item object to process events
+    $Kernel::OM->ObjectsDiscard( Objects => ['ITSMConfigItem'] );
 
-# check command with class options ($RandomClass class)
-# three config Items of ten created in test were deleted with the previous commands
-# with the next command other seven will be deleted
-$ExitCode = $CommandObject->Execute( '--class', $RandomClass );
-
-$Self->Is(
-    $ExitCode,
-    0,
-    "Exit code: Option --class $RandomClass",
-);
-
-# discard config item object to process events
-$Kernel::OM->ObjectsDiscard( Objects => ['ITSMConfigItem'] );
+    $AssetCount = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'ConfigItem',
+        Search     => {
+            AND => [
+                {
+                    Field    => 'ClassID',
+                    Operator => 'IN',
+                    Type     => 'NUMERIC',
+                    Value    => [ $ClassID ]
+                }
+            ]
+        },
+        UserID   => 1,
+        UserType => 'Agent',
+        Result   => 'COUNT',
+    );
+    $Self->Is(
+        $AssetCount,
+        $Test->{Count},
+        'Asset count: Options "' . join( ' ', @{ $Test->{Options} } ) . '"',
+    );
+}
 
 # rollback transaction on database
 $Helper->Rollback();
 
 1;
-
-
 
 =back
 

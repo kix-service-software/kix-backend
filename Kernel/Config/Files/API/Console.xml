@@ -20,7 +20,7 @@
                 <Item Key="Module">Kernel::API::Operation::V1::Console::ConsoleCommandGet</Item>
                 <Item Key="APIVersion">V1</Item>
                 <Item Key="ObjectID">Command</Item>
-                <Item Key="ResponseSchema">ConsoleCommandResponse</Item>                
+                <Item Key="ResponseSchema">ConsoleCommandResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -31,7 +31,7 @@
                 <Item Key="Name">ConsoleCommandExecute</Item>
                 <Item Key="Module">Kernel::API::Operation::V1::Console::ConsoleCommandExecute</Item>
                 <Item Key="APIVersion">V1</Item>
-                <Item Key="ResponseSchema">ConsoleCommandExecuteResponse</Item>                
+                <Item Key="ResponseSchema">ConsoleCommandPostResponse</Item>
             </Hash>
         </Setting>
     </ConfigItem>

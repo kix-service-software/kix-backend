@@ -304,11 +304,26 @@ sub Search {
         );
     }
 
+    # remember CacheInMemory state
+    my $CacheInMemory = $Kernel::OM->Get('Cache')->{CacheInMemory};
+
+    # enable CacheInMemory
+    $Kernel::OM->Get('Cache')->Configure(
+        CacheInMemory  => 1,
+    );
+
     # check for existing cache value
     my $CacheData = $Kernel::OM->Get('Cache')->Get(
         Type => 'ObjectSearch_' . $ObjectType,
         Key  => $CacheKey,
     );
+
+    # restore CacheInMemory
+    $Kernel::OM->Get('Cache')->Configure(
+        CacheInMemory  => $CacheInMemory,
+    );
+
+    # handle cached data
     if ( defined( $CacheData ) ) {
         # check result ref of cache data
         if ( ref( $CacheData ) ne $ResultRefMap{ $Param{Result} } ) {
@@ -358,15 +373,24 @@ sub Search {
     }
 
     # write cache
-    if (
-        !$IsRelative
-        && $Param{CacheTTL}
-    ) {
+    if ( $Param{CacheTTL} ) {
+        # enable CacheInMemory
+        $Kernel::OM->Get('Cache')->Configure(
+            CacheInMemory  => 1,
+        );
+
+        # set cache
         $Kernel::OM->Get('Cache')->Set(
-            Type  => 'ObjectSearch_' . $ObjectType,
-            Key   => $CacheKey,
-            Value => $SearchResult,
-            TTL   => $Param{CacheTTL},
+            Type           => 'ObjectSearch_' . $ObjectType,
+            Key            => $CacheKey,
+            Value          => $SearchResult,
+            TTL            => $Param{CacheTTL},
+            CacheInBackend => !$IsRelative
+        );
+
+        # restore CacheInMemory
+        $Kernel::OM->Get('Cache')->Configure(
+            CacheInMemory  => $CacheInMemory,
         );
     }
 

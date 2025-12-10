@@ -167,6 +167,13 @@ sub Run {
     # ConfigObject section / get params
     my $GetParam = $Self->GetEmailParams();
 
+    if ( !$GetParam->{To} ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'info',
+            Message  => "Email ($GetParam->{'Message-ID'}) contains no To header.",
+        );
+    }
+
     $GetParam->{From} = $GetParam->{From} || $GetParam->{'MAIL FROM'} || $GetParam->{'X-KIX-From'};
 
     if (!$GetParam->{From}) {

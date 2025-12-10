@@ -357,7 +357,9 @@ sub SplitAddressLine {
     my ( $Self, %Param ) = @_;
 
     my @GetParam;
+    LINE:
     for my $Line ( $Self->_MailAddressParse( Email => $Param{Line} ) ) {
+        next LINE if !$Line->is_valid();
         push @GetParam, $Line->format();
     }
 

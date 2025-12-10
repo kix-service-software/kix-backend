@@ -28,61 +28,124 @@ local $Kernel::OM = Kernel::System::ObjectManager->new(
 
 use vars qw(%INC);
 
-_UpdateJobFilters();
+# migrate OutOfOffice prefs to users table
+_MigrateOOOPrefs();
 
-exit 0;
+# update chart report definition for mysql
+_UpdateChartReports();
 
-sub _UpdateJobFilters {
+sub _MigrateOOOPrefs {
     my ( $Self, %Param ) = @_;
 
-    my @JobNames = (
-        'Customer Response - reopen from pending'
+    my $LogObject = $Kernel::OM->Get('Log');
+    my $DBObject = $Kernel::OM->Get('DB');
+
+    $DBObject->Prepare(
+        SQL => "SELECT user_id, preferences_key, preferences_value FROM user_preferences WHERE "
+             . "preferences_key IN ('OutOfOfficeStart', 'OutOfOfficeEnd', 'OutOfOfficeSubstitute') AND "
+             . "preferences_value IS NOT NULL OR preferences_value != ''",
     );
 
-    for my $JobName ( @JobNames ) {
-        my $JobID = $Kernel::OM->Get('Automation')->JobLookup(
-            Name => $JobName,
+    my $Data = $DBObject->FetchAllArrayRef(
+        Columns => [ 'UserID', 'Key', 'Value' ]
+    );
+
+    ROW:
+    foreach my $Row ( @{$Data || []} ) {
+        next if !$Row->{Value};
+
+        my $Success = $Kernel::OM->Get('User')->SetPreferences(
+            Key    => $Row->{Key},
+            Value  => $Row->{Value},
+            UserID => $Row->{UserID},
         );
-
-        if ( $JobID ) {
-            my %Job = $Kernel::OM->Get('Automation')->JobGet(
-                ID => $JobID
-            );
-
-            if ( IsArrayRefWithData( $Job{Filter} ) ) {
-                my $Update = 0;
-
-                for my $ORHash ( @{ $Job{Filter} } ) {
-                    for my $Operator ( sort keys %{ $ORHash } ) {
-                        FILTER:
-                        for my $Filter ( @{ $ORHash->{$Operator} } ) {
-                            next FILTER if $Filter->{Field} !~ /(?:SenderTypeID|TypeID|ChannelID|DynamicField_PwResetState)/sm;
-                            next FILTER if $Filter->{Operator} ne 'EQ';
-
-                            $Filter->{Operator} = 'IN';
-                            $Filter->{Value} = [ $Filter->{Value} ];
-                            $Update = 1;
-                        }
-                    }
-                }
-
-                if ( $Update ) {
-                    $Kernel::OM->Get('Automation')->JobUpdate(
-                        %Job,
-                        UserID => 1
-                    );
-                }
-            }
-
-        } else {
+        if ( !$Success ) {
             $Kernel::OM->Get('Log')->Log(
-                Priority  => 'info',
-                Message   => 'Did not found job "' . $JobName . '", nothing to do.',
+                Priority  => 'error',
+                Message   => "Could not set preference \"$Row->{Key}\" ($Row->{Value}) for user $Row->{UserID}!",
             );
         }
     }
+
+    $DBObject->Prepare(
+        SQL => "DELETE FROM user_preferences WHERE preferences_key IN ('OutOfOfficeStart', 'OutOfOfficeEnd', 'OutOfOfficeSubstitute')",
+    );
+
     return 1;
 }
+
+sub _UpdateChartReports {
+    my ( $Self, %Param ) = @_;
+
+    my @Definitions = (
+        {
+            Name      => Kernel::Language::Translatable('Number of tickets created within the last 7 days'),
+            OldConfig => {
+                'DataSource' => {
+                    'SQL' => {
+                        'postgresql' => 'base64(U0VMRUNUIGRhdGUoY3JlYXRlX3RpbWUpIGFzIGRheSwgQ291bnQoKikgYXMgY291bnQgRlJPTSB0aWNrZXQKV0hFUkUgKGRhdGUoY3JlYXRlX3RpbWUpIEJFVFdFRU4gZGF0ZSgoTk9XKCkgLSBJTlRFUlZBTCAnNyBEQVknKSkgQU5EIGRhdGUoTk9XKCkpKQpHUk9VUCBCWSBkYXkKb3JkZXIgYnkgZGF5IEFTQzs=)',
+                        'mysql'      => 'base64(U0VMRUNUIGRhdGUoY3JlYXRlX3RpbWUpIGFzIGRheSwgQ291bnQoKikgYXMgY291bnQgRlJPTSB0aWNrZXQKV0hFUkUgKGRhdGUoY3JlYXRlX3RpbWUpIEJFVFdFRU4gVElNRVNUQU1QKCBEQVRFX0ZPUk1BVChDVVJSRU5UX0RBVEUgLSBJTlRFUlZBTCA3IERBWSAsJyVZLSVtLTAxJykpIEFORCBjdXJyZW50X3RpbWUpCkdST1VQIEJZIGRheQpvcmRlciBieSBkYXkgQVNDOw==)'
+                    }
+                },
+                "OutputFormats" => {
+                    "CSV" => {
+                        "IncludeColumnHeader"   => 1,
+                        "Quote"                 => "\"",
+                        "Separator"             => ",",
+                        "TranslateColumnNames"  => 0
+                    }
+                }
+            },
+            NewConfig => {
+                'DataSource' => {
+                    'SQL' => {
+                        'postgresql' => 'base64(U0VMRUNUIGRhdGUoY3JlYXRlX3RpbWUpIGFzIGRheSwgQ291bnQoKikgYXMgY291bnQgRlJPTSB0aWNrZXQKV0hFUkUgKGRhdGUoY3JlYXRlX3RpbWUpIEJFVFdFRU4gZGF0ZSgoTk9XKCkgLSBJTlRFUlZBTCAnNyBEQVknKSkgQU5EIGRhdGUoTk9XKCkpKQpHUk9VUCBCWSBkYXkKb3JkZXIgYnkgZGF5IEFTQzs=)',
+                        'mysql'      => 'base64(U0VMRUNUIGRhdGUoY3JlYXRlX3RpbWUpIGFzIGRheSwgQ291bnQoKikgYXMgY291bnQgRlJPTSB0aWNrZXQKV0hFUkUgKGRhdGUoY3JlYXRlX3RpbWUpIEJFVFdFRU4gVElNRVNUQU1QKCBEQVRFX0ZPUk1BVChDVVJSRU5UX0RBVEUgLSBJTlRFUlZBTCA3IERBWSAsJyVZLSVtLSVkJykpIEFORCBjdXJyZW50X3RpbWUpCkdST1VQIEJZIGRheQpvcmRlciBieSBkYXkgQVNDOw==)'
+                    }
+                },
+                "OutputFormats" => {
+                    "CSV" => {
+                        "IncludeColumnHeader"   => 1,
+                        "Quote"                 => "\"",
+                        "Separator"             => ",",
+                        "TranslateColumnNames"  => 0
+                    }
+                }
+            }
+        }
+    );
+
+    for my $Definition ( @Definitions ) {
+        my $ReportDefinitionID = $Kernel::OM->Get('Reporting')->ReportDefinitionLookup(
+            Name => $Definition->{Name},
+        );
+
+        if ( $ReportDefinitionID ) {
+             my %ReportDefinitionData = $Kernel::OM->Get('Reporting')->ReportDefinitionGet(
+                ID => $ReportDefinitionID,
+            );
+
+            if (
+                !DataIsDifferent(
+                    Data1 => $ReportDefinitionData{Config},
+                    Data2 => $Definition->{OldConfig},
+                )
+            ) {
+
+                my $Success = $Kernel::OM->Get('Reporting')->ReportDefinitionUpdate(
+                    %ReportDefinitionData,
+                    ID     => $ReportDefinitionID,
+                    Config => $Definition->{NewConfig},
+                    UserID => 1,
+                );
+            }
+        }
+    }
+
+    return 1;
+}
+
+exit 0;
 
 =back
 

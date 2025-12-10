@@ -163,7 +163,11 @@ sub Run {
             ID => $Contact->{PrimaryOrganisationID},
         );
 
-        if (!%OrgData || $OrgData{ValidID} != 1) {
+        if (
+            !%OrgData ||
+            # accept already set organisations even if invalid
+            ($OrgData{ValidID} != 1 && $Contact->{PrimaryOrganisationID} != $ContactData{PrimaryOrganisationID})
+        ) {
             return $Self->_Error(
                 Code    => 'BadRequest',
                 Message => 'Validation failed. No valid organisation found for primary organisation ID "' . $Contact->{PrimaryOrganisationID} . '".',
@@ -174,11 +178,16 @@ sub Run {
 
     # check each assigned customer
     if ( IsArrayRefWithData($Contact->{OrganisationIDs}) ) {
+        my %CurrentOrgs = map {$_ => 1} @{$ContactData{OrganisationIDs}};
         foreach my $OrgID ( @{ $Contact->{OrganisationIDs} } ) {
             my %OrgData = $Kernel::OM->Get('Organisation')->OrganisationGet(
                 ID => $OrgID,
             );
-            if ( !%OrgData || $OrgData{ValidID} != 1 ) {
+            if (
+                !%OrgData ||
+                # accept already set organisations even if invalid
+                ($OrgData{ValidID} != 1 && !$CurrentOrgs{$OrgID})
+            ) {
                 return $Self->_Error(
                     Code    => 'BadRequest',
                     Message => 'Validation failed. No valid organisation found for assigned organisation ID "' . $OrgID . '".',

@@ -24,6 +24,9 @@
     <Column Name="login" Required="true" Size="200" Type="VARCHAR"/>
     <Column Name="pw" Required="true" Size="64" Type="VARCHAR"/>
     <Column Name="comments" Required="false" Size="250" Type="VARCHAR"/>
+    <Column Name="outofoffice_start" Required="false" Type="DATE"/>
+    <Column Name="outofoffice_end" Required="false" Type="DATE"/>
+    <Column Name="outofoffice_substitute" Required="false" Type="INTEGER"/>
     <Column Name="valid_id" Required="true" Type="SMALLINT"/>
     <Column Name="create_time" Required="true" Type="DATE"/>
     <Column Name="create_by" Required="true" Type="INTEGER"/>
@@ -38,9 +41,13 @@
         <Reference Local="valid_id" Foreign="id"/>
     </ForeignKey>
     <ForeignKey ForeignTable="users">
+        <Reference Local="outofoffice_substitute" Foreign="id"/>
         <Reference Local="create_by" Foreign="id"/>
         <Reference Local="change_by" Foreign="id"/>
     </ForeignKey>
+    <Index Name="users_ooo_substitute">
+        <IndexColumn Name="outofoffice_substitute"/>
+    </Index>
 </Table>
 
 <!-- user preferences -->

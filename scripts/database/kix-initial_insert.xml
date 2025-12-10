@@ -1702,7 +1702,7 @@
         <Data Key="content_type" Type="Quote">text/html</Data>
         <Data Key="language" Type="Quote">en</Data>
         <Data Key="subject" Type="Quote"><![CDATA[Owner assigned: <KIX_TICKET_Title>]]></Data>
-        <Data Key="text" Type="Quote"><![CDATA[<p>You have been assigned as ticket owner: <a href="&lt;KIX_CONFIG_HttpType&gt;://&lt;KIX_CONFIG_FQDN_Frontend&gt;/tickets/&lt;KIX_TICKET_TicketID&gt;">[&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</a></p>]]></Data>
+        <Data Key="text" Type="Quote"><![CDATA[<p>New ticket owner: <KIX_OWNER_Firstname> <KIX_OWNER_Lastname> (<KIX_OWNER_UserLogin>)</p><br/><br/><p>number: <a href="&lt;KIX_CONFIG_HttpType&gt;://&lt;KIX_CONFIG_FQDN_Frontend&gt;/tickets/&lt;KIX_TICKET_TicketID&gt;">[&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</a></p><br/><br/><p>Title:&nbsp;&lt;KIX_TICKET_Title&gt;</p>]]></Data>
     </Insert>
     <Insert Table="notification_event_message">
         <Data Key="id" Type="AutoIncrement">6</Data>
@@ -1792,7 +1792,7 @@
         <Data Key="content_type" Type="Quote">text/html</Data>
         <Data Key="language" Type="Quote">de</Data>
         <Data Key="subject" Type="Quote"><![CDATA[Bearbeiter zugeordnet: <KIX_TICKET_Title>]]></Data>
-        <Data Key="text" Type="Quote"><![CDATA[<p>Ihnen wurde die Bearbeitung dieses Tickets &uuml;bertragen: <a href="&lt;KIX_CONFIG_HttpType&gt;://&lt;KIX_CONFIG_FQDN_Frontend&gt;/tickets/&lt;KIX_TICKET_TicketID&gt;">[&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</a></p><br/><br/><p>Titel:&nbsp;&lt;KIX_TICKET_Title&gt;</p>]]></Data>
+        <Data Key="text" Type="Quote"><![CDATA[<p>Neuer Ticketbearbeiter: <KIX_OWNER_Firstname> <KIX_OWNER_Lastname> (<KIX_OWNER_UserLogin>)</p><br/><br/><p>Nummer: <a href="&lt;KIX_CONFIG_HttpType&gt;://&lt;KIX_CONFIG_FQDN_Frontend&gt;/tickets/&lt;KIX_TICKET_TicketID&gt;">[&lt;KIX_CONFIG_Ticket::Hook&gt;&lt;KIX_TICKET_TicketNumber&gt;]</a></p><br/><br/><p>Titel:&nbsp;&lt;KIX_TICKET_Title&gt;</p>]]></Data>
     </Insert>
     <Insert Table="notification_event_message">
         <Data Key="id" Type="AutoIncrement">19</Data>
@@ -4802,87 +4802,9 @@ DefaultValue:
     </Insert>
 <!-- EO initial job "KIX Field Agent - Mobile Processing Rejected" -->
 
-<!-- initial job "Customer Response - reopen from pending" -->
-    <Insert Table="exec_plan">
-        <Data Key="id" Type="AutoIncrement">2</Data>
-        <Data Key="name" Type="Quote" Translatable="1">Event based Execution Plan for Job "Customer Response - reopen from pending"</Data>
-        <Data Key="type" Type="Quote">EventBased</Data>
-        <Data Key="parameters" Type="Quote"><![CDATA[
-{"Event":["ArticleCreate"]}
-    ]]></Data>
-        <Data Key="comments" Type="Quote" Translatable="1">Event based Execution Plan for Job "Customer Response - reopen from pending"</Data>
-        <Data Key="valid_id">1</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <Insert Table="macro">
-        <Data Key="id" Type="AutoIncrement">2</Data>
-        <Data Key="name" Type="Quote" Translatable="1">Macro for Job "Customer Response - reopen from pending"</Data>
-        <Data Key="type" Type="Quote">Ticket</Data>
-        <Data Key="exec_order" Type="Quote">3</Data>
-        <Data Key="comments" Type="Quote" Translatable="1">Macro for Job "Customer Response - reopen from pending"</Data>
-        <Data Key="valid_id">1</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <Insert Table="macro_action">
-        <Data Key="id" Type="AutoIncrement">3</Data>
-        <Data Key="macro_id">2</Data>
-        <Data Key="type" Type="Quote">StateSet</Data>
-        <Data Key="parameters" Type="Quote"><![CDATA[
-{"State":"open"}
-    ]]></Data>
-        <Data Key="comments" Type="Quote" Translatable="1">MacroAction for Job "Customer Response - reopen from pending"</Data>
-        <Data Key="valid_id">1</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <Insert Table="job">
-        <Data Key="id" Type="AutoIncrement">2</Data>
-        <Data Key="name" Type="Quote" Translatable="1">Customer Response - reopen from pending</Data>
-        <Data Key="type" Type="Quote">Ticket</Data>
-        <Data Key="filter" Type="Quote"><![CDATA[
-{"AND":[
-{"Field":"SenderTypeID","Value":[3],"Operator":"IN","Type":"NUMERIC"},
-{"Field":"StateTypeID","Value":[4,5],"Operator":"IN","Type":"NUMERIC"},
-{"Field":"ChannelID","Value":[1],"Operator":"IN","Type":"NUMERIC"},
-{"Field":"CreateTime","Operator":"LT","Type":"DATETIME","Value":"-1m"}
-]}
-    ]]></Data>
-        <Data Key="comments" Type="Quote" Translatable="1">Reopens ticket from pending by customer response.</Data>
-        <Data Key="valid_id">1</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <Insert Table="job_exec_plan">
-        <Data Key="job_id">2</Data>
-        <Data Key="exec_plan_id">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-    <Insert Table="job_macro">
-        <Data Key="job_id">2</Data>
-        <Data Key="macro_id">2</Data>
-        <Data Key="create_by">1</Data>
-        <Data Key="create_time">current_timestamp</Data>
-        <Data Key="change_by">1</Data>
-        <Data Key="change_time">current_timestamp</Data>
-    </Insert>
-<!-- EO initial job "Customer Response - reopen from pending" -->
-
 <!-- initial job "Periodic Reports" -->
     <Insert Table="exec_plan">
-        <Data Key="id" Type="AutoIncrement">3</Data>
+        <Data Key="id" Type="AutoIncrement">2</Data>
         <Data Key="name" Type="Quote" Translatable="1">Time based Execution Plan for Job "Periodic Reports"</Data>
         <Data Key="type" Type="Quote">TimeBased</Data>
         <Data Key="parameters" Type="Quote"><![CDATA[
@@ -4922,10 +4844,10 @@ DefaultValue:
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="macro">
-        <Data Key="id" Type="AutoIncrement">3</Data>
+        <Data Key="id" Type="AutoIncrement">2</Data>
         <Data Key="name" Type="Quote" Translatable="1">Macro for Job "Periodic Reports"</Data>
         <Data Key="type" Type="Quote">Reporting</Data>
-        <Data Key="exec_order" Type="Quote">4</Data>
+        <Data Key="exec_order" Type="Quote">3</Data>
         <Data Key="comments" Type="Quote" Translatable="1">Macro for Job "Periodic Reports"</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>
@@ -4934,8 +4856,8 @@ DefaultValue:
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="macro_action">
-        <Data Key="id" Type="AutoIncrement">4</Data>
-        <Data Key="macro_id">3</Data>
+        <Data Key="id" Type="AutoIncrement">3</Data>
+        <Data Key="macro_id">2</Data>
         <Data Key="type" Type="Quote">CreateReport</Data>
         <Data Key="parameters" Type="Quote"><![CDATA[
 {"DefinitionID":"${ObjectID}", "OutputFormats":["CSV"]}
@@ -4948,7 +4870,7 @@ DefaultValue:
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="job">
-        <Data Key="id" Type="AutoIncrement">3</Data>
+        <Data Key="id" Type="AutoIncrement">2</Data>
         <Data Key="name" Type="Quote" Translatable="1">Periodic Reports</Data>
         <Data Key="type" Type="Quote">Reporting</Data>
         <Data Key="filter" Type="Quote"><![CDATA[
@@ -4962,16 +4884,16 @@ DefaultValue:
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="job_exec_plan">
-        <Data Key="job_id">3</Data>
-        <Data Key="exec_plan_id">3</Data>
+        <Data Key="job_id">2</Data>
+        <Data Key="exec_plan_id">2</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="job_macro">
-        <Data Key="job_id">3</Data>
-        <Data Key="macro_id">3</Data>
+        <Data Key="job_id">2</Data>
+        <Data Key="macro_id">2</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
@@ -4981,7 +4903,7 @@ DefaultValue:
 
 <!-- initial job "Owner Out Of Office - unlock ticket" -->
     <Insert Table="exec_plan">
-        <Data Key="id" Type="AutoIncrement">4</Data>
+        <Data Key="id" Type="AutoIncrement">3</Data>
         <Data Key="name" Type="Quote" Translatable="1">Event based Execution Plan for Job "Owner Out Of Office - unlock ticket"</Data>
         <Data Key="type" Type="Quote">EventBased</Data>
         <Data Key="parameters" Type="Quote"><![CDATA[
@@ -4995,7 +4917,7 @@ DefaultValue:
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="exec_plan">
-        <Data Key="id" Type="AutoIncrement">5</Data>
+        <Data Key="id" Type="AutoIncrement">4</Data>
         <Data Key="name" Type="Quote" Translatable="1">Time based Execution Plan for Job "Owner Out Of Office - unlock ticket"</Data>
         <Data Key="type" Type="Quote">TimeBased</Data>
         <Data Key="parameters" Type="Quote"><![CDATA[
@@ -5009,10 +4931,10 @@ DefaultValue:
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="macro">
-        <Data Key="id" Type="AutoIncrement">4</Data>
+        <Data Key="id" Type="AutoIncrement">3</Data>
         <Data Key="name" Type="Quote" Translatable="1">Macro for Job "Owner Out Of Office - unlock ticket"</Data>
         <Data Key="type" Type="Quote">Ticket</Data>
-        <Data Key="exec_order" Type="Quote">5,6</Data>
+        <Data Key="exec_order" Type="Quote">4,5</Data>
         <Data Key="comments" Type="Quote" Translatable="1">Macro for Job "Owner Out Of Office - unlock ticket"</Data>
         <Data Key="valid_id">1</Data>
         <Data Key="create_by">1</Data>
@@ -5021,8 +4943,8 @@ DefaultValue:
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="macro_action">
-        <Data Key="id" Type="AutoIncrement">5</Data>
-        <Data Key="macro_id">4</Data>
+        <Data Key="id" Type="AutoIncrement">4</Data>
+        <Data Key="macro_id">3</Data>
         <Data Key="type" Type="Quote">LockSet</Data>
         <Data Key="parameters" Type="Quote"><![CDATA[
 {"Lock":"unlock"}
@@ -5035,8 +4957,8 @@ DefaultValue:
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="macro_action">
-        <Data Key="id" Type="AutoIncrement">6</Data>
-        <Data Key="macro_id">4</Data>
+        <Data Key="id" Type="AutoIncrement">5</Data>
+        <Data Key="macro_id">3</Data>
         <Data Key="type" Type="Quote">OwnerSet</Data>
         <Data Key="parameters" Type="Quote"><![CDATA[
 {"OwnerLoginOrID":"1"}
@@ -5049,7 +4971,7 @@ DefaultValue:
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="job">
-        <Data Key="id" Type="AutoIncrement">4</Data>
+        <Data Key="id" Type="AutoIncrement">3</Data>
         <Data Key="name" Type="Quote" Translatable="1">Owner Out Of Office - unlock ticket</Data>
         <Data Key="type" Type="Quote">Ticket</Data>
         <Data Key="filter" Type="Quote"><![CDATA[
@@ -5075,24 +4997,24 @@ DefaultValue:
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="job_exec_plan">
-        <Data Key="job_id">4</Data>
-        <Data Key="exec_plan_id">4</Data>
+        <Data Key="job_id">3</Data>
+        <Data Key="exec_plan_id">3</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="job_exec_plan">
-        <Data Key="job_id">4</Data>
-        <Data Key="exec_plan_id">5</Data>
+        <Data Key="job_id">3</Data>
+        <Data Key="exec_plan_id">4</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
     <Insert Table="job_macro">
-        <Data Key="job_id">4</Data>
-        <Data Key="macro_id">4</Data>
+        <Data Key="job_id">3</Data>
+        <Data Key="macro_id">3</Data>
         <Data Key="create_by">1</Data>
         <Data Key="create_time">current_timestamp</Data>
         <Data Key="change_by">1</Data>
@@ -5224,7 +5146,7 @@ DefaultValue:
   "DataSource": {
     "SQL": {
         "postgresql": "base64(U0VMRUNUIGRhdGUoY3JlYXRlX3RpbWUpIGFzIGRheSwgQ291bnQoKikgYXMgY291bnQgRlJPTSB0aWNrZXQKV0hFUkUgKGRhdGUoY3JlYXRlX3RpbWUpIEJFVFdFRU4gZGF0ZSgoTk9XKCkgLSBJTlRFUlZBTCAnNyBEQVknKSkgQU5EIGRhdGUoTk9XKCkpKQpHUk9VUCBCWSBkYXkKb3JkZXIgYnkgZGF5IEFTQzs=)",
-        "mysql": "base64(U0VMRUNUIGRhdGUoY3JlYXRlX3RpbWUpIGFzIGRheSwgQ291bnQoKikgYXMgY291bnQgRlJPTSB0aWNrZXQKV0hFUkUgKGRhdGUoY3JlYXRlX3RpbWUpIEJFVFdFRU4gVElNRVNUQU1QKCBEQVRFX0ZPUk1BVChDVVJSRU5UX0RBVEUgLSBJTlRFUlZBTCA3IERBWSAsJyVZLSVtLTAxJykpIEFORCBjdXJyZW50X3RpbWUpCkdST1VQIEJZIGRheQpvcmRlciBieSBkYXkgQVNDOw==)"
+        "mysql": "base64(U0VMRUNUIGRhdGUoY3JlYXRlX3RpbWUpIGFzIGRheSwgQ291bnQoKikgYXMgY291bnQgRlJPTSB0aWNrZXQKV0hFUkUgKGRhdGUoY3JlYXRlX3RpbWUpIEJFVFdFRU4gVElNRVNUQU1QKCBEQVRFX0ZPUk1BVChDVVJSRU5UX0RBVEUgLSBJTlRFUlZBTCA3IERBWSAsJyVZLSVtLSVkJykpIEFORCBjdXJyZW50X3RpbWUpCkdST1VQIEJZIGRheQpvcmRlciBieSBkYXkgQVNDOw==)"
     }
   },
   "OutputFormats": {

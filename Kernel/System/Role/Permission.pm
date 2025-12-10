@@ -793,7 +793,8 @@ sub PermissionListGet {
 delete a permission entry
 
     my $Success = $RoleObject->PermissionDelete(
-        ID => 123,
+        ID     => 123,
+        UserID => 123,
     );
 
 =cut
@@ -802,7 +803,7 @@ sub PermissionDelete {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(ID)) {
+    for (qw(ID UserID)) {
         if ( !$Param{$_} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
