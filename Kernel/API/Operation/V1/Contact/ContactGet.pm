@@ -352,7 +352,8 @@ sub _GetContactData {
             $UserData = $Self->ExecOperation(
                 OperationType => 'V1::User::UserGet',
                 Data          => {
-                    UserID => $ContactData{AssignedUserID},
+                    UserID      => $ContactData{AssignedUserID},
+                    ContactData => \%ContactData                    # use the data we already have (saves at least 2ms)
                 }
             );
         }

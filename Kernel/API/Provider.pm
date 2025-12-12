@@ -144,6 +144,7 @@ sub Run {
     $Webservice = $Kernel::OM->Get('Webservice')->WebserviceGet(
         Name => $Self->{WebserviceName},
     );
+    $Self->{Webservice} = $Webservice;
 
     if ( !IsHashRefWithData($Webservice) ) {
         if ( !$Param{Silent} ) {
@@ -266,6 +267,7 @@ sub Run {
                 CurrentRoute            => $ProcessedRequest->{Route},
                 RequestURI              => $ProcessedRequest->{RequestURI},
                 Authorization           => $Self->{Authorization},
+                TransportConfig         => $Self->{TransportConfig},
             );
 
             # if operation init failed, bail out
@@ -373,6 +375,7 @@ sub Run {
         CurrentRoute                 => $ProcessedRequest->{Route},
         RequestURI                   => $ProcessedRequest->{RequestURI},
         Authorization                => $Self->{Authorization},
+        TransportConfig              => $Self->{TransportConfig},
     );
 
     # if operation init failed, bail out

@@ -75,7 +75,7 @@ sub new {
     bless( $Self, $Type );
 
     # check needed objects
-    for my $Needed (qw(Operation OperationType OperationRouteMapping ParentMethodOperationMapping AvailableMethods RequestMethod RequestURI CurrentRoute WebserviceID)) {
+    for my $Needed (qw(TransportConfig Operation OperationType OperationRouteMapping ParentMethodOperationMapping AvailableMethods RequestMethod RequestURI CurrentRoute WebserviceID)) {
         if ( !$Param{$Needed} ) {
 
             return $Self->_Error(
@@ -171,6 +171,7 @@ sub new {
             Authorization RequestURI RequestMethod Operation OperationType
             OperationConfig OperationRouteMapping ParentMethodOperationMapping
             AvailableMethods IgnorePermissions SuppressPermissionErrors HandleSortInCORE
+            TransportConfig
         )
     ) {
         $Self->{BackendObject}->{$Key} = $Self->{$Key} || $Param{$Key};

@@ -178,10 +178,17 @@ sub _GetUserData {
 
     #FIXME: workaoround KIX2018-3308###########
     $Self->AddCacheDependency(Type => 'Contact');
-    my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
-        UserID        => $UserID,
-        DynamicFields => $Param{Data}->{include}->{DynamicFields},
-    );
+    my %ContactData;
+    if ( !IsHashRefWithData($Param{Data}->{ContactData}) ) {
+        %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
+            UserID        => $UserID,
+            DynamicFields => $Param{Data}->{include}->{DynamicFields},
+        );
+    }
+    else {
+        # use what we have been given by ContactGet 
+        %ContactData = %{$Param{Data}->{ContactData}};
+    }
     $UserData{UserFirstname} = %ContactData ? $ContactData{Firstname} : undef;
     $UserData{UserLastname} = %ContactData ? $ContactData{Lastname} : undef;
     $UserData{UserFullname} = %ContactData ? $ContactData{Fullname} : undef;
