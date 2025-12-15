@@ -856,6 +856,7 @@ sub MacroActionExecute {
                 ObjectID  => $ObjectID,
                 UserID    => $Param{UserID},
                 Data      => IsHashRefWithData( $Param{AdditionalData} ) ? $Param{AdditionalData} : {},
+                ReplaceNotFound => $Option->{Placeholder}->{ReplaceNotFound}
             );
         }
 

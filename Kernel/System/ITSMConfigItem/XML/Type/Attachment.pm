@@ -119,7 +119,7 @@ prepare "external" value to "internal"
     my $AttachmentDirID = $BackendObject->InternalValuePrepare(
         Value => {
             Filename    => '...',
-            ContentType => '...'
+            ContentType => '...',
             Content     => '...'            # base64 coded
         }
     );
@@ -162,13 +162,18 @@ sub InternalValuePrepare {
 
 prepare "internal" value to "external"
 
-    my $AttachmentDirID = $BackendObject->ExternalValuePrepare(
-        Value => {
-            Filename    => '...',
-            ContentType => '...'
-            Content     => '...'            # base64 coded
-        }
+    my $Attachment = $BackendObject->ExternalValuePrepare(
+        Value => $AttachmentDirID
     );
+
+    returns
+    {
+        Filename    => '...',
+        ContentType => '...',
+        Content     => '...',            # base64 coded
+        Filesize    => '123 KBytes',
+        FilesizeRaw => 12345678
+    }
 
 =cut
 
