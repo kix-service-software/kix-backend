@@ -116,7 +116,8 @@ sub GetSupportedAttributes {
             IsSearchable   => 1,
             IsSortable     => 0,
             IsFulltextable => 0,
-            Operators      => ['EMPTY','EQ','NE','IN','!IN','GT','GTE','LT','LTE']
+            Operators      => ['EMPTY','EQ','NE','IN','!IN','GT','GTE','LT','LTE'],
+            ValueType      => 'NUMERIC'
         }
     };
 }

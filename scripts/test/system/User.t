@@ -228,7 +228,6 @@ my $SetPreferences = $Kernel::OM->Get('User')->SetPreferences(
     Value  => 'fr',
     UserID => $UserID,
 );
-
 $Self->True(
     $SetPreferences,
     "SetPreferences - $UserID",
@@ -237,12 +236,10 @@ $Self->True(
 my %UserPreferences = $Kernel::OM->Get('User')->GetPreferences(
     UserID => $UserID,
 );
-
 $Self->True(
     %UserPreferences || '',
     "GetPreferences - $UserID",
 );
-
 $Self->Is(
     $UserPreferences{UserLanguage},
     "fr",
@@ -419,6 +416,17 @@ my $DeleteResult = $Kernel::OM->Get('User')->DeleteNewlyCreatedUser(
 $Self->True(
     $DeleteResult,
     'DeleteNewlyCreatedUser()',
+);
+
+# testing preferences setting empty array
+$SetPreferences = $Kernel::OM->Get('User')->SetPreferences(
+    Key    => 'UnitTest',
+    Value  => [],
+    UserID => $UserID,
+);
+$Self->True(
+    $SetPreferences,
+    "SetPreferences with empty array - $UserID",
 );
 
 # reset fixed time

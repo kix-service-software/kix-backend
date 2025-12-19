@@ -2489,7 +2489,7 @@ Static: 2',
     },
 );
 
-my $TestCount = 0;
+$TestCount = 0;
 foreach my $Test ( @Tests ) {
     $TestCount++;
 

@@ -86,7 +86,7 @@ sub SetPreferences {
     else {
         # prepare multiple values (i.e. MyQueues, MyServices, ...)
         my @Values;
-        if ( IsArrayRefWithData($Param{Value}) ) {
+        if ( IsArrayRef($Param{Value}) ) {
             @Values = @{$Param{Value}};
         }
         else {
@@ -102,7 +102,8 @@ sub SetPreferences {
             Bind => [ \$Param{UserID}, \$Param{Key} ],
         );
 
-        foreach my $Value ( @Values ) {
+        for my $Value ( @Values ) {
+            next if ( !defined( $Value ) );
             # insert new data
             return if !$DBObject->Do(
                 SQL => "
