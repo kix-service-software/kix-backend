@@ -1797,26 +1797,29 @@ sub SetPreferences {
     my $PreferencesObject = $Kernel::OM->Get($GeneratorModule);
 
     # set preferences
-    my $Result = $PreferencesObject->SetPreferences(%Param);
+    my $Success = $PreferencesObject->SetPreferences(%Param);
 
-    # trigger event
-    $Self->EventHandler(
-        Event  => 'UserSetPreferences',
-        Data   => {
-            UserID => $Param{UserID},
-            Key    => $Param{Key},
-        },
-        UserID => 1,
-    );
+    # only trigger events on success
+    if ( $Success ) {
+        # trigger event
+        $Self->EventHandler(
+            Event  => 'UserSetPreferences',
+            Data   => {
+                UserID => $Param{UserID},
+                Key    => $Param{Key},
+            },
+            UserID => 1,
+        );
 
-    # push client callback event
-    $Kernel::OM->Get('ClientNotification')->NotifyClients(
-        Event     => 'UPDATE',
-        Namespace => 'User.UserPreference',
-        ObjectID  => $Param{UserID} . '::' . $Param{Key},
-    );
+        # push client callback event
+        $Kernel::OM->Get('ClientNotification')->NotifyClients(
+            Event     => 'UPDATE',
+            Namespace => 'User.UserPreference',
+            ObjectID  => $Param{UserID} . '::' . $Param{Key},
+        );
+    }
 
-    return $Result;
+    return $Success;
 }
 
 =item GetUserLanguage()
