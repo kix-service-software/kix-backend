@@ -202,7 +202,7 @@
             <String>Kernel::System::Automation</String>
         </Setting>
     </ConfigItem>
-    
+
     <ConfigItem AccessLevel="internal" Name="Automation::VariableFilter###BaseUtil" Required="0" Valid="1">
         <Description Translatable="1">Registration of a variable filter module.</Description>
         <Group>Automation</Group>
@@ -210,7 +210,13 @@
             <String>Kernel::System::Automation::VariableFilter::BaseUtil</String>
         </Setting>
     </ConfigItem>
-    
+    <ConfigItem AccessLevel="internal" Name="Automation::VariableFilter###CSVUtil" Required="0" Valid="1">
+        <Description Translatable="1">Registration of a variable filter module.</Description>
+        <Group>Automation</Group>
+        <Setting>
+            <String>Kernel::System::Automation::VariableFilter::CSVUtil</String>
+        </Setting>
+    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Automation::VariableFilter###DateUtil" Required="0" Valid="1">
         <Description Translatable="1">Registration of a variable filter module.</Description>
         <Group>Automation</Group>
@@ -218,7 +224,6 @@
             <String>Kernel::System::Automation::VariableFilter::DateUtil</String>
         </Setting>
     </ConfigItem>
-    
     <ConfigItem AccessLevel="internal" Name="Automation::VariableFilter###XMLUtil" Required="0" Valid="1">
         <Description Translatable="1">Registration of a variable filter module.</Description>
         <Group>Automation</Group>

@@ -122,7 +122,8 @@ $Self->IsDeeply(
             IsSearchable   => 1,
             IsSelectable   => 0,
             IsSortable     => 0,
-            Operators      => ['EMPTY','EQ','NE','IN','!IN','GT','GTE','LT','LTE']
+            Operators      => ['EMPTY','EQ','NE','IN','!IN','GT','GTE','LT','LTE'],
+            ValueType      => 'NUMERIC'
         }
     },
     'GetSupportedAttributes provides expected data'

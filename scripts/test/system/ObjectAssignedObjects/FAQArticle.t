@@ -557,7 +557,7 @@ END
     #     # consider only test articles
     #     ObjectIDList => [ $TestData{EnglishFAQID}, $TestData{GermanFAQID} ]
     # );
-    my @EnglishArticleIDList = $Kernel::OM->Get('ObjectSearch')->Search(
+    @EnglishArticleIDList = $Kernel::OM->Get('ObjectSearch')->Search(
         ObjectType => 'FAQArticle',
         Result     => 'ARRAY',
         UserID     => 1,

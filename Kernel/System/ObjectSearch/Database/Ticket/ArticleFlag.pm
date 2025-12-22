@@ -57,7 +57,10 @@ sub AttributePrepare {
         my $JoinString = 'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id';
 
         # restrict search from customers to customer visible articles
-        if ( $Param{UserType} eq 'Customer' ) {
+        if (
+            defined( $Param{UserType} )
+            && $Param{UserType} eq 'Customer'
+        ) {
             $JoinString .= ' AND ta.customer_visible = 1';
         }
         push( @SQLJoin, $JoinString );
