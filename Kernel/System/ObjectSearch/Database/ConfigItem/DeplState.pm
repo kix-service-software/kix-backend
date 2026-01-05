@@ -49,6 +49,11 @@ sub GetSupportedAttributes {
             IsSearchable => 1,
             IsSortable   => 1,
             Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+        },
+        DeplStateType => {
+            IsSearchable => 1,
+            IsSortable   => 0,
+            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         }
     };
 }
@@ -70,32 +75,50 @@ sub Search {
 
         if ( $Param{Search}->{Field} eq 'DeplState' ) {
             if ( !$Param{Flags}->{JoinMap}->{ConfigItemVersionDeplState} ) {
-                push( @SQLJoin, 'INNER JOIN general_catalog civds ON civds.id = civ.depl_state_id AND general_catalog_class = \'ITSM::ConfigItem::DeploymentState\'' );
+                push( @SQLJoin, 'INNER JOIN general_catalog civds ON civds.id = civ.depl_state_id AND civds.general_catalog_class = \'ITSM::ConfigItem::DeploymentState\'' );
 
                 $Param{Flags}->{JoinMap}->{ConfigItemVersionDeplState} = 1;
+            }
+        }
+        elsif ( $Param{Search}->{Field} eq 'DeplStateType' ) {
+            if ( !$Param{Flags}->{JoinMap}->{ConfigItemDeplStateType} ) {
+                push( @SQLJoin, 'LEFT OUTER JOIN general_catalog_preferences civdst ON civdst.general_catalog_id = civ.depl_state_id AND civdst.pref_key = \'Functionality\'' );
+
+                $Param{Flags}->{JoinMap}->{ConfigItemDeplStateType} = 1;
             }
         }
     }
     elsif ( $Param{Search}->{Field} eq 'DeplState' ) {
         if ( !$Param{Flags}->{JoinMap}->{ConfigItemDeplState} ) {
-            push( @SQLJoin, 'INNER JOIN general_catalog cids ON cids.id = ci.cur_depl_state_id AND general_catalog_class = \'ITSM::ConfigItem::DeploymentState\'' );
+            push( @SQLJoin, 'INNER JOIN general_catalog cids ON cids.id = ci.cur_depl_state_id AND cids.general_catalog_class = \'ITSM::ConfigItem::DeploymentState\'' );
 
             $Param{Flags}->{JoinMap}->{ConfigItemDeplState} = 1;
+        }
+    }
+    elsif ( $Param{Search}->{Field} eq 'DeplStateType' ) {
+        if ( !$Param{Flags}->{JoinMap}->{ConfigItemDeplStateType} ) {
+            push( @SQLJoin, 'LEFT OUTER JOIN general_catalog_preferences cidst ON cidst.general_catalog_id = ci.cur_depl_state_id AND cidst.pref_key = \'Functionality\'' );
+
+            $Param{Flags}->{JoinMap}->{ConfigItemDeplStateType} = 1;
         }
     }
 
     # init mapping
     my %AttributeMapping = (
-        DeplStateID  => {
+        DeplStateID   => {
             Column    => $Param{Flags}->{PreviousVersionSearch} ? 'civ.depl_state_id' : 'ci.cur_depl_state_id',
             ValueType => 'NUMERIC'
         },
-        DeplStateIDs => {
+        DeplStateIDs  => {
             Column    => $Param{Flags}->{PreviousVersionSearch} ? 'civ.depl_state_id' : 'ci.cur_depl_state_id',
             ValueType => 'NUMERIC'
         },
-        DeplState    => {
+        DeplState     => {
             Column    => $Param{Flags}->{PreviousVersionSearch} ? 'civds.name' : 'cids.name'
+        },
+        DeplStateType => {
+            Column    => $Param{Flags}->{PreviousVersionSearch} ? 'civdst.pref_value' : 'cidst.pref_value',
+            NULLValue => 1
         }
     );
 
@@ -104,6 +127,7 @@ sub Search {
         Operator  => $Param{Search}->{Operator},
         Column    => $AttributeMapping{ $Param{Search}->{Field} }->{Column},
         ValueType => $AttributeMapping{ $Param{Search}->{Field} }->{ValueType},
+        NULLValue => $AttributeMapping{ $Param{Search}->{Field} }->{NULLValue},
         Value     => $Param{Search}->{Value},
         Silent    => $Param{Silent}
     );
@@ -128,7 +152,7 @@ sub Sort {
     my @SQLJoin = ();
     if ( $Param{Attribute} eq 'DeplState' ) {
         if ( !$Param{Flags}->{JoinMap}->{ConfigItemDeplStateSort} ) {
-            push( @SQLJoin, 'LEFT OUTER JOIN general_catalog cids ON cids.id = ci.cur_depl_state_id AND general_catalog_class = \'ITSM::ConfigItem::DeploymentState\'' );
+            push( @SQLJoin, 'LEFT OUTER JOIN general_catalog cids ON cids.id = ci.cur_depl_state_id AND cids.general_catalog_class = \'ITSM::ConfigItem::DeploymentState\'' );
 
             $Param{Flags}->{JoinMap}->{ConfigItemDeplStateSort} = 1;
         }

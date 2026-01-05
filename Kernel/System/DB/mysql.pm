@@ -336,22 +336,6 @@ sub TableCreate {
     $SQL .= "\n";
     push @Return, $SQLStart . $SQL . $SQLEnd;
 
-    # add indexs
-    #    for my $Name (sort keys %Index) {
-    #        push (@Return, $Self->IndexCreate(
-    #            TableName => $TableName,
-    #            Name => $Name,
-    #            Data => $Index{$Name},
-    #        ));
-    #    }
-    # add uniq
-    #    for my $Name (sort keys %Uniq) {
-    #        push (@Return, $Self->UniqueCreate(
-    #            TableName => $TableName,
-    #            Name => $Name,
-    #            Data => $Uniq{$Name},
-    #        ));
-    #    }
     # add foreign keys
     for my $ForeignKey ( sort keys %Foreign ) {
         my @Array = @{ $Foreign{$ForeignKey} };
@@ -469,9 +453,9 @@ sub TableAlter {
             # normal data type
             push @SQL, $SQLStart . " CHANGE $Tag->{NameOld} $Tag->{NameNew} $Tag->{Type} NULL";
 
-            # remove possible default (not on TEXT/BLOB/LONGBLOB type, not supported by mysql)
+            # set default as NULL (not on TEXT/BLOB/LONGBLOB type, not supported by mysql)
             if ( $Tag->{Type} !~ /^(TEXT|MEDIUMTEXT|BLOB|LONGBLOB)$/i ) {
-                push @SQL, "ALTER TABLE $Table ALTER $Tag->{NameNew} DROP DEFAULT";
+                push @SQL, "ALTER TABLE $Table CHANGE $Tag->{NameNew} $Tag->{NameNew} $Tag->{Type} DEFAULT NULL";
             }
 
             # investigate the default value

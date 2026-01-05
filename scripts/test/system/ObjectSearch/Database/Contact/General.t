@@ -29,7 +29,7 @@ $Self->Is(
 );
 
 # check supported methods
-for my $Method ( qw(GetSupportedAttributes Search Sort) ) {
+for my $Method ( qw(GetSupportedAttributes AttributePrepare Select Search Sort) ) {
     $Self->True(
         $AttributeObject->can($Method),
         'Attribute object can "' . $Method . q{"}
@@ -42,59 +42,81 @@ $Self->IsDeeply(
     $AttributeList,
     {
         Title => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EMPTY','EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         Firstname => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         Lastname => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         Phone => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EMPTY','EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         Fax => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EMPTY','EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         Mobile => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EMPTY','EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         Street => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EMPTY','EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         City => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EMPTY','EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         Zip => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EMPTY','EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         Country => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EMPTY','EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         Comment => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EMPTY','EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         }
     },
     'GetSupportedAttributes provides expected data'
@@ -273,6 +295,34 @@ my @SearchTests = (
         Expected     => {
             'Where' => [
                 $CaseSensitive ? 'LOWER(c.title) LIKE \'test\'' : 'c.title LIKE \'test\''
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field Title / Operator EMPTY / Value 1',
+        Search       => {
+            Field    => 'Title',
+            Operator => 'EMPTY',
+            Value    => 1
+        },
+        Expected     => {
+            'IsRelative' => undef,
+            'Where'      => [
+                '(c.title = \'\' OR c.title IS NULL)'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field Title / Operator EMPTY / Value 0',
+        Search       => {
+            Field    => 'Title',
+            Operator => 'EMPTY',
+            Value    => 0
+        },
+        Expected     => {
+            'IsRelative' => undef,
+            'Where'      => [
+                '(c.title != \'\' AND c.title IS NOT NULL)'
             ]
         }
     },
@@ -589,6 +639,34 @@ my @SearchTests = (
         }
     },
     {
+        Name         => 'Search: valid search / Field Phone / Operator EMPTY / Value 1',
+        Search       => {
+            Field    => 'Phone',
+            Operator => 'EMPTY',
+            Value    => 1
+        },
+        Expected     => {
+            'IsRelative' => undef,
+            'Where'      => [
+                '(c.phone = \'\' OR c.phone IS NULL)'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field Phone / Operator EMPTY / Value 0',
+        Search       => {
+            Field    => 'Phone',
+            Operator => 'EMPTY',
+            Value    => 0
+        },
+        Expected     => {
+            'IsRelative' => undef,
+            'Where'      => [
+                '(c.phone != \'\' AND c.phone IS NOT NULL)'
+            ]
+        }
+    },
+    {
         Name         => 'Search: valid search / Field Fax / Operator EQ',
         Search       => {
             Field    => 'Fax',
@@ -689,6 +767,34 @@ my @SearchTests = (
         Expected     => {
             'Where' => [
                 $CaseSensitive ? 'LOWER(c.fax) LIKE \'test\'' : 'c.fax LIKE \'test\''
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field Fax / Operator EMPTY / Value 1',
+        Search       => {
+            Field    => 'Fax',
+            Operator => 'EMPTY',
+            Value    => 1
+        },
+        Expected     => {
+            'IsRelative' => undef,
+            'Where'      => [
+                '(c.fax = \'\' OR c.fax IS NULL)'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field Fax / Operator EMPTY / Value 0',
+        Search       => {
+            Field    => 'Fax',
+            Operator => 'EMPTY',
+            Value    => 0
+        },
+        Expected     => {
+            'IsRelative' => undef,
+            'Where'      => [
+                '(c.fax != \'\' AND c.fax IS NOT NULL)'
             ]
         }
     },
@@ -797,6 +903,34 @@ my @SearchTests = (
         }
     },
     {
+        Name         => 'Search: valid search / Field Mobile / Operator EMPTY / Value 1',
+        Search       => {
+            Field    => 'Mobile',
+            Operator => 'EMPTY',
+            Value    => 1
+        },
+        Expected     => {
+            'IsRelative' => undef,
+            'Where'      => [
+                '(c.mobile = \'\' OR c.mobile IS NULL)'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field Mobile / Operator EMPTY / Value 0',
+        Search       => {
+            Field    => 'Mobile',
+            Operator => 'EMPTY',
+            Value    => 0
+        },
+        Expected     => {
+            'IsRelative' => undef,
+            'Where'      => [
+                '(c.mobile != \'\' AND c.mobile IS NOT NULL)'
+            ]
+        }
+    },
+    {
         Name         => 'Search: valid search / Field Street / Operator EQ',
         Search       => {
             Field    => 'Street',
@@ -897,6 +1031,34 @@ my @SearchTests = (
         Expected     => {
             'Where' => [
                 $CaseSensitive ? 'LOWER(c.street) LIKE \'test\'' : 'c.street LIKE \'test\''
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field Street / Operator EMPTY / Value 1',
+        Search       => {
+            Field    => 'Street',
+            Operator => 'EMPTY',
+            Value    => 1
+        },
+        Expected     => {
+            'IsRelative' => undef,
+            'Where'      => [
+                '(c.street = \'\' OR c.street IS NULL)'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field Street / Operator EMPTY / Value 0',
+        Search       => {
+            Field    => 'Street',
+            Operator => 'EMPTY',
+            Value    => 0
+        },
+        Expected     => {
+            'IsRelative' => undef,
+            'Where'      => [
+                '(c.street != \'\' AND c.street IS NOT NULL)'
             ]
         }
     },
@@ -1005,6 +1167,34 @@ my @SearchTests = (
         }
     },
     {
+        Name         => 'Search: valid search / Field City / Operator EMPTY / Value 1',
+        Search       => {
+            Field    => 'City',
+            Operator => 'EMPTY',
+            Value    => 1
+        },
+        Expected     => {
+            'IsRelative' => undef,
+            'Where'      => [
+                '(c.city = \'\' OR c.city IS NULL)'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field City / Operator EMPTY / Value 0',
+        Search       => {
+            Field    => 'City',
+            Operator => 'EMPTY',
+            Value    => 0
+        },
+        Expected     => {
+            'IsRelative' => undef,
+            'Where'      => [
+                '(c.city != \'\' AND c.city IS NOT NULL)'
+            ]
+        }
+    },
+    {
         Name         => 'Search: valid search / Field Zip / Operator EQ',
         Search       => {
             Field    => 'Zip',
@@ -1105,6 +1295,34 @@ my @SearchTests = (
         Expected     => {
             'Where' => [
                 $CaseSensitive ? 'LOWER(c.zip) LIKE \'test\'' : 'c.zip LIKE \'test\''
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field Zip / Operator EMPTY / Value 1',
+        Search       => {
+            Field    => 'Zip',
+            Operator => 'EMPTY',
+            Value    => 1
+        },
+        Expected     => {
+            'IsRelative' => undef,
+            'Where'      => [
+                '(c.zip = \'\' OR c.zip IS NULL)'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field Zip / Operator EMPTY / Value 0',
+        Search       => {
+            Field    => 'Zip',
+            Operator => 'EMPTY',
+            Value    => 0
+        },
+        Expected     => {
+            'IsRelative' => undef,
+            'Where'      => [
+                '(c.zip != \'\' AND c.zip IS NOT NULL)'
             ]
         }
     },
@@ -1213,6 +1431,34 @@ my @SearchTests = (
         }
     },
     {
+        Name         => 'Search: valid search / Field Country / Operator EMPTY / Value 1',
+        Search       => {
+            Field    => 'Country',
+            Operator => 'EMPTY',
+            Value    => 1
+        },
+        Expected     => {
+            'IsRelative' => undef,
+            'Where'      => [
+                '(c.country = \'\' OR c.country IS NULL)'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field Country / Operator EMPTY / Value 0',
+        Search       => {
+            Field    => 'Country',
+            Operator => 'EMPTY',
+            Value    => 0
+        },
+        Expected     => {
+            'IsRelative' => undef,
+            'Where'      => [
+                '(c.country != \'\' AND c.country IS NOT NULL)'
+            ]
+        }
+    },
+    {
         Name         => 'Search: valid search / Field Comment / Operator EQ',
         Search       => {
             Field    => 'Comment',
@@ -1315,6 +1561,34 @@ my @SearchTests = (
                 $CaseSensitive ? 'LOWER(c.comments) LIKE \'test\'' : 'c.comments LIKE \'test\''
             ]
         }
+    },
+    {
+        Name         => 'Search: valid search / Field Comment / Operator EMPTY / Value 1',
+        Search       => {
+            Field    => 'Comment',
+            Operator => 'EMPTY',
+            Value    => 1
+        },
+        Expected     => {
+            'IsRelative' => undef,
+            'Where'      => [
+                '(c.comments = \'\' OR c.comments IS NULL)'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field Comment / Operator EMPTY / Value 0',
+        Search       => {
+            Field    => 'Comment',
+            Operator => 'EMPTY',
+            Value    => 0
+        },
+        Expected     => {
+            'IsRelative' => undef,
+            'Where'      => [
+                '(c.comments != \'\' AND c.comments IS NOT NULL)'
+            ]
+        }
     }
 );
 for my $Test ( @SearchTests ) {
@@ -1348,10 +1622,10 @@ my @SortTests = (
         Attribute => 'Title',
         Expected  => {
             'OrderBy' => [
-                'LOWER(c.title)'
+                'SortAttr0'
             ],
             'Select' => [
-                'LOWER(c.title)'
+                'LOWER(c.title) AS SortAttr0'
             ]
         }
     },
@@ -1360,10 +1634,10 @@ my @SortTests = (
         Attribute => 'Firstname',
         Expected  => {
             'OrderBy' => [
-                'LOWER(c.firstname)'
+                'SortAttr0'
             ],
             'Select' => [
-                'LOWER(c.firstname)'
+                'LOWER(c.firstname) AS SortAttr0'
             ]
         }
     },
@@ -1372,10 +1646,10 @@ my @SortTests = (
         Attribute => 'Lastname',
         Expected  => {
             'OrderBy' => [
-                'LOWER(c.lastname)'
+                'SortAttr0'
             ],
             'Select' => [
-                'LOWER(c.lastname)'
+                'LOWER(c.lastname) AS SortAttr0'
             ]
         }
     },
@@ -1384,10 +1658,10 @@ my @SortTests = (
         Attribute => 'Phone',
         Expected  => {
             'OrderBy' => [
-                'LOWER(COALESCE(c.phone,\'\'))'
+                'SortAttr0'
             ],
             'Select' => [
-                'LOWER(COALESCE(c.phone,\'\'))'
+                'LOWER(COALESCE(c.phone,\'\')) AS SortAttr0'
             ]
         }
     },
@@ -1396,10 +1670,10 @@ my @SortTests = (
         Attribute => 'Fax',
         Expected  => {
             'OrderBy' => [
-                'LOWER(COALESCE(c.fax,\'\'))'
+                'SortAttr0'
             ],
             'Select' => [
-                'LOWER(COALESCE(c.fax,\'\'))'
+                'LOWER(COALESCE(c.fax,\'\')) AS SortAttr0'
             ]
         }
     },
@@ -1408,10 +1682,10 @@ my @SortTests = (
         Attribute => 'Mobile',
         Expected  => {
             'OrderBy' => [
-                'LOWER(COALESCE(c.mobile,\'\'))'
+                'SortAttr0'
             ],
             'Select' => [
-                'LOWER(COALESCE(c.mobile,\'\'))'
+                'LOWER(COALESCE(c.mobile,\'\')) AS SortAttr0'
             ]
         }
     },
@@ -1420,10 +1694,10 @@ my @SortTests = (
         Attribute => 'Street',
         Expected  => {
             'OrderBy' => [
-                'LOWER(COALESCE(c.street,\'\'))'
+                'SortAttr0'
             ],
             'Select' => [
-                'LOWER(COALESCE(c.street,\'\'))'
+                'LOWER(COALESCE(c.street,\'\')) AS SortAttr0'
             ]
         }
     },
@@ -1432,10 +1706,10 @@ my @SortTests = (
         Attribute => 'City',
         Expected  => {
             'OrderBy' => [
-                'LOWER(COALESCE(c.city,\'\'))'
+                'SortAttr0'
             ],
             'Select' => [
-                'LOWER(COALESCE(c.city,\'\'))'
+                'LOWER(COALESCE(c.city,\'\')) AS SortAttr0'
             ]
         }
     },
@@ -1444,10 +1718,10 @@ my @SortTests = (
         Attribute => 'Zip',
         Expected  => {
             'OrderBy' => [
-                'LOWER(COALESCE(c.zip,\'\'))'
+                'SortAttr0'
             ],
             'Select' => [
-                'LOWER(COALESCE(c.zip,\'\'))'
+                'LOWER(COALESCE(c.zip,\'\')) AS SortAttr0'
             ]
         }
     },
@@ -1456,10 +1730,10 @@ my @SortTests = (
         Attribute => 'Country',
         Expected  => {
             'OrderBy' => [
-                'LOWER(COALESCE(c.country,\'\'))'
+                'SortAttr0'
             ],
             'Select' => [
-                'LOWER(COALESCE(c.country,\'\'))'
+                'LOWER(COALESCE(c.country,\'\')) AS SortAttr0'
             ]
         }
     },
@@ -1468,10 +1742,10 @@ my @SortTests = (
         Attribute => 'Comment',
         Expected  => {
             'OrderBy' => [
-                'LOWER(COALESCE(c.comments,\'\'))'
+                'SortAttr0'
             ],
             'Select' => [
-                'LOWER(COALESCE(c.comments,\'\'))'
+                'LOWER(COALESCE(c.comments,\'\')) AS SortAttr0'
             ]
         }
     }
@@ -1763,6 +2037,32 @@ my @IntegrationSearchTests = (
             ]
         },
         Expected => [$ContactID1]
+    },
+    {
+        Name     => "Search: Field Title / Operator EMPTY / Value 1",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Title',
+                    Operator => 'EMPTY',
+                    Value    => 1
+                }
+            ]
+        },
+        Expected => [1,$ContactID4]
+    },
+    {
+        Name     => "Search: Field Title / Operator EMPTY / Value 0",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Title',
+                    Operator => 'EMPTY',
+                    Value    => 0
+                }
+            ]
+        },
+        Expected => [$ContactID1,$ContactID2,$ContactID3]
     },
     {
         Name     => "Search: Field Firstname / Operator EQ / Value \$TestData[0]->{Firstname}",
@@ -2077,6 +2377,32 @@ my @IntegrationSearchTests = (
         Expected => [$ContactID1]
     },
     {
+        Name     => "Search: Field Phone / Operator EMPTY / Value 1",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Phone',
+                    Operator => 'EMPTY',
+                    Value    => 1
+                }
+            ]
+        },
+        Expected => [1,$ContactID2,$ContactID4]
+    },
+    {
+        Name     => "Search: Field Phone / Operator EMPTY / Value 0",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Phone',
+                    Operator => 'EMPTY',
+                    Value    => 0
+                }
+            ]
+        },
+        Expected => [$ContactID1,$ContactID3]
+    },
+    {
         Name     => "Search: Field Lastname / Operator EQ / Value \$TestData[0]->{Lastname}",
         Search   => {
             'AND' => [
@@ -2389,6 +2715,32 @@ my @IntegrationSearchTests = (
         Expected => [$ContactID1,$ContactID4]
     },
     {
+        Name     => "Search: Field Fax / Operator EMPTY / Value 1",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Fax',
+                    Operator => 'EMPTY',
+                    Value    => 1
+                }
+            ]
+        },
+        Expected => [1,$ContactID2,$ContactID3]
+    },
+    {
+        Name     => "Search: Field Fax / Operator EMPTY / Value 0",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Fax',
+                    Operator => 'EMPTY',
+                    Value    => 0
+                }
+            ]
+        },
+        Expected => [$ContactID1,$ContactID4]
+    },
+    {
         Name     => "Search: Field Mobile / Operator EQ / Value \$TestData[1]->{Mobile}",
         Search   => {
             'AND' => [
@@ -2543,6 +2895,32 @@ my @IntegrationSearchTests = (
             ]
         },
         Expected => [$ContactID2]
+    },
+    {
+        Name     => "Search: Field Mobile / Operator EMPTY / Value 1",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Mobile',
+                    Operator => 'EMPTY',
+                    Value    => 1
+                }
+            ]
+        },
+        Expected => [1,$ContactID1,$ContactID4]
+    },
+    {
+        Name     => "Search: Field Mobile / Operator EMPTY / Value 0",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Mobile',
+                    Operator => 'EMPTY',
+                    Value    => 0
+                }
+            ]
+        },
+        Expected => [$ContactID2,$ContactID3]
     },
     {
         Name     => "Search: Field Street / Operator EQ / Value \$TestData[0]->{Street}",
@@ -2701,6 +3079,32 @@ my @IntegrationSearchTests = (
         Expected => [$ContactID1]
     },
     {
+        Name     => "Search: Field Street / Operator EMPTY / Value 1",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Street',
+                    Operator => 'EMPTY',
+                    Value    => 1
+                }
+            ]
+        },
+        Expected => [1,$ContactID3]
+    },
+    {
+        Name     => "Search: Field Street / Operator EMPTY / Value 0",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Street',
+                    Operator => 'EMPTY',
+                    Value    => 0
+                }
+            ]
+        },
+        Expected => [$ContactID1,$ContactID2,$ContactID4]
+    },
+    {
         Name     => "Search: Field Zip / Operator EQ / Value \$TestData[0]->{Zip}",
         Search   => {
             'AND' => [
@@ -2855,6 +3259,32 @@ my @IntegrationSearchTests = (
             ]
         },
         Expected => [$ContactID1]
+    },
+    {
+        Name     => "Search: Field Zip / Operator EMPTY / Value 1",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Zip',
+                    Operator => 'EMPTY',
+                    Value    => 1
+                }
+            ]
+        },
+        Expected => [1,$ContactID3]
+    },
+    {
+        Name     => "Search: Field Zip / Operator EMPTY / Value 0",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Zip',
+                    Operator => 'EMPTY',
+                    Value    => 0
+                }
+            ]
+        },
+        Expected => [$ContactID1,$ContactID2,$ContactID4]
     },
     {
         Name     => "Search: Field City / Operator EQ / Value \$TestData[0]->{City}",
@@ -3013,6 +3443,32 @@ my @IntegrationSearchTests = (
         Expected => [$ContactID1,$ContactID4]
     },
     {
+        Name     => "Search: Field City / Operator EMPTY / Value 1",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'City',
+                    Operator => 'EMPTY',
+                    Value    => 1
+                }
+            ]
+        },
+        Expected => [1,$ContactID3]
+    },
+    {
+        Name     => "Search: Field City / Operator EMPTY / Value 0",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'City',
+                    Operator => 'EMPTY',
+                    Value    => 0
+                }
+            ]
+        },
+        Expected => [$ContactID1,$ContactID2,$ContactID4]
+    },
+    {
         Name     => "Search: Field Country / Operator EQ / Value \$TestData[0]->{Country}",
         Search   => {
             'AND' => [
@@ -3169,6 +3625,32 @@ my @IntegrationSearchTests = (
         Expected => [$ContactID1,$ContactID4]
     },
     {
+        Name     => "Search: Field Country / Operator EMPTY / Value 1",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Country',
+                    Operator => 'EMPTY',
+                    Value    => 1
+                }
+            ]
+        },
+        Expected => [1,$ContactID3]
+    },
+    {
+        Name     => "Search: Field Country / Operator EMPTY / Value 0",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Country',
+                    Operator => 'EMPTY',
+                    Value    => 0
+                }
+            ]
+        },
+        Expected => [$ContactID1,$ContactID2,$ContactID4]
+    },
+    {
         Name     => "Search: Field Comment / Operator EQ / Value \$TestData[1]->{Comment}",
         Search   => {
             'AND' => [
@@ -3319,6 +3801,32 @@ my @IntegrationSearchTests = (
                     Field    => 'Comment',
                     Operator => 'LIKE',
                     Value    => q{*} . substr($TestData[1]->{Comment},5)
+                }
+            ]
+        },
+        Expected => [$ContactID2,$ContactID4]
+    },
+    {
+        Name     => "Search: Field Comment / Operator EMPTY / Value 1",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Comment',
+                    Operator => 'EMPTY',
+                    Value    => 1
+                }
+            ]
+        },
+        Expected => [1,$ContactID1,$ContactID3]
+    },
+    {
+        Name     => "Search: Field Comment / Operator EMPTY / Value 0",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Comment',
+                    Operator => 'EMPTY',
+                    Value    => 0
                 }
             ]
         },

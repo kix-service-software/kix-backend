@@ -1022,6 +1022,15 @@
         <Data Key="change_by">1</Data>
         <Data Key="change_time">current_timestamp</Data>
     </Insert>
+    <Insert Table="ticket_history_type">
+        <Data Key="id" Type="AutoIncrement">39</Data>
+        <Data Key="name" Type="Quote">ArticleSend</Data>
+        <Data Key="valid_id">1</Data>
+        <Data Key="create_by">1</Data>
+        <Data Key="create_time">current_timestamp</Data>
+        <Data Key="change_by">1</Data>
+        <Data Key="change_time">current_timestamp</Data>
+    </Insert>
 
 <!-- channel -->
     <Insert Table="channel">
@@ -5046,12 +5055,14 @@ DefaultValue:
         <Data Key="filter" Type="Quote"><![CDATA[
 [{"AND":[
 {"Field":"OwnerOutOfOffice","Value":1,"Operator":"EQ","Type":"NUMERIC"},
+{"Field":"OwnerOutOfOfficeSubstitute","Value":"1","Operator":"EMPTY","Type":"NUMERIC"},
 {"Field":"LockID","Value":2,"Operator":"EQ","Type":"NUMERIC"},
 {"Field":"StateTypeID","Value":[4],"Operator":"IN","Type":"NUMERIC"},
 {"Field":"PendingTime","Operator":"LT","Type":"DATETIME","Value":"-0m"}
 ]},
 {"AND":[
 {"Field":"OwnerOutOfOffice","Value":1,"Operator":"EQ","Type":"NUMERIC"},
+{"Field":"OwnerOutOfOfficeSubstitute","Value":"1","Operator":"EMPTY","Type":"NUMERIC"},
 {"Field":"LockID","Value":2,"Operator":"EQ","Type":"NUMERIC"},
 {"Field":"StateTypeID","Value":[1,2],"Operator":"IN","Type":"NUMERIC"}
 ]}]
@@ -5213,7 +5224,7 @@ DefaultValue:
   "DataSource": {
     "SQL": {
         "postgresql": "base64(U0VMRUNUIGRhdGUoY3JlYXRlX3RpbWUpIGFzIGRheSwgQ291bnQoKikgYXMgY291bnQgRlJPTSB0aWNrZXQKV0hFUkUgKGRhdGUoY3JlYXRlX3RpbWUpIEJFVFdFRU4gZGF0ZSgoTk9XKCkgLSBJTlRFUlZBTCAnNyBEQVknKSkgQU5EIGRhdGUoTk9XKCkpKQpHUk9VUCBCWSBkYXkKb3JkZXIgYnkgZGF5IEFTQzs=)",
-        "mysql": "base64(U0VMRUNUIGRhdGUoY3JlYXRlX3RpbWUpIGFzIGRheSwgQ291bnQoKikgYXMgY291bnQgRlJPTSB0aWNrZXQKV0hFUkUgKGRhdGUoY3JlYXRlX3RpbWUpIEJFVFdFRU4gVElNRVNUQU1QKCBEQVRFX0ZPUk1BVChDVVJSRU5UX0RBVEUgLSBJTlRFUlZBTCA3IERBWSAsJyVZLSVtLTAxJykpIEFORCBjdXJyZW50X3RpbWUpCkdST1VQIEJZIGRheQpvcmRlciBieSBkYXkgQVNDOw==)"
+        "mysql": "base64(U0VMRUNUIGRhdGUoY3JlYXRlX3RpbWUpIGFzIGRheSwgQ291bnQoKikgYXMgY291bnQgRlJPTSB0aWNrZXQKV0hFUkUgKGRhdGUoY3JlYXRlX3RpbWUpIEJFVFdFRU4gVElNRVNUQU1QKCBEQVRFX0ZPUk1BVChDVVJSRU5UX0RBVEUgLSBJTlRFUlZBTCA3IERBWSAsJyVZLSVtLSVkJykpIEFORCBjdXJyZW50X3RpbWUpCkdST1VQIEJZIGRheQpvcmRlciBieSBkYXkgQVNDOw==)"
     }
   },
   "OutputFormats": {

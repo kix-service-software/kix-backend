@@ -68,3 +68,28 @@ When qr/added a user roleid with UserID (\d+)$/, sub {
       }
    );
 };
+
+When qr/added a user roleid with fail roleid$/, sub {
+   my %Properties;
+   foreach my $Row ( @{ C->data } ) {
+      foreach my $Attribute ( keys %{$Row}) {
+         $Properties{$Attribute} = $Row->{$Attribute};
+      }
+   }
+
+   ( S->{Response}, S->{ResponseContent} ) = _Post(
+       URL     => S->{API_URL}.'/system/users/1/roleids',
+       Token   => S->{Token},
+       Content => {
+           RoleID => 111111
+       }
+   );
+};
+
+
+
+
+
+
+
+

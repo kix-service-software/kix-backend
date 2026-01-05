@@ -410,7 +410,7 @@ sub CategoryGet {
     }
 
     # check cache
-    my $CacheKey = 'CategoryGet::' . $Param{CategoryID};
+    my $CacheKey = 'FAQ::CategoryGet::' . $Param{CategoryID};
 
     # get cache object
     my $CacheObject = $Kernel::OM->Get('Cache');
@@ -516,6 +516,19 @@ sub CategoryList {
         $Valid = $Param{Valid};
     }
 
+    # check cache
+    my $CacheKey = 'FAQ::CategoryList::' . $Valid;
+
+    # get cache object
+    my $CacheObject = $Kernel::OM->Get('Cache');
+
+    my $Cache = $CacheObject->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+
+    return $Cache if $Cache;
+
     # build SQL
     my $SQL = '
         SELECT id, parent_id, name
@@ -539,6 +552,14 @@ sub CategoryList {
     while ( my @Row = $DBObject->FetchrowArray() ) {
         $Data{ $Row[1] }->{ $Row[0] } = $Row[2];
     }
+
+    # cache result
+    $CacheObject->Set(
+        Type  => $Self->{CacheType},
+        Key   => $CacheKey,
+        Value => \%Data,
+        TTL   => $Self->{CacheTTL}
+    );
 
     return \%Data;
 }
@@ -899,6 +920,14 @@ sub CategoryTreeList {
         $Valid = $Param{Valid};
     }
 
+    # check if result is already cached
+    my $CacheKey = "FAQ::CategoryTreeList::Valid::$Valid";
+    my $Cache = $Kernel::OM->Get('Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return $Cache if $Cache;
+
     # build SQL
     my $SQL = '
         SELECT id, parent_id, name
@@ -955,6 +984,14 @@ sub CategoryTreeList {
             $CategoryTree{$CategoryID} = $CategoryName;
         }
     }
+
+    # cache result
+    $Kernel::OM->Get('Cache')->Set(
+        Type  => $Self->{CacheType},
+        TTL   => $Self->{CacheTTL},
+        Key   => $CacheKey,
+        Value => \%CategoryTree,
+    );
 
     return \%CategoryTree;
 }

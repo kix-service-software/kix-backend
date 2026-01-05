@@ -86,7 +86,7 @@ sub GetLocalConfig {
 
     if ( opendir(my $DIR, $ConfigDir) ) {
         # filter files and ignore file with .dist extension
-        my @Files = grep { -f "$ConfigDir/$_" && $_ !~ /\.dist$/ } readdir($DIR);
+        my @Files = grep { -f "$ConfigDir/$_" && $_ !~ /((^(\.|\~)(.*?))|(\.(dist|old|bak|backup|custom_backup|save|swp)|\~))$/ } readdir($DIR);
         closedir $DIR;
 
         foreach my $File ( sort @Files ) {

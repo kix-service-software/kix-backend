@@ -1022,31 +1022,6 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="PreferencesGroups###PrintRichtext" Required="0" Valid="0">
-        <Description Translatable="1">Defines the config parameters of this item, to be shown in the preferences view.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::Generic</Item>
-                <Item Key="Column">Other Settings</Item>
-                <Item Key="Label" Translatable="1">PrintBehaviour</Item>
-                <Item Key="Key" Translatable="1">Use the kind of behaviour for printing ticket content.</Item>
-                <Item Key="Desc" Translatable="1">You have the possibility to be ask every time which print module you want to take or to fix the using of one special print module.</Item>
-                <Item Key="Data">
-                    <Hash>
-                        <Item Key="ask">Ask every time</Item>
-                        <Item Key="standard">Print standard</Item>
-                        <Item Key="printrichtext">Print richtext</Item>
-                    </Hash>
-                </Item>
-                <Item Key="DataSelected">ask</Item>
-                <Item Key="PrefKey">UserPrintBehaviour</Item>
-                <Item Key="Prio">9000</Item>
-                <Item Key="Active">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="TicketStateWorkflow" Required="1" Valid="1">
         <Description Translatable="1">Settings for TicketStateWorkflow to define the following possible state. States have to be comma separated. placeholders are _ANY_ , _PREVIOUS_ and _NONE_.</Description>
         <Group>Framework</Group>
@@ -7748,129 +7723,174 @@ Notes:
         <Group>Framework</Group>
         <Setting>
             <Object>[
-                {
-                    "Enabled": 0,
-                    "Name": "LDAP Example",
-                    "Module": "Kernel::System::Auth::LDAP",
-                    "Config": {
-                        "Host": "ldap.example.com",
-                        "BaseDN": "dc=example,dc=com",
-                        "UID": "uid",
-                        "GroupDN": "cn=kixallow,ou=posixGroups,dc=example,dc=com",
-                        "AccessAttr": "memberUid",
-                        "UserAttr": "UID",
-                        "SearchUserDN": "cn=binduser,ou=users,dc=example,dc=com",
-                        "SearchUserPw": "some_password",
-                        "AlwaysFilter": "(!objectclass=computer)",
-                        "UserSuffix": "@domain.com",
-                        "Charset": "utf-8",
-                        "Die": 0,
-                        "Params": {
-                            "port": 389,
-                            "timeout": 120,
-                            "async": 0,
-                            "version": 3
+    {
+        "Name": "1st Backend: Customer Contact From LDAP (use mail address as login)",
+        "Enabled": 0,
+        "UsageContext": "Customer",
+        "Module": "Kernel::System::Auth::LDAP",
+        "Config": {
+            "Host": "ldap.example.com",
+            "Params": {
+                "async": 0,
+                "port": 389,
+                "timeout": 10,
+                "version": 3
+            },
+            "BaseDN": "dc=example,dc=com",
+            "AlwaysFilter": "(&amp;(objectclass=person)(mail=*))",
+            "Charset": "utf-8",
+            "SearchUserDN": "cn=read-only-admin,dc=example,dc=com",
+            "SearchUserPw": "password",
+            "GroupDN": "dc=customercontacts,dc=example,dc=com",
+            "AccessAttr": "uid",
+            "UID": "uid",
+            "UserAttr": "UID",
+            "AuthAttr": "mail",
+            "UserSuffix": ""
+        },
+        "Sync": [
+            {
+                "Enabled": 1,
+                "Module": "Kernel::System::Auth::Sync::LDAP",
+                "Config": {
+                    "ContactUserSync": {
+                        "title": "title",
+                        "Email": "mail",
+                        "Firstname": "cn",
+                        "Lastname": "sn",
+                        "UserLogin": "uid",
+                        "Phone": "telephoneNumber",
+                        "Mobile": "mobile",
+                        "Street": "street",
+                        "Zip": "postalCode",
+                        "City": "l",
+                        "Comment": "CONCAT:{departmentNumber} {postalCode}-{l}",
+                        "PrimaryOrganisationID": "SET:1",
+                        "OrganisationIDs": [
+                            "departmentNumber",
+                            "SET:2",
+                            "SET:26"
+                        ],
+                        "ImgThumbNail": "TOBASE64:jpegPhoto",
+                        "DynamicField_Source": "SET:Backend001-D"
+                    },
+                    "GroupDNBasedRoleSync": {
+                        "dc=customercontacts,dc=example,dc=com": {
+                            "Some Customer Role": 1
                         }
                     },
-                    "Sync": [
-                        {
-                            "Enabled": 0,
-                            "Module": "Kernel::System::Auth::Sync::LDAP",
-                            "Config": {
-                                "GroupDNBasedUsageContextSync": {
-                                    "SomeDN": {
-                                        "IsAgent": 1,
-                                        "IsCustomer": 0
-                                    },
-                                    "SomeOtherDN": {
-                                        "IsCustomer": 1
-                                    }
-                                },
-                                "GroupDNBasedRoleSync": {
-                                    "SomeDN": {
-                                        "Role1": 1,
-                                        "Role2": 0,
-                                        "Role3": 1
-                                    }
-                                },
-                                "AttributeBasedRoleSync": {
-                                    "LDAPAttribute": {
-                                        "some value": {
-                                            "Role1": 1,
-                                            "Role2": 0,
-                                            "Role3": 1
-                                        }
-                                    }
-                                },
-                                "ContactUserSync" : {
-                                    "KIXAttribute1" : "LDAPAttribute1",
-                                    "KIXAttribute2" : "LDAPAttribute2",
-                                    "KIXAttribute3" : "SET:some value"
-                                }
+                    "GroupDNBasedUsageContextSync": {
+                        "dc=serviceteam,dc=example,dc=com": {
+                            "IsAgent": 1,
+                            "IsCustomer": 1
+                        },
+                        "dc=agentsonly,dc=example,dc=com": {
+                            "IsAgent": 1,
+                            "IsCustomer": 0
+                        },
+                        "dc=customercontacts,dc=example,dc=com": {
+                            "IsCustomer": 1
+                        },
+                        "dc=externals,dc=example,dc=com": {
+                            "IsCustomer": 1
+                        }
+                    }
+                }
+            }
+        ]
+    },
+    {
+        "Name": "2nd Backend: Agent Users from Active Directory (via multiple LDAPS)",
+        "Enabled": 0,
+        "UsageContext": "Agent",
+        "Module": "Kernel::System::Auth::LDAP",
+        "Config": {
+            "Host": [
+                "ldaps://dc1.example.com",
+                "ldaps://dc2.example.com"
+            ],
+            "Params": {
+                "async": 0,
+                "port": 636,
+                "timeout": 10,
+                "version": 3
+            },
+            "BaseDN": "dc=example,dc=com",
+            "AlwaysFilter": "(&amp;(objectclass=person)(mail=*))",
+            "Charset": "utf-8",
+            "SearchUserDN": "cn=read-only-admin,dc=example,dc=com",
+            "SearchUserPw": "password",
+            "GroupDN": "dc=serviceteam,dc=example,dc=com",
+            "AccessAttr": "member",
+            "UID": "sAMAccountName",
+            "UserAttr": "DN",
+            "UserSuffix": ""
+        },
+        "Sync": [
+            {
+                "Enabled": 1,
+                "Module": "Kernel::System::Auth::Sync::LDAP",
+                "Config": {
+                    "ContactUserSync": {
+                        "Email": "mail",
+                        "Title": "title",
+                        "Firstname": "givenname",
+                        "Lastname": "sn",
+                        "Street": "streetAddress",
+                        "City": "l",
+                        "Zip": "postalCode",
+                        "Phone": "telephoneNumber",
+                        "Mobile": "mobile",
+                        "Fax": "facsimileTelephoneNumber",
+                        "UserLogin": "sAMAccountName",
+                        "PrimaryOrganisationID": "department",
+                        "OrganisationIDs": [
+                            "department",
+                            "SET:13"
+                        ],
+                        "DynamicField_Source": "SET:Backend002-AD"
+                    },
+                    "GroupDNBasedRoleSync": {
+                        "dc=serviceteam,dc=example,dc=com": {
+                            "News Manager": 1,
+                            "Ticket Agent": 1,
+                            "Asset Maintainer": 1,
+                            "Customer Manager": 1,
+                            "FAQ Editor": 1
+                        }
+                    },
+                    "AttributeBasedRoleSync": {
+                        "sAMAccountName": {
+                            "m.mustermann": {
+                                "Superuser": 1
                             }
                         }
-                    ]
-                },
-                {
-                    "Enabled": 0,
-                    "Name": "HTTPBasicAuth Example",
-                    "Module": "Kernel::System::Auth::HTTPBasicAuth",
-                    "Config": {
-                        "Replace": "example_domain\\",
-                        "ReplaceRegExp": "^(.+?)@.+?$"
                     }
-                },
-                {
-                    "Enabled": 0,
-                    "Name": "Radius Example",
-                    "Module": "Kernel::System::Auth::Radius",
-                    "Config": {
-                        "Host": "radiushost",
-                        "Password": "radiussecret",
-                        "Die": 0
-                    }
-                },
-                {
-                    "Enabled": 0,
-                    "Module": "Kernel::System::Auth::ValidUser",
-                    "Name": "Valid User Example",
-                    "UsageContext": "Customer",
-                    "Config": {
-                        "RelevantClientIPs": [
-                            "^172\\..*?$"
-                        ],
-                        "RelevantUsers": [
-                            "mamu"
-                        ]
-                    }
-                },
-                {
-                    "Enabled": 0,
-                    "Name": "Foreign Database",
-                    "Module": "Kernel::System::Auth::DB",
-                    "UsageContext": "Customer",
-                    "Config": {
-                        "DSN": "DBI:mysql:database=customerdb;host=customerdbhost",
-                        "Type": "mysql",
-                        "User": "some_user",
-                        "Password": "come_password",
-                        "Table": "user",
-                        "Columns": {
-                            "ID": "id",
-                            "Login": "login",
-                            "Password": "password"
-                        }
-                    }
-                },
-                {
-                    "Enabled": 1,
-                    "Name": "Local Database",
-                    "Module": "Kernel::System::Auth::DB",
-                    "Config": {}
                 }
+            }
+        ]
+    },
+    {
+        "Name": "Valid User Example",
+        "Enabled": 0,
+        "UsageContext": "Customer",
+        "Module": "Kernel::System::Auth::ValidUser",
+        "Config": {
+            "RelevantClientIPs": [
+                "^172\\..*?$"
+            ],
+            "RelevantUsers": [
+                "mamu"
             ]
-
-            </Object>
+        }
+    },
+    {
+        "Name": "Local Database",
+        "Enabled": 1,
+        "Module": "Kernel::System::Auth::DB",
+        "Config": {}
+    }
+]</Object>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="confidential" Name="MultiFactorAuthentication###000-Default" Required="1" Valid="1" ConfigLevel="200">
@@ -7878,24 +7898,29 @@ Notes:
         <Group>Framework</Group>
         <Setting>
             <Object>[
-                {
-                    "Enabled": 0,
-                    "Name": "TOTP-Example",
-                    "Module": "Kernel::System::Auth::MFA::TOTP",
-                    "UsageContext": "Agent",
-                    "AuthType": "LOGIN",
-                    "Config": {
-                        "TimeStep": 30,
-                        "Digits": 6,
-                        "Algorithm": "SHA1",
-                        "AllowEmptySecret": 1,
-                        "MaxPreviousToken": 0,
-                        "SecretLength": 8
-                    }
-                }
-            ]
-
-            </Object>
+    {
+        "Enabled": 0,
+        "Name": "TOTP-Example",
+        "Module": "Kernel::System::Auth::MFA::TOTP",
+        "UsageContext": "Agent",
+        "AuthType": "LOGIN",
+        "Config": {
+            "TimeStep": 30,
+            "Digits": 6,
+            "Algorithm": "SHA1",
+            "AllowEmptySecret": 1,
+            "MaxPreviousToken": 0,
+            "SecretLength": 8
+        }
+    }
+]</Object>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="confidential" Name="Authentication::MaxLoginFailed" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Sets a user invalid-temporarily, when the given amount of logins failed without a successful login.</Description>
+        <Group>Framework</Group>
+        <Setting>
+            <String Regex="">5</String>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="PreferencesTable" Required="1" Valid="1">
@@ -7928,119 +7953,6 @@ Notes:
         <SubGroup>Frontend::Agent::Preferences</SubGroup>
         <Setting>
             <String Regex="">user_id</String>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="PreferencesGroups###Password" Required="0" Valid="1">
-        <Description Translatable="1">Defines the config parameters of this item, to be shown in the preferences view. 'PasswordRegExp' allows to match passwords against a regular expression. Define the minimum number of characters using 'PasswordMinSize'. Define if at least 2 lowercase and 2 uppercase letter characters are needed by setting the appropriate option to '1'. 'PasswordMin2Characters' defines if the password needs to contain at least 2 letter characters (set to 0 or 1). 'PasswordNeedDigit' controls the need of at least 1 digit (set to 0 or 1 to control). 'PasswordMaxLoginFailed' allows to set an agent to invalid-temporarily if max failed logins reached.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::Password</Item>
-                <Item Key="Column">User Profile</Item>
-                <Item Key="Label" Translatable="1">Change password</Item>
-                <Item Key="Prio">0500</Item>
-                <Item Key="Area">Agent</Item>
-                <!-- <Item Key="PasswordRegExp">[a-z]|[A-z]|[0-9]|\.|;|,|:|-|\+|#|!|\$|&|\?</Item> -->
-                <Item Key="PasswordRegExp"/>
-                <Item Key="PasswordMinSize">0</Item>
-                <Item Key="PasswordMin2Lower2UpperCharacters">0</Item>
-                <Item Key="PasswordMin2Characters">0</Item>
-                <Item Key="PasswordNeedDigit">0</Item>
-                <Item Key="PasswordMaxLoginFailed">5</Item>
-                <Item Key="Active">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="PreferencesGroups###SpellDict" Required="0" Valid="0">
-        <Description Translatable="1">Defines the config parameters of this item, to be shown in the preferences view. Take care to maintain the dictionaries installed in the system in the data section.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::Generic</Item>
-                <Item Key="Column">User Profile</Item>
-                <Item Key="Label" Translatable="1">Spelling Dictionary</Item>
-                <Item Key="Key" Translatable="1">Default spelling dictionary</Item>
-                <Item Key="Data">
-                    <Hash>
-                        <Item Key="english">English</Item>
-                        <Item Key="deutsch">Deutsch</Item>
-                    </Hash>
-                </Item>
-                <Item Key="DataSelected">english</Item>
-                <Item Key="PrefKey">UserSpellDict</Item>
-                <Item Key="Prio">2000</Item>
-                <Item Key="Active">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="PreferencesGroups###Comment" Required="0" Valid="1">
-        <Description Translatable="1">Defines the config parameters of this item, to be shown in the preferences view.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::Generic</Item>
-                <Item Key="Column">Other Settings</Item>
-                <Item Key="Label" Translatable="1">Comment</Item>
-                <Item Key="Key" Translatable="1">Comment</Item>
-                <Item Key="Block">Input</Item>
-                <Item Key="Data">[% Env("UserComment") %]</Item>
-                <Item Key="PrefKey">UserComment</Item>
-                <Item Key="Prio">6000</Item>
-                <Item Key="Active">0</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="PreferencesGroups###DynamicField" Required="0" Valid="0">
-        <Description Translatable="1">Defines the config parameters of this item, to be shown in the preferences view.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::Generic</Item>
-                <Item Key="Column">Other Settings</Item>
-                <Item Key="Label" Translatable="1">NameX</Item>
-                <Item Key="Key" Translatable="1">Default value for NameX</Item>
-                <Item Key="Block">Input</Item>
-                <Item Key="Data">[% Env("UserDynamicField_NameX") %]</Item>
-                <Item Key="PrefKey">UserDynamicField_NameX</Item>
-                <Item Key="Prio">7000</Item>
-                <Item Key="Active">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="PreferencesGroups###Language" Required="0" Valid="1">
-        <Description Translatable="1">Defines the config parameters of this item, to be shown in the preferences view.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::Language</Item>
-                <Item Key="Column">User Profile</Item>
-                <Item Key="Label" Translatable="1">Language</Item>
-                <Item Key="Key" Translatable="1">Language</Item>
-                <Item Key="PrefKey">UserLanguage</Item>
-                <Item Key="Prio">1000</Item>
-                <Item Key="Active">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="PreferencesGroups###TimeZone" Required="0" Valid="1">
-        <Description Translatable="1">Defines the config parameters of this item, to be shown in the preferences view.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::TimeZone</Item>
-                <Item Key="Column">User Profile</Item>
-                <Item Key="Label" Translatable="1">Time Zone</Item>
-                <Item Key="Key" Translatable="1">Time Zone</Item>
-                <Item Key="PrefKey">UserTimeZone</Item>
-                <Item Key="Prio">5000</Item>
-                <Item Key="Active">1</Item>
-            </Hash>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="ContactEmailUniqueCheck" Required="1" Valid="1">
@@ -8526,130 +8438,6 @@ Notes:
             </Hash>
         </Setting>
     </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="PreferencesGroups###MultipleSelection" Required="0" Valid="0">
-        <Description Translatable="1">Defines the config parameters of this item, to allow multiple selected options and be shown in the preferences view.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::GenericMultiple</Item>
-                <Item Key="Column">Other Settings</Item>
-                <Item Key="Label" Translatable="1">Multiple Selection</Item>
-                <Item Key="Key" Translatable="1">Multiple Selection</Item>
-                <Item Key="Block">Option</Item>
-                <Item Key="Data">
-                    <Hash>
-                        <Item Key="1st">1st Option</Item>
-                        <Item Key="2nd">2nd Option</Item>
-                        <Item Key="3rd">3rd Option</Item>
-                    </Hash>
-                </Item>
-                <Item Key="DataSelected"/>
-                <Item Key="PrefKey">UserMultipleSelection</Item>
-                <Item Key="Prio">6000</Item>
-                <Item Key="Active">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="PreferencesGroups###TextInput" Required="0" Valid="0">
-        <Description Translatable="1">Defines the config parameters of this item, to allow multiple selected options and be shown in the preferences view.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::Generic</Item>
-                <Item Key="Column">Other Settings</Item>
-                <Item Key="Label" Translatable="1">Textarea input</Item>
-                <Item Key="Key" Translatable="1">Textarea input</Item>
-                <Item Key="Block">InputField</Item>
-                <Item Key="Data">[% Env("UserTextInput") %]</Item>
-                <Item Key="PrefKey">UserTextInput</Item>
-                <Item Key="Prio">6100</Item>
-                <Item Key="Active">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="PreferencesGroups###OutOfOfficeSubstitute" Required="0" Valid="1">
-        <Description Translatable="1">Parameters for the Out Of Office Substitute object in the preference view.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::OutOfOfficeSubstitute</Item>
-                <Item Key="Column">User Profile</Item>
-                <Item Key="Block">OutOfOfficeSubstitute</Item>
-                <Item Key="Label" Translatable="1">Out Of Office Substitute</Item>
-                <Item Key="Key" Translatable="1">Select your out of office substitute.</Item>
-                <Item Key="Desc" Translatable="1">Select your out of office substitute.</Item>
-                <Item Key="Prio">4001</Item>
-                <Item Key="Active">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="PreferencesGroups###RemoveArticleFlags" Required="0" Valid="1">
-        <Description Translatable="1">Defines the use preference to select article flags which could be removed after ticket close.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::RemoveArticleFlags</Item>
-                <Item Key="Column">Other Settings</Item>
-                <Item Key="Label" Translatable="1">My Removable Article Flags</Item>
-                <Item Key="Desc" Translatable="1">Select article flags which should be removed after ticket close.</Item>
-                <Item Key="Key" Translatable="1">My Removable Article Flags</Item>
-                <Item Key="Prio">1200</Item>
-                <Item Key="Active">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="PreferencesGroups###ShowMergedTicketsInLinkedObjects" Required="0" Valid="1">
-        <Description Translatable="1">Defines user preference to decide if merged tickets should be shown in linked objects table.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::Generic</Item>
-                <Item Key="Column">Other Settings</Item>
-                <Item Key="Label" Translatable="1">Show Merged Tickets in Linked Objects</Item>
-                <Item Key="Desc" Translatable="1">Show merged tickets in linked objects table.</Item>
-                <Item Key="Key" Translatable="1">Show Merged Tickets in Linked Objects</Item>
-                <Item Key="Data">
-                    <Hash>
-                        <Item Key="1">Yes</Item>
-                        <Item Key="0">No</Item>
-                    </Hash>
-                </Item>
-                <Item Key="DataSelected">0</Item>
-                <Item Key="PrefKey">UserShowMergedTicketsInLinkedObjects</Item>
-                <Item Key="Prio">1300</Item>
-                <Item Key="Active">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
-    <ConfigItem AccessLevel="internal" Name="PreferencesGroups###DisplayPendingTime" Required="0" Valid="1">
-        <Description Translatable="1">Defines user preference to decide how pending time should be displayed.</Description>
-        <Group>Framework</Group>
-        <SubGroup>Frontend::Agent::Preferences</SubGroup>
-        <Setting>
-            <Hash>
-                <Item Key="Module">Kernel::Output::HTML::Preferences::Generic</Item>
-                <Item Key="Column">Other Settings</Item>
-                <Item Key="Label" Translatable="1">Display of pending time</Item>
-                <Item Key="Desc" Translatable="1">Show pending time as remaining time or as point of time with date and time.</Item>
-                <Item Key="Key" Translatable="1">Show pending time as</Item>
-                <Item Key="Data">
-                    <Hash>
-                        <Item Key="RemainingTime">Remaining Time</Item>
-                        <Item Key="PointOfTime">Point of Time</Item>
-                    </Hash>
-                </Item>
-                <Item Key="DataSelected">PointOfTime</Item>
-                <Item Key="PrefKey">UserDisplayPendingTime</Item>
-                <Item Key="Prio">1310</Item>
-                <Item Key="Active">1</Item>
-            </Hash>
-        </Setting>
-    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="TextModule::CustomModules" Required="0" Valid="1">
         <Description Translatable="1">Additional and extended TextModule methods.</Description>
         <Group>Framework</Group>
@@ -8957,6 +8745,11 @@ Notes:
                 "SearchAttributes": [
                     "RelevantOrganisationID"
                 ]
+            },
+            "ContactID": {
+                "SearchAttributes": [
+                    "ID"
+                ]
             }
         },
         "TicketArticle": {
@@ -9136,6 +8929,17 @@ Notes:
         <Description Translatable="1">Defines the maximal size (in bytes) for icon uploads. Default: 32K</Description>
         <Setting>
             <String Regex="^[0-9]{1,11}$">32768</String>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem AccessLevel="internal" Name="User::EventModulePost###000-ResetUserLoginFailed" Required="1" Valid="1">
+        <Description Translatable="1">Event module registration.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::User::Event::ResetUserLoginFailed</Item>
+                <Item Key="Transaction">1</Item>
+                <Item Key="Event">UserUpdate</Item>
+            </Hash>
         </Setting>
     </ConfigItem>
 </kix_config>

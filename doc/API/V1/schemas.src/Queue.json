@@ -82,28 +82,12 @@
       "type": "integer"
     },
     "TicketStats": {
-      "type": "object",
-      "description": "added via include \"TicketStats\"",
-      "readOnly": true,
-      "properties": {
-        "EscalatedCount": {
-          "type": "integer",
-          "readOnly": true
-        },
-        "LockCount": {
-          "type": "integer",
-          "readOnly": true
-        },
-        "TotalCount": {
-          "type": "integer",
-          "readOnly": true
-        }
-      }
+      "$ref": "QueueTicketStatsResponse.json",
+      "description": "added via include \"TicketStats\""
     },
     "Tickets": {
-      "type": "array",
-      "description": "added via include \"Tickets\"",
-      "readOnly": true
+      "$ref": "QueueTicketsResponse.json",
+      "description": "added via include \"Tickets\""
     },
     "UnlockTimeout": {
       "anyOf": [

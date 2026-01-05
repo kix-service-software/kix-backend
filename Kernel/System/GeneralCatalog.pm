@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
+# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -64,8 +64,9 @@ sub new {
     }
 
     # define cache settings
-    $Self->{CacheType} = 'GeneralCatalog';
-    $Self->{CacheTTL}  = 60 * 60 * 3;
+    $Self->{CacheType}   = 'GeneralCatalog';
+    $Self->{OSCacheType} = 'ObjectSearch_GeneralCatalog';
+    $Self->{CacheTTL}    = 60 * 60 * 3;
 
     return $Self;
 }
@@ -81,6 +82,14 @@ return an array reference of all general catalog classes
 sub ClassList {
     my ( $Self, %Param ) = @_;
 
+    # check if result is already cached
+    my $CacheKey = 'ClassList';
+    my $Cache = $Kernel::OM->Get('Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return $Cache if $Cache;
+
     # ask database
     $Kernel::OM->Get('DB')->Prepare(
         SQL => 'SELECT DISTINCT(general_catalog_class) '
@@ -94,7 +103,6 @@ sub ClassList {
     }
 
     # cache the result
-    my $CacheKey = 'ClassList';
     $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         TTL   => $Self->{CacheTTL},
@@ -169,6 +177,11 @@ sub ClassRename {
     # reset cache
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
+    );
+
+    # reset cache object search
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{OSCacheType},
     );
 
     # rename general catalog class
@@ -535,11 +548,6 @@ sub ItemAdd {
         return;
     }
 
-    # reset cache
-    $Kernel::OM->Get('Cache')->CleanUp(
-        Type => $Self->{CacheType},
-    );
-
     # insert new item
     return if !$Kernel::OM->Get('DB')->Do(
         SQL => 'INSERT INTO general_catalog '
@@ -567,6 +575,16 @@ sub ItemAdd {
     while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         $ItemID = $Row[0];
     }
+
+    # reset cache
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
+
+    # reset cache object search
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{OSCacheType},
+    );
 
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
@@ -698,6 +716,11 @@ sub ItemUpdate {
         Type => $Self->{CacheType},
     );
 
+    # reset cache object search
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{OSCacheType},
+    );
+
     my $Result = $Kernel::OM->Get('DB')->Do(
         SQL => 'UPDATE general_catalog SET '
             . 'name = ?, valid_id = ?, comments = ?, '
@@ -801,6 +824,11 @@ sub GeneralCatalogPreferencesSet {
         Type => $Self->{CacheType},
     );
 
+    # reset cache object search
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{OSCacheType},
+    );
+
     return $Self->{PreferencesObject}->GeneralCatalogPreferencesSet(@_);
 }
 
@@ -865,6 +893,11 @@ sub GeneralCatalogItemDelete {
     # reset cache
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
+    );
+
+    # reset cache object search
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{OSCacheType},
     );
 
     # push client callback event

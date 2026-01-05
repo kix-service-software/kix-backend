@@ -174,22 +174,14 @@ sub ValueValidate {
     return $Success;
 }
 
-
-sub SearchSQLSearchFieldGet {
+sub SQLParameterGet {
     my ( $Self, %Param ) = @_;
 
-    return {
-        Column => "$Param{TableAlias}.value_date"
-    };
-}
+    my $SQLParameter = $Self->SUPER::SQLParameterGet( %Param );
 
-sub SearchSQLSortFieldGet {
-    my ( $Self, %Param ) = @_;
+    $SQLParameter->{Column} = $Param{TableAlias} . '.value_date';
 
-    return {
-        Select  => ["$Param{TableAlias}.value_date"],
-        OrderBy => ["$Param{TableAlias}.value_date"]
-    };
+    return $SQLParameter;
 }
 
 sub DisplayValueRender {

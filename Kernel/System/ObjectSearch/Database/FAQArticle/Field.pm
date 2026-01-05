@@ -39,7 +39,7 @@ sub GetSupportedAttributes {
         $Supported{"Field$_"} = {
             IsSearchable => 1,
             IsSortable   => 0,
-            Operators    => ['STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            Operators    => ['EMPTY','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         };
     }
 

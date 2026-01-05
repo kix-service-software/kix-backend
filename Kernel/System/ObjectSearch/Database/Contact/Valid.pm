@@ -52,96 +52,25 @@ sub GetSupportedAttributes {
 
     return {
         Valid => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN']
         },
         ValidID => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN'],
+            ValueType      => 'NUMERIC'
         }
     };
 }
 
-=item Search()
-
-run this module and return the SQL extensions
-
-    my $Result = $Object->Search(
-        Search => {}
-    );
-
-    $Result = {
-        Where   => [ ],
-    };
-
-=cut
-
-sub Search {
+sub AttributePrepare {
     my ( $Self, %Param ) = @_;
-
-    my @SQLJoin;
-
-    # check params
-    return if !$Self->_CheckSearchParams(%Param);
-
-    # map search attributes to table attributes
-    my %AttributeMapping = (
-        ValidID => {
-            Column    => 'c.valid_id',
-            ValueType => 'NUMERIC'
-        },
-        Valid   => {
-            Column    => 'cv.name'
-        }
-    );
-
-    if (
-        $Param{Search}->{Field} eq 'Valid'
-        && !$Param{Flags}->{JoinMap}->{ContactValid}
-    ) {
-        push( @SQLJoin, 'INNER JOIN valid cv ON cv.id = c.valid_id' );
-        $Param{Flags}->{JoinMap}->{ContactValid} = 1;
-    }
-
-    my $Condition = $Self->_GetCondition(
-        Operator  => $Param{Search}->{Operator},
-        Column    => $AttributeMapping{$Param{Search}->{Field}}->{Column},
-        ValueType => $AttributeMapping{$Param{Search}->{Field}}->{ValueType},
-        Value     => $Param{Search}->{Value},
-        Silent    => $Param{Silent}
-    );
-
-    return if ( !$Condition );
-
-    return {
-        Join  => \@SQLJoin,
-        Where => [ $Condition ]
-    };
-}
-
-=item Sort()
-
-run this module and return the SQL extensions
-
-    my $Result = $Object->Sort(
-        Attribute => '...'      # required
-    );
-
-    $Result = {
-        Select   => [ ],          # optional
-        OrderBy  => [ ]           # optional
-    };
-
-=cut
-
-sub Sort {
-    my ( $Self, %Param ) = @_;
-
-    # check params
-    return if !$Self->_CheckSortParams(%Param);
 
     # check for needed joins
     my $TableAliasTLP = 'tlp' . ( $Param{Flags}->{JoinMap}->{TranslationContactValid} // '' );
@@ -150,44 +79,58 @@ sub Sort {
     if ( $Param{Attribute} eq 'Valid' ) {
         if ( !$Param{Flags}->{JoinMap}->{ContactValid} ) {
             push( @SQLJoin, 'INNER JOIN valid cv ON cv.id = c.valid_id' );
-
             $Param{Flags}->{JoinMap}->{ContactValid} = 1;
         }
 
-        if ( !defined( $Param{Flags}->{JoinMap}->{TranslationContactValid} ) ) {
-            my $Count = $Param{Flags}->{TranslationJoinCounter}++;
-            $TableAliasTLP .= $Count;
-            $TableAliasTL  .= $Count;
+        if ( $Param{PrepareType} eq 'Sort' ) {
+            if ( !defined( $Param{Flags}->{JoinMap}->{TranslationContactValid} ) ) {
+                my $Count = $Param{Flags}->{TranslationJoinCounter}++;
+                $TableAliasTLP .= $Count;
+                $TableAliasTL  .= $Count;
 
-            push( @SQLJoin, "LEFT OUTER JOIN translation_pattern $TableAliasTLP ON $TableAliasTLP.value = cv.name" );
-            push( @SQLJoin, "LEFT OUTER JOIN translation_language $TableAliasTL ON $TableAliasTL.pattern_id = $TableAliasTLP.id AND $TableAliasTL.language = '$Param{Language}'" );
+                push( @SQLJoin, "LEFT OUTER JOIN translation_pattern $TableAliasTLP ON $TableAliasTLP.value = cv.name" );
+                push( @SQLJoin, "LEFT OUTER JOIN translation_language $TableAliasTL ON $TableAliasTL.pattern_id = $TableAliasTLP.id AND $TableAliasTL.language = '$Param{Language}'" );
 
-            $Param{Flags}->{JoinMap}->{TranslationContactValid} = $Count;
+                $Param{Flags}->{JoinMap}->{TranslationContactValid} = $Count;
+            }
         }
     }
 
-    # init mapping
-    my %AttributeMapping = (
-        ValidID => {
-            Select  => ['c.valid_id'],
-            OrderBy => ['c.valid_id']
+    # init Definition
+    my %AttributeDefinition = (
+        ValidID         => {
+            Column       => 'c.valid_id',
+            ConditionDef => {
+                ValueType => 'NUMERIC'
+            }
         },
-        Valid   => {
-            Select  => ["LOWER(COALESCE($TableAliasTL.value, cv.name)) AS TranslateValid"],
-            OrderBy => ['TranslateValid']
+        Valid => {
+            Column       => 'cv.name',
+            ConditionDef => {
+                ValueType => 'STRING'
+            }
         }
     );
+    
+    my %Attribute = (
+        Column => $AttributeDefinition{ $Param{Attribute} }->{Column},
+        SQLDef => {
+            Join => \@SQLJoin
+        }
+    );
+    if ( $Param{PrepareType} eq 'Condition' ) {
+        $Attribute{ConditionDef} = $AttributeDefinition{ $Param{Attribute} }->{ConditionDef};
+    }
+    elsif ( $Param{PrepareType} eq 'Sort' ) {
+        if ( $Param{Attribute} eq 'Valid' ) {
+            $Attribute{Column} = 'LOWER(COALESCE(' . $TableAliasTL . '.value, cv.name))';
+        }
+    }
 
-    # return sort def
-    return {
-        Join    => \@SQLJoin,
-        Select  => $AttributeMapping{ $Param{Attribute} }->{Select},
-        OrderBy => $AttributeMapping{ $Param{Attribute} }->{OrderBy}
-    };
+    return \%Attribute;
 }
 
 1;
-
 
 =back
 

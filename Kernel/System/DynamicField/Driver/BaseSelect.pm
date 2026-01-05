@@ -334,23 +334,6 @@ sub ValueIsDifferent {
     );
 }
 
-sub SearchSQLSearchFieldGet {
-    my ( $Self, %Param ) = @_;
-
-    return {
-        Column => "$Param{TableAlias}.value_text"
-    };
-}
-
-sub SearchSQLSortFieldGet {
-    my ( $Self, %Param ) = @_;
-
-    return {
-        Select  => ["$Param{TableAlias}.value_text"],
-        OrderBy => ["$Param{TableAlias}.value_text"]
-    };
-}
-
 sub DisplayValueRender {
     my ( $Self, %Param ) = @_;
 

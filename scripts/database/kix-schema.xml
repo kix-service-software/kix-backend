@@ -24,6 +24,9 @@
     <Column Name="login" Required="true" Size="200" Type="VARCHAR"/>
     <Column Name="pw" Required="true" Size="64" Type="VARCHAR"/>
     <Column Name="comments" Required="false" Size="250" Type="VARCHAR"/>
+    <Column Name="outofoffice_start" Required="false" Type="DATE"/>
+    <Column Name="outofoffice_end" Required="false" Type="DATE"/>
+    <Column Name="outofoffice_substitute" Required="false" Type="INTEGER"/>
     <Column Name="valid_id" Required="true" Type="SMALLINT"/>
     <Column Name="create_time" Required="true" Type="DATE"/>
     <Column Name="create_by" Required="true" Type="INTEGER"/>
@@ -38,9 +41,13 @@
         <Reference Local="valid_id" Foreign="id"/>
     </ForeignKey>
     <ForeignKey ForeignTable="users">
+        <Reference Local="outofoffice_substitute" Foreign="id"/>
         <Reference Local="create_by" Foreign="id"/>
         <Reference Local="change_by" Foreign="id"/>
     </ForeignKey>
+    <Index Name="users_ooo_substitute">
+        <IndexColumn Name="outofoffice_substitute"/>
+    </Index>
 </Table>
 
 <!-- user preferences -->
@@ -997,6 +1004,9 @@
     <Index Name="time_accounting_ticket_id">
         <IndexColumn Name="ticket_id"/>
     </Index>
+    <Index Name="time_accounting_article_id">
+        <IndexColumn Name="article_id"/>
+    </Index>
     <ForeignKey ForeignTable="ticket">
         <Reference Local="ticket_id" Foreign="id"/>
     </ForeignKey>
@@ -1164,6 +1174,16 @@
     <Column Name="contact_id" Required="true" Type="INTEGER"/>
     <Column Name="org_id" Required="true" Type="INTEGER"/>
     <Column Name="is_primary" Required="true" Default="0" Type="SMALLINT"/>
+    <Index Name="contact_organisation_contact_id">
+        <IndexColumn Name="contact_id"/>
+    </Index>
+    <Index Name="contact_organisation_org_id">
+        <IndexColumn Name="org_id"/>
+    </Index>
+    <Index Name="contact_organisation_contact_primary">
+        <IndexColumn Name="contact_id"/>
+        <IndexColumn Name="is_primary"/>
+    </Index>
     <ForeignKey ForeignTable="contact">
         <Reference Local="contact_id" Foreign="id"/>
     </ForeignKey>
@@ -1182,6 +1202,7 @@
     <Column Name="client_id"     Required="true" Type="VARCHAR" Size="1800000"/>
     <Column Name="client_secret" Required="true" Type="VARCHAR" Size="1800000"/>
     <Column Name="scope"         Required="true" Type="VARCHAR" Size="1800000"/>
+    <Column Name="pkce"          Required="true" Type="SMALLINT"/>
     <Column Name="valid_id"      Required="true" Type="SMALLINT"/>
     <Column Name="create_time"   Required="true" Type="DATE"/>
     <Column Name="create_by"     Required="true" Type="INTEGER"/>
@@ -2615,6 +2636,8 @@
     <Column Name="object_id" Required="false" Size="255" Type="VARCHAR"/>
     <Column Name="source_object_id" Required="false" Size="255" Type="VARCHAR"/>
     <Column Name="additional_data" Required="false" Size="1800000" Type="VARCHAR"/>
+    <Column Name="create_time" Required="true" Type="DATE"/>
+    <Column Name="change_time" Required="false" Type="DATE"/>
     <Index Name="migration_sourceid_otype_soid">
         <IndexColumn Name="source_id"/>
         <IndexColumn Name="object_type"/>

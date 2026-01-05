@@ -12,12 +12,10 @@ use strict;
 use warnings;
 
 use base qw(
-    Kernel::System::ObjectSearch::Database::CommonAttribute
+    Kernel::System::ObjectSearch::Database::CommonFulltext
 );
 
-our @ObjectDependencies = qw(
-    Log
-);
+our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
@@ -30,116 +28,6 @@ Kernel::System::ObjectSearch::Database::Contact::Fulltext - attribute module for
 =over 4
 
 =cut
-
-=item GetSupportedAttributes()
-
-defines the list of attributes this module is supporting
-
-    my $AttributeList = $Object->GetSupportedAttributes();
-
-    $Result = {
-        Property => {
-            IsSortable     => 0|1,
-            IsSearchable => 0|1,
-            Operators     => []
-        },
-    };
-
-=cut
-
-sub GetSupportedAttributes {
-    my ( $Self, %Param ) = @_;
-
-    return {
-        Fulltext => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['LIKE']
-        },
-    };
-}
-
-=item Search()
-
-run this module and return the SQL extensions
-
-    my $Result = $Object->Search(
-        Search => {}
-    );
-
-    $Result = {
-        Where   => [ ],
-    };
-
-=cut
-
-sub Search {
-    my ( $Self, %Param ) = @_;
-
-    # check params
-    return if !$Self->_CheckSearchParams(%Param);
-
-    my @SQLJoin;
-    my $UserTable        = $Param{Flags}->{JoinMap}->{UserJoin} // 'u';
-    my $OrgaTable        = $Param{Flags}->{JoinMap}->{OrganisationJoin} // 'o';
-    my $OrgaContactTable = $Param{Flags}->{JoinMap}->{OrganisationContactJoin} // 'co';
-    if ( !$Param{Flags}->{JoinMap}->{UserJoin} ) {
-        my $Count = $Param{Flags}->{UserJoinCounter}++;
-        $UserTable .= $Count;
-
-        push(
-            @SQLJoin,
-            "LEFT JOIN users $UserTable ON c.user_id = $UserTable.id",
-        );
-        $Param{Flags}->{JoinMap}->{UserJoin} = $UserTable;
-    }
-
-    if ( !$Param{Flags}->{JoinMap}->{OrganisationContactJoin} ) {
-        my $Count = $Param{Flags}->{OrganisationContactJoinCounter}++;
-        $OrgaContactTable .= $Count;
-
-        push(
-            @SQLJoin,
-            "LEFT JOIN contact_organisation $OrgaContactTable ON c.id = $OrgaContactTable.contact_id"
-        );
-
-        $Param{Flags}->{JoinMap}->{OrganisationContactJoin} = $OrgaContactTable;
-    }
-
-    if ( !$Param{Flags}->{JoinMap}->{OrganisationJoin} ) {
-        my $Count = $Param{Flags}->{OrganisationJoinCounter}++;
-        $OrgaTable .= $Count;
-
-        push(
-            @SQLJoin,
-            "LEFT JOIN organisation $OrgaTable ON $OrgaTable.id = $OrgaContactTable.org_id"
-        );
-        $Param{Flags}->{JoinMap}->{OrganisationJoin} = $OrgaTable;
-    }
-
-    # fixed search in the  following columns:
-    # Firstname, Lastname, E-Mail, E-Mail1-5 Title, Phone, Fax, Mobile,
-    # Street, City, Zip and Country
-    # inlcudes related columns of other tables:
-    # table users: Login
-    # table organisation: Number and Name
-    my $Condition = $Self->_FulltextCondition(
-        Columns => [
-            'c.firstname', 'c.lastname',
-            'c.email','c.email1','c.email2','c.email3','c.email4','c.email5',
-            'c.title','c.phone','c.fax','c.mobile',
-            'c.street','c.city','c.zip','c.country',
-            "$UserTable.login","$OrgaTable.number","$OrgaTable.name"
-        ],
-        Value   => $Param{Search}->{Value},
-        Silent  => $Param{Silent}
-    );
-
-    return {
-        Where => [$Condition],
-        Join  => \@SQLJoin
-    };
-}
 
 1;
 

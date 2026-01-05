@@ -83,6 +83,7 @@ search for objects
         Language   => 'de',                 # Optional. Default: en; Language used for sorting of several attributes
         UserType   => 'Agent',              # type of requesting user. Used for permission checks. Agent or Customer
         UserID     => 1,                    # ID of requesting user. Used for permission checks
+        Permission => 'READ',               # Optional. Default: READ; Required Permission for BasePermissions
     );
 
 SearchParams:
@@ -164,6 +165,12 @@ sub Search {
     if ( !defined( $Param{Result} ) ) {
         $Param{Result} = 'HASH';
     }
+    if (
+        !defined( $Param{Select} )
+        || $Param{Result} ne 'HASH'
+    ) {
+        $Param{Select} = [];
+    }
     if ( !defined( $Param{Search} ) ) {
         $Param{Search} = {};
     }
@@ -179,6 +186,9 @@ sub Search {
     if ( !defined( $Param{Language} ) ) {
         $Param{Language} = '';
     }
+    if ( !defined( $Param{Permission} ) ) {
+        $Param{Permission} = 'READ';
+    }
 
     # prepare result ref map
     my %ResultRefMap = (
@@ -192,78 +202,92 @@ sub Search {
 
     # check parameter
     if ( !defined( $ResultRefMap{ $Param{Result} } ) ) {
-        if ( !$Param{Silent} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Invalid Result!",
-            );
-        }
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Invalid Result!",
+            Silent   => $Param{Silent},
+        );
+        return;
+    }
+    if ( ref( $Param{Select} ) ne 'ARRAY' ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Invalid Select!",
+            Silent   => $Param{Silent},
+        );
         return;
     }
     if ( ref( $Param{Search} ) ne 'HASH' ) {
-        if ( !$Param{Silent} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Invalid Search!",
-            );
-        }
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Invalid Search!",
+            Silent   => $Param{Silent},
+        );
         return;
     }
     if ( ref( $Param{Sort} ) ne 'ARRAY' ) {
-        if ( !$Param{Silent} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Invalid Sort!",
-            );
-        }
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Invalid Sort!",
+            Silent   => $Param{Silent},
+        );
         return;
     }
     if ( $Param{Limit} !~ m/^[0-9]+$/ ) {
-        if ( !$Param{Silent} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Invalid Limit!",
-            );
-        }
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Invalid Limit!",
+            Silent   => $Param{Silent},
+        );
         return;
     }
     if ( $Param{CacheTTL} !~ m/^[0-9]+$/ ) {
-        if ( !$Param{Silent} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Invalid CacheTTL!",
-            );
-        }
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Invalid CacheTTL!",
+            Silent   => $Param{Silent},
+        );
         return;
     }
     if ( $Param{UserID} !~ m/^[1-9][0-9]*$/ ) {
-        if ( !$Param{Silent} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Invalid UserID!",
-            );
-        }
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Invalid UserID!",
+            Silent   => $Param{Silent},
+        );
         return;
     }
     if ( $Param{UserType} !~ m/^(?:Agent|Customer)$/ ) {
-        if ( !$Param{Silent} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Invalid UserType!",
-            );
-        }
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Invalid UserType!",
+            Silent   => $Param{Silent},
+        );
+        return;
+    }
+    if ( $Param{Permission} !~ m/^(?:READ|CREATE|UPDATE|DELETE)$/ ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Invalid Permission!",
+            Silent   => $Param{Silent},
+        );
         return;
     }
 
+    # only use unique select values
+    @{ $Param{Select} } = $Kernel::OM->Get('Main')->GetUnique( @{ $Param{Select} } );
+
     # prepare cache key data
     my $CacheKeyData = {
-        Result   => $Param{Result},
-        Search   => $Param{Search},
-        Sort     => $Param{Sort},
-        Limit    => $Param{Limit},
-        Language => $Param{Language},
-        UserType => $Param{UserType},
-        UserID   => $Param{UserID},
+        Result     => $Param{Result},
+        Select     => $Param{Select},
+        Search     => $Param{Search},
+        Sort       => $Param{Sort},
+        Limit      => $Param{Limit},
+        Language   => $Param{Language},
+        UserType   => $Param{UserType},
+        UserID     => $Param{UserID},
+        Permission => $Param{Permission},
     };
 
     # prepare cache key
@@ -280,11 +304,26 @@ sub Search {
         );
     }
 
+    # remember CacheInMemory state
+    my $CacheInMemory = $Kernel::OM->Get('Cache')->{CacheInMemory};
+
+    # enable CacheInMemory
+    $Kernel::OM->Get('Cache')->Configure(
+        CacheInMemory  => 1,
+    );
+
     # check for existing cache value
     my $CacheData = $Kernel::OM->Get('Cache')->Get(
         Type => 'ObjectSearch_' . $ObjectType,
         Key  => $CacheKey,
     );
+
+    # restore CacheInMemory
+    $Kernel::OM->Get('Cache')->Configure(
+        CacheInMemory  => $CacheInMemory,
+    );
+
+    # handle cached data
     if ( defined( $CacheData ) ) {
         # check result ref of cache data
         if ( ref( $CacheData ) ne $ResultRefMap{ $Param{Result} } ) {
@@ -334,15 +373,24 @@ sub Search {
     }
 
     # write cache
-    if (
-        !$IsRelative
-        && $Param{CacheTTL}
-    ) {
+    if ( $Param{CacheTTL} ) {
+        # enable CacheInMemory
+        $Kernel::OM->Get('Cache')->Configure(
+            CacheInMemory  => 1,
+        );
+
+        # set cache
         $Kernel::OM->Get('Cache')->Set(
-            Type  => 'ObjectSearch_' . $ObjectType,
-            Key   => $CacheKey,
-            Value => $SearchResult,
-            TTL   => $Param{CacheTTL},
+            Type           => 'ObjectSearch_' . $ObjectType,
+            Key            => $CacheKey,
+            Value          => $SearchResult,
+            TTL            => $Param{CacheTTL},
+            CacheInBackend => !$IsRelative
+        );
+
+        # restore CacheInMemory
+        $Kernel::OM->Get('Cache')->Configure(
+            CacheInMemory  => $CacheInMemory,
         );
     }
 

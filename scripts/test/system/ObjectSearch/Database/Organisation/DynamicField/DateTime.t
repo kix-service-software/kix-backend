@@ -69,7 +69,7 @@ $Self->IsDeeply(
     {
         IsSearchable => 1,
         IsSortable   => 1,
-        Operators    => ['EQ','NE','GT','GTE','LT','LTE'],
+        Operators    => ['EMPTY','EQ','NE','GT','GTE','LT','LTE'],
         ValueType    => 'DATETIME'
     },
     'GetSupportedAttributes provides expected data'
@@ -142,6 +142,40 @@ my @SearchTests = (
             Value    => '1'
         },
         Expected     => undef
+    },
+    {
+        Name         => 'Search: valid search / Field DynamicField_UnitTest / Operator EMPTY / date value',
+        Search       => {
+            Field    => 'DynamicField_UnitTest',
+            Operator => 'EMPTY',
+            Value    => 1
+        },
+        Expected     => {
+            'IsRelative' => undef,
+            'Join'       => [
+                'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = o.id AND dfv_left0.field_id = ' . $DynamicFieldID
+            ],
+            'Where'      => [
+                'dfv_left0.value_date IS NULL'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field DynamicField_UnitTest / Operator EMPTY / empty value',
+        Search       => {
+            Field    => 'DynamicField_UnitTest',
+            Operator => 'EMPTY',
+            Value    => 0
+        },
+        Expected     => {
+            'IsRelative' => undef,
+            'Join'       => [
+                'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = o.id AND dfv_left0.field_id = ' . $DynamicFieldID
+            ],
+            'Where'      => [
+                'dfv_left0.value_date IS NOT NULL'
+            ]
+        }
     },
     {
         Name         => 'Search: valid search / Field DynamicField_UnitTest / Operator EQ / absolute value',
@@ -415,7 +449,7 @@ my $ObjectSearch = $Kernel::OM->Get('ObjectSearch');
 $Helper->BeginWork();
 
 ## prepare test organisations ##
-# first ticket
+# first organisation
 my $OrganisationID1   = $Kernel::OM->Get('Organisation')->OrganisationAdd(
     Number  => $Helper->GetRandomID(),
     Name    => $Helper->GetRandomID(),
@@ -436,7 +470,7 @@ $Self->True(
     $ValueSet1,
     'Dynamic field value set for first organisation'
 );
-# second ticket
+# second organisation
 my $OrganisationID2   = $Kernel::OM->Get('Organisation')->OrganisationAdd(
     Number  => $Helper->GetRandomID(),
     Name    => $Helper->GetRandomID(),
@@ -457,7 +491,7 @@ $Self->True(
     $ValueSet2,
     'Dynamic field value set for first organisation'
 );
-# third ticket
+# third organisation
 my $OrganisationID3   = $Kernel::OM->Get('Organisation')->OrganisationAdd(
     Number  => $Helper->GetRandomID(),
     Name    => $Helper->GetRandomID(),
@@ -476,6 +510,32 @@ $Kernel::OM->ObjectsDiscard(
 
 # test Search
 my @IntegrationSearchTests = (
+    {
+        Name     => 'Search: Field DynamicField_UnitTest / Operator EMPTY / Value 1',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DynamicField_UnitTest',
+                    Operator => 'EMPTY',
+                    Value    => 1
+                }
+            ]
+        },
+        Expected => ['1',$OrganisationID3]
+    },
+    {
+        Name     => 'Search: Field DynamicField_UnitTest / Operator EMPTY / Value 0',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DynamicField_UnitTest',
+                    Operator => 'EMPTY',
+                    Value    => 0
+                }
+            ]
+        },
+        Expected => [$OrganisationID1,$OrganisationID2]
+    },
     {
         Name     => 'Search: Field DynamicField_UnitTest / Operator EQ / Value 2014-01-02 00:00:00',
         Search   => {

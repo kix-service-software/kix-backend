@@ -58,9 +58,11 @@ sub new {
 
     # set field properties
     $Self->{Properties} = {
-        'IsSearchable'    => 0,
+        'IsSelectable'    => 0,
+        'IsSearchable'    => 1,
         'IsSortable'      => 0,
-        'SearchOperators' => []
+        'IsFulltextable'  => 0,
+        'SearchOperators' => ['EMPTY']
     };
 
     # get the Dynamic Field Backend custom extensions

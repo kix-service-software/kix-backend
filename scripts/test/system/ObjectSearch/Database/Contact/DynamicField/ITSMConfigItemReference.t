@@ -64,10 +64,12 @@ my $AttributeList = $AttributeObject->GetSupportedAttributes();
 $Self->IsDeeply(
     $AttributeList->{'DynamicField_UnitTest'},
     {
-        IsSearchable => 1,
-        IsSortable   => 0,
-        Operators    => ['EQ','NE','IN','!IN'],
-        ValueType    => 'NUMERIC'
+        IsSelectable   => 1,
+        IsSearchable   => 1,
+        IsSortable     => 0,
+        IsFulltextable => 0,
+        Operators      => ['EMPTY','EQ','NE','IN','!IN'],
+        ValueType      => 'NUMERIC'
     },
     'GetSupportedAttributes provides expected data'
 );
@@ -230,6 +232,38 @@ my @SearchTests = (
                 'dfv_left0.value_text NOT IN (\'1\')'
             ]
         }
+    },
+    {
+        Name         => 'Search: valid search / Field DynamicField_UnitTest / Operator EMPTY / Value 1',
+        Search       => {
+            Field    => 'DynamicField_UnitTest',
+            Operator => 'EMPTY',
+            Value    => 1
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = c.id AND dfv_left0.field_id = ' . $DynamicFieldID
+            ],
+            'Where' => [
+                '(dfv_left0.value_text = \'\' OR dfv_left0.value_text IS NULL)'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field DynamicField_UnitTest / Operator EMPTY / Value 0',
+        Search       => {
+            Field    => 'DynamicField_UnitTest',
+            Operator => 'EMPTY',
+            Value    => 0
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT OUTER JOIN dynamic_field_value dfv_left0 ON dfv_left0.object_id = c.id AND dfv_left0.field_id = ' . $DynamicFieldID
+            ],
+            'Where' => [
+                '(dfv_left0.value_text != \'\' AND dfv_left0.value_text IS NOT NULL)'
+            ]
+        }
     }
 );
 for my $Test ( @SearchTests ) {
@@ -326,8 +360,8 @@ $Kernel::OM->ObjectsDiscard(
     Objects => ['ITSMConfigItem'],
 );
 
-## prepare test organisations ##
-# first ticket
+## prepare test contacts ##
+# first contact
 my $ContactID1   = $Kernel::OM->Get('Contact')->ContactAdd(
     Firstname => $Helper->GetRandomID(),
     Lastname  => $Helper->GetRandomID(),
@@ -336,7 +370,7 @@ my $ContactID1   = $Kernel::OM->Get('Contact')->ContactAdd(
 );
 $Self->True(
     $ContactID1,
-    'Created first organisation'
+    'Created first contact'
 );
 my $ValueSet1 = $Kernel::OM->Get('DynamicField::Backend')->ValueSet(
     DynamicFieldConfig => $DynamicFieldConfig,
@@ -346,9 +380,9 @@ my $ValueSet1 = $Kernel::OM->Get('DynamicField::Backend')->ValueSet(
 );
 $Self->True(
     $ValueSet1,
-    'Dynamic field value set for first organisation'
+    'Dynamic field value set for first contact'
 );
-# second ticket
+# second contact
 my $ContactID2   = $Kernel::OM->Get('Contact')->ContactAdd(
     Firstname => $Helper->GetRandomID(),
     Lastname  => $Helper->GetRandomID(),
@@ -357,7 +391,7 @@ my $ContactID2   = $Kernel::OM->Get('Contact')->ContactAdd(
 );
 $Self->True(
     $ContactID2,
-    'Created second organisation'
+    'Created second contact'
 );
 my $ValueSet2 = $Kernel::OM->Get('DynamicField::Backend')->ValueSet(
     DynamicFieldConfig => $DynamicFieldConfig,
@@ -367,9 +401,9 @@ my $ValueSet2 = $Kernel::OM->Get('DynamicField::Backend')->ValueSet(
 );
 $Self->True(
     $ValueSet2,
-    'Dynamic field value set for first organisation'
+    'Dynamic field value set for second contact'
 );
-# third ticket
+# third contact
 my $ContactID3   = $Kernel::OM->Get('Contact')->ContactAdd(
     Firstname => $Helper->GetRandomID(),
     Lastname  => $Helper->GetRandomID(),
@@ -378,7 +412,7 @@ my $ContactID3   = $Kernel::OM->Get('Contact')->ContactAdd(
 );
 $Self->True(
     $ContactID3,
-    'Created third organisation without df value'
+    'Created third contact without df value'
 );
 
 # discard contact object to process events
@@ -388,6 +422,32 @@ $Kernel::OM->ObjectsDiscard(
 
 # test Search
 my @IntegrationSearchTests = (
+    {
+        Name     => 'Search: Field DynamicField_UnitTest / Operator EMPTY / Value 1',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DynamicField_UnitTest',
+                    Operator => 'EMPTY',
+                    Value    => 1
+                }
+            ]
+        },
+        Expected => [1,$ContactID3]
+    },
+    {
+        Name     => 'Search: Field DynamicField_UnitTest / Operator EMPTY / Value zero',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'DynamicField_UnitTest',
+                    Operator => 'EMPTY',
+                    Value    => 0
+                }
+            ]
+        },
+        Expected => [$ContactID1,$ContactID2]
+    },
     {
         Name     => 'Search: Field DynamicField_UnitTest / Operator EQ / Value $ConfigItemID2',
         Search   => {

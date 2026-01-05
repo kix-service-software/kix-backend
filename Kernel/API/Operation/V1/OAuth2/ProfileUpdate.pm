@@ -80,6 +80,10 @@ sub ParameterDefinition {
         'Profile::Scope' => {
             RequiresValueIfUsed => 1
         },
+        'Profile::PKCE' => {
+            DataType            => 'NUMERIC',
+            RequiresValueIfUsed => 1
+        },
     }
 }
 
@@ -98,6 +102,7 @@ perform OAuth2 ProfileUpdate Operation. This will return the updated ProfileID.
                 ClientID          => 'ClientID',      # optional
                 ClientSecret      => 'ClientSecret',  # optional
                 Scope             => 'Scope'          # optional
+                PKCE              => 1,               # optional
                 ValidID           => 1,               # optional
             },
         },
@@ -144,6 +149,7 @@ sub Run {
         ClientID     => $Profile->{ClientID}     || $ProfileData{ClientID},
         ClientSecret => $Profile->{ClientSecret} || $ProfileData{ClientSecret},
         Scope        => $Profile->{Scope}        || $ProfileData{Scope},
+        PKCE         => $Profile->{PKCE}         // $ProfileData{PKCE},
         ValidID      => $Profile->{ValidID}      || $ProfileData{ValidID},
         UserID       => $Self->{Authorization}->{UserID},
     );

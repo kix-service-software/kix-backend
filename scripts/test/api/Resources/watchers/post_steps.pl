@@ -66,3 +66,38 @@ When qr/I create a watcher$/, sub {
    );
 };
 
+When qr/I create a watcher fail attribute (.*?)$/, sub {
+    my $Object;
+    my $ObjectID;
+    my $UserID;
+
+    if ( $1 eq "object" ){
+        $Object = "",
+        $ObjectID = 94,
+        $UserID = 1
+    }
+    elsif ($1 eq "objectid") {
+        $Object = "Ticket",
+        $ObjectID = 94,
+        $UserID = 1
+    }
+    elsif ($1 eq "userid"){
+        $Object = "Ticket",
+        $ObjectID = 94,
+        $UserID = ''
+    }
+    ( S->{Response}, S->{ResponseContent} ) = _Post(
+        URL     => S->{API_URL}.'/watchers',
+        Token   => S->{Token},
+        Content => {
+            Watcher => {
+                Object => $Object,
+                ObjectID => $ObjectID,
+                UserID => $UserID
+            }
+        }
+    );
+};
+
+
+

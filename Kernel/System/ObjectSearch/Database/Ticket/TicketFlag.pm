@@ -34,21 +34,20 @@ sub GetSupportedAttributes {
 
     return {
         'TicketFlag.Seen' => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EQ','NE']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE']
         },
     };
 }
 
-sub Search {
+sub AttributePrepare {
     my ( $Self, %Param ) = @_;
 
-    # check params
-    return if ( !$Self->_CheckSearchParams( %Param ) );
-
     # get requested flag
-    my $Flag = $Param{Search}->{Field};
+    my $Flag = $Param{Attribute};
     $Flag =~ s/^TicketFlag\.//;
 
     # check for needed joins
@@ -62,21 +61,19 @@ sub Search {
         $Param{Flags}->{JoinMap}->{ 'TicketFlag_' . $Flag } = $Count;
     }
 
-    # prepare condition
-    my $Condition = $Self->_GetCondition(
-        Operator   => $Param{Search}->{Operator},
-        Column     => "$TableAlias.ticket_value",
-        Value      => $Param{Search}->{Value},
-        NULLValue  => 1,
-        Silent     => $Param{Silent}
+    my %Attribute = (
+        Column => $TableAlias . '.ticket_value',
+        SQLDef => {
+            Join  => \@SQLJoin
+        }
     );
-    return if ( !$Condition );
+    if ( $Param{PrepareType} eq 'Condition' ) {
+        $Attribute{ConditionDef} = {
+            NULLValue => 1
+        };
+    }
 
-    # return search def
-    return {
-        Join  => \@SQLJoin,
-        Where => [ $Condition ]
-    };
+    return \%Attribute;
 }
 
 1;

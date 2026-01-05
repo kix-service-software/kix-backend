@@ -12,3 +12,12 @@ Feature: POST request to the /faq/articles resource
     When I delete this faq article
     Then the response code is 204
     And the response has no content
+
+  Scenario: create a faq article with no categoryid
+    When I create a faq article with no categoryid
+    Then the response code is 400
+
+
+
+
+

@@ -29,7 +29,7 @@ $Self->Is(
 );
 
 # check supported methods
-for my $Method ( qw(GetSupportedAttributes Search Sort) ) {
+for my $Method ( qw(GetSupportedAttributes FulltextSearch) ) {
     $Self->True(
         $AttributeObject->can($Method),
         'Attribute object can "' . $Method . q{"}
@@ -39,11 +39,14 @@ for my $Method ( qw(GetSupportedAttributes Search Sort) ) {
 # check GetSupportedAttributes
 my $AttributeList = $AttributeObject->GetSupportedAttributes();
 $Self->IsDeeply(
-    $AttributeList, {
+    $AttributeList,
+    {
         Fulltext => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['LIKE']
+            IsSelectable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 0,
+            Operators      => ['LIKE']
         }
     },
     'GetSupportedAttributes provides expected data'
@@ -56,179 +59,114 @@ if ( $QuoteBack ) {
     $Escape =~ s/\\/$QuoteBack\\/g;
 }
 
+# Quoting single quote character
+my $QuoteSingle = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteSingle');
+
+# Quoting semicolon character
+my $QuoteSemicolon = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteSemicolon');
+
 # check if database is casesensitive
 my $CaseSensitive = $Kernel::OM->Get('DB')->GetDatabaseFunction('CaseSensitive');
 
-# set config 'Ticket::SearchIndexModule' to 'StaticDB' to check sql preparation
-$Kernel::OM->Get('Config')->Set(
-    Key   => 'Ticket::SearchIndexModule',
-    Value => 'Kernel::System::Ticket::ArticleSearchIndex::StaticDB'
-);
-
-# check Search
-my @SearchTests = (
+# check FulltextSearch
+my @FulltextSearchTests = (
     {
-        Name         => 'Search/StaticDB: undef search',
+        Name         => 'FulltextSearch: Search undef | Columns undef',
         Search       => undef,
+        Columns      => undef,
         Expected     => undef
     },
     {
-        Name         => 'Search/StaticDB: Value undef',
+        Name         => 'FulltextSearch: Search->Value undef | Columns valid',
         Search       => {
             Field    => 'Fulltext',
             Operator => 'LIKE',
             Value    => undef
 
         },
+        Columns      => ['Title','Subject'],
         Expected     => undef
     },
     {
-        Name         => 'Search/StaticDB: Field undef',
+        Name         => 'FulltextSearch: Search->Field undef | Columns valid',
         Search       => {
             Field    => undef,
             Operator => 'LIKE',
             Value    => 'Test'
         },
+        Columns      => ['Title','Subject'],
         Expected     => undef
     },
     {
-        Name         => 'Search/StaticDB: Field invalid',
+        Name         => 'FulltextSearch: Search->Field invalid | Columns valid',
         Search       => {
             Field    => 'Test',
             Operator => 'LIKE',
             Value    => 'Test'
         },
+        Columns      => ['Title','Subject'],
         Expected     => undef
     },
     {
-        Name         => 'Search/StaticDB: Operator undef',
+        Name         => 'FulltextSearch: Search->Operator undef | Columns valid',
         Search       => {
             Field    => 'Fulltext',
             Operator => undef,
             Value    => 'Test'
         },
+        Columns      => ['Title','Subject'],
         Expected     => undef
     },
     {
-        Name         => 'Search/StaticDB: Operator invalid',
+        Name         => 'FulltextSearch: Search->Operator invalid | Columns valid',
         Search       => {
             Field    => 'Fulltext',
             Operator => 'Test',
             Value    => 'Test'
         },
+        Columns      => ['Title','Subject'],
         Expected     => undef
     },
     {
-        Name         => 'Search/StaticDB: valid search / Field Fulltext / Operator LIKE',
+        Name         => 'FulltextSearch: Search valid | Columns undef',
         Search       => {
             Field    => 'Fulltext',
             Operator => 'LIKE',
             Value    => 'Test'
         },
+        Columns      => undef,
+        Expected     => undef
+    },
+    {
+        Name         => 'FulltextSearch: Search valid | Columns invalid',
+        Search       => {
+            Field    => 'Fulltext',
+            Operator => 'LIKE',
+            Value    => 'Test'
+        },
+        Columns      => 'Test',
+        Expected     => undef
+    },
+    {
+        Name         => 'FulltextSearch: valid search | Field Fulltext | Operator LIKE',
+        Search       => {
+            Field    => 'Fulltext',
+            Operator => 'LIKE',
+            Value    => 'Test'
+        },
+        Columns      => ['Test'],
         Expected     => {
-            'Join' => [
-                'LEFT OUTER JOIN article_search s_ta ON s_ta.ticket_id = st.id'
-            ],
+            'Join' => undef,
             'Where' => [
-                $CaseSensitive ? '(LOWER(st.tn) LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR LOWER(st.title) LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR s_ta.a_to LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR s_ta.a_cc LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR s_ta.a_from LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR s_ta.a_body LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR s_ta.a_subject LIKE \'%test%\' ESCAPE \'' . $Escape . '\') ' : '(st.tn LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR st.title LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR s_ta.a_to LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR s_ta.a_cc LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR s_ta.a_from LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR s_ta.a_body LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR s_ta.a_subject LIKE \'%test%\' ESCAPE \'' . $Escape . '\') '
+                $CaseSensitive ? '(LOWER(Test) LIKE \'%test%\' ESCAPE \'' . $Escape . '\') ' : '(Test LIKE \'%test%\' ESCAPE \'' . $Escape . '\') '
             ]
         }
     }
 );
-for my $Test ( @SearchTests ) {
-    my $Result = $AttributeObject->Search(
+for my $Test ( @FulltextSearchTests ) {
+    my $Result = $AttributeObject->FulltextSearch(
         Search       => $Test->{Search},
-        BoolOperator => 'AND',
-        UserID       => 1,
-        UserType     => 'Agent',
-        Silent       => defined( $Test->{Expected} ) ? 0 : 1
-    );
-    $Self->IsDeeply(
-        $Result,
-        $Test->{Expected},
-        $Test->{Name}
-    );
-}
-
-# set config 'Ticket::SearchIndexModule' to 'RuntimeDB' to check sql preparation
-$Kernel::OM->Get('Config')->Set(
-    Key   => 'Ticket::SearchIndexModule',
-    Value => 'Kernel::System::Ticket::ArticleSearchIndex::RuntimeDB'
-);
-
-# check Search
-@SearchTests = (
-    {
-        Name         => 'Search/RuntimeDB: undef search',
-        Search       => undef,
-        Expected     => undef
-    },
-    {
-        Name         => 'Search/RuntimeDB: Value undef',
-        Search       => {
-            Field    => 'Fulltext',
-            Operator => 'LIKE',
-            Value    => undef
-
-        },
-        Expected     => undef
-    },
-    {
-        Name         => 'Search/RuntimeDB: Field undef',
-        Search       => {
-            Field    => undef,
-            Operator => 'LIKE',
-            Value    => 'Test'
-        },
-        Expected     => undef
-    },
-    {
-        Name         => 'Search/RuntimeDB: Field invalid',
-        Search       => {
-            Field    => 'Test',
-            Operator => 'LIKE',
-            Value    => 'Test'
-        },
-        Expected     => undef
-    },
-    {
-        Name         => 'Search/RuntimeDB: Operator undef',
-        Search       => {
-            Field    => 'Fulltext',
-            Operator => undef,
-            Value    => 'Test'
-        },
-        Expected     => undef
-    },
-    {
-        Name         => 'Search/RuntimeDB: Operator invalid',
-        Search       => {
-            Field    => 'Fulltext',
-            Operator => 'Test',
-            Value    => 'Test'
-        },
-        Expected     => undef
-    },
-    {
-        Name         => 'Search/RuntimeDB: valid search / Field Fulltext / Operator LIKE',
-        Search       => {
-            Field    => 'Fulltext',
-            Operator => 'LIKE',
-            Value    => 'Test'
-        },
-        Expected     => {
-            'Join' => [
-                'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id'
-            ],
-            'Where' => [
-                $CaseSensitive ? '(LOWER(st.tn) LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR LOWER(st.title) LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR LOWER(ta.a_to) LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR LOWER(ta.a_cc) LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR LOWER(ta.a_from) LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR LOWER(ta.a_body) LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR LOWER(ta.a_subject) LIKE \'%test%\' ESCAPE \'' . $Escape . '\') ' : '(st.tn LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR st.title LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR ta.a_to LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR ta.a_cc LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR ta.a_from LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR ta.a_body LIKE \'%test%\' ESCAPE \'' . $Escape . '\' OR ta.a_subject LIKE \'%test%\' ESCAPE \'' . $Escape . '\') '
-            ]
-        }
-    }
-);
-for my $Test ( @SearchTests ) {
-    my $Result = $AttributeObject->Search(
-        Search       => $Test->{Search},
+        Columns      => $Test->{Columns},
         BoolOperator => 'AND',
         UserID       => 1,
         UserType     => 'Agent',
@@ -242,35 +180,7 @@ for my $Test ( @SearchTests ) {
 }
 
 # check Sort
-my @SortTests = (
-    {
-        Name      => 'Sort: Attribute undef',
-        Attribute => undef,
-        Expected  => undef
-    },
-    {
-        Name      => 'Sort: Attribute invalid',
-        Attribute => 'Test',
-        Expected  => undef
-    },
-    {
-        Name      => 'Sort: Attribute "Fulltext"',
-        Attribute => 'Fulltext',
-        Expected  => undef
-    }
-);
-for my $Test ( @SortTests ) {
-    my $Result = $AttributeObject->Sort(
-        Attribute => $Test->{Attribute},
-        Language  => 'en',
-        Silent    => defined( $Test->{Expected} ) ? 0 : 1
-    );
-    $Self->IsDeeply(
-        $Result,
-        $Test->{Expected},
-        $Test->{Name}
-    );
-}
+# attributes of this backend are not sortable
 
 ### Integration Test ###
 # discard current object search object
@@ -314,6 +224,7 @@ my $SenderTypeID1   = $Kernel::OM->Get('Ticket')->ArticleSenderTypeLookup( Sende
 my $SenderTypeID2   = $Kernel::OM->Get('Ticket')->ArticleSenderTypeLookup( SenderType => $SenderTypeName2 );
 my $From1           = '"Agent" <agent@kixdesk.com>';
 my $From2           = '"Customer" <customer@external.com>';
+my $From3           = '"Max Mustermann" <max.mustermann@unittest.com>';
 my $To1             = '"Customer" <customer@external.com>';
 my $To2             = '"Agent" <agent@kixdesk.com>';
 my $Cc1             = '"External" <external@external.com>';
@@ -327,6 +238,7 @@ my $Body2           = 'You have to test again and again.';
 # first ticket
 my $TicketID1 = $Kernel::OM->Get('Ticket')->TicketCreate(
     Title          => $Title1,
+    TN             => 'TN1',
     QueueID        => 1,
     Lock           => 'unlock',
     PriorityID     => 1,
@@ -342,6 +254,8 @@ $Self->True(
     $TicketID1,
     'Created first ticket'
 );
+
+# first article
 my $ArticleID1 = $Kernel::OM->Get('Ticket')->ArticleCreate(
     TicketID        => $TicketID1,
     ChannelID       => $ChannelID1,
@@ -365,6 +279,7 @@ $Self->True(
 $Helper->FixedTimeAddSeconds(60);
 my $TicketID2 = $Kernel::OM->Get('Ticket')->TicketCreate(
     Title          => $Title2,
+    TN             => 'TN2',
     QueueID        => 1,
     Lock           => 'unlock',
     PriorityID     => 1,
@@ -380,6 +295,8 @@ $Self->True(
     $TicketID2,
     'Created second ticket'
 );
+
+# second article
 my $ArticleID2 = $Kernel::OM->Get('Ticket')->ArticleCreate(
     TicketID        => $TicketID2,
     ChannelID       => $ChannelID2,
@@ -403,6 +320,7 @@ $Self->True(
 $Helper->FixedTimeAddSeconds(60);
 my $TicketID3 = $Kernel::OM->Get('Ticket')->TicketCreate(
     Title          => $Title3,
+    TN             => 'TN3',
     QueueID        => 1,
     Lock           => 'unlock',
     PriorityID     => 1,
@@ -438,6 +356,9 @@ $From1 = $Kernel::OM->Get('Ticket')->_ArticleIndexString(
 $From2 = $Kernel::OM->Get('Ticket')->_ArticleIndexString(
     String => $From2
 );
+$From3 = $Kernel::OM->Get('Ticket')->_ArticleIndexString(
+    String => $From3
+);
 $To1 = $Kernel::OM->Get('Ticket')->_ArticleIndexString(
     String => $To1
 );
@@ -456,10 +377,12 @@ $Kernel::OM->ObjectsDiscard(
     Objects => ['Ticket'],
 );
 
+my $DefaultCnf = $Kernel::OM->Get('Config')->Get('ObjectSearch::Database::ObjectType');
+
 # test Search
 my @IntegrationSearchTests = (
     {
-        Name     => "Search: Field Fulltext / Operator LIKE / Value \$To1",
+        Name     => "Search: Field Fulltext | Operator LIKE | FulltextAttributes: Default | Value \$To1",
         Search   => {
             'AND' => [
                 {
@@ -472,7 +395,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID1,$TicketID2]
     },
     {
-        Name     => "Search: Field Fulltext / Operator LIKE / Value substr(\$To1,0,4)",
+        Name     => "Search: Field Fulltext | Operator LIKE | FulltextAttributes: Default | Value substr(\$To1,0,4)",
         Search   => {
             'AND' => [
                 {
@@ -485,7 +408,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID1,$TicketID2]
     },
     {
-        Name     => "Search: Field Fulltext / Operator LIKE / Value \$Body1",
+        Name     => "Search: Field Fulltext | Operator LIKE | FulltextAttributes: Default | Value \"\$Body1\"",
         Search   => {
             'AND' => [
                 {
@@ -498,7 +421,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID1,$TicketID2,$TicketID3]
     },
     {
-        Name     => "Search: Field Fulltext / Operator LIKE / Value substr(\$Body1,-5)",
+        Name     => "Search: Field Fulltext | Operator LIKE | FulltextAttributes: Default |  Value \"substr(\$Body1,-5)\"",
         Search   => {
             'AND' => [
                 {
@@ -511,7 +434,20 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID1,$TicketID2,$TicketID3]
     },
     {
-        Name     => "Search: Field Fulltext / Operator LIKE / Value \$Title2",
+        Name     => "Search: Field Fulltext | Operator LIKE | FulltextAttributes: Default | Value \$Title2",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Fulltext',
+                    Operator => 'LIKE',
+                    Value    => $Title2
+                }
+            ]
+        },
+        Expected => [$TicketID2]
+    },
+    {
+        Name     => "Search: Field Fulltext | Operator LIKE | FulltextAttributes: Default | Value \"\$Title2\"",
         Search   => {
             'AND' => [
                 {
@@ -524,7 +460,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID2]
     },
     {
-        Name     => "Search: Field Fulltext / Operator LIKE / Value substr(\$Title2,2,-2)",
+        Name     => "Search: Field Fulltext | Operator LIKE | FulltextAttributes: Default | Value \"substr(\$Title2,2,-2)\"",
         Search   => {
             'AND' => [
                 {
@@ -537,7 +473,20 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID1,$TicketID2,$TicketID3]
     },
     {
-        Name     => "Search: Field Fulltext / Operator LIKE / Value \$Subject2",
+        Name     => "Search: Field Fulltext | Operator LIKE | FulltextAttributes: Default | Value \$Subject2",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Fulltext',
+                    Operator => 'LIKE',
+                    Value    => $Subject2
+                }
+            ]
+        },
+        Expected => [$TicketID2]
+    },
+    {
+        Name     => "Search: Field Fulltext | Operator LIKE | FulltextAttributes: Default | Value \"\$Subject2\"",
         Search   => {
             'AND' => [
                 {
@@ -550,20 +499,20 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID2]
     },
     {
-        Name     => "Search: Field Fulltext / Operator LIKE / Value \"\$To2\"",
+        Name     => "Search: Field Fulltext | Operator LIKE | FulltextAttributes: Default | Value \$To2",
         Search   => {
             'AND' => [
                 {
                     Field    => 'Fulltext',
                     Operator => 'LIKE',
-                    Value    => q{"} . $To2 . q{"}
+                    Value    => $To2
                 }
             ]
         },
         Expected => [$TicketID1, $TicketID2]
     },
     {
-        Name     => "Search: Field Fulltext / Operator LIKE / Value \"substr(\$To2,0,4)\"",
+        Name     => "Search: Field Fulltext | Operator LIKE | FulltextAttributes: Default | Value \"substr(\$To2,0,4)\"",
         Search   => {
             'AND' => [
                 {
@@ -576,7 +525,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID1, $TicketID2]
     },
     {
-        Name     => "Search: Field Fulltext / Operator LIKE / Value \$Body2",
+        Name     => "Search: Field Fulltext | Operator LIKE | FulltextAttributes: Default | Value \"\$Body2\"",
         Search   => {
             'AND' => [
                 {
@@ -589,7 +538,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID1,$TicketID2,$TicketID3]
     },
     {
-        Name     => "Search: Field Fulltext / Operator LIKE / Value substr(\$Body2,-5)",
+        Name     => "Search: Field Fulltext | Operator LIKE | FulltextAttributes: Default | Value \"substr(\$Body2,-5)\"",
         Search   => {
             'AND' => [
                 {
@@ -602,7 +551,20 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID1,$TicketID2,$TicketID3]
     },
     {
-        Name     => "Search: Field Fulltext / Operator LIKE / Value \$Title3",
+        Name     => "Search: Field Fulltext | Operator LIKE | FulltextAttributes: Default | Value \$Title3",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Fulltext',
+                    Operator => 'LIKE',
+                    Value    => $Title3
+                }
+            ]
+        },
+        Expected => [$TicketID3]
+    },
+    {
+        Name     => "Search: Field Fulltext | Operator LIKE | FulltextAttributes: Default | Value \"\$Title3\"",
         Search   => {
             'AND' => [
                 {
@@ -615,7 +577,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID3]
     },
     {
-        Name     => "Search: Field Fulltext / Operator LIKE / Value substr(\$Title3,2,-2)",
+        Name     => "Search: Field Fulltext | Operator LIKE | FulltextAttributes: Default | Value \"substr(\$Title3,2,-2)\"",
         Search   => {
             'AND' => [
                 {
@@ -628,7 +590,7 @@ my @IntegrationSearchTests = (
         Expected => [$TicketID1, $TicketID2, $TicketID3]
     },
     {
-        Name     => "Search: Field Fulltext / Operator LIKE / Value \$Subject1",
+        Name     => "Search: Field Fulltext | Operator LIKE | FulltextAttributes: Default | Value \"\$Subject1\"",
         Search   => {
             'AND' => [
                 {
@@ -639,15 +601,110 @@ my @IntegrationSearchTests = (
             ]
         },
         Expected => [$TicketID1]
+    },
+    {
+        Name     => "Search: Field Fulltext | Operator LIKE | FulltextAttributes: Title | Value Unit Test",
+        ConfigSet => {
+            %{$DefaultCnf},
+            Ticket => {
+                %{$DefaultCnf->{Ticket}},
+                FulltextAttributes => [
+                    'Title',
+                ]
+            }
+        },
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Fulltext',
+                    Operator => 'LIKE',
+                    Value    => 'Unit Test'
+                }
+            ]
+        },
+        Expected => [$TicketID1,$TicketID2,$TicketID3]
+    },
+    {
+        Name     => "Search: Field Fulltext | Operator LIKE | FulltextAttributes: Title | Value \$Subject1",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Fulltext',
+                    Operator => 'LIKE',
+                    Value    => $Subject1
+                }
+            ]
+        },
+        Expected => []
+    },
+    {
+        Name     => "Search: Field Fulltext | Operator LIKE | FulltextAttributes: To,Cc | Value \$To1",
+        ConfigSet => {
+            %{$DefaultCnf},
+            Ticket => {
+                %{$DefaultCnf->{Ticket}},
+                FulltextAttributes => [
+                    'To',
+                    'Cc'
+                ]
+            }
+        },
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Fulltext',
+                    Operator => 'LIKE',
+                    Value    => $To1
+                }
+            ]
+        },
+        Expected => [$TicketID1]
+    },
+    {
+        Name     => "Search: Field Fulltext | Operator LIKE | FulltextAttributes: To,Cc | Value \$From3",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Fulltext',
+                    Operator => 'LIKE',
+                    Value    => $From3
+                }
+            ]
+        },
+        Expected => []
     }
 );
 for my $Test ( @IntegrationSearchTests ) {
-    my @Result = $ObjectSearch->Search(
+    if ( IsHashRefWithData($Test->{ConfigSet}) ) {
+        $Kernel::OM->Get('Config')->Set(
+            Key   => 'ObjectSearch::Database::ObjectType',
+            Value => $Test->{ConfigSet}
+        );
+
+        my $Config = $Kernel::OM->Get('Config')->Get('ObjectSearch::Database::ObjectType');
+
+        $Self->IsDeeply(
+            $Config,
+            $Test->{ConfigSet},
+            'Search: Field Fulltext | SET FulltextAttributes: ' . join(q(,), @{$Test->{ConfigSet}->{Ticket}->{FulltextAttributes}})
+        );
+
+        # discard ObjectSearch object to process events
+        $Kernel::OM->ObjectsDiscard(
+            Objects => ['ObjectSearch'],
+        );
+    }
+
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => 'ObjectSearch_Ticket'
+    );
+
+    my @Result = $Kernel::OM->Get('ObjectSearch')->Search(
         ObjectType => 'Ticket',
         Result     => 'ARRAY',
         Search     => $Test->{Search},
         UserType   => 'Agent',
-        UserID     => 1,
+        UserID     => 1
     );
     $Self->IsDeeply(
         \@Result,

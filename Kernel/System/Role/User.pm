@@ -263,9 +263,10 @@ sub RoleUserList {
 return a list of all roles of a given user
 
     my @RoleIDs = $RoleObject->UserRoleList(
-        UserID       => 123,                    # required
-        UsageContext => 'Agent'|'Customer'      # optional, if not given, all assigned roles will be returned
-        Valid        => 1                       # optional
+        UserID             => 123,                    # required
+        UsageContext       => 'Agent'|'Customer',     # optional, if not given, all assigned roles will be returned
+        Valid              => 1,                      # optional
+        IgnoreContextRoles => 1,                      # optional, don't list the base roles assigned by the user context
     );
 
 =cut
@@ -284,11 +285,12 @@ sub UserRoleList {
         }
     }
 
-    # set default value
-    my $Valid = $Param{Valid} ? 1 : 0;
+    # set binary values
+    my $Valid              = $Param{Valid} ? 1 : 0;
+    my $IgnoreContextRoles = $Param{IgnoreContextRoles} ? 1 : 0;
 
     # check cache
-    my $CacheKey = 'UserRoleList::' . $Param{UserID} . '::' . $Valid . '::' . ($Param{UsageContext} || '');
+    my $CacheKey = 'UserRoleList::' . $Param{UserID} . '::' . $Valid  . '::' . $IgnoreContextRoles . ($Param{UsageContext} ? "::$Param{UsageContext}" : '');
     my $Cache    = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
@@ -301,8 +303,20 @@ sub UserRoleList {
     push @Bind, \$Param{UserID};
 
     # create sql
-    my $SQL = 'SELECT u.role_id, r.usage_context FROM role_user u LEFT JOIN roles r ON r.id = u.role_id WHERE u.user_id = ?';
+    my $SQL = 'SELECT u.role_id FROM role_user u INNER JOIN roles r ON r.id = u.role_id WHERE u.user_id = ?';
 
+    if ( $Param{UsageContext} ) {
+        my $UsageContext = Kernel::System::Role->USAGE_CONTEXT->{uc($Param{UsageContext})};
+        $SQL .= ' AND (r.usage_context & ? ) = ?';
+        push( @Bind, \$UsageContext, \$UsageContext );
+    }
+    if ( $IgnoreContextRoles ) {
+        my $RoleNameAgent    = 'Agent User';
+        my $RoleNameCustomer = 'Customer';
+
+        $SQL .= ' AND u.role_id NOT IN (SELECT id FROM roles WHERE name IN (?, ?))';
+        push( @Bind, \$RoleNameAgent, \$RoleNameCustomer );
+    }
     if ( $Valid ) {
         $SQL .= ' AND valid_id = 1';
     }
@@ -316,9 +330,6 @@ sub UserRoleList {
     # fetch the result
     my @Result;
     while ( my @Row = $DBObject->FetchrowArray() ) {
-        # check if this role is valid for the given usage context
-        next if ( $Param{UsageContext} && ($Row[1] & Kernel::System::Role->USAGE_CONTEXT->{uc($Param{UsageContext})}) != Kernel::System::Role->USAGE_CONTEXT->{uc($Param{UsageContext})} );
-
         push(@Result, $Row[0]);
     }
 
@@ -338,8 +349,9 @@ sub UserRoleList {
 remove a user from the role
 
     my $Success = $RoleObject->RoleUserDelete(
-        RoleID => 6,                    # required if UserID not given
-        UserID => 12,                   # required if RoleID not given
+        RoleIDs            => [6,7],    # Note: * One of RoleIDs, RoleID, or UserId has to be given
+        RoleID             => 6,        #       * RoleIDs has priority over RoleID
+        UserID             => 12,
         IgnoreContextRoles => 1,        # optional, don't delete the base roles assigned by the user context
     );
 
@@ -349,10 +361,20 @@ sub RoleUserDelete {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    if ( !$Param{RoleID} && !$Param{UserID} ) {
+    if ( !$Param{RoleIDs} && !$Param{RoleID} && !$Param{UserID} ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => "Need either RoleID or UserID or both!"
+            Message  => "Need at least one of RoleIDs or RoleID or UserID!"
+        );
+        return;
+    }
+    if (
+        defined( $Param{RoleIDs} )
+        && !IsArrayRefWithData( $Param{RoleIDs} )
+    ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "RoleIDs has to be an array with data!"
         );
         return;
     }
@@ -372,7 +394,11 @@ sub RoleUserDelete {
         push( @Where, 'user_id = ?' );
         push( @Bind, \$Param{UserID} );
     }
-    if ( $Param{RoleID} ) {
+    if ( $Param{RoleIDs} ) {
+        push( @Where, ('role_id IN (' . join( ', ', map {'?'} @{ $Param{RoleIDs} } ) . ')') );
+        push( @Bind, map { \$_ } @{ $Param{RoleIDs} } );
+    }
+    elsif ( $Param{RoleID} ) {
         push( @Where, 'role_id = ?' );
         push( @Bind, \$Param{RoleID} );
     }

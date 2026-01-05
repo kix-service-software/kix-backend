@@ -78,7 +78,7 @@
                 <Item Key="ConfigDialog">AdminAPIOperationDefault</Item>
                 <Item Key="ObjectID">FAQArticleID</Item>
                 <Item Key="CacheType">API_faq</Item>
-                <Item Key="CacheTypeDependency">FAQ</Item>
+                <Item Key="CacheTypeDependency">FAQ,LinkObject</Item>
             </Hash>
         </Setting>
     </ConfigItem>

@@ -36,82 +36,106 @@ sub GetSupportedAttributes {
 
     return {
         ArticleID         => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
+            ValueType      => 'NUMERIC'
         },
         ChannelID         => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
+            ValueType      => 'NUMERIC'
         },
         Channel           => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            IsSelectable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
         SenderTypeID      => {
+            IsSelectable => 0,
             IsSearchable => 1,
             IsSortable   => 0,
             Operators    => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
             ValueType    => 'NUMERIC'
         },
         SenderType        => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            IsSelectable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
         CustomerVisible   => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
+            ValueType      => 'NUMERIC'
         },
         From              => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            IsSelectable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
         To                => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            IsSelectable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
         Cc                => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            IsSelectable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
         Subject           => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            IsSelectable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
         Body              => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            IsSelectable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 1,
+            Operators      => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
         ArticleCreateTime => {
-            IsSearchable => 1,
-            IsSortable   => 0,
-            Operators    => ['EQ','LT','GT','LTE','GTE'],
-            ValueType    => 'DATETIME'
+            IsSelectable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 0,
+            IsFulltextable => 0,
+            Operators      => ['EQ','LT','GT','LTE','GTE'],
+            ValueType      => 'DATETIME'
         }
     };
 }
 
-sub Search {
+sub AttributePrepare {
     my ( $Self, %Param ) = @_;
-
-    # check params
-    return if ( !$Self->_CheckSearchParams( %Param ) );
 
     # check if search for ArticleID is used
     my $HasArticleIDSearch = 0;
-    if ( IsArrayRefWithData( $Param{WholeSearch} ) ) {
+    if (
+        defined $Param{PrepareType}
+        && $Param{PrepareType} eq 'Condition'
+        && IsArrayRefWithData( $Param{WholeSearch} )
+    ) {
         for my $SearchEntry ( @{ $Param{WholeSearch} } ) {
             if ($SearchEntry->{Field} eq 'ArticleID') {
                 $HasArticleIDSearch = 1;
@@ -123,7 +147,11 @@ sub Search {
 
     # check if static search should be used. Only if search for ArticleID is NOT used and static search index is active
     my $IsStaticSearch = 0;
-    if ( !$HasArticleIDSearch ) {
+    if (
+        defined $Param{PrepareType}
+        && $Param{PrepareType} eq 'Condition'
+        && !$HasArticleIDSearch
+    ) {
         my $SearchIndexModule = $Kernel::OM->Get('Config')->Get('Ticket::SearchIndexModule');
         if ( $SearchIndexModule =~ /::StaticDB$/ ) {
             $IsStaticSearch = 1;
@@ -146,14 +174,14 @@ sub Search {
 
             $Param{Flags}->{JoinMap}->{StaticArticle} = 1;
         }
-        if ( $Param{Search}->{Field} eq 'Channel' ) {
+        if ( $Param{Attribute} eq 'Channel' ) {
             if ( !$Param{Flags}->{JoinMap}->{StaticArticleChannel} ) {
                 push( @SQLJoin, 'LEFT OUTER JOIN channel s_tac ON s_tac.id = s_ta.channel_id' );
 
                 $Param{Flags}->{JoinMap}->{StaticArticleChannel} = 1;
             }
         }
-        if ( $Param{Search}->{Field} eq 'SenderType' ) {
+        if ( $Param{Attribute} eq 'SenderType' ) {
             if ( !$Param{Flags}->{JoinMap}->{StaticArticleSenderType} ) {
                 push( @SQLJoin, 'LEFT OUTER JOIN article_sender_type s_tast ON s_tast.id = s_ta.article_sender_type_id' );
 
@@ -173,14 +201,14 @@ sub Search {
 
             $Param{Flags}->{JoinMap}->{Article} = 1;
         }
-        if ( $Param{Search}->{Field} eq 'Channel' ) {
+        if ( $Param{Attribute} eq 'Channel' ) {
             if ( !$Param{Flags}->{JoinMap}->{ArticleChannel} ) {
                 push( @SQLJoin, 'LEFT OUTER JOIN channel tac ON tac.id = ta.channel_id' );
 
                 $Param{Flags}->{JoinMap}->{ArticleChannel} = 1;
             }
         }
-        if ( $Param{Search}->{Field} eq 'SenderType' ) {
+        if ( $Param{Attribute} eq 'SenderType' ) {
             if ( !$Param{Flags}->{JoinMap}->{ArticleSenderType} ) {
                 push( @SQLJoin, 'LEFT OUTER JOIN article_sender_type tast ON tast.id = ta.article_sender_type_id' );
 
@@ -190,98 +218,147 @@ sub Search {
     }
 
     # init mapping
-    my %AttributeMapping = (
+    my %AttributeDefinition = (
         ArticleID         => {
-            Column          => $TableAliasPrefix . 'ta.id',
-            ValueType       => 'NUMERIC'
+            Column       => $TableAliasPrefix . 'ta.id',
+            ConditionDef => {
+                ValueType => 'NUMERIC',
+                NULLValue => 1
+            }
         },
         ChannelID         => {
-            Column          => $TableAliasPrefix . 'ta.channel_id',
-            ValueType       => 'NUMERIC'
+            Column       => $TableAliasPrefix . 'ta.channel_id',
+            ConditionDef => {
+                ValueType => 'NUMERIC',
+                NULLValue => 1
+            }
         },
         Channel           => {
-            Column          => $TableAliasPrefix . 'tac.name',
-            CaseInsensitive => 1
+            Column       => $TableAliasPrefix . 'tac.name',
+            ConditionDef => {
+                CaseInsensitive => 1,
+                NULLValue       => 1
+            }
         },
         SenderTypeID      => {
-            Column          => $TableAliasPrefix . 'ta.article_sender_type_id',
-            ValueType       => 'NUMERIC'
+            Column       => $TableAliasPrefix . 'ta.article_sender_type_id',
+            ConditionDef => {
+                ValueType => 'NUMERIC',
+                NULLValue => 1
+            }
         },
         SenderType        => {
-            Column          => $TableAliasPrefix . 'tast.name',
-            CaseInsensitive => 1
+            Column       => $TableAliasPrefix . 'tast.name',
+            ConditionDef => {
+                CaseInsensitive => 1,
+                NULLValue       => 1
+            }
         },
         CustomerVisible   => {
-            Column          => $TableAliasPrefix . 'ta.customer_visible',
-            ValueType       => 'NUMERIC'
+            Column       => $TableAliasPrefix . 'ta.customer_visible',
+            ConditionDef => {
+                ValueType => 'NUMERIC',
+                NULLValue => 1
+            }
         },
         From              => {
-            Column          => $TableAliasPrefix . 'ta.a_from',
-            CaseInsensitive => 1,
-            IsStaticSearch  => $IsStaticSearch
+            Column       => $TableAliasPrefix . 'ta.a_from',
+            ConditionDef => {
+                CaseInsensitive => 1,
+                IsStaticSearch  => $IsStaticSearch,
+                NULLValue       => 1
+            }
         },
         To                => {
-            Column          => $TableAliasPrefix . 'ta.a_to',
-            CaseInsensitive => 1,
-            IsStaticSearch  => $IsStaticSearch
+            Column       => $TableAliasPrefix . 'ta.a_to',
+            ConditionDef => {
+                CaseInsensitive => 1,
+                IsStaticSearch  => $IsStaticSearch,
+                NULLValue       => 1
+            }
         },
         Cc                => {
-            Column          => $TableAliasPrefix . 'ta.a_cc',
-            CaseInsensitive => 1,
-            IsStaticSearch  => $IsStaticSearch
+            Column       => $TableAliasPrefix . 'ta.a_cc',
+            ConditionDef => {
+                CaseInsensitive => 1,
+                IsStaticSearch  => $IsStaticSearch,
+                NULLValue       => 1
+            }
         },
         Subject           => {
-            Column          => $TableAliasPrefix . 'ta.a_subject',
-            CaseInsensitive => 1,
-            IsStaticSearch  => $IsStaticSearch
+            Column       => $TableAliasPrefix . 'ta.a_subject',
+            ConditionDef => {
+                CaseInsensitive => 1,
+                IsStaticSearch  => $IsStaticSearch,
+                NULLValue       => 1
+            }
         },
         Body              => {
-            Column          => $TableAliasPrefix . 'ta.a_body',
-            CaseInsensitive => 1,
-            IsStaticSearch  => $IsStaticSearch
+            Column       => $TableAliasPrefix . 'ta.a_body',
+            ConditionDef => {
+                CaseInsensitive => 1,
+                IsStaticSearch  => $IsStaticSearch,
+                NULLValue       => 1
+            }
         },
         ArticleCreateTime => {
-            Column          => $TableAliasPrefix . 'ta.incoming_time',
-            ValueType       => 'NUMERIC'
+            Column       => $TableAliasPrefix . 'ta.incoming_time',
+            ConditionDef => {
+                ValueType => 'NUMERIC',
+                NULLValue => 1
+            }
         }
+    );
+
+    my %Attribute = (
+        Column => $AttributeDefinition{ $Param{Attribute} }->{Column},
+        SQLDef => {
+            Join => \@SQLJoin,
+        }
+    );
+    if (
+        defined $Param{PrepareType}
+        && $Param{PrepareType} eq 'Condition'
+    ) {
+        $Attribute{ConditionDef} = $AttributeDefinition{ $Param{Attribute} }->{ConditionDef};
+    }
+
+    return \%Attribute;
+}
+
+sub ValuePrepare {
+    my ($Self, %Param) = @_;
+
+    return $Param{Search}->{Value} if (
+        $Param{Search}->{Field} ne 'ArticleCreateTime'
     );
 
     # prepare given values as array ref and convert if required
     my $Values = [];
     if ( !IsArrayRef( $Param{Search}->{Value} ) ) {
-        push( @{ $Values },  $Param{Search}->{Value}  );
+        push( @{ $Values }, $Param{Search}->{Value} );
     }
     else {
         $Values =  $Param{Search}->{Value} ;
     }
 
-    # special handling for ArticleCreateTime
-    if ( $Param{Search}->{Field} eq 'ArticleCreateTime' ) {
-        for my $Value ( @{ $Values } ) {
-            $Value = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
-                String => $Value
+    # convert timestamp to system time
+    for my $Value ( @{ $Values } ) {
+        $Value = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
+            String => $Value
+        );
+        if ( !$Value ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Invalid date format found in parameter $Param{Search}->{Field}!",
             );
+            return;
         }
+
+        $Value = $Kernel::OM->Get('DB')->Quote( $Value );
     }
 
-    # prepare condition
-    my $Condition = $Self->_GetCondition(
-        Operator        => $Param{Search}->{Operator},
-        Column          => $AttributeMapping{ $Param{Search}->{Field} }->{Column},
-        ValueType       => $AttributeMapping{ $Param{Search}->{Field} }->{ValueType},
-        CaseInsensitive => $AttributeMapping{ $Param{Search}->{Field} }->{CaseInsensitive},
-        IsStaticSearch  => $AttributeMapping{ $Param{Search}->{Field} }->{IsStaticSearch},
-        Value           => $Values,
-        NULLValue       => 1,
-        Silent          => $Param{Silent}
-    );
-    return if ( !$Condition );
-
-    return {
-        Join       => \@SQLJoin,
-        Where      => [ $Condition ],
-        IsRelative => $Param{Search}->{IsRelative}
-    };
+    return $Values;
 }
 
 1;

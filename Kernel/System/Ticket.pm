@@ -503,11 +503,6 @@ sub TicketCreate {
         return;
     }
 
-    # create ticket number if none is given
-    if ( !$Param{TN} ) {
-        $Param{TN} = $Self->TicketCreateNumber();
-    }
-
     # check ticket title
     if ( !$Param{Title} ) {
 
@@ -631,29 +626,76 @@ sub TicketCreate {
         $ExistingOrganisationID = undef;
     }
 
-    # create db record
-    return if !$Kernel::OM->Get('DB')->Do(
-        SQL => '
-            INSERT INTO ticket (
-                tn, title, create_time_unix, type_id, queue_id, ticket_lock_id, user_id,
-                responsible_user_id, ticket_priority_id, ticket_state_id, timeout,
-                until_time, archive_flag, create_time, create_by, change_time, change_by,
-                contact_id, organisation_id)
-            VALUES (?, ?, ?, ?, ?, ?, ?,
-                    ?, ?, ?, 0,
-                    0, ?, current_timestamp, ?, current_timestamp, ?,
-                    ?, ?)',
-        Bind => [
-            \$Param{TN}, \$Param{Title}, \$Age, \$Param{TypeID}, \$Param{QueueID}, \$Param{LockID},
-            \$Param{OwnerID}, \$Param{ResponsibleID}, \$Param{PriorityID}, \$Param{StateID},
-            \$ArchiveFlag, \$Param{UserID}, \$Param{UserID},
-            \$Param{ContactID}, \$ExistingOrganisationID,
-        ],
-    );
+    my $Success;
+    my $TicketNumber;
+    do {
+        # prepare ticket number
+        if ( $Param{TN} ) {
+            $TicketNumber = $Param{TN};
+        }
+        else {
+            $TicketNumber = $Self->TicketCreateNumber();
+        }
+
+        # create db record
+        $Success = $Kernel::OM->Get('DB')->Do(
+            SQL    => '
+                INSERT INTO ticket (
+                    tn, title, create_time_unix, type_id, queue_id, ticket_lock_id, user_id,
+                    responsible_user_id, ticket_priority_id, ticket_state_id, timeout,
+                    until_time, archive_flag, create_time, create_by, change_time, change_by,
+                    contact_id, organisation_id)
+                VALUES (?, ?, ?, ?, ?, ?, ?,
+                        ?, ?, ?, 0,
+                        0, ?, current_timestamp, ?, current_timestamp, ?,
+                        ?, ?)',
+            Bind   => [
+                \$TicketNumber, \$Param{Title}, \$Age, \$Param{TypeID}, \$Param{QueueID}, \$Param{LockID},
+                \$Param{OwnerID}, \$Param{ResponsibleID}, \$Param{PriorityID}, \$Param{StateID},
+                \$ArchiveFlag, \$Param{UserID}, \$Param{UserID},
+                \$Param{ContactID}, \$ExistingOrganisationID,
+            ],
+            Silent => 1,
+        );
+
+        # db insert failed
+        if ( !$Success ) {
+            # check for existing ticket with ticket number
+            my $TicketID = $Self->TicketIDLookup(
+                TicketNumber => $TicketNumber,
+                UserID       => $Param{UserID},
+            );
+
+            # no existing ticket => other db error
+            if ( !$TicketID ) {
+                my $LogMessage = $Kernel::OM->Get('Log')->GetLogEntry(
+                    Type => 'error',
+                    What => 'Message',
+                );
+
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => $LogMessage,
+                    Silent   => $Param{Silent},
+                );
+
+                return;
+            }
+            elsif ( $Param{TN} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => 'Ticket with ticket number ' . $Param{TN} . ' already exists!',
+                    Silent   => $Param{Silent},
+                );
+
+                return;
+            }
+        }
+    } while ( !$Success );
 
     # get ticket id
     my $TicketID = $Self->TicketIDLookup(
-        TicketNumber => $Param{TN},
+        TicketNumber => $TicketNumber,
         UserID       => $Param{UserID},
     );
 
@@ -662,14 +704,14 @@ sub TicketCreate {
         TicketID     => $TicketID,
         QueueID      => $Param{QueueID},
         HistoryType  => 'NewTicket',
-        Name         => "\%\%$Param{TN}\%\%$Param{Queue}\%\%$Param{Priority}\%\%$Param{State}\%\%$TicketID",
+        Name         => "\%\%$TicketNumber\%\%$Param{Queue}\%\%$Param{Priority}\%\%$Param{State}\%\%$TicketID",
         CreateUserID => $Param{UserID},
     );
 
     # log ticket creation
     $Kernel::OM->Get('Log')->Log(
         Priority => 'info',
-        Message  => "New Ticket [$Param{TN}/" . substr( $Param{Title}, 0, 15 ) . "] created "
+        Message  => "New Ticket [$TicketNumber/" . substr( $Param{Title}, 0, 15 ) . "] created "
             . "(TicketID=$TicketID,Queue=$Param{Queue},Priority=$Param{Priority},State=$Param{State})",
     );
 
@@ -5971,7 +6013,7 @@ END
 updates the number of attachments of an ticket
 
     my $Result = $TicketObject->TicketAttachmentCountUpdate(
-        TicketID => 123,
+        TicketID => 123,       # optional - do all tickets if not given
         Notify   => 1 | 0      # optional - notify clients (default 0)
     );
 
@@ -5980,37 +6022,40 @@ updates the number of attachments of an ticket
 sub TicketAttachmentCountUpdate {
     my ( $Self, %Param ) = @_;
 
-    for my $Needed (qw(TicketID)) {
-        if ( !$Param{$Needed} ) {
+    my @TicketIDs = $Param{TicketID} ? ( $Param{TicketID} ) : ();
+    if ( !$Param{TicketID} ) {
+        # use all tickets
+        @TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+            ObjectType => 'Ticket',
+            Result     => 'ARRAY',
+            UserID     => 1,
+        );
+    }
+
+    foreach my $TicketID ( @TicketIDs ) {
+        my $AttachmentCount = $Self->TicketAttachmentCountCalculate(
+            TicketID => $TicketID
+        );
+
+        my $Success = $Kernel::OM->Get('DB')->Do(
+            SQL => "UPDATE ticket SET attachment_count = ? WHERE id = ?",
+            Bind => [ \$AttachmentCount, \$TicketID ],
+        );
+        if (!$Success) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "Need $Needed!"
+                Message  => "Couldn't update ticket attachment count for ticket ($TicketID)!",
             );
             return;
         }
-    }
 
-    my $AttachmentCount = $Self->TicketAttachmentCountCalculate(
-        TicketID => $Param{TicketID}
-    );
-
-    my $Success = $Kernel::OM->Get('DB')->Do(
-        SQL => "UPDATE ticket SET attachment_count = ? WHERE id = ?",
-        Bind => [ \$AttachmentCount, \$Param{TicketID} ],
-    );
-    if (!$Success) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Couldn't update ticket attachment count for ticket ($Param{TicketID})!",
+        $Self->_TicketCacheClear(
+            TicketID => $TicketID
         );
-        return;
     }
-
-    $Self->_TicketCacheClear(
-        TicketID => $Param{TicketID}
-    );
 
     if ($Param{Notify}) {
+        # in case Param{TicketID} is not given, the frontend will handle it accordingly
         $Kernel::OM->Get('ClientNotification')->NotifyClients(
             Event     => 'UPDATE',
             Namespace => 'Ticket',
@@ -6044,16 +6089,16 @@ sub TicketAttachmentCountCalculate {
         }
     }
 
-    my $AttachmentCount = 0;
-
-    my @Articles = $Self->ArticleGet(
-        TicketID => $Param{TicketID},
-        UserID   => 1
+    return if !$Kernel::OM->Get('DB')->Prepare(
+        SQL   => 'SELECT SUM(attachment_count) FROM article WHERE ticket_id = ?',
+        Bind  => [
+            \$Param{TicketID}
+        ],
     );
-    if (@Articles) {
-        for my $Article (@Articles) {
-            $AttachmentCount += $Article->{AttachmentCount} || 0;
-        }
+
+    my $AttachmentCount;
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
+        $AttachmentCount  = $Row[0];
     }
 
     return $AttachmentCount;

@@ -54,7 +54,7 @@ $Self->IsDeeply(
         Keywords => {
             IsSearchable => 1,
             IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            Operators    => ['EMPTY','EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         Language => {
             IsSearchable => 1,
@@ -377,7 +377,7 @@ my @SearchTests = (
         },
         Expected     => {
             'Where' => [
-                $CaseSensitive ? 'LOWER(f.f_keywords) IN (\'test\')' : 'f.f_keywords IN (\'test\')'
+                $CaseSensitive ? 'LOWER(f.f_keywords) LIKE \'%test%\'' : 'f.f_keywords LIKE \'%test%\''
             ]
         }
     },
@@ -443,6 +443,32 @@ my @SearchTests = (
         Expected     => {
             'Where' => [
                 $CaseSensitive ? 'LOWER(f.f_keywords) LIKE \'test\'' : 'f.f_keywords LIKE \'test\''
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field Keywords / Operator EMPTY / Value 1',
+        Search       => {
+            Field    => 'Keywords',
+            Operator => 'EMPTY',
+            Value    => 1
+        },
+        Expected     => {
+            'Where' => [
+                "(f.f_keywords = '' OR f.f_keywords IS NULL)"
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field Keywords / Operator EMPTY / Value 0',
+        Search       => {
+            Field    => 'Keywords',
+            Operator => 'EMPTY',
+            Value    => 0
+        },
+        Expected     => {
+            'Where' => [
+                "(f.f_keywords != '' AND f.f_keywords IS NOT NULL)"
             ]
         }
     },
@@ -668,7 +694,7 @@ for my $Key (
 ) {
     my $LCount = 658;
     my $Count  = 658_849;
-    for ( 0..3 ) {
+    for ( 0..4 ) {
         push(
             @{$FAQParam{$Key}},
             ($Key eq 'Language' ? 'Lang' : $Key)
@@ -728,6 +754,22 @@ $Self->True(
     'Created third faq article'
 );
 
+# fourth faq article
+my $FAQArticleID4 = $Kernel::OM->Get('FAQ')->FAQAdd(
+    Title       => $FAQParam{Title}[3],
+    CategoryID  => 1,
+    Visibility  => 'internal',
+    Language    => $FAQParam{Language}[3],
+    ValidID     => 1,
+    ContentType => 'text/plain',
+    UserID      => 1,
+    Number      => $FAQParam{Number}[3]
+);
+$Self->True(
+    $FAQArticleID4,
+    'Created fourth faq article'
+);
+
 my %Results = $ObjectSearch->Search(
     ObjectType => 'FAQArticle',
     Result     => 'HASH',
@@ -762,7 +804,7 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => [$FAQArticleID2,$FAQArticleID3]
+        Expected => [$FAQArticleID2,$FAQArticleID3,$FAQArticleID4]
     },
     {
         Name     => "Search: Field Title / Operator IN / Value \$FAQParam{Title}[0]",
@@ -788,7 +830,7 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => [$FAQArticleID2,$FAQArticleID3]
+        Expected => [$FAQArticleID2,$FAQArticleID3,$FAQArticleID4]
     },
     {
         Name     => "Search: Field Title / Operator STARTSWITH / Value \$FAQParam{Title}[1]",
@@ -814,7 +856,7 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => [$FAQArticleID1,$FAQArticleID2,$FAQArticleID3]
+        Expected => [$FAQArticleID1,$FAQArticleID2,$FAQArticleID3,$FAQArticleID4]
     },
     {
         Name     => "Search: Field Title / Operator ENDSWITH / Value \$FAQParam{Title}[2]",
@@ -866,7 +908,7 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => [$FAQArticleID1,$FAQArticleID2,$FAQArticleID3]
+        Expected => [$FAQArticleID1,$FAQArticleID2,$FAQArticleID3,$FAQArticleID4]
     },
     {
         Name     => "Search: Field Title / Operator LIKE / Value \$FAQParam{Title}[0]",
@@ -918,7 +960,7 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => [$FAQArticleID2,$FAQArticleID3]
+        Expected => [$FAQArticleID2,$FAQArticleID3,$FAQArticleID4]
     },
     {
         Name     => "Search: Field Number / Operator IN / Value \$FAQParam{Number}[0]",
@@ -944,7 +986,7 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => [$FAQArticleID2,$FAQArticleID3]
+        Expected => [$FAQArticleID2,$FAQArticleID3,$FAQArticleID4]
     },
     {
         Name     => "Search: Field Number / Operator STARTSWITH / Value \$FAQParam{Number}[1]",
@@ -970,7 +1012,7 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => [$FAQArticleID1,$FAQArticleID2,$FAQArticleID3]
+        Expected => [$FAQArticleID1,$FAQArticleID2,$FAQArticleID3,$FAQArticleID4]
     },
     {
         Name     => "Search: Field Number / Operator ENDSWITH / Value \$FAQParam{Number}[2]",
@@ -1022,7 +1064,7 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => [$FAQArticleID1,$FAQArticleID2,$FAQArticleID3]
+        Expected => [$FAQArticleID1,$FAQArticleID2,$FAQArticleID3,$FAQArticleID4]
     },
     {
         Name     => "Search: Field Number / Operator LIKE / Value \$FAQParam{Number}[0]",
@@ -1074,7 +1116,7 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => [$FAQArticleID2,$FAQArticleID3]
+        Expected => [$FAQArticleID2,$FAQArticleID3,$FAQArticleID4]
     },
     {
         Name     => "Search: Field Language / Operator IN / Value \$FAQParam{Language}[0]",
@@ -1100,7 +1142,7 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => [$FAQArticleID2,$FAQArticleID3]
+        Expected => [$FAQArticleID2,$FAQArticleID3,$FAQArticleID4]
     },
     {
         Name     => "Search: Field Language / Operator STARTSWITH / Value \$FAQParam{Language}[1]",
@@ -1126,7 +1168,7 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => [$FAQArticleID1,$FAQArticleID2,$FAQArticleID3]
+        Expected => [$FAQArticleID1,$FAQArticleID2,$FAQArticleID3,$FAQArticleID4]
     },
     {
         Name     => "Search: Field Language / Operator ENDSWITH / Value \$FAQParam{Language}[2]",
@@ -1178,7 +1220,7 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => [$FAQArticleID1,$FAQArticleID2,$FAQArticleID3]
+        Expected => [$FAQArticleID1,$FAQArticleID2,$FAQArticleID3,$FAQArticleID4]
     },
     {
         Name     => "Search: Field Language / Operator LIKE / Value \$FAQParam{Language}[0]",
@@ -1230,7 +1272,7 @@ my @IntegrationSearchTests = (
                 }
             ]
         },
-        Expected => [$FAQArticleID2,$FAQArticleID3]
+        Expected => [$FAQArticleID2,$FAQArticleID3,$FAQArticleID4]
     },
     {
         Name     => "Search: Field Keywords / Operator IN / Value \$FAQParam{Keywords}[0]",
@@ -1361,6 +1403,32 @@ my @IntegrationSearchTests = (
             ]
         },
         Expected => [$FAQArticleID1]
+    },
+    {
+        Name     => 'Search: Field Keywords / Operator EMPTY / Value 1',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Keywords',
+                    Operator => 'EMPTY',
+                    Value    => 1
+                }
+            ]
+        },
+        Expected => [$FAQArticleID4]
+    },
+    {
+        Name     => 'Search: Field Keywords / Operator EMPTY / Value 0',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Keywords',
+                    Operator => 'EMPTY',
+                    Value    => 0
+                }
+            ]
+        },
+        Expected => [$FAQArticleID1,$FAQArticleID2,$FAQArticleID3]
     }
 );
 for my $Test ( @IntegrationSearchTests ) {
@@ -1387,7 +1455,7 @@ my @IntegrationSortTests = (
                 Field => 'Title'
             }
         ],
-        Expected => [$FAQArticleID1, $FAQArticleID2, $FAQArticleID3]
+        Expected => [$FAQArticleID1, $FAQArticleID2, $FAQArticleID3, $FAQArticleID4]
     },
     {
         Name     => 'Sort: Field Title / Direction ascending',
@@ -1397,7 +1465,7 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => [$FAQArticleID1, $FAQArticleID2, $FAQArticleID3]
+        Expected => [$FAQArticleID1, $FAQArticleID2, $FAQArticleID3, $FAQArticleID4]
     },
     {
         Name     => 'Sort: Field Title / Direction descending',
@@ -1407,7 +1475,7 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Expected => [$FAQArticleID3, $FAQArticleID2, $FAQArticleID1]
+        Expected => [$FAQArticleID4, $FAQArticleID3, $FAQArticleID2, $FAQArticleID1]
     },
     {
         Name     => 'Sort: Field Number',
@@ -1416,7 +1484,7 @@ my @IntegrationSortTests = (
                 Field => 'Number'
             }
         ],
-        Expected => [$FAQArticleID1, $FAQArticleID2, $FAQArticleID3]
+        Expected => [$FAQArticleID1, $FAQArticleID2, $FAQArticleID3, $FAQArticleID4]
     },
     {
         Name     => 'Sort: Field Number / Direction ascending',
@@ -1426,7 +1494,7 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => [$FAQArticleID1, $FAQArticleID2, $FAQArticleID3]
+        Expected => [$FAQArticleID1, $FAQArticleID2, $FAQArticleID3, $FAQArticleID4]
     },
     {
         Name     => 'Sort: Field Number / Direction descending',
@@ -1436,7 +1504,7 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Expected => [$FAQArticleID3, $FAQArticleID2, $FAQArticleID1]
+        Expected => [$FAQArticleID4, $FAQArticleID3, $FAQArticleID2, $FAQArticleID1]
     },
     {
         Name     => 'Sort: Field Language',
@@ -1445,7 +1513,7 @@ my @IntegrationSortTests = (
                 Field => 'Language'
             }
         ],
-        Expected => [$FAQArticleID1, $FAQArticleID2, $FAQArticleID3]
+        Expected => [$FAQArticleID1, $FAQArticleID2, $FAQArticleID3, $FAQArticleID4]
     },
     {
         Name     => 'Sort: Field Language / Direction ascending',
@@ -1455,7 +1523,7 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => [$FAQArticleID1, $FAQArticleID2, $FAQArticleID3]
+        Expected => [$FAQArticleID1, $FAQArticleID2, $FAQArticleID3, $FAQArticleID4]
     },
     {
         Name     => 'Sort: Field Language / Direction descending',
@@ -1465,7 +1533,7 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Expected => [$FAQArticleID3, $FAQArticleID2, $FAQArticleID1]
+        Expected => [$FAQArticleID4, $FAQArticleID3, $FAQArticleID2, $FAQArticleID1]
     },
     {
         Name     => 'Sort: Field Keywords',
@@ -1474,7 +1542,7 @@ my @IntegrationSortTests = (
                 Field => 'Keywords'
             }
         ],
-        Expected => [$FAQArticleID1, $FAQArticleID2, $FAQArticleID3]
+        Expected => [$FAQArticleID4, $FAQArticleID1, $FAQArticleID2, $FAQArticleID3]
     },
     {
         Name     => 'Sort: Field Keywords / Direction ascending',
@@ -1484,7 +1552,7 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => [$FAQArticleID1, $FAQArticleID2, $FAQArticleID3]
+        Expected => [$FAQArticleID4, $FAQArticleID1, $FAQArticleID2, $FAQArticleID3]
     },
     {
         Name     => 'Sort: Field Keywords / Direction descending',
@@ -1494,7 +1562,7 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Expected => [$FAQArticleID3, $FAQArticleID2, $FAQArticleID1]
+        Expected => [$FAQArticleID3, $FAQArticleID2, $FAQArticleID1, $FAQArticleID4]
     }
 );
 for my $Test ( @IntegrationSortTests ) {

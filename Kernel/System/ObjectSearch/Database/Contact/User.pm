@@ -36,83 +36,43 @@ sub GetSupportedAttributes {
 
     return {
         UserID => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EMPTY','EQ','NE','IN','!IN'],
+            ValueType      => 'NUMERIC'
         },
         AssignedUserID => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EMPTY','EQ','NE','IN','!IN'],
+            ValueType      => 'NUMERIC'
         },
         Login => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EMPTY','EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
         UserLogin => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 1,
+            Operators      => ['EMPTY','EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         }
     };
 }
 
-sub Search {
-    my ( $Self, %Param ) = @_;
-    my @SQLJoin;
-
-    # check params
-    return if !$Self->_CheckSearchParams(%Param);
-
-    my %GetParams = (
-        Column    => 'c.user_id',
-        ValueType => 'NUMERIC'
-    );
-
-    my $TableAlias = $Param{Flags}->{FlagMap}->{UserJoin} // 'u';
-    if ( $Param{Search}->{Field} =~ m/Login$/sm ){
-        if ( !$Param{Flags}->{FlagMap}->{UserJoin} ) {
-            my $Count = $Param{Flags}->{UserCounter}++;
-            $TableAlias .= $Count;
-            push(
-                @SQLJoin,
-                "LEFT JOIN users $TableAlias ON c.user_id = $TableAlias.id"
-            );
-            $Param{Flags}->{UserJoin} = $TableAlias;
-        }
-        %GetParams = (
-            Column          => "$TableAlias.login",
-            ValueType       => 'STRING',
-            CaseInsensitive => 1,
-        );
-    }
-
-    my $Condition = $Self->_GetCondition(
-        Operator  => $Param{Search}->{Operator},
-        Value     => $Param{Search}->{Value},
-        NULLValue => 1,
-        %GetParams
-    );
-
-    return if ( !$Condition );
-
-    return {
-        Join  => \@SQLJoin,
-        Where => [ $Condition ]
-    };
-}
-
-sub Sort {
+sub AttributePrepare {
     my ( $Self, %Param ) = @_;
 
-    # check params
-    return if !$Self->_CheckSortParams(%Param);
-
-    my @SQLJoin;
     my $TableAlias = $Param{Flags}->{FlagMap}->{UserJoin} // 'u';
+    my @SQLJoin;
     if ( $Param{Attribute} =~ m/Login$/sm ){
         if ( !$Param{Flags}->{FlagMap}->{UserJoin} ) {
             my $Count = $Param{Flags}->{UserCounter}++;
@@ -125,19 +85,51 @@ sub Sort {
         }
     }
 
-    # map search attributes to table attributes
-    my %AttributeMapping = (
-        UserID         => 'c.user_id',
-        AssignedUserID => 'c.user_id',
-        Login          => "$TableAlias.login",
-        UserLogin      => "$TableAlias.login",
+    # init Definition
+    my %AttributeDefinition = (
+        UserID         => {
+            Column       => 'c.user_id',
+            ConditionDef => {
+                ValueType => 'NUMERIC',
+                NULLValue => 1
+            }
+        },
+        AssignedUserID => {
+            Column       => 'c.user_id',
+            ConditionDef => {
+                ValueType => 'NUMERIC',
+                NULLValue => 1
+            }
+        },
+        Login          => {
+            Column       => $TableAlias . '.login',
+            ConditionDef => {
+                ValueType       => 'STRING',
+                CaseInsensitive => 1,
+                NULLValue       => 1
+            }
+        },
+        UserLogin      => {
+            Column       => $TableAlias . '.login',
+            ConditionDef => {
+                ValueType       => 'STRING',
+                CaseInsensitive => 1,
+                NULLValue       => 1
+            }
+        }
     );
+    
+    my %Attribute = (
+        Column => $AttributeDefinition{ $Param{Attribute} }->{Column},
+        SQLDef => {
+            Join => \@SQLJoin
+        }
+    );
+    if ( $Param{PrepareType} eq 'Condition' ) {
+        $Attribute{ConditionDef} = $AttributeDefinition{ $Param{Attribute} }->{ConditionDef};
+    }
 
-    return {
-        Select  => [$AttributeMapping{$Param{Attribute}}],
-        OrderBy => [$AttributeMapping{$Param{Attribute}}],
-        Join    => \@SQLJoin
-    };
+    return \%Attribute;
 }
 
 1;

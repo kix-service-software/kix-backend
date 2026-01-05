@@ -54,9 +54,11 @@ sub new {
 
     # set field properties
     $Self->{Properties} = {
+        'IsSelectable'    => 1,
         'IsSearchable'    => 1,
         'IsSortable'      => 1,
-        'SearchOperators' => ['EQ','NE','GT','GTE','LT','LTE'],
+        'IsFulltextable'  => 0,
+        'SearchOperators' => ['EMPTY','EQ','NE','GT','GTE','LT','LTE'],
         'SearchValueType' => 'DATETIME'
     };
 

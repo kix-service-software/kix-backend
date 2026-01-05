@@ -117,6 +117,7 @@ sub Search {
                 UserID     => $Param{UserID},
                 UserType   => $Param{UserType},
                 Search     => \%Search,
+                Language   => $Param{Language},
                 Silent     => $Param{Silent}
             );
 

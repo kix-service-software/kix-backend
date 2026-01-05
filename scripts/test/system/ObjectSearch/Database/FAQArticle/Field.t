@@ -44,32 +44,32 @@ $Self->IsDeeply(
         Field1 => {
             IsSearchable => 1,
             IsSortable   => 0,
-            Operators    => ['STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            Operators    => ['EMPTY','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
         Field2 => {
             IsSearchable => 1,
             IsSortable   => 0,
-            Operators    => ['STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            Operators    => ['EMPTY','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
         Field3 => {
             IsSearchable => 1,
             IsSortable   => 0,
-            Operators    => ['STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            Operators    => ['EMPTY','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
         Field4 => {
             IsSearchable => 1,
             IsSortable   => 0,
-            Operators    => ['STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            Operators    => ['EMPTY','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
         Field5 => {
             IsSearchable => 1,
             IsSortable   => 0,
-            Operators    => ['STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            Operators    => ['EMPTY','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
         Field6 => {
             IsSearchable => 1,
             IsSortable   => 0,
-            Operators    => ['STARTSWITH','ENDSWITH','CONTAINS','LIKE']
+            Operators    => ['EMPTY','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         }
     },
     'GetSupportedAttributes provides expected data'
@@ -257,6 +257,32 @@ my @SearchTests = (
         }
     },
     {
+        Name         => 'Search: valid search / Field Field1 / Operator EMPTY / Value 1',
+        Search       => {
+            Field    => 'Field1',
+            Operator => 'EMPTY',
+            Value    => 1
+        },
+        Expected     => {
+            'Where' => [
+                "(f.f_field1 = '' OR f.f_field1 IS NULL)"
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field Field1 / Operator EMPTY / Value 0',
+        Search       => {
+            Field    => 'Field1',
+            Operator => 'EMPTY',
+            Value    => 0
+        },
+        Expected     => {
+            'Where' => [
+                "(f.f_field1 != '' AND f.f_field1 IS NOT NULL)"
+            ]
+        }
+    },
+    {
         Name         => 'Search: valid search / Field Field2 / Operator STARTSWITH',
         Search       => {
             Field    => 'Field2',
@@ -365,6 +391,32 @@ my @SearchTests = (
                 ( $CaseSensitive ? "(LOWER(f.f_field2) LIKE 'test<br/>\n" : "(f.f_field2 LIKE 'test<br/>\n" )
                 . ( $CaseSensitive ? "test' OR LOWER(f.f_field2) LIKE 'test\n" : "test' OR f.f_field2 LIKE 'test\n" )
                 . "test')"
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field Field2 / Operator EMPTY / Value 1',
+        Search       => {
+            Field    => 'Field2',
+            Operator => 'EMPTY',
+            Value    => 1
+        },
+        Expected     => {
+            'Where' => [
+                "(f.f_field2 = '' OR f.f_field2 IS NULL)"
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field Field2 / Operator EMPTY / Value 0',
+        Search       => {
+            Field    => 'Field2',
+            Operator => 'EMPTY',
+            Value    => 0
+        },
+        Expected     => {
+            'Where' => [
+                "(f.f_field2 != '' AND f.f_field2 IS NOT NULL)"
             ]
         }
     },
@@ -481,6 +533,32 @@ my @SearchTests = (
         }
     },
     {
+        Name         => 'Search: valid search / Field Field3 / Operator EMPTY / Value 1',
+        Search       => {
+            Field    => 'Field3',
+            Operator => 'EMPTY',
+            Value    => 1
+        },
+        Expected     => {
+            'Where' => [
+                "(f.f_field3 = '' OR f.f_field3 IS NULL)"
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field Field3 / Operator EMPTY / Value 0',
+        Search       => {
+            Field    => 'Field3',
+            Operator => 'EMPTY',
+            Value    => 0
+        },
+        Expected     => {
+            'Where' => [
+                "(f.f_field3 != '' AND f.f_field3 IS NOT NULL)"
+            ]
+        }
+    },
+    {
         Name         => 'Search: valid search / Field Field4 / Operator STARTSWITH',
         Search       => {
             Field    => 'Field4',
@@ -589,6 +667,32 @@ my @SearchTests = (
                 ( $CaseSensitive ? "(LOWER(f.f_field4) LIKE 'test<br/>\n" : "(f.f_field4 LIKE 'test<br/>\n" )
                 . ( $CaseSensitive ? "test' OR LOWER(f.f_field4) LIKE 'test\n" : "test' OR f.f_field4 LIKE 'test\n" )
                 . "test')"
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field Field4 / Operator EMPTY / Value 1',
+        Search       => {
+            Field    => 'Field4',
+            Operator => 'EMPTY',
+            Value    => 1
+        },
+        Expected     => {
+            'Where' => [
+                "(f.f_field4 = '' OR f.f_field4 IS NULL)"
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field Field4 / Operator EMPTY / Value 0',
+        Search       => {
+            Field    => 'Field4',
+            Operator => 'EMPTY',
+            Value    => 0
+        },
+        Expected     => {
+            'Where' => [
+                "(f.f_field4 != '' AND f.f_field4 IS NOT NULL)"
             ]
         }
     },
@@ -705,15 +809,41 @@ my @SearchTests = (
         }
     },
     {
-        Name         => 'Search: valid search / Field Field6 / Operator STARTSWITH',
+        Name         => 'Search: valid search / Field Field5 / Operator STARTSWITH',
         Search       => {
-            Field    => 'Field6',
+            Field    => 'Field5',
             Operator => 'STARTSWITH',
             Value    => 'Test'
         },
         Expected     => {
             'Where' => [
-                $CaseSensitive ? 'LOWER(f.f_field6) LIKE \'test%\'' : 'f.f_field6 LIKE \'test%\''
+                $CaseSensitive ? 'LOWER(f.f_field5) LIKE \'test%\'' : 'f.f_field5 LIKE \'test%\''
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field Field5 / Operator EMPTY / Value 1',
+        Search       => {
+            Field    => 'Field5',
+            Operator => 'EMPTY',
+            Value    => 1
+        },
+        Expected     => {
+            'Where' => [
+                "(f.f_field5 = '' OR f.f_field5 IS NULL)"
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field Field6 / Operator EMPTY / Value 0',
+        Search       => {
+            Field    => 'Field6',
+            Operator => 'EMPTY',
+            Value    => 0
+        },
+        Expected     => {
+            'Where' => [
+                "(f.f_field6 != '' AND f.f_field6 IS NOT NULL)"
             ]
         }
     },
@@ -816,6 +946,32 @@ my @SearchTests = (
             ]
         }
     },
+    {
+        Name         => 'Search: valid search / Field Field6 / Operator EMPTY / Value 1',
+        Search       => {
+            Field    => 'Field6',
+            Operator => 'EMPTY',
+            Value    => 1
+        },
+        Expected     => {
+            'Where' => [
+                "(f.f_field6 = '' OR f.f_field6 IS NULL)"
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field Field6 / Operator EMPTY / Value 0',
+        Search       => {
+            Field    => 'Field6',
+            Operator => 'EMPTY',
+            Value    => 0
+        },
+        Expected     => {
+            'Where' => [
+                "(f.f_field6 != '' AND f.f_field6 IS NOT NULL)"
+            ]
+        }
+    }
 );
 for my $Test ( @SearchTests ) {
     my $Result = $AttributeObject->Search(
@@ -1121,6 +1277,32 @@ my @IntegrationSearchTests = (
         Expected => [$FAQArticleID1,$FAQArticleID6]
     },
     {
+        Name     => 'Search: Field Field1 / Operator EMPTY / Value 1',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Field1',
+                    Operator => 'EMPTY',
+                    Value    => 1
+                }
+            ]
+        },
+        Expected => [$FAQArticleID2,$FAQArticleID3,$FAQArticleID4,$FAQArticleID5]
+    },
+    {
+        Name     => 'Search: Field Field1 / Operator EMPTY / Value 0',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Field1',
+                    Operator => 'EMPTY',
+                    Value    => 0
+                }
+            ]
+        },
+        Expected => [$FAQArticleID1,$FAQArticleID6]
+    },
+    {
         Name     => "Search: Field Field2 / Operator STARTSWITH / Value \$Field2",
         Search   => {
             'AND' => [
@@ -1219,6 +1401,32 @@ my @IntegrationSearchTests = (
                     Field    => 'Field2',
                     Operator => 'LIKE',
                     Value    => substr($Field2,0,10) . q{*}
+                }
+            ]
+        },
+        Expected => [$FAQArticleID2,$FAQArticleID3]
+    },
+    {
+        Name     => 'Search: Field Field2 / Operator EMPTY / Value 1',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Field2',
+                    Operator => 'EMPTY',
+                    Value    => 1
+                }
+            ]
+        },
+        Expected => [$FAQArticleID1,$FAQArticleID4,$FAQArticleID5,$FAQArticleID6]
+    },
+    {
+        Name     => 'Search: Field Field2 / Operator EMPTY / Value 0',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Field2',
+                    Operator => 'EMPTY',
+                    Value    => 0
                 }
             ]
         },
@@ -1329,6 +1537,32 @@ my @IntegrationSearchTests = (
         Expected => [$FAQArticleID3,$FAQArticleID5,$FAQArticleID6]
     },
     {
+        Name     => 'Search: Field Field3 / Operator EMPTY / Value 1',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Field3',
+                    Operator => 'EMPTY',
+                    Value    => 1
+                }
+            ]
+        },
+        Expected => [$FAQArticleID1,$FAQArticleID2,$FAQArticleID4]
+    },
+    {
+        Name     => 'Search: Field Field3 / Operator EMPTY / Value 0',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Field3',
+                    Operator => 'EMPTY',
+                    Value    => 0
+                }
+            ]
+        },
+        Expected => [$FAQArticleID3,$FAQArticleID5,$FAQArticleID6]
+    },
+    {
         Name     => "Search: Field Field4 / Operator STARTSWITH / Value \$Field4",
         Search   => {
             'AND' => [
@@ -1427,6 +1661,32 @@ my @IntegrationSearchTests = (
                     Field    => 'Field4',
                     Operator => 'LIKE',
                     Value    => substr($Field4,0,10) . q{*}
+                }
+            ]
+        },
+        Expected => [$FAQArticleID1,$FAQArticleID4]
+    },
+    {
+        Name     => 'Search: Field Field4 / Operator EMPTY / Value 1',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Field4',
+                    Operator => 'EMPTY',
+                    Value    => 1
+                }
+            ]
+        },
+        Expected => [$FAQArticleID2,$FAQArticleID3,$FAQArticleID5,$FAQArticleID6]
+    },
+    {
+        Name     => 'Search: Field Field4 / Operator EMPTY / Value 0',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Field4',
+                    Operator => 'EMPTY',
+                    Value    => 0
                 }
             ]
         },
@@ -1537,6 +1797,32 @@ my @IntegrationSearchTests = (
         Expected => [$FAQArticleID2,$FAQArticleID5]
     },
     {
+        Name     => 'Search: Field Field5 / Operator EMPTY / Value 1',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Field5',
+                    Operator => 'EMPTY',
+                    Value    => 1
+                }
+            ]
+        },
+        Expected => [$FAQArticleID1,$FAQArticleID3,$FAQArticleID4,$FAQArticleID6]
+    },
+    {
+        Name     => 'Search: Field Field5 / Operator EMPTY / Value 0',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Field5',
+                    Operator => 'EMPTY',
+                    Value    => 0
+                }
+            ]
+        },
+        Expected => [$FAQArticleID2,$FAQArticleID5]
+    },
+    {
         Name     => "Search: Field Field6 / Operator STARTSWITH / Value \$Field6",
         Search   => {
             'AND' => [
@@ -1639,7 +1925,34 @@ my @IntegrationSearchTests = (
             ]
         },
         Expected => [$FAQArticleID4,$FAQArticleID6]
+    },
+    {
+        Name     => 'Search: Field Field6 / Operator EMPTY / Value 1',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Field6',
+                    Operator => 'EMPTY',
+                    Value    => 1
+                }
+            ]
+        },
+        Expected => [$FAQArticleID1,$FAQArticleID2,$FAQArticleID3,$FAQArticleID5]
+    },
+    {
+        Name     => 'Search: Field Field6 / Operator EMPTY / Value 0',
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Field6',
+                    Operator => 'EMPTY',
+                    Value    => 0
+                }
+            ]
+        },
+        Expected => [$FAQArticleID4,$FAQArticleID6]
     }
+
 );
 
 for my $Test ( @IntegrationSearchTests ) {

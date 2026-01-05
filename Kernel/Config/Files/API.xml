@@ -70,6 +70,26 @@
             </Hash>
         </Setting>
     </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="API::StrictFiltering" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Enable strict filtering in API. When enabled, filter expressions with non-existing properties will result in a Bad Request (HTTP 400) error. Keep in mind, that enabling this may cause applications such as KIX Field Agent to produce errors and stop working.</Description>
+        <Group>API</Group>
+        <Setting>
+            <Option SelectedID="0">
+                <Item Key="0" Translatable="1">No</Item>
+                <Item Key="1" Translatable="1">Yes</Item>
+            </Option>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="API::StrictSearching" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Enable strict searching in API. When enabled, search expressions with non-existing properties will result in a Bad Request (HTTP 400) error. Keep in mind, that enabling this may cause applications such as KIX Field Agent to produce errors and stop working.</Description>
+        <Group>API</Group>
+        <Setting>
+            <Option SelectedID="0">
+                <Item Key="0" Translatable="1">No</Item>
+                <Item Key="1" Translatable="1">Yes</Item>
+            </Option>
+        </Setting>
+    </ConfigItem>
 
     <ConfigItem AccessLevel="internal" Name="WebserviceConfig::CacheTTL" Required="1" Valid="1">
         <Description Translatable="1">Cache time in seconds for the web service config backend.</Description>

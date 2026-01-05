@@ -29,7 +29,7 @@ $Self->Is(
 );
 
 # check supported methods
-for my $Method ( qw(GetSupportedAttributes Search Sort) ) {
+for my $Method ( qw(GetSupportedAttributes AttributePrepare Select Search Sort) ) {
     $Self->True(
         $AttributeObject->can($Method),
         'Attribute object can "' . $Method . '"'
@@ -41,28 +41,36 @@ my $AttributeList = $AttributeObject->GetSupportedAttributes();
 $Self->IsDeeply(
     $AttributeList, {
         CreateByID => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
+            ValueType      => 'NUMERIC'
         },
         CreateBy => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
+            ValueType      => 'NUMERIC'
         },
         ChangeByID => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
+            ValueType      => 'NUMERIC'
         },
         ChangeBy => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','IN','!IN','LT','GT','LTE','GTE'],
+            ValueType      => 'NUMERIC'
         }
     },
     'GetSupportedAttributes provides expected data'
@@ -582,10 +590,10 @@ my @SortTests = (
         Expected  => {
             'Join'    => [],
             'OrderBy' => [
-                'st.create_by'
+                'SortAttr0'
             ],
             'Select'  => [
-                'st.create_by'
+                'st.create_by AS SortAttr0'
             ]
         }
     },
@@ -598,14 +606,14 @@ my @SortTests = (
                 'LEFT OUTER JOIN contact tcruc ON tcruc.user_id = tcru.id'
             ],
             'OrderBy' => [
-                'LOWER(tcruc.lastname)',
-                'LOWER(tcruc.firstname)',
-                'LOWER(tcru.login)'
+                'SortAttr0',
+                'SortAttr1',
+                'SortAttr2'
             ],
             'Select' => [
-                'tcruc.lastname',
-                'tcruc.firstname',
-                'tcru.login'
+                'LOWER(tcruc.lastname) AS SortAttr0',
+                'LOWER(tcruc.firstname) AS SortAttr1',
+                'LOWER(tcru.login) AS SortAttr2'
             ]
         }
     },
@@ -615,10 +623,10 @@ my @SortTests = (
         Expected  => {
             'Join'    => [],
             'OrderBy' => [
-                'st.change_by'
+                'SortAttr0'
             ],
             'Select'  => [
-                'st.change_by'
+                'st.change_by AS SortAttr0'
             ]
         }
     },
@@ -631,14 +639,14 @@ my @SortTests = (
                 'LEFT OUTER JOIN contact tchuc ON tchuc.user_id = tchu.id'
             ],
             'OrderBy' => [
-                'LOWER(tchuc.lastname)',
-                'LOWER(tchuc.firstname)',
-                'LOWER(tchu.login)'
+                'SortAttr0',
+                'SortAttr1',
+                'SortAttr2'
             ],
             'Select' => [
-                'tchuc.lastname',
-                'tchuc.firstname',
-                'tchu.login'
+                'LOWER(tchuc.lastname) AS SortAttr0',
+                'LOWER(tchuc.firstname) AS SortAttr1',
+                'LOWER(tchu.login) AS SortAttr2'
             ]
         }
     }

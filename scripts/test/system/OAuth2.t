@@ -13,6 +13,8 @@ use utf8;
 # include needed libs
 use HTTP::Response;
 use HTTP::Status qw(:constants status_message);
+use Digest::SHA;
+use MIME::Base64;
 
 use vars (qw($Self));
 
@@ -22,6 +24,7 @@ my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 my $OAuthProviderHost = 'oauth.unittest';
 my $LocalHost         = 'local.unittest';
 
+my $CodeChallenge;
 $Helper->HTTPRequestOverwriteSet(
     sub {
         my ( $Self, $Request, $Proxy, $Arguments, $Size, $Timeout ) = @_;
@@ -51,19 +54,47 @@ $Helper->HTTPRequestOverwriteSet(
 
                     $Response = HTTP::Response->new(HTTP_FOUND, status_message(HTTP_FOUND));
                     $Response->header('Location' => $RedirectURI);
+
+                    $CodeChallenge = undef;
+                    if (
+                        $QueryParameter{code_challenge}
+                        && $QueryParameter{code_challenge_method} eq 'S256'
+                    ) {
+                        $CodeChallenge = $QueryParameter{code_challenge};
+                    }
                 }
             }
             elsif ( $Request->method() eq 'POST' ) {
-                $Response = HTTP::Response->new(HTTP_OK, status_message(HTTP_OK));
-                $Response->header('Content-Type' => 'application/json');
-                $Response->content(
+                my $ChallengeCheck = 1;
+                if  ( $CodeChallenge ) {
+                    $ChallengeCheck = 0;
+
+                    my $CodeVerifier = $Request->content();
+                    $CodeVerifier =~ s/^.*[;&]?code_verifier=(.+?)(?:[&;].+|)$/$1/;
+                    my $SHAObject = Digest::SHA->new('sha256');
+                    $SHAObject->add($CodeVerifier);
+                    my $RequestCodeChallenge = MIME::Base64::encode_base64url( $SHAObject->digest() );
+                    if ( $CodeChallenge eq $RequestCodeChallenge ) {
+                        $ChallengeCheck = 1;
+                    }
+                }
+                if ( $ChallengeCheck ) {
+                    $Response = HTTP::Response->new(HTTP_OK, status_message(HTTP_OK));
+                    $Response->header('Content-Type' => 'application/json');
+                    $Response->content(
 '{
     "access_token": "1234",
     "refresh_token": "5678",
     "expires_in": "1200",
     "id_token": "abcd"
 }'
-                );
+                    );
+                }
+                else {
+                    $Response = HTTP::Response->new(HTTP_BAD_REQUEST, status_message(HTTP_BAD_REQUEST));
+                    $Response->header('Content-Type' => 'application/json');
+                    $Response->content('{"error":"invalid_grant"}');
+                }
             }
             else {
                 $Response = HTTP::Response->new(HTTP_BAD_REQUEST, status_message(HTTP_BAD_REQUEST));
@@ -120,6 +151,7 @@ my $OAuth2ProfileAdd = $OAuth2Object->ProfileAdd(
     ClientID     => "ClientID",
     ClientSecret => "ClientSecret",
     Scope        => "Scope",
+    PKCE         => 1,
     ValidID      => 1,
     UserID       => 1,
 );
@@ -172,6 +204,11 @@ $Self->Is(
     'ProfileGet() - Scope',
 );
 $Self->Is(
+    $OAuth2Profile{PKCE},
+    '1',
+    'ProfileGet() - PKCE',
+);
+$Self->Is(
     $OAuth2Profile{ValidID},
     1,
     'ProfileGet() - ValidID',
@@ -188,7 +225,7 @@ $Self->Is(
 );
 
 my $OAuth2ProfileUpdate = $OAuth2Object->ProfileUpdate(
-    ID            => $OAuth2ProfileAdd,
+    ID           => $OAuth2ProfileAdd,
     Name         => 'Profile2',
     URLAuth      => 'https://' . $OAuthProviderHost . '/auth',
     URLToken     => 'https://' . $OAuthProviderHost . '/token',
@@ -196,6 +233,7 @@ my $OAuth2ProfileUpdate = $OAuth2Object->ProfileUpdate(
     ClientID     => "ClientID2",
     ClientSecret => "ClientSecret2",
     Scope        => "Scope2",
+    PKCE         => 0,
     ValidID      => 1,
     UserID       => 1,
 );
@@ -246,6 +284,11 @@ $Self->Is(
     $OAuth2Profile{Scope},
     'Scope2',
     'ProfileGet() - Scope',
+);
+$Self->Is(
+    $OAuth2Profile{PKCE},
+    0,
+    'ProfileGet() - PKCE',
 );
 $Self->Is(
     $OAuth2Profile{ValidID},
@@ -305,6 +348,11 @@ $Self->Is(
     $OAuth2Profile{Scope},
     'Scope2',
     'ProfileGet() with Name param - Scope',
+);
+$Self->Is(
+    $OAuth2Profile{PKCE},
+    0,
+    'ProfileGet() with Name param - PKCE',
 );
 $Self->Is(
     $OAuth2Profile{ValidID},
@@ -664,9 +712,164 @@ $Self->True(
 my $OAuth2ProfileDelete = $OAuth2Object->ProfileDelete(
     ID => $OAuth2ProfileAdd,
 );
-
 $Self->True(
     $OAuth2ProfileDelete,
+    'ProfileDelete()',
+);
+
+my $OAuth2ProfileAdd2 = $OAuth2Object->ProfileAdd(
+    Name         => 'Profile',
+    URLAuth      => 'URL Auth',
+    URLToken     => 'URL Token',
+    URLRedirect  => 'URL Redirect',
+    ClientID     => "ClientID",
+    ClientSecret => "ClientSecret",
+    Scope        => "Scope",
+    ValidID      => 1,
+    UserID       => 1,
+);
+$Self->True(
+    $OAuth2ProfileAdd2,
+    'ProfileAdd() - No PKCE parameter',
+);
+
+my %OAuth2Profile2 = $OAuth2Object->ProfileGet(
+    ID => $OAuth2ProfileAdd2,
+);
+$Self->Is(
+    $OAuth2Profile{PKCE},
+    '0',
+    'ProfileGet() - PKCE',
+);
+
+my $OAuth2ProfileUpdate2 = $OAuth2Object->ProfileUpdate(
+    ID           => $OAuth2ProfileAdd2,
+    Name         => 'Profile',
+    URLAuth      => 'https://' . $OAuthProviderHost . '/auth',
+    URLToken     => 'https://' . $OAuthProviderHost . '/token',
+    URLRedirect  => 'https://' . $LocalHost . '/authcode',
+    ClientID     => "ClientID",
+    ClientSecret => "ClientSecret",
+    Scope        => "Scope",
+    PKCE         => 1,
+    ValidID      => 1,
+    UserID       => 1,
+);
+$Self->True(
+    $OAuth2ProfileUpdate2,
+    'ProfileUpdate() - Activate PKCE',
+);
+%OAuth2Profile2 = $OAuth2Object->ProfileGet(
+    ID => $OAuth2ProfileAdd2,
+);
+$Self->Is(
+    $OAuth2Profile2{PKCE},
+    '1',
+    'ProfileGet() - PKCE',
+);
+
+$AuthURL = $OAuth2Object->PrepareAuthURL(
+    ProfileID   => $OAuth2ProfileAdd2,
+    TokenType   => 'id_token',
+    URLRedirect => 'https://' . $LocalHost . '/ProcessAuthCode',
+    Nonce       => 1,
+    StateData   => {
+        UnitTest => 1,
+    }
+);
+$Self->True(
+    $AuthURL,
+    'PrepareAuthURL() - specific parameter',
+);
+$URI = URI->new( $AuthURL );
+%QueryParameter = $URI->query_form();
+$Self->Is(
+    $QueryParameter{'client_id'},
+    'ClientID',
+    'PrepareAuthURL() - client_id',
+);
+$Self->Is(
+    $QueryParameter{'scope'},
+    'Scope',
+    'PrepareAuthURL() - scope',
+);
+$Self->Is(
+    $QueryParameter{'redirect_uri'},
+    'https://' . $LocalHost . '/ProcessAuthCode',
+    'PrepareAuthURL() - redirect_uri',
+);
+$Self->Is(
+    $QueryParameter{'response_type'},
+    'code',
+    'PrepareAuthURL() - response_type',
+);
+$Self->Is(
+    $QueryParameter{'response_mode'},
+    'query',
+    'PrepareAuthURL() - response_mode',
+);
+$Self->True(
+    $QueryParameter{'state'},
+    'PrepareAuthURL() - state',
+);
+$Self->True(
+    $QueryParameter{'nonce'},
+    'PrepareAuthURL() - nonce',
+);
+$Self->True(
+    $QueryParameter{'code_challenge'},
+    'PrepareAuthURL() - code_challenge',
+);
+$Self->Is(
+    $QueryParameter{'code_challenge_method'},
+    'S256',
+    'PrepareAuthURL() - code_challenge_method',
+);
+
+$StateData = $OAuth2Object->StateGet(
+    State  => $QueryParameter{'state'},
+);
+$Self->IsDeeply(
+    $StateData,
+    {
+        ProfileID    => $OAuth2ProfileAdd2,
+        TokenType    => 'id_token',
+        URLRedirect  => 'https://' . $LocalHost . '/ProcessAuthCode',
+        Nonce        => $QueryParameter{'nonce'},
+        UnitTest     => 1,
+        CodeVerifier => $StateData->{CodeVerifier}
+    },
+    'StateGet() for AuthURL',
+);
+
+%Response = $WebUserAgentObject->Request(
+    URL                 => $AuthURL,
+    SkipSSLVerification => 1,
+);
+$Self->Is(
+    $Response{Status},
+    '200 OK',
+    'Response of AuthURL - Status'
+);
+$Self->Is(
+    $Response{HTTPCode},
+    '200',
+    'Response of AuthURL - Status code'
+);
+$Self->Is(
+    ${$Response{Content}},
+'{
+    "profile_id": "' . $OAuth2ProfileAdd2 . '",
+    "token": "abcd"
+}',
+    'Response of AuthURL - Content'
+);
+
+my $OAuth2ProfileDelete2 = $OAuth2Object->ProfileDelete(
+    ID => $OAuth2ProfileAdd2,
+);
+$Self->True(
+    $OAuth2ProfileDelete2,
     'ProfileDelete()',
 );
 

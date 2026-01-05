@@ -29,7 +29,7 @@ $Self->Is(
 );
 
 # check supported methods
-for my $Method ( qw(GetSupportedAttributes Search Sort) ) {
+for my $Method ( qw(GetSupportedAttributes AttributePrepare Select Search Sort) ) {
     $Self->True(
         $AttributeObject->can($Method),
         'Attribute object can "' . $Method . q{"}
@@ -42,16 +42,20 @@ $Self->IsDeeply(
     $AttributeList,
     {
         IsAgent => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE'],
+            ValueType      => 'NUMERIC'
         },
         IsCustomer => {
-            IsSearchable => 1,
-            IsSortable   => 1,
-            Operators    => ['EQ','NE'],
-            ValueType    => 'NUMERIC'
+            IsSelectable   => 0,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE'],
+            ValueType      => 'NUMERIC'
         }
     },
     'GetSupportedAttributes provides expected data'
@@ -273,10 +277,10 @@ my @SortTests = (
                 'LEFT JOIN users u0 ON c.user_id = u0.id'
             ],
             'OrderBy' => [
-                'isagent'
+                'SortAttr0'
             ],
             'Select' => [
-                'COALESCE(u0.is_agent,0) AS isagent'
+                'COALESCE(u0.is_agent,0) AS SortAttr0'
             ]
         }
     },
@@ -288,10 +292,10 @@ my @SortTests = (
                 'LEFT JOIN users u0 ON c.user_id = u0.id'
             ],
             'OrderBy' => [
-                'iscustomer'
+                'SortAttr0'
             ],
             'Select' => [
-                'COALESCE(u0.is_customer,0) AS iscustomer'
+                'COALESCE(u0.is_customer,0) AS SortAttr0'
             ]
         }
     }
