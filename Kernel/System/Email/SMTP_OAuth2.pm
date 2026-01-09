@@ -121,7 +121,7 @@ sub Check {
         );
 
         # try to authenticate
-        $AuthSuccess = $SMTP->auth($SASL);
+        $AuthSuccess = eval { $SMTP->auth($SASL) };
 
         last TRY if ( $AuthSuccess );
 

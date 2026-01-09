@@ -92,7 +92,7 @@ sub Check {
 
     # use smtp auth if configured
     if ( $Self->{User} && $Self->{Password} ) {
-        if ( !$SMTP->auth( $Self->{User}, $Self->{Password} ) ) {
+        if ( !eval{ $SMTP->auth( $Self->{User}, $Self->{Password} ) } ) {
             my $Error = $SMTP->code() . $SMTP->message();
             $SMTP->quit();
             return (
