@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/ 
+# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -127,6 +127,7 @@ sub Run {
             if ( $Param{Data}->{include}->{Definition} ) {
                 my $VersionData = $Kernel::OM->Get('ITSMConfigItem')->VersionGet(
                     VersionID  => $VersionID,
+                    XMLDataGet => 1,
                 );
 
                 # get already prepared Definition data from ClassDefinitionGet operation
@@ -163,8 +164,13 @@ sub Run {
                     XMLDataGet => 1,
                 );
 
-                my $Data = $Kernel::OM->Get('Storable')->Clone($Version->{Data});
-                if ( !IsHashRefWithData($Data) ) {
+                my $Data;
+                if ( IsHashRef( $Version->{Data} ) ) {
+                    $Data = $Kernel::OM->Get('Storable')->Clone(
+                        Data => $Version->{Data}
+                    );
+                }
+                else {
                     $Data = $Self->ConvertDataToExternal(
                         ClassID    => $ConfigItem->{ClassID},
                         Definition => $VersionData->{XMLDefinition},
