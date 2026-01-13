@@ -58,7 +58,7 @@ if (!IsHashRefWithData(\%Handler)) {
     );
 }
 $Self->True(
-    (keys %Handler) == 12,
+    (keys %Handler) == 2,
     'GetFilterHandler() returns 2 handler',
 );
 
