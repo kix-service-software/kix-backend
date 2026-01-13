@@ -594,6 +594,9 @@ sub FixedTimeSet {
 
     $FixedTime = $TimeToSave // CORE::time();
 
+    # reset InMemory cache on changed time
+    delete( $Kernel::OM->Get('Cache')->{Cache} );
+
     return $FixedTime;
 }
 
@@ -607,6 +610,9 @@ sub FixedTimeUnset {
     my ($Self) = @_;
 
     undef $FixedTime;
+
+    # reset InMemory cache on changed time
+    delete( $Kernel::OM->Get('Cache')->{Cache} );
 
     return;
 }
@@ -623,6 +629,10 @@ sub FixedTimeAddSeconds {
 
     return if ( !defined $FixedTime );
     $FixedTime += $SecondsToAdd;
+
+    # reset InMemory cache on changed time
+    delete( $Kernel::OM->Get('Cache')->{Cache} );
+
     return;
 }
 
