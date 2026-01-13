@@ -1610,7 +1610,8 @@ sub ArticleGet {
     if ( !$Param{ArticleID} && !$Param{TicketID} ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => 'Need ArticleID or TicketID!'
+            Message  => 'Need ArticleID or TicketID!',
+            Silent   => $Param{Silent}
         );
         return;
     }
@@ -1864,6 +1865,7 @@ sub ArticleGet {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "No such article for ArticleID ($Param{ArticleID})!",
+                Silent   => $Param{Silent}
             );
         }
 

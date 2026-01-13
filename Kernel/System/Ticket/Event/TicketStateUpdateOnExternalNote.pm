@@ -120,9 +120,11 @@ sub Run {
         ArticleID     => $Param{Data}->{ArticleID},
         DynamicFields => 0,
         UserID        => 1,
+        Silent        => 1,
     );
     return 1 if (
-        $Article{Channel} ne 'note'
+        !%Article
+        || $Article{Channel} ne 'note'
         || $Article{SenderType} ne 'external'
     );
 
