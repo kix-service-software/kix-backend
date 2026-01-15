@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
+# Modified version of the work: Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -1128,6 +1128,7 @@ my @Tests = (
                 ToArray => [$Contact{Email}],
             },
         ],
+        ExpectedVisibleForCustomer => 1,
         Success => 1,
     },
     {
@@ -1190,6 +1191,7 @@ my @Tests = (
                 ToArray => [$Contact{Email}],
             },
         ],
+        ExpectedVisibleForCustomer => 1,
         Success => 1,
     },
     {
@@ -1267,6 +1269,7 @@ this is a URL: [1]KIXDesk
                 ToArray => [$Contact{Email}],
             },
         ],
+        ExpectedVisibleForCustomer => 1,
         Success => 1,
     },
 );
@@ -1554,7 +1557,13 @@ for my $Test (@Tests) {
         );
 
         # check if the new article is customer visible
-        if ( IsArrayRefWithData($Test->{Data}->{VisibleForCustomer}) && $Test->{Data}->{VisibleForCustomer}->[0] ) {
+        if (
+            $Test->{ExpectedVisibleForCustomer}
+            || (
+                IsArrayRefWithData($Test->{Data}->{VisibleForCustomer})
+                && $Test->{Data}->{VisibleForCustomer}->[0]
+            )
+         ) {
             $Self->True(
                 ($ArticleBox[-1]->{CustomerVisible} == 1),
                 "$Test->{Name} - article is visible for the customer",
