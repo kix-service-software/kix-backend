@@ -259,7 +259,6 @@ sub GetSearchDef {
             else {
                 $AttributeDef = $AttributeModule->Search(
                     Search       => $SearchEntry,
-                    WholeSearch  => $Param{Search}->{ $BoolOperator },   # forward "whole" search, e.g. if behavior depends on other attributes
                     BoolOperator => $BoolOperator,
                     Flags        => $Param{Flags},
                     Language     => $Param{Language},

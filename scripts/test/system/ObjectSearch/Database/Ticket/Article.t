@@ -4427,6 +4427,2041 @@ for my $UserType ( qw(Agent Customer) ) {
     for my $Test ( @SearchTests ) {
         my $Result = $AttributeObject->Search(
             Search       => $Test->{Search},
+            Flags        => $Test->{Flags},
+            BoolOperator => 'AND',
+            UserType     => $UserType,
+            UserID       => 1,
+            Silent       => defined( $Test->{Expected} ) ? 0 : 1
+        );
+        $Self->IsDeeply(
+            $Result,
+            $Test->{Expected},
+            $Test->{Name}
+        );
+    }
+
+    if ( $UserType eq 'Customer' ) {
+        $JoinArticleSuffix = ' AND ta.customer_visible = 1'
+    }
+    # define tests
+    my @SearchTestsWithFlags = (
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / undef search',
+            Search       => undef,
+            Expected     => undef
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "ArticleID" / Operation "EQ" / Value undef',
+            Search       => {
+                Field    => 'ArticleID',
+                Operator => 'EQ',
+                Value    => undef
+
+            },
+            Expected     => undef
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "ArticleID" / Operation "EQ" / Value invalid',
+            Search       => {
+                Field    => 'ArticleID',
+                Operator => 'EQ',
+                Value    => 'Test'
+            },
+            Expected     => undef
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "undef" / Operation "EQ" / Value "1"',
+            Search       => {
+                Field    => undef,
+                Operator => 'EQ',
+                Value    => '1'
+            },
+            Expected     => undef
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "invalid" / Operation "EQ" / Value "1"',
+            Search       => {
+                Field    => 'Test',
+                Operator => 'EQ',
+                Value    => '1'
+            },
+            Expected     => undef
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "ArticleID" / Operator undef / Value "1"',
+            Search       => {
+                Field    => 'ArticleID',
+                Operator => undef,
+                Value    => '1'
+            },
+            Expected     => undef
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "ArticleID" / Operator invalid / Value "1"',
+            Search       => {
+                Field    => 'ArticleID',
+                Operator => 'Test',
+                Value    => '1'
+            },
+            Expected     => undef
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "ArticleID" / Operator "EQ" / Value "1"',
+            Search       => {
+                Field    => 'ArticleID',
+                Operator => 'EQ',
+                Value    => '1'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    'ta.id = 1'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "ArticleID" / Operator "EQ" / Value "0"',
+            Search       => {
+                Field    => 'ArticleID',
+                Operator => 'EQ',
+                Value    => '0'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    '(ta.id = 0 OR ta.id IS NULL)'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "ArticleID" / Operator "NE" / Value "1"',
+            Search       => {
+                Field    => 'ArticleID',
+                Operator => 'NE',
+                Value    => '1'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    '(ta.id <> 1 OR ta.id IS NULL)'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "ArticleID" / Operator "NE" / Value "0"',
+            Search       => {
+                Field    => 'ArticleID',
+                Operator => 'NE',
+                Value    => '0'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    'ta.id <> 0'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "ArticleID" / Operator "IN" / Value ["1"]',
+            Search       => {
+                Field    => 'ArticleID',
+                Operator => 'IN',
+                Value    => ['1']
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    'ta.id IN (1)'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "ArticleID" / Operator "!IN" / Value ["1"]',
+            Search       => {
+                Field    => 'ArticleID',
+                Operator => '!IN',
+                Value    => ['1']
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    'ta.id NOT IN (1)'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "ArticleID" / Operator "LT" / Value "1"',
+            Search       => {
+                Field    => 'ArticleID',
+                Operator => 'LT',
+                Value    => '1'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    'ta.id < 1'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "ArticleID" / Operator "GT" / Value "1"',
+            Search       => {
+                Field    => 'ArticleID',
+                Operator => 'GT',
+                Value    => '1'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    'ta.id > 1'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "ArticleID" / Operator "LTE" / Value "1"',
+            Search       => {
+                Field    => 'ArticleID',
+                Operator => 'LTE',
+                Value    => '1'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    'ta.id <= 1'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "ArticleID" / Operator "GTE" / Value "1"',
+            Search       => {
+                Field    => 'ArticleID',
+                Operator => 'GTE',
+                Value    => '1'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    'ta.id >= 1'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "ChannelID" / Operator "EQ" / Value "1"',
+            Search       => {
+                Field    => 'ChannelID',
+                Operator => 'EQ',
+                Value    => '1'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    'ta.channel_id = 1'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "ChannelID" / Operator "EQ" / Value "0"',
+            Search       => {
+                Field    => 'ChannelID',
+                Operator => 'EQ',
+                Value    => '0'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    '(ta.channel_id = 0 OR ta.channel_id IS NULL)'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "ChannelID" / Operator "NE" / Value "1"',
+            Search       => {
+                Field    => 'ChannelID',
+                Operator => 'NE',
+                Value    => '1'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    '(ta.channel_id <> 1 OR ta.channel_id IS NULL)'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "ChannelID" / Operator "NE" / Value "0"',
+            Search       => {
+                Field    => 'ChannelID',
+                Operator => 'NE',
+                Value    => '0'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    'ta.channel_id <> 0'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "ChannelID" / Operator "IN" / Value ["1"]',
+            Search       => {
+                Field    => 'ChannelID',
+                Operator => 'IN',
+                Value    => ['1']
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    'ta.channel_id IN (1)'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "ChannelID" / Operator "!IN" / Value ["1"]',
+            Search       => {
+                Field    => 'ChannelID',
+                Operator => '!IN',
+                Value    => ['1']
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    'ta.channel_id NOT IN (1)'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "ChannelID" / Operator "LT" / Value "1"',
+            Search       => {
+                Field    => 'ChannelID',
+                Operator => 'LT',
+                Value    => '1'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    'ta.channel_id < 1'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "ChannelID" / Operator "GT" / Value "1"',
+            Search       => {
+                Field    => 'ChannelID',
+                Operator => 'GT',
+                Value    => '1'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    'ta.channel_id > 1'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "ChannelID" / Operator "LTE" / Value "1"',
+            Search       => {
+                Field    => 'ChannelID',
+                Operator => 'LTE',
+                Value    => '1'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    'ta.channel_id <= 1'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "ChannelID" / Operator "GTE" / Value "1"',
+            Search       => {
+                Field    => 'ChannelID',
+                Operator => 'GTE',
+                Value    => '1'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    'ta.channel_id >= 1'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "Channel" / Operator "EQ" / Value "Test"',
+            Search       => {
+                Field    => 'Channel',
+                Operator => 'EQ',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
+                    'LEFT OUTER JOIN channel tac ON tac.id = ta.channel_id'
+                ],
+                'Where' => [
+                    $CaseSensitive ? 'LOWER(tac.name) = \'test\'' : 'tac.name = \'test\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "Channel" / Operator "EQ" / Value ""',
+            Search       => {
+                Field    => 'Channel',
+                Operator => 'EQ',
+                Value    => ''
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
+                    'LEFT OUTER JOIN channel tac ON tac.id = ta.channel_id'
+                ],
+                'Where' => [
+                    $CaseSensitive ? '(LOWER(tac.name) = \'\' OR tac.name IS NULL)' : '(tac.name = \'\' OR tac.name IS NULL)'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "Channel" / Operator "NE" / Value "Test"',
+            Search       => {
+                Field    => 'Channel',
+                Operator => 'NE',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
+                    'LEFT OUTER JOIN channel tac ON tac.id = ta.channel_id'
+                ],
+                'Where' => [
+                    $CaseSensitive ? '(LOWER(tac.name) != \'test\' OR tac.name IS NULL)' : '(tac.name != \'test\' OR tac.name IS NULL)'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "Channel" / Operator "NE" / Value ""',
+            Search       => {
+                Field    => 'Channel',
+                Operator => 'NE',
+                Value    => ''
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
+                    'LEFT OUTER JOIN channel tac ON tac.id = ta.channel_id'
+                ],
+                'Where' => [
+                    $CaseSensitive ? 'LOWER(tac.name) != \'\'' : 'tac.name != \'\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "Channel" / Operator "IN" / Value ["Test"]',
+            Search       => {
+                Field    => 'Channel',
+                Operator => 'IN',
+                Value    => ['Test']
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
+                    'LEFT OUTER JOIN channel tac ON tac.id = ta.channel_id'
+                ],
+                'Where' => [
+                    $CaseSensitive ? 'LOWER(tac.name) IN (\'test\')' : 'tac.name IN (\'test\')'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "Channel" / Operator "!IN" / Value ["Test"]',
+            Search       => {
+                Field    => 'Channel',
+                Operator => '!IN',
+                Value    => ['Test']
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
+                    'LEFT OUTER JOIN channel tac ON tac.id = ta.channel_id'
+                ],
+                'Where' => [
+                    $CaseSensitive ? 'LOWER(tac.name) NOT IN (\'test\')' : 'tac.name NOT IN (\'test\')'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "Channel" / Operator "STARTSWITH" / Value "Test"',
+            Search       => {
+                Field    => 'Channel',
+                Operator => 'STARTSWITH',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
+                    'LEFT OUTER JOIN channel tac ON tac.id = ta.channel_id'
+                ],
+                'Where' => [
+                    $CaseSensitive ? 'LOWER(tac.name) LIKE \'test%\'' : 'tac.name LIKE \'test%\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "Channel" / Operator "ENDSWITH" / Value "Test"',
+            Search       => {
+                Field    => 'Channel',
+                Operator => 'ENDSWITH',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
+                    'LEFT OUTER JOIN channel tac ON tac.id = ta.channel_id'
+                ],
+                'Where' => [
+                    $CaseSensitive ? 'LOWER(tac.name) LIKE \'%test\'' : 'tac.name LIKE \'%test\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "Channel" / Operator "CONTAINS" / Value "Test"',
+            Search       => {
+                Field    => 'Channel',
+                Operator => 'CONTAINS',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
+                    'LEFT OUTER JOIN channel tac ON tac.id = ta.channel_id'
+                ],
+                'Where' => [
+                    $CaseSensitive ? 'LOWER(tac.name) LIKE \'%test%\'' : 'tac.name LIKE \'%test%\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "Channel" / Operator "LIKE" / Value "Test"',
+            Search       => {
+                Field    => 'Channel',
+                Operator => 'LIKE',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
+                    'LEFT OUTER JOIN channel tac ON tac.id = ta.channel_id'
+                ],
+                'Where' => [
+                    $CaseSensitive ? 'LOWER(tac.name) LIKE \'test\'' : 'tac.name LIKE \'test\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "SenderTypeID" / Operator "EQ" / Value "1"',
+            Search       => {
+                Field    => 'SenderTypeID',
+                Operator => 'EQ',
+                Value    => '1'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    'ta.article_sender_type_id = 1'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "SenderTypeID" / Operator "EQ" / Value "0"',
+            Search       => {
+                Field    => 'SenderTypeID',
+                Operator => 'EQ',
+                Value    => '0'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    '(ta.article_sender_type_id = 0 OR ta.article_sender_type_id IS NULL)'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "SenderTypeID" / Operator "NE" / Value "1"',
+            Search       => {
+                Field    => 'SenderTypeID',
+                Operator => 'NE',
+                Value    => '1'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    '(ta.article_sender_type_id <> 1 OR ta.article_sender_type_id IS NULL)'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "SenderTypeID" / Operator "NE" / Value "0"',
+            Search       => {
+                Field    => 'SenderTypeID',
+                Operator => 'NE',
+                Value    => '0'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    'ta.article_sender_type_id <> 0'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "SenderTypeID" / Operator "IN" / Value ["1"]',
+            Search       => {
+                Field    => 'SenderTypeID',
+                Operator => 'IN',
+                Value    => ['1']
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    'ta.article_sender_type_id IN (1)'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "SenderTypeID" / Operator "!IN" / Value ["1"]',
+            Search       => {
+                Field    => 'SenderTypeID',
+                Operator => '!IN',
+                Value    => ['1']
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    'ta.article_sender_type_id NOT IN (1)'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "SenderTypeID" / Operator "LT" / Value "1"',
+            Search       => {
+                Field    => 'SenderTypeID',
+                Operator => 'LT',
+                Value    => '1'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    'ta.article_sender_type_id < 1'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "SenderTypeID" / Operator "GT" / Value "1"',
+            Search       => {
+                Field    => 'SenderTypeID',
+                Operator => 'GT',
+                Value    => '1'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    'ta.article_sender_type_id > 1'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "SenderTypeID" / Operator "LTE" / Value "1"',
+            Search       => {
+                Field    => 'SenderTypeID',
+                Operator => 'LTE',
+                Value    => '1'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    'ta.article_sender_type_id <= 1'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "SenderTypeID" / Operator "GTE" / Value "1"',
+            Search       => {
+                Field    => 'SenderTypeID',
+                Operator => 'GTE',
+                Value    => '1'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    'ta.article_sender_type_id >= 1'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "SenderType" / Operator "EQ" / Value "Test"',
+            Search       => {
+                Field    => 'SenderType',
+                Operator => 'EQ',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
+                    'LEFT OUTER JOIN article_sender_type tast ON tast.id = ta.article_sender_type_id'
+                ],
+                'Where' => [
+                    $CaseSensitive ? 'LOWER(tast.name) = \'test\'' : 'tast.name = \'test\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "SenderType" / Operator "EQ" / Value ""',
+            Search       => {
+                Field    => 'SenderType',
+                Operator => 'EQ',
+                Value    => ''
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
+                    'LEFT OUTER JOIN article_sender_type tast ON tast.id = ta.article_sender_type_id'
+                ],
+                'Where' => [
+                    $CaseSensitive ? '(LOWER(tast.name) = \'\' OR tast.name IS NULL)' : '(tast.name = \'\' OR tast.name IS NULL)'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "SenderType" / Operator "NE" / Value "Test"',
+            Search       => {
+                Field    => 'SenderType',
+                Operator => 'NE',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
+                    'LEFT OUTER JOIN article_sender_type tast ON tast.id = ta.article_sender_type_id'
+                ],
+                'Where' => [
+                    $CaseSensitive ? '(LOWER(tast.name) != \'test\' OR tast.name IS NULL)' : '(tast.name != \'test\' OR tast.name IS NULL)'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "SenderType" / Operator "NE" / Value ""',
+            Search       => {
+                Field    => 'SenderType',
+                Operator => 'NE',
+                Value    => ''
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
+                    'LEFT OUTER JOIN article_sender_type tast ON tast.id = ta.article_sender_type_id'
+                ],
+                'Where' => [
+                    $CaseSensitive ? 'LOWER(tast.name) != \'\'' : 'tast.name != \'\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "SenderType" / Operator "IN" / Value ["Test"]',
+            Search       => {
+                Field    => 'SenderType',
+                Operator => 'IN',
+                Value    => ['Test']
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
+                    'LEFT OUTER JOIN article_sender_type tast ON tast.id = ta.article_sender_type_id'
+                ],
+                'Where' => [
+                    $CaseSensitive ? 'LOWER(tast.name) IN (\'test\')' : 'tast.name IN (\'test\')'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "SenderType" / Operator "!IN" / Value ["Test"]',
+            Search       => {
+                Field    => 'SenderType',
+                Operator => '!IN',
+                Value    => ['Test']
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
+                    'LEFT OUTER JOIN article_sender_type tast ON tast.id = ta.article_sender_type_id'
+                ],
+                'Where' => [
+                    $CaseSensitive ? 'LOWER(tast.name) NOT IN (\'test\')' : 'tast.name NOT IN (\'test\')'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "SenderType" / Operator "STARTSWITH" / Value "Test"',
+            Search       => {
+                Field    => 'SenderType',
+                Operator => 'STARTSWITH',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
+                    'LEFT OUTER JOIN article_sender_type tast ON tast.id = ta.article_sender_type_id'
+                ],
+                'Where' => [
+                    $CaseSensitive ? 'LOWER(tast.name) LIKE \'test%\'' : 'tast.name LIKE \'test%\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "SenderType" / Operator "ENDSWITH" / Value "Test"',
+            Search       => {
+                Field    => 'SenderType',
+                Operator => 'ENDSWITH',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
+                    'LEFT OUTER JOIN article_sender_type tast ON tast.id = ta.article_sender_type_id'
+                ],
+                'Where' => [
+                    $CaseSensitive ? 'LOWER(tast.name) LIKE \'%test\'' : 'tast.name LIKE \'%test\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "SenderType" / Operator "CONTAINS" / Value "Test"',
+            Search       => {
+                Field    => 'SenderType',
+                Operator => 'CONTAINS',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
+                    'LEFT OUTER JOIN article_sender_type tast ON tast.id = ta.article_sender_type_id'
+                ],
+                'Where' => [
+                    $CaseSensitive ? 'LOWER(tast.name) LIKE \'%test%\'' : 'tast.name LIKE \'%test%\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "SenderType" / Operator "LIKE" / Value "Test"',
+            Search       => {
+                Field    => 'SenderType',
+                Operator => 'LIKE',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix,
+                    'LEFT OUTER JOIN article_sender_type tast ON tast.id = ta.article_sender_type_id'
+                ],
+                'Where' => [
+                    $CaseSensitive ? 'LOWER(tast.name) LIKE \'test\'' : 'tast.name LIKE \'test\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "CustomerVisible" / Operator "EQ" / Value "1"',
+            Search       => {
+                Field    => 'CustomerVisible',
+                Operator => 'EQ',
+                Value    => '1'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    'ta.customer_visible = 1'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "CustomerVisible" / Operator "EQ" / Value "0"',
+            Search       => {
+                Field    => 'CustomerVisible',
+                Operator => 'EQ',
+                Value    => '0'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    '(ta.customer_visible = 0 OR ta.customer_visible IS NULL)'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "CustomerVisible" / Operator "NE" / Value "1"',
+            Search       => {
+                Field    => 'CustomerVisible',
+                Operator => 'NE',
+                Value    => '1'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    '(ta.customer_visible <> 1 OR ta.customer_visible IS NULL)'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "CustomerVisible" / Operator "NE" / Value "0"',
+            Search       => {
+                Field    => 'CustomerVisible',
+                Operator => 'NE',
+                Value    => '0'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    'ta.customer_visible <> 0'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "CustomerVisible" / Operator "IN" / Value ["1"]',
+            Search       => {
+                Field    => 'CustomerVisible',
+                Operator => 'IN',
+                Value    => ['1']
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    'ta.customer_visible IN (1)'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "CustomerVisible" / Operator "!IN" / Value ["1"]',
+            Search       => {
+                Field    => 'CustomerVisible',
+                Operator => '!IN',
+                Value    => ['1']
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    'ta.customer_visible NOT IN (1)'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "CustomerVisible" / Operator "LT" / Value "1"',
+            Search       => {
+                Field    => 'CustomerVisible',
+                Operator => 'LT',
+                Value    => '1'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    'ta.customer_visible < 1'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "CustomerVisible" / Operator "GT" / Value "1"',
+            Search       => {
+                Field    => 'CustomerVisible',
+                Operator => 'GT',
+                Value    => '1'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    'ta.customer_visible > 1'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "CustomerVisible" / Operator "LTE" / Value "1"',
+            Search       => {
+                Field    => 'CustomerVisible',
+                Operator => 'LTE',
+                Value    => '1'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    'ta.customer_visible <= 1'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "CustomerVisible" / Operator "GTE" / Value "1"',
+            Search       => {
+                Field    => 'CustomerVisible',
+                Operator => 'GTE',
+                Value    => '1'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    'ta.customer_visible >= 1'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "From" / Operator "EQ" / Value "Test"',
+            Search       => {
+                Field    => 'From',
+                Operator => 'EQ',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    $CaseSensitive ? 'LOWER(ta.a_from) = \'test\'' : 'ta.a_from = \'test\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "From" / Operator "EQ" / Value ""',
+            Search       => {
+                Field    => 'From',
+                Operator => 'EQ',
+                Value    => ''
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    $CaseSensitive ? '(LOWER(ta.a_from) = \'\' OR ta.a_from IS NULL)' : '(ta.a_from = \'\' OR ta.a_from IS NULL)'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "From" / Operator "NE" / Value "Test"',
+            Search       => {
+                Field    => 'From',
+                Operator => 'NE',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    $CaseSensitive ? '(LOWER(ta.a_from) != \'test\' OR ta.a_from IS NULL)' : '(ta.a_from != \'test\' OR ta.a_from IS NULL)'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "From" / Operator "NE" / Value ""',
+            Search       => {
+                Field    => 'From',
+                Operator => 'NE',
+                Value    => ''
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    $CaseSensitive ? 'LOWER(ta.a_from) != \'\'' : 'ta.a_from != \'\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "From" / Operator "IN" / Value ["Test"]',
+            Search       => {
+                Field    => 'From',
+                Operator => 'IN',
+                Value    => ['Test']
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    $CaseSensitive ? 'LOWER(ta.a_from) IN (\'test\')' : 'ta.a_from IN (\'test\')'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "From" / Operator "!IN" / Value ["Test"]',
+            Search       => {
+                Field    => 'From',
+                Operator => '!IN',
+                Value    => ['Test']
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    $CaseSensitive ? 'LOWER(ta.a_from) NOT IN (\'test\')' : 'ta.a_from NOT IN (\'test\')'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "From" / Operator "STARTSWITH" / Value "Test"',
+            Search       => {
+                Field    => 'From',
+                Operator => 'STARTSWITH',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    $CaseSensitive ? 'LOWER(ta.a_from) LIKE \'test%\'' : 'ta.a_from LIKE \'test%\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "From" / Operator "ENDSWITH" / Value "Test"',
+            Search       => {
+                Field    => 'From',
+                Operator => 'ENDSWITH',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    $CaseSensitive ? 'LOWER(ta.a_from) LIKE \'%test\'' : 'ta.a_from LIKE \'%test\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "From" / Operator "CONTAINS" / Value "Test"',
+            Search       => {
+                Field    => 'From',
+                Operator => 'CONTAINS',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    $CaseSensitive ? 'LOWER(ta.a_from) LIKE \'%test%\'' : 'ta.a_from LIKE \'%test%\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "From" / Operator "LIKE" / Value "Test"',
+            Search       => {
+                Field    => 'From',
+                Operator => 'LIKE',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    $CaseSensitive ? 'LOWER(ta.a_from) LIKE \'test\'' : 'ta.a_from LIKE \'test\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "To" / Operator "EQ" / Value "1"',
+            Search       => {
+                Field    => 'To',
+                Operator => 'EQ',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    $CaseSensitive ? 'LOWER(ta.a_to) = \'test\'' : 'ta.a_to = \'test\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "To" / Operator "EQ" / Value ""',
+            Search       => {
+                Field    => 'To',
+                Operator => 'EQ',
+                Value    => ''
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    $CaseSensitive ? '(LOWER(ta.a_to) = \'\' OR ta.a_to IS NULL)' : '(ta.a_to = \'\' OR ta.a_to IS NULL)'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "To" / Operator "NE" / Value "1"',
+            Search       => {
+                Field    => 'To',
+                Operator => 'NE',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    $CaseSensitive ? '(LOWER(ta.a_to) != \'test\' OR ta.a_to IS NULL)' : '(ta.a_to != \'test\' OR ta.a_to IS NULL)'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "To" / Operator "NE" / Value ""',
+            Search       => {
+                Field    => 'To',
+                Operator => 'NE',
+                Value    => ''
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    $CaseSensitive ? 'LOWER(ta.a_to) != \'\'' : 'ta.a_to != \'\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "To" / Operator "IN" / Value ["1"]',
+            Search       => {
+                Field    => 'To',
+                Operator => 'IN',
+                Value    => ['Test']
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    $CaseSensitive ? 'LOWER(ta.a_to) IN (\'test\')' : 'ta.a_to IN (\'test\')'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "To" / Operator "!IN" / Value ["1"]',
+            Search       => {
+                Field    => 'To',
+                Operator => '!IN',
+                Value    => ['Test']
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    $CaseSensitive ? 'LOWER(ta.a_to) NOT IN (\'test\')' : 'ta.a_to NOT IN (\'test\')'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "To" / Operator "STARTSWITH" / Value "Test"',
+            Search       => {
+                Field    => 'To',
+                Operator => 'STARTSWITH',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    $CaseSensitive ? 'LOWER(ta.a_to) LIKE \'test%\'' : 'ta.a_to LIKE \'test%\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "To" / Operator "ENDSWITH" / Value "Test"',
+            Search       => {
+                Field    => 'To',
+                Operator => 'ENDSWITH',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    $CaseSensitive ? 'LOWER(ta.a_to) LIKE \'%test\'' : 'ta.a_to LIKE \'%test\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "To" / Operator "CONTAINS" / Value "Test"',
+            Search       => {
+                Field    => 'To',
+                Operator => 'CONTAINS',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    $CaseSensitive ? 'LOWER(ta.a_to) LIKE \'%test%\'' : 'ta.a_to LIKE \'%test%\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "To" / Operator "LIKE" / Value "Test"',
+            Search       => {
+                Field    => 'To',
+                Operator => 'LIKE',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    $CaseSensitive ? 'LOWER(ta.a_to) LIKE \'test\'' : 'ta.a_to LIKE \'test\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "Cc" / Operator "EQ" / Value "1"',
+            Search       => {
+                Field    => 'Cc',
+                Operator => 'EQ',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    $CaseSensitive ? 'LOWER(ta.a_cc) = \'test\'' : 'ta.a_cc = \'test\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "Cc" / Operator "EQ" / Value ""',
+            Search       => {
+                Field    => 'Cc',
+                Operator => 'EQ',
+                Value    => ''
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    $CaseSensitive ? '(LOWER(ta.a_cc) = \'\' OR ta.a_cc IS NULL)' : '(ta.a_cc = \'\' OR ta.a_cc IS NULL)'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "Cc" / Operator "NE" / Value "1"',
+            Search       => {
+                Field    => 'Cc',
+                Operator => 'NE',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    $CaseSensitive ? '(LOWER(ta.a_cc) != \'test\' OR ta.a_cc IS NULL)' : '(ta.a_cc != \'test\' OR ta.a_cc IS NULL)'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "Cc" / Operator "NE" / Value ""',
+            Search       => {
+                Field    => 'Cc',
+                Operator => 'NE',
+                Value    => ''
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    $CaseSensitive ? 'LOWER(ta.a_cc) != \'\'' : 'ta.a_cc != \'\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "Cc" / Operator "IN" / Value ["1"]',
+            Search       => {
+                Field    => 'Cc',
+                Operator => 'IN',
+                Value    => ['Test']
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    $CaseSensitive ? 'LOWER(ta.a_cc) IN (\'test\')' : 'ta.a_cc IN (\'test\')'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "Cc" / Operator "!IN" / Value ["1"]',
+            Search       => {
+                Field    => 'Cc',
+                Operator => '!IN',
+                Value    => ['Test']
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    $CaseSensitive ? 'LOWER(ta.a_cc) NOT IN (\'test\')' : 'ta.a_cc NOT IN (\'test\')'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "Cc" / Operator "STARTSWITH" / Value "Test"',
+            Search       => {
+                Field    => 'Cc',
+                Operator => 'STARTSWITH',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    $CaseSensitive ? 'LOWER(ta.a_cc) LIKE \'test%\'' : 'ta.a_cc LIKE \'test%\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "Cc" / Operator "ENDSWITH" / Value "Test"',
+            Search       => {
+                Field    => 'Cc',
+                Operator => 'ENDSWITH',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    $CaseSensitive ? 'LOWER(ta.a_cc) LIKE \'%test\'' : 'ta.a_cc LIKE \'%test\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "Cc" / Operator "CONTAINS" / Value "Test"',
+            Search       => {
+                Field    => 'Cc',
+                Operator => 'CONTAINS',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    $CaseSensitive ? 'LOWER(ta.a_cc) LIKE \'%test%\'' : 'ta.a_cc LIKE \'%test%\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "Cc" / Operator "LIKE" / Value "Test"',
+            Search       => {
+                Field    => 'Cc',
+                Operator => 'LIKE',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    $CaseSensitive ? 'LOWER(ta.a_cc) LIKE \'test\'' : 'ta.a_cc LIKE \'test\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "Subject" / Operator "EQ" / Value "1"',
+            Search       => {
+                Field    => 'Subject',
+                Operator => 'EQ',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    $CaseSensitive ? 'LOWER(ta.a_subject) = \'test\'' : 'ta.a_subject = \'test\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "Subject" / Operator "EQ" / Value ""',
+            Search       => {
+                Field    => 'Subject',
+                Operator => 'EQ',
+                Value    => ''
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    $CaseSensitive ? '(LOWER(ta.a_subject) = \'\' OR ta.a_subject IS NULL)' : '(ta.a_subject = \'\' OR ta.a_subject IS NULL)'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "Subject" / Operator "NE" / Value "1"',
+            Search       => {
+                Field    => 'Subject',
+                Operator => 'NE',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    $CaseSensitive ? '(LOWER(ta.a_subject) != \'test\' OR ta.a_subject IS NULL)' : '(ta.a_subject != \'test\' OR ta.a_subject IS NULL)'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "Subject" / Operator "NE" / Value ""',
+            Search       => {
+                Field    => 'Subject',
+                Operator => 'NE',
+                Value    => ''
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    $CaseSensitive ? 'LOWER(ta.a_subject) != \'\'' : 'ta.a_subject != \'\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "Subject" / Operator "IN" / Value ["1"]',
+            Search       => {
+                Field    => 'Subject',
+                Operator => 'IN',
+                Value    => ['Test']
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    $CaseSensitive ? 'LOWER(ta.a_subject) IN (\'test\')' : 'ta.a_subject IN (\'test\')'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "Subject" / Operator "!IN" / Value ["1"]',
+            Search       => {
+                Field    => 'Subject',
+                Operator => '!IN',
+                Value    => ['Test']
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    $CaseSensitive ? 'LOWER(ta.a_subject) NOT IN (\'test\')' : 'ta.a_subject NOT IN (\'test\')'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "Subject" / Operator "STARTSWITH" / Value "Test"',
+            Search       => {
+                Field    => 'Subject',
+                Operator => 'STARTSWITH',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    $CaseSensitive ? 'LOWER(ta.a_subject) LIKE \'test%\'' : 'ta.a_subject LIKE \'test%\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "Subject" / Operator "ENDSWITH" / Value "Test"',
+            Search       => {
+                Field    => 'Subject',
+                Operator => 'ENDSWITH',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    $CaseSensitive ? 'LOWER(ta.a_subject) LIKE \'%test\'' : 'ta.a_subject LIKE \'%test\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "Subject" / Operator "CONTAINS" / Value "Test"',
+            Search       => {
+                Field    => 'Subject',
+                Operator => 'CONTAINS',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    $CaseSensitive ? 'LOWER(ta.a_subject) LIKE \'%test%\'' : 'ta.a_subject LIKE \'%test%\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "Subject" / Operator "LIKE" / Value "Test"',
+            Search       => {
+                Field    => 'Subject',
+                Operator => 'LIKE',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    $CaseSensitive ? 'LOWER(ta.a_subject) LIKE \'test\'' : 'ta.a_subject LIKE \'test\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "Body" / Operator "EQ" / Value "1"',
+            Search       => {
+                Field    => 'Body',
+                Operator => 'EQ',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    $CaseSensitive ? 'LOWER(ta.a_body) = \'test\'' : 'ta.a_body = \'test\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "Body" / Operator "EQ" / Value ""',
+            Search       => {
+                Field    => 'Body',
+                Operator => 'EQ',
+                Value    => ''
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    $CaseSensitive ? '(LOWER(ta.a_body) = \'\' OR ta.a_body IS NULL)' : '(ta.a_body = \'\' OR ta.a_body IS NULL)'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "Body" / Operator "NE" / Value "1"',
+            Search       => {
+                Field    => 'Body',
+                Operator => 'NE',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    $CaseSensitive ? '(LOWER(ta.a_body) != \'test\' OR ta.a_body IS NULL)' : '(ta.a_body != \'test\' OR ta.a_body IS NULL)'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "Body" / Operator "NE" / Value ""',
+            Search       => {
+                Field    => 'Body',
+                Operator => 'NE',
+                Value    => ''
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    $CaseSensitive ? 'LOWER(ta.a_body) != \'\'' : 'ta.a_body != \'\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "Body" / Operator "IN" / Value ["1"]',
+            Search       => {
+                Field    => 'Body',
+                Operator => 'IN',
+                Value    => ['Test']
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    $CaseSensitive ? 'LOWER(ta.a_body) IN (\'test\')' : 'ta.a_body IN (\'test\')'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "Body" / Operator "!IN" / Value ["1"]',
+            Search       => {
+                Field    => 'Body',
+                Operator => '!IN',
+                Value    => ['Test']
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    $CaseSensitive ? 'LOWER(ta.a_body) NOT IN (\'test\')' : 'ta.a_body NOT IN (\'test\')'
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "Body" / Operator "STARTSWITH" / Value "Test"',
+            Search       => {
+                Field    => 'Body',
+                Operator => 'STARTSWITH',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    $CaseSensitive ? 'LOWER(ta.a_body) LIKE \'test%\'' : 'ta.a_body LIKE \'test%\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "Body" / Operator "ENDSWITH" / Value "Test"',
+            Search       => {
+                Field    => 'Body',
+                Operator => 'ENDSWITH',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    $CaseSensitive ? 'LOWER(ta.a_body) LIKE \'%test\'' : 'ta.a_body LIKE \'%test\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "Body" / Operator "CONTAINS" / Value "Test"',
+            Search       => {
+                Field    => 'Body',
+                Operator => 'CONTAINS',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    $CaseSensitive ? 'LOWER(ta.a_body) LIKE \'%test%\'' : 'ta.a_body LIKE \'%test%\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "Body" / Operator "LIKE" / Value "Test"',
+            Search       => {
+                Field    => 'Body',
+                Operator => 'LIKE',
+                Value    => 'Test'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    $CaseSensitive ? 'LOWER(ta.a_body) LIKE \'test\'' : 'ta.a_body LIKE \'test\''
+                ]
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "ArticleCreateTime" / Operator "EQ" / Value "2014-01-01 12:00:00"',
+            Search       => {
+                Field    => 'ArticleCreateTime',
+                Operator => 'EQ',
+                Value    => '2014-01-01 12:00:00'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    'ta.incoming_time = ' . $Kernel::OM->Get('Time')->TimeStamp2SystemTime(String => '2014-01-01 12:00:00')
+                ],
+                'IsRelative' => undef
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "ArticleCreateTime" / Operator "EQ" / Value "+1h"',
+            Search       => {
+                Field    => 'ArticleCreateTime',
+                Operator => 'EQ',
+                Value    => '+1h'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    'ta.incoming_time = ' . $Kernel::OM->Get('Time')->TimeStamp2SystemTime(String => '+1h')
+                ],
+                'IsRelative' => 1
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "ArticleCreateTime" / Operator "LT" / Value "2014-01-01 12:00:00"',
+            Search       => {
+                Field    => 'ArticleCreateTime',
+                Operator => 'LT',
+                Value    => '2014-01-01 12:00:00'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    'ta.incoming_time < ' . $Kernel::OM->Get('Time')->TimeStamp2SystemTime(String => '2014-01-01 12:00:00')
+                ],
+                'IsRelative' => undef
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "ArticleCreateTime" / Operator "LT" / Value "+1h"',
+            Search       => {
+                Field    => 'ArticleCreateTime',
+                Operator => 'LT',
+                Value    => '+1h'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    'ta.incoming_time < ' . $Kernel::OM->Get('Time')->TimeStamp2SystemTime(String => '+1h')
+                ],
+                'IsRelative' => 1
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "ArticleCreateTime" / Operator "GT" / Value "2014-01-01 12:00:00"',
+            Search       => {
+                Field    => 'ArticleCreateTime',
+                Operator => 'GT',
+                Value    => '2014-01-01 12:00:00'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    'ta.incoming_time > ' . $Kernel::OM->Get('Time')->TimeStamp2SystemTime(String => '2014-01-01 12:00:00')
+                ],
+                'IsRelative' => undef
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "ArticleCreateTime" / Operator "GT" / Value "+1h"',
+            Search       => {
+                Field    => 'ArticleCreateTime',
+                Operator => 'GT',
+                Value    => '+1h'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    'ta.incoming_time > ' . $Kernel::OM->Get('Time')->TimeStamp2SystemTime(String => '+1h')
+                ],
+                'IsRelative' => 1
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "ArticleCreateTime" / Operator "LTE" / Value "2014-01-01 12:00:00"',
+            Search       => {
+                Field    => 'ArticleCreateTime',
+                Operator => 'LTE',
+                Value    => '2014-01-01 12:00:00'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    'ta.incoming_time <= ' . $Kernel::OM->Get('Time')->TimeStamp2SystemTime(String => '2014-01-01 12:00:00')
+                ],
+                'IsRelative' => undef
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "ArticleCreateTime" / Operator "LTE" / Value "+1h"',
+            Search       => {
+                Field    => 'ArticleCreateTime',
+                Operator => 'LTE',
+                Value    => '+1h'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    'ta.incoming_time <= ' . $Kernel::OM->Get('Time')->TimeStamp2SystemTime(String => '+1h')
+                ],
+                'IsRelative' => 1
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "ArticleCreateTime" / Operator "GTE" / Value "2014-01-01 12:00:00"',
+            Search       => {
+                Field    => 'ArticleCreateTime',
+                Operator => 'GTE',
+                Value    => '2014-01-01 12:00:00'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    'ta.incoming_time >= ' . $Kernel::OM->Get('Time')->TimeStamp2SystemTime(String => '2014-01-01 12:00:00')
+                ],
+                'IsRelative' => undef
+            }
+        },
+        {
+            Name         => 'Search: SearchIndexModule StaticDB with ArticleID-Flag / UserType ' . $UserType . ' / Field "ArticleCreateTime" / Operator "GTE" / Value "+1h"',
+            Search       => {
+                Field    => 'ArticleCreateTime',
+                Operator => 'GTE',
+                Value    => '+1h'
+            },
+            Expected     => {
+                'Join' => [
+                    'LEFT OUTER JOIN article ta ON ta.ticket_id = st.id' . $JoinArticleSuffix
+                ],
+                'Where' => [
+                    'ta.incoming_time >= ' . $Kernel::OM->Get('Time')->TimeStamp2SystemTime(String => '+1h')
+                ],
+                'IsRelative' => 1
+            }
+        }
+    );
+    for my $Test ( @SearchTestsWithFlags ) {
+        my $Result = $AttributeObject->Search(
+            Search       => $Test->{Search},
+            Flags        => {
+                ArticleID => 1
+            },
             BoolOperator => 'AND',
             UserType     => $UserType,
             UserID       => 1,

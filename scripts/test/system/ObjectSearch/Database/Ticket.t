@@ -54,7 +54,10 @@ $Self->IsDeeply(
     {
         Select  => ['st.id', 'st.tn'],
         From    => ['ticket st'],
-        OrderBy => ['st.id ASC']
+        OrderBy => ['st.id ASC'],
+        Extract => {
+            ArticleID => 1,
+        }
     },
     'GetBaseDef provides expected data'
 );
