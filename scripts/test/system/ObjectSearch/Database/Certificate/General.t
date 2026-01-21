@@ -1431,7 +1431,8 @@ for my $File ( @Files ) {
         },
         CType      => $File->{CType},
         Type       => $File->{Type},
-        Passphrase => $File->{Passphrase}
+        Passphrase => $File->{Passphrase},
+        UserID     => 1
     );
 
     $Self->True(

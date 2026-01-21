@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/ 
+# Modified version of the work: Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -12,6 +12,8 @@ package Kernel::System::Priority;
 
 use strict;
 use warnings;
+
+use base qw(Kernel::System::EventHandler);
 
 our @ObjectDependencies = qw(
     ClientRegistration
@@ -57,6 +59,11 @@ sub new {
 
     $Self->{CacheType} = 'Priority';
     $Self->{CacheTTL}  = 60 * 60 * 24 * 20;
+
+    # init of event handler
+    $Self->EventHandlerInit(
+        Config => 'Priority::EventModulePost',
+    );
 
     return $Self;
 }
@@ -296,6 +303,15 @@ sub PriorityAdd {
         Type => $Self->{CacheType},
     );
 
+    # event
+    $Self->EventHandler(
+        Event => 'PriorityAdd',
+        Data  => {
+            ID => $ID,
+        },
+        UserID => $Param{UserID},
+    );
+
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
@@ -352,6 +368,15 @@ sub PriorityUpdate {
     # delete cache
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
+    );
+
+    # event
+    $Self->EventHandler(
+        Event => 'PriorityUpdate',
+        Data  => {
+            ID => $Param{PriorityID}
+        },
+        UserID => $Param{UserID},
     );
 
     # push client callback event
@@ -450,6 +475,15 @@ sub PriorityDelete {
     # reset cache
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
+    );
+
+    # event
+    $Self->EventHandler(
+        Event => 'PriorityDelete',
+        Data  => {
+            ID => $Param{PriorityID},
+        },
+        UserID => $Param{UserID},
     );
 
     # push client callback event

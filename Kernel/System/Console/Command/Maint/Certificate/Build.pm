@@ -30,7 +30,9 @@ sub Run {
 
     $Self->Print("<yellow>building certificates...</yellow>\n");
 
-    my $Success = $Kernel::OM->Get('Certificate')->CertificateToFS();
+    my $Success = $Kernel::OM->Get('Certificate')->CertificateToFS(
+        UserID => 1
+    );
 
     if ( $Success ) {
         $Self->Print("<green>Done.</green>\n");

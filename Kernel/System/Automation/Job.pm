@@ -317,6 +317,15 @@ sub JobAdd {
         Type => $Self->{CacheType},
     );
 
+    # event
+    $Self->EventHandler(
+        Event => 'JobAdd',
+        Data  => {
+            ID => $ID,
+        },
+        UserID => $Param{UserID},
+    );
+
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
@@ -467,6 +476,15 @@ sub JobUpdate {
         Type => $Self->{CacheType},
     );
 
+    # event
+    $Self->EventHandler(
+        Event => 'JobUpdate',
+        Data  => {
+            ID => $Param{ID},
+        },
+        UserID => $Param{UserID},
+    );
+
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
@@ -552,7 +570,8 @@ sub JobList {
 deletes a job
 
     my $Success = $AutomationObject->JobDelete(
-        ID => 123,
+        ID     => 123,
+        UserID => 123
     );
 
 =cut
@@ -561,7 +580,7 @@ sub JobDelete {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(ID)) {
+    for (qw(ID UserID)) {
         if ( !$Param{$_} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
@@ -619,7 +638,8 @@ sub JobDelete {
                 )
             ) {
                 $Self->ExecPlanDelete(
-                    ID => $ExecPlanID,
+                    ID     => $ExecPlanID,
+                    UserID => $Param{UserID}
                 );
             }
         }
@@ -645,7 +665,8 @@ sub JobDelete {
                 )
             ) {
                 $Self->MacroDelete(
-                    ID => $MacroID,
+                    ID     => $MacroID,
+                    UserID => $Param{UserID}
                 );
             }
         }
@@ -660,6 +681,15 @@ sub JobDelete {
     # delete cache
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
+    );
+
+    # event
+    $Self->EventHandler(
+        Event => 'JobDelete',
+        Data  => {
+            ID => $Param{ID},
+        },
+        UserID => $Param{UserID},
     );
 
     # push client callback event

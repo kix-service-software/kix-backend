@@ -96,7 +96,8 @@ sub _AddUnlockJob {
 
         # removed created execution plan
         $AutomationObject->ExecPlanDelete(
-            ID => $ExecPlanID1,
+            ID     => $ExecPlanID1,
+            UserID => 1
         );
         return;
     }
@@ -217,17 +218,21 @@ sub _AddUnlockJob {
         # removed created actions, macro and execution plan
         for my $ActionID ( @ActionIDs ) {
             $AutomationObject->MacroActionDelete(
-                ID => $ActionID,
+                ID     => $ActionID,
+                UserID => 1
             );
         }
         $AutomationObject->MacroDelete(
-            ID => $MacroID,
+            ID     => $MacroID,
+            UserID => 1
         );
         $AutomationObject->ExecPlanDelete(
-            ID => $ExecPlanID1,
+            ID     => $ExecPlanID1,
+            UserID => 1
         );
         $AutomationObject->ExecPlanDelete(
-            ID => $ExecPlanID2,
+            ID     => $ExecPlanID2,
+            UserID => 1
         );
         return;
     }

@@ -455,7 +455,8 @@ my @DeleteTests = (
 
 for my $Test ( @DeleteTests ) {
     my $Result = $ObjectTagObject->ObjectTagDelete(
-        %{$Test->{Data}}
+        %{$Test->{Data}},
+        UserID => 1
     );
 
     $Self->Is(

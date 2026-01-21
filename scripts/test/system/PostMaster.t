@@ -170,7 +170,7 @@ my $ContentRef = $Kernel::OM->Get('Main')->FileRead(
 }
 
 my $Message = $Kernel::OM->Get('Log')->GetLogEntry(
-    Type  => 'info',   
+    Type  => 'info',
     What  => 'Message',
     Index => -3,
 );
@@ -861,10 +861,10 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                 $NamePrefix . ' TicketDelete()',
             );
         }
-        $PostMasterFilter->FilterDelete( Name => $FilterRand1 );
-        $PostMasterFilter->FilterDelete( Name => $FilterRand2 );
-        $PostMasterFilter->FilterDelete( Name => $FilterRand3 );
-        $PostMasterFilter->FilterDelete( Name => $FilterRand4 );
+        $PostMasterFilter->FilterDelete( Name => $FilterRand1, UserID => 1 );
+        $PostMasterFilter->FilterDelete( Name => $FilterRand2, UserID => 1 );
+        $PostMasterFilter->FilterDelete( Name => $FilterRand3, UserID => 1 );
+        $PostMasterFilter->FilterDelete( Name => $FilterRand4, UserID => 1 );
     }
 }
 
@@ -1039,7 +1039,7 @@ Some Content in Body
     # remove filter
     for my $Test (@Tests) {
         if ( $Type eq 'DB' ) {
-            $PostMasterFilter->FilterDelete( Name => $Test->{Name} );
+            $PostMasterFilter->FilterDelete( Name => $Test->{Name}, UserID => 1 );
         }
         else {
             $Kernel::OM->Get('Config')->Set(
@@ -1187,7 +1187,7 @@ for my $Test (@Tests) {
         # remove filter
         for my $Test (@Tests) {
             if ( $Type eq 'DB' ) {
-                $PostMasterFilter->FilterDelete( Name => $Test->{Name} );
+                $PostMasterFilter->FilterDelete( Name => $Test->{Name}, UserID => 1 );
             }
             else {
                 $Kernel::OM->Get('Config')->Set(

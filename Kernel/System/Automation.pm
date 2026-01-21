@@ -16,6 +16,7 @@ use Time::HiRes qw(time);
 use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
+    Kernel::System::EventHandler
     Kernel::System::Automation::ExecPlan
     Kernel::System::Automation::Job
     Kernel::System::Automation::Macro
@@ -103,6 +104,11 @@ sub new {
 
         $Self->{LogHandler}->{$Type} = $HandlerObject;
     }
+
+    # init of event handler
+    $Self->EventHandlerInit(
+        Config => 'Automation::EventModulePost',
+    );
 
     return $Self;
 }

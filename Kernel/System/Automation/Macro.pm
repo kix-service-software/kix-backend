@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/ 
+# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -252,6 +252,15 @@ sub MacroAdd {
         Type => $Self->{CacheType},
     );
 
+    # event
+    $Self->EventHandler(
+        Event => 'MacroAdd',
+        Data  => {
+            ID => $ID,
+        },
+        UserID => $Param{UserID},
+    );
+
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
@@ -361,6 +370,15 @@ sub MacroUpdate {
         Type => $Self->{CacheType},
     );
 
+    # event
+    $Self->EventHandler(
+        Event => 'MacroUpdate',
+        Data  => {
+            ID => $Param{ID}
+        },
+        UserID => $Param{UserID},
+    );
+
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
@@ -448,7 +466,8 @@ sub MacroList {
 deletes a macro
 
     my $Success = $AutomationObject->MacroDelete(
-        ID => 123,
+        ID     => 123,
+        UserID => 123
     );
 
 =cut
@@ -457,7 +476,7 @@ sub MacroDelete {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for my $Needed (qw(ID)) {
+    for my $Needed (qw(ID UserID)) {
         if ( !$Param{$Needed} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
@@ -497,7 +516,8 @@ sub MacroDelete {
 
     # delete actions
     my $Success = $Self->MacroActionListDelete(
-        MacroID => $Param{ID}
+        MacroID => $Param{ID},
+        UserID  => $Param{UserID}
     );
     if (!$Success) {
         $Kernel::OM->Get('Log')->Log(
@@ -533,6 +553,15 @@ sub MacroDelete {
     # delete cache
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
+    );
+
+    # event
+    $Self->EventHandler(
+        Event => 'MacroDelete',
+        Data  => {
+            ID => $Param{ID}
+        },
+        UserID => $Param{UserID},
     );
 
     # push client callback event
@@ -633,7 +662,7 @@ sub MacroExecute {
             AdditionalData => $Param{AdditionalData} || {}
         };
     }
-    
+
     $Self->{MacroID} = $Param{ID};
 
     # add variables
@@ -693,7 +722,7 @@ sub MacroExecute {
         Message  => "executing macro \"$Macro{Name}\" with ".(scalar(@{$Macro{ExecOrder}})).' macro actions on ObjectID "'.$ObjectIDString.'".',
         UserID   => $Param{UserID},
     );
-    
+
     # add root macro type to macro variables
     if ( !$Self->{MacroID} ) {
         $Self->{MacroVariables}->{RootMacroType} = $Param{RootMacroType} || $Macro{Type};

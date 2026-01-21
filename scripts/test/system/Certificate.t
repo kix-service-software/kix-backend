@@ -1273,7 +1273,9 @@ for my $Test ( @TestsVD ) {
 _RemoveFiles();
 
 # Certificate: Export / Export Certificates/Private Keys to FS
-my $Result = $Kernel::OM->Get('Certificate')->CertificateToFS();
+my $Result = $Kernel::OM->Get('Certificate')->CertificateToFS(
+    UserID => 1
+);
 
 $Self->Is(
     $Result,

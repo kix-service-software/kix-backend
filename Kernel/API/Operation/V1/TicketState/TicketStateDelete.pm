@@ -88,7 +88,7 @@ sub Run {
             Search       => {
                 AND => [
                     {
-                        Field => 'TicketStateID',
+                        Field => 'StateID',
                         Value => $TicketStateID,
                         Operator => 'EQ',
                     },

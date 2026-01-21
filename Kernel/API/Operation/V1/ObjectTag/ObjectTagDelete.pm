@@ -101,7 +101,9 @@ sub Run {
 
             # delete contact
             my $Success = $Kernel::OM->Get('ObjectTag')->ObjectTagDelete(
-                ID => $ObjectTagID
+                ID     => $ObjectTagID,
+                UserID => $Self->{Authorization}->{UserID},
+
             );
 
             if ( !$Success ) {

@@ -138,6 +138,15 @@ sub CategoryAdd {
         Type => $Self->{CacheType},
     );
 
+    # event
+    $Self->EventHandler(
+        Event => 'FAQCategoryAdd',
+        Data  => {
+            ID => $CategoryID
+        },
+        UserID => $Param{UserID},
+    );
+
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
@@ -276,6 +285,15 @@ sub CategoryDelete {
     # reset cache object search
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{OSCacheType},
+    );
+
+    # event
+    $Self->EventHandler(
+        Event => 'FAQCategoryDelete',
+        Data  => {
+            ID => $Param{CategoryID},
+        },
+        UserID => $Param{UserID},
     );
 
     # push client callback event
@@ -1084,6 +1102,15 @@ sub CategoryUpdate {
     # clear cache
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
+    );
+
+    # event
+    $Self->EventHandler(
+        Event => 'FAQCategoryUpdate',
+        Data  => {
+            ID => $Param{CategoryID}
+        },
+        UserID => $Param{UserID},
     );
 
     # push client callback event

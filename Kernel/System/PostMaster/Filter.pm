@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/ 
+# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -12,6 +12,8 @@ package Kernel::System::PostMaster::Filter;
 
 use strict;
 use warnings;
+
+use base qw(Kernel::System::EventHandler);
 
 our @ObjectDependencies = qw(
     ClientRegistration
@@ -49,6 +51,11 @@ sub new {
     # allocate new hash for object
     my $Self = {};
     bless( $Self, $Type );
+
+    # init of event handler
+    $Self->EventHandlerInit(
+        Config => 'PostMaster::Filter::EventModulePost',
+    );
 
     return $Self;
 }
@@ -239,6 +246,15 @@ sub FilterAdd {
     # add properties
     return if !$Self->_addProperties( %Param, FilterID => $FilterID );
 
+    # event
+    $Self->EventHandler(
+        Event => 'MailFilterAdd',
+        Data  => {
+            ID => $FilterID,
+        },
+        UserID => $Param{UserID},
+    );
+
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
@@ -358,6 +374,15 @@ sub FilterUpdate {
     # add properties
     return if !$Self->_addProperties( %Param, FilterID => $Param{ID} );
 
+    # event
+    $Self->EventHandler(
+        Event => 'MailFilterUpdate',
+        Data  => {
+            ID => $Param{ID}
+        },
+        UserID => $Param{UserID},
+    );
+
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
@@ -373,8 +398,9 @@ sub FilterUpdate {
 delete a filter
 
     $PMFilterObject->FilterDelete(
-        ID   => 132,
-        Name => 'some name'   # needed if no ID given
+        ID     => 132,
+        Name   => 'some name',   # needed if no ID given
+        UserID => 123
     );
 
 =cut
@@ -387,6 +413,13 @@ sub FilterDelete {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Need ID or Name!"
+        );
+        return;
+    }
+    elsif ( !$Param{UserID} ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Need UserID!"
         );
         return;
     }
@@ -407,6 +440,15 @@ sub FilterDelete {
     return if !$DBObject->Do(
         SQL  => 'DELETE FROM mail_filter WHERE id = ?',
         Bind => [ \$Param{ID} ]
+    );
+
+    # event
+    $Self->EventHandler(
+        Event => 'MailFilterDelete',
+        Data  => {
+            ID => $Param{ID}
+        },
+        UserID => $Param{UserID},
     );
 
     # push client callback event
