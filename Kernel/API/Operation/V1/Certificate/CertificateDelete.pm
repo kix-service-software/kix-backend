@@ -83,7 +83,8 @@ sub Run {
 
         # delete Certificate
         my $Success = $Kernel::OM->Get('Certificate')->CertificateDelete(
-            ID  => $CertificateID,
+            ID     => $CertificateID,
+            UserID => $Self->{Authorization}->{UserID},
         );
 
         if ( !$Success ) {

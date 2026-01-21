@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/ 
+# Modified version of the work: Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -12,6 +12,8 @@ package Kernel::System::State;
 
 use strict;
 use warnings;
+
+use base qw(Kernel::System::EventHandler);
 
 our @ObjectDependencies = qw(
     ClientRegistration
@@ -56,6 +58,11 @@ sub new {
 
     $Self->{CacheType} = 'State';
     $Self->{CacheTTL}  = 60 * 60 * 24 * 20;
+
+    # init of event handler
+    $Self->EventHandlerInit(
+        Config => 'State::EventModulePost',
+    );
 
     # check needed config options
     for (qw(Ticket::ViewableStateType Ticket::UnlockStateType)) {
@@ -125,6 +132,15 @@ sub StateAdd {
     # delete cache
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
+    );
+
+    # trigger event
+    $Self->EventHandler(
+        Event => 'StateAdd',
+        Data  => {
+            ID => $ID
+        },
+        UserID => $Param{UserID},
     );
 
     # push client callback event
@@ -302,6 +318,15 @@ sub StateUpdate {
     # delete cache
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
+    );
+
+    # trigger event
+    $Self->EventHandler(
+        Event => 'StateUpdate',
+        Data  => {
+            ID  => $Param{ID}
+        },
+        UserID => $Param{UserID}
     );
 
     # push client callback event
@@ -768,11 +793,20 @@ sub StateDelete {
         Type => $Self->{CacheType},
     );
 
+    # trigger event
+    $Self->EventHandler(
+        Event => 'StateDelete',
+        Data  => {
+            ID => $Param{StateID}
+        },
+        UserID => $Param{UserID}
+    );
+
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'State',
-        ObjectID  => $Param{ID},
+        ObjectID  => $Param{StateID},
     );
 
     return 1;

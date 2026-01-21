@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/ 
+# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -324,6 +324,15 @@ sub ExecPlanAdd {
         Type => $Self->{CacheType},
     );
 
+    # event
+    $Self->EventHandler(
+        Event => 'ExecPlanAdd',
+        Data  => {
+            ID => $ID,
+        },
+        UserID => $Param{UserID},
+    );
+
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
@@ -457,6 +466,15 @@ sub ExecPlanUpdate {
         Type => $Self->{CacheType},
     );
 
+    # event
+    $Self->EventHandler(
+        Event => 'ExecPlanUpdate',
+        Data  => {
+            ID => $Param{ID}
+        },
+        UserID => $Param{UserID},
+    );
+
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
@@ -532,7 +550,8 @@ sub ExecPlanList {
 deletes an ExecPlan
 
     my $Success = $AutomationObject->ExecPlanDelete(
-        ID => 123,
+        ID     => 123,
+        UserID => 123
     );
 
 =cut
@@ -541,7 +560,7 @@ sub ExecPlanDelete {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(ID)) {
+    for (qw(ID UserID)) {
         if ( !$Param{$_} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
@@ -599,6 +618,15 @@ sub ExecPlanDelete {
     # delete cache
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
+    );
+
+    # event
+    $Self->EventHandler(
+        Event => 'ExecPlanDelete',
+        Data  => {
+            ID => $Param{ID},
+        },
+        UserID => $Param{UserID},
     );
 
     # push client callback event

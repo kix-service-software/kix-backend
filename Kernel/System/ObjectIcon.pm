@@ -298,7 +298,7 @@ sub ObjectIconUpdate {
             Data  => {
                 ID       => $Param{ID},
                 Object   => $Param{Object},
-                ObjectID => $Param{ObjectID},
+                ObjectID => $Param{ObjectID}
             },
             UserID => $Param{UserID},
         );
@@ -392,7 +392,8 @@ sub ObjectIconList {
 Delete an objecticon.
 
     my $Result = $ObjectIconObject->ObjectIconDelete(
-        ID      => 123,
+        ID     => 123,
+        UserID => 123
     );
 
 =cut
@@ -401,7 +402,7 @@ sub ObjectIconDelete {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(ID)) {
+    for (qw(ID UserID)) {
         if ( !$Param{$_} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
@@ -469,8 +470,8 @@ sub ObjectIconValidate {
     my $MaxAllowedSize = $Kernel::OM->Get('Config')->Get('ObjectIcon::MaxAllowedSize');
     my $ContentSize = bytes::length( MIME::Base64::decode_base64( $Param{Content} ) );
     if ( !$ContentSize ) {
-        $Kernel::OM->Get('Log')->Log( 
-            Priority => 'error', 
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
             Message  => 'Content is empty!',
             Silent   => $Param{Silent}
         );
@@ -478,8 +479,8 @@ sub ObjectIconValidate {
         return;
     }
     elsif ( $ContentSize > $MaxAllowedSize ) {
-        $Kernel::OM->Get('Log')->Log( 
-            Priority => 'error', 
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
             Message  => "Size exceeds maximum allowed size ($MaxAllowedSize bytes)!",
             Silent   => $Param{Silent}
         );

@@ -11,6 +11,8 @@ package Kernel::System::TextModule;
 use strict;
 use warnings;
 
+use base qw(Kernel::System::EventHandler);
+
 use Kernel::System::VariableCheck qw(:all);
 use vars qw(@ISA);
 
@@ -58,24 +60,12 @@ sub new {
     my $Self = {};
     bless( $Self, $Type );
 
-    # get needed objects
-    $Self->{DBObject}     = $Kernel::OM->Get('DB');
-    $Self->{ConfigObject} = $Kernel::OM->Get('Config');
-    $Self->{CacheObject}  = $Kernel::OM->Get('Cache');
-    $Self->{CSVObject}    = $Kernel::OM->Get('CSV');
-    $Self->{LogObject}    = $Kernel::OM->Get('Log');
-    $Self->{MainObject}   = $Kernel::OM->Get('Main');
-    $Self->{QueueObject}  = $Kernel::OM->Get('Queue');
-    $Self->{StateObject}  = $Kernel::OM->Get('State');
-    $Self->{TypeObject}   = $Kernel::OM->Get('Type');
-    $Self->{XMLObject}    = $Kernel::OM->Get('XML');
-
     # extension modules
-    if ( $Self->{ConfigObject}->Get('TextModule::CustomModules') ) {
-        my @CustomModules = @{ $Self->{ConfigObject}->Get('TextModule::CustomModules') };
+    if ( $Kernel::OM->Get('Config')->Get('TextModule::CustomModules') ) {
+        my @CustomModules = @{ $Kernel::OM->Get('Config')->Get('TextModule::CustomModules') };
         for my $CustMod (@CustomModules) {
-            if ( !$Self->{MainObject}->Require($CustMod) ) {
-                $Self->{LogObject}->Log(
+            if ( !$Kernel::OM->Get('Main')->Require($CustMod) ) {
+                $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Can't load TextModule custom module "
                         . $CustMod . " ($@)!",
@@ -88,6 +78,11 @@ sub new {
     }
 
     $Self->{CacheType} = 'TextModule';
+
+    # init of event handler
+    $Self->EventHandlerInit(
+        Config => 'TextModule::EventModulePost',
+    );
 
     return $Self;
 }
@@ -118,14 +113,17 @@ sub TextModuleAdd {
     # check needed stuff
     for (qw(Name Text UserID ValidID)) {
         if ( !defined( $Param{$_} ) ) {
-            $Self->{LogObject}->Log( Priority => 'error', Message => "Need $_!" );
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message => "Need $_!"
+            );
             return;
         }
     }
 
     # default language...
     if ( !$Param{Language} ) {
-        $Param{Language} = $Self->{ConfigObject}->Get('DefaultLanguage') || 'en';
+        $Param{Language} = $Kernel::OM->Get('Config')->Get('DefaultLanguage') || 'en';
     }
 
     # build sql...
@@ -137,7 +135,7 @@ sub TextModuleAdd {
         . "current_timestamp, ?, current_timestamp, ?) ";
 
     # do the db insert...
-    my $DBInsert = $Self->{DBObject}->Do(
+    my $DBInsert = $Kernel::OM->Get('DB')->Do(
         SQL  => $SQL,
         Bind => [
             \$Param{Name}, \$Param{ValidID}, \$Param{Keywords}, \$Param{Category},
@@ -150,18 +148,18 @@ sub TextModuleAdd {
     if ($DBInsert) {
 
         # delete cache
-        $Self->{CacheObject}->CleanUp(
+        $Kernel::OM->Get('Cache')->CleanUp(
             Type => $Self->{CacheType}
         );
 
-        return 0 if !$Self->{DBObject}->Prepare(
+        return 0 if !$Kernel::OM->Get('DB')->Prepare(
             SQL => 'SELECT max(id) FROM text_module '
                 . " WHERE name = ? AND language = ? AND create_by = ? ",
             Bind => [ \$Param{Name}, \$Param{Language}, \$Param{UserID} ],
         );
 
         my $ID;
-        while ( my @Row = $Self->{DBObject}->FetchrowArray() ) {
+        while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
             $ID = $Row[0];
         }
 
@@ -180,13 +178,22 @@ sub TextModuleAdd {
             if ( IsArrayRefWithData( $Param{ $Parameter } ) ) {
                 my $InsertSQL = 'INSERT INTO ' . $TMParameter{ $Parameter }->{Table} . ' (text_module_id, ' . $TMParameter{ $Parameter }->{Column} . ') VALUES (?, ?)';
                 for my $Entry ( @{ $Param{ $Parameter } } ) {
-                    my $InsertResult = $Self->{DBObject}->Do(
+                    my $InsertResult = $Kernel::OM->Get('DB')->Do(
                         SQL  => $InsertSQL,
                         Bind => [ \$ID, \$Entry ],
                     );
                 }
             }
         }
+
+        # event
+        $Self->EventHandler(
+            Event => 'TextModuleAdd',
+            Data  => {
+                ID => $ID,
+            },
+            UserID => $Param{UserID},
+        );
 
         # push client callback event
         $Kernel::OM->Get('ClientNotification')->NotifyClients(
@@ -198,7 +205,7 @@ sub TextModuleAdd {
         return $ID;
     }
     else {
-        $Self->{LogObject}->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "TextModules::DB insert failed!",
         );
@@ -222,13 +229,16 @@ sub TextModuleGet {
 
     # check required params...
     if ( !$Param{ID} ) {
-        $Self->{LogObject}->Log( Priority => 'error', Message => "Need ID!" );
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message => "Need ID!"
+        );
         return;
     }
 
     # read cache
     my $CacheKey = 'TextModule::' . $Param{ID};
-    my $Cache    = $Self->{CacheObject}->Get(
+    my $Cache    = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey
     );
@@ -236,7 +246,7 @@ sub TextModuleGet {
 
     # db quote
     for (qw(ID)) {
-        $Param{$_} = $Self->{DBObject}->Quote( $Param{$_}, 'Integer' );
+        $Param{$_} = $Kernel::OM->Get('DB')->Quote( $Param{$_}, 'Integer' );
     }
 
     # sql
@@ -245,12 +255,12 @@ sub TextModuleGet {
         . 'FROM text_module '
         . 'WHERE id = ?';
 
-    return if !$Self->{DBObject}->Prepare(
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL  => $SQL,
         Bind => [ \$Param{ID} ]
     );
 
-    if ( my @Data = $Self->{DBObject}->FetchrowArray() ) {
+    if ( my @Data = $Kernel::OM->Get('DB')->FetchrowArray() ) {
 
         my %Data = (
             ID                  => $Param{ID},
@@ -285,19 +295,19 @@ sub TextModuleGet {
 
             # prepare sql statement
             my $ParameterSQL = 'SELECT ' . $TMParameter{ $Parameter }->{Column} . ' FROM ' . $TMParameter{ $Parameter }->{Table} . ' WHERE text_module_id = ?';
-            return if !$Self->{DBObject}->Prepare(
+            return if !$Kernel::OM->Get('DB')->Prepare(
                 SQL  => $ParameterSQL,
                 Bind => [ \$Param{ID} ]
             );
 
             # fetch data
-            while ( my @Row = $Self->{DBObject}->FetchrowArray() ) {
+            while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
                 push( @{ $Data{ $Parameter } }, $Row[0] );
             }
         }
 
         # set cache
-        $Self->{CacheObject}->Set(
+        $Kernel::OM->Get('Cache')->Set(
             Type  => $Self->{CacheType},
             Key   => $CacheKey,
             Value => \%Data
@@ -336,14 +346,17 @@ sub TextModuleUpdate {
     # check required params...
     for (qw(ID Name Text UserID ValidID)) {
         if ( !defined( $Param{$_} ) ) {
-            $Self->{LogObject}->Log( Priority => 'error', Message => "Need $_!" );
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message => "Need $_!"
+            );
             return;
         }
     }
 
     # default language...
     if ( !$Param{Language} ) {
-        $Param{Language} = $Self->{ConfigObject}->Get('DefaultLanguage') || 'en';
+        $Param{Language} = $Kernel::OM->Get('Config')->Get('DefaultLanguage') || 'en';
     }
 
     # build sql...
@@ -354,7 +367,7 @@ sub TextModuleUpdate {
         . "WHERE id = ?";
 
     # do the db insert...
-    my $DBUpdate = $Self->{DBObject}->Do(
+    my $DBUpdate = $Kernel::OM->Get('DB')->Do(
         SQL  => $SQL,
         Bind => [
             \$Param{Name}, \$Param{Text}, \$Param{Subject},
@@ -379,7 +392,7 @@ sub TextModuleUpdate {
         );
         for my $Parameter ( keys( %TMParameter ) ) {
             my $DeleteSQL    = 'DELETE FROM ' . $TMParameter{ $Parameter }->{Table} . ' WHERE text_module_id = ?';
-            my $DeleteResult = $Self->{DBObject}->Do(
+            my $DeleteResult = $Kernel::OM->Get('DB')->Do(
                 SQL  => $DeleteSQL,
                 Bind => [ \$Param{ID} ],
             );
@@ -387,7 +400,7 @@ sub TextModuleUpdate {
             if ( IsArrayRefWithData( $Param{ $Parameter } ) ) {
                 my $InsertSQL = 'INSERT INTO ' . $TMParameter{ $Parameter }->{Table} . ' (text_module_id, ' . $TMParameter{ $Parameter }->{Column} . ') VALUES (?, ?)';
                 for my $Entry ( @{ $Param{ $Parameter } } ) {
-                    my $InsertResult = $Self->{DBObject}->Do(
+                    my $InsertResult = $Kernel::OM->Get('DB')->Do(
                         SQL  => $InsertSQL,
                         Bind => [ \$Param{ID}, \$Entry ],
                     );
@@ -396,8 +409,17 @@ sub TextModuleUpdate {
         }
 
         # delete cache
-        $Self->{CacheObject}->CleanUp(
+        $Kernel::OM->Get('Cache')->CleanUp(
             Type => $Self->{CacheType}
+        );
+
+        # event
+        $Self->EventHandler(
+            Event => 'TextModuleUpdate',
+            Data  => {
+                ID => $Param{ID}
+            },
+            UserID => $Param{UserID},
         );
 
         # push client callback event
@@ -410,7 +432,7 @@ sub TextModuleUpdate {
         return $Param{ID};
     }
     else {
-        $Self->{LogObject}->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "TextModules::DB update of $Param{ID} failed!",
         );
@@ -425,6 +447,7 @@ Deletes a text module.
 
     my $HashRef = $TextModuleObject->TextModuleDelete(
         ID      => 1234,  #required
+        UserID  => 123    #required
     );
 
 =cut
@@ -433,31 +456,45 @@ sub TextModuleDelete {
     my ( $Self, %Param ) = @_;
 
     # check required params...
-    if ( !$Param{ID} ) {
-        $Self->{LogObject}->Log( Priority => 'error', Message => 'TextModuleDelete: Need ID!' );
-        return;
+    for my $Needed ( qw(ID UserID) ) {
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message => "TextModuleDelete: Need $Needed!"
+            );
+            return;
+        }
     }
 
     # delete cache
-    $Self->{CacheObject}->CleanUp(
+    $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType}
     );
 
     # delete queue references
-    $Self->{DBObject}->Do(
+    $Kernel::OM->Get('DB')->Do(
         SQL  => 'DELETE FROM text_module_queue WHERE text_module_id = ?',
         Bind => [ \$Param{ID} ],
     );
 
     # delete ticket type references
-    $Self->{DBObject}->Do(
+    $Kernel::OM->Get('DB')->Do(
         SQL  => 'DELETE FROM text_module_ticket_type WHERE text_module_id = ?',
         Bind => [ \$Param{ID} ],
     );
 
-    return if !$Self->{DBObject}->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL  => 'DELETE FROM text_module WHERE id = ?',
         Bind => [ \$Param{ID} ],
+    );
+
+    # event
+    $Self->EventHandler(
+        Event => 'TextModuleDelete',
+        Data  => {
+            ID => $Param{ID},
+        },
+        UserID => $Param{UserID},
     );
 
     # push client callback event
@@ -497,7 +534,10 @@ sub TextModuleList {
     my $CacheKey = 'TextModuleList::';
     my @Params;
     foreach my $ParamKey (
-        qw{Category Name Language ValidID QueueIDs TicketTypeIDs WithDependencies}
+        qw{
+            Category Name Language ValidID
+            QueueIDs TicketTypeIDs WithDependencies
+        }
     ) {
         if ( $Param{$ParamKey} ) {
             push( @Params, $Param{$ParamKey} );
@@ -508,7 +548,7 @@ sub TextModuleList {
     }
 
     $CacheKey .= join( '::', @Params );
-    my $Cache = $Self->{CacheObject}->Get(
+    my $Cache = $Kernel::OM->Get('Cache')->Get(
         Type => $Self->{CacheType},
         Key  => $CacheKey,
     );
@@ -556,17 +596,17 @@ sub TextModuleList {
     }
 
     # do query
-    return if !$Self->{DBObject}->Prepare(
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL  => $SQL,
         Bind => \@BindVars
     );
 
-    while ( my @Data = $Self->{DBObject}->FetchrowArray() ) {
+    while ( my @Data = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         push( @Result, $Data[0] );
     }
 
     # set cache
-    $Self->{CacheObject}->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => $Self->{CacheType},
         Key   => $CacheKey,
         Value => \@Result
@@ -589,12 +629,12 @@ sub TextModuleCategoryList {
 
     my $SQL = "SELECT DISTINCT(category) FROM text_module WHERE category <> ''";
 
-    return if !$Self->{DBObject}->Prepare(
+    return if !$Kernel::OM->Get('DB')->Prepare(
         SQL => $SQL,
     );
 
     my @Result;
-    while ( my @Data = $Self->{DBObject}->FetchrowArray() ) {
+    while ( my @Data = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         push(@Result, $Data[0]);
     }
 
@@ -630,7 +670,7 @@ sub TextModuleObjectLinkGet {
 
     # check required params...
     if ( !$Param{TextModuleID} && !$Param{ObjectType} && !$Param{ObjectID} ) {
-        $Self->{LogObject}->Log(
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'TextModuleObjectLinkDelete: Need ObjectType and TextModuleID or ObjectID!'
         );
@@ -648,7 +688,7 @@ sub TextModuleObjectLinkGet {
         . $Param{TextModuleID} . '::'
         . $Param{ObjectType} . '::'
         . $Param{ObjectID};
-    my $Cache = $Self->{CacheObject}->Get(
+    my $Cache = $Kernel::OM->Get('Cache')->Get(
         Type => 'TextModule',
         Key  => $CacheKey
     );
@@ -656,26 +696,26 @@ sub TextModuleObjectLinkGet {
 
     # select object_link<->text module relation
     if ( $Param{TextModuleID} ) {
-        return if !$Self->{DBObject}->Prepare(
+        return if !$Kernel::OM->Get('DB')->Prepare(
             SQL =>
                 'SELECT object_id FROM text_module_object_link WHERE object_type = ? AND text_module_id = ? ',
             Bind => [ \$Param{ObjectType}, \$Param{TextModuleID} ],
         );
     }
     else {
-        return if !$Self->{DBObject}->Prepare(
+        return if !$Kernel::OM->Get('DB')->Prepare(
             SQL =>
                 'SELECT text_module_id FROM text_module_object_link WHERE object_type = ? AND object_id = ? ',
             Bind => [ \$Param{ObjectType}, \$Param{ObjectID} ],
         );
     }
 
-    while ( my @Data = $Self->{DBObject}->FetchrowArray() ) {
+    while ( my @Data = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         push( @Result, $Data[0] );
     }
 
     # set cache
-    $Self->{CacheObject}->Set(
+    $Kernel::OM->Get('Cache')->Set(
         Type  => 'TextModule',
         Key   => $CacheKey,
         Value => \@Result
@@ -706,8 +746,12 @@ sub TextModuleObjectLinkDelete {
     my ( $Self, %Param ) = @_;
 
     # check required params...
-    if ( !$Param{TextModuleID} && !$Param{ObjectType} && !$Param{ObjectID} ) {
-        $Self->{LogObject}->Log(
+    if (
+        !$Param{TextModuleID}
+        && !$Param{ObjectType}
+        && !$Param{ObjectID}
+    ) {
+        $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'TextModuleObjectLinkDelete: Need TextModuleID or ObjectType and ObjectID!'
         );
@@ -715,26 +759,26 @@ sub TextModuleObjectLinkDelete {
     }
 
     # delete cache
-    $Self->{CacheObject}->CleanUp(Type => 'TextModule');
+    $Kernel::OM->Get('Cache')->CleanUp(Type => 'TextModule');
 
     # delete object_link<->text module relation
     if ( $Param{TextModuleID} ) {
         if ( $Param{ObjectType} ) {
-            return $Self->{DBObject}->Do(
+            return $Kernel::OM->Get('DB')->Do(
                 SQL =>
                     'DELETE FROM text_module_object_link WHERE object_type = ? AND text_module_id = ?',
                 Bind => [ \$Param{ObjectType}, \$Param{TextModuleID} ],
             );
         }
         else {
-            return $Self->{DBObject}->Do(
+            return $Kernel::OM->Get('DB')->Do(
                 SQL  => 'DELETE FROM text_module_object_link WHERE text_module_id = ?',
                 Bind => [ \$Param{TextModuleID} ],
             );
         }
     }
     else {
-        return $Self->{DBObject}->Do(
+        return $Kernel::OM->Get('DB')->Do(
             SQL =>
                 'DELETE FROM text_module_object_link WHERE object_type = ? AND object_id = ?',
             Bind => [ \$Param{ObjectType}, \$Param{ObjectID} ],
@@ -762,7 +806,10 @@ sub TextModuleObjectLinkCreate {
     # check required params...
     for (qw(TextModuleID ObjectType ObjectID UserID)) {
         if ( !$Param{$_} ) {
-            $Self->{LogObject}->Log( Priority => 'error', Message => "Need $_!" );
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message => "Need $_!"
+            );
             return;
         }
     }
@@ -771,7 +818,7 @@ sub TextModuleObjectLinkCreate {
         . " (text_module_id, object_type, object_id, create_time, create_by, change_time, change_by)"
         . " VALUES  (?, ?, ?, current_timestamp, ?, current_timestamp, ?)";
 
-    return $Self->{DBObject}->Do(
+    return $Kernel::OM->Get('DB')->Do(
         SQL  => $SQL,
         Bind => [
             \$Param{TextModuleID}, \$Param{ObjectType}, \$Param{ObjectID},
@@ -796,17 +843,20 @@ sub TextModuleCount {
     my ( $Self, %Param ) = @_;
     my $SQL = "SELECT count(*) FROM text_module t";
 
-    if ( defined $Param{Type} && $Param{Type} =~ /^UNASSIGNED::(.*?)$/g ) {
+    if (
+        defined $Param{Type}
+        && $Param{Type} =~ /^UNASSIGNED::(.*?)$/g
+    ) {
         $SQL
             .= " WHERE NOT EXISTS (SELECT object_id FROM text_module_object_link ol WHERE object_type = '"
             . $1
             . "' AND ol.text_module_id = t.id)";
     }
 
-    return if !$Self->{DBObject}->Prepare( SQL => $SQL );
+    return if !$Kernel::OM->Get('DB')->Prepare( SQL => $SQL );
 
     my $Count = 0;
-    while ( my @Data = $Self->{DBObject}->FetchrowArray() ) {
+    while ( my @Data = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         $Count = $Data[0];
         last;
     }
@@ -859,9 +909,6 @@ sub TextModulesExport {
 }
 
 1;
-
-
-
 
 =back
 

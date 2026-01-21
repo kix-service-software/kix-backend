@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/ 
+# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -275,6 +275,15 @@ sub ReportDefinitionAdd {
         Type => $Self->{CacheType},
     );
 
+    # trigger event
+    $Self->EventHandler(
+        Event => 'ReportDefinitionAdd',
+        Data  => {
+            ID => $ID,
+        },
+        UserID => $Param{UserID},
+    );
+
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
@@ -386,6 +395,15 @@ sub ReportDefinitionUpdate {
     # delete cache
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
+    );
+
+    # trigger event
+    $Self->EventHandler(
+        Event => 'ReportDefinitionUpdate',
+        Data  => {
+            ID => $Param{ID}
+        },
+        UserID => $Param{UserID},
     );
 
     # push client callback event
@@ -533,6 +551,15 @@ sub ReportDefinitionDelete {
     # delete cache
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
+    );
+
+    # trigger event
+    $Self->EventHandler(
+        Event => 'ReportDefinitionDelete',
+        Data  => {
+            ID => $Param{ID}
+        },
+        UserID => $Param{UserID},
     );
 
     # push client callback event

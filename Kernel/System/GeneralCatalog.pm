@@ -13,6 +13,8 @@ package Kernel::System::GeneralCatalog;
 use strict;
 use warnings;
 
+use base qw(Kernel::System::EventHandler);
+
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = qw(
@@ -67,6 +69,11 @@ sub new {
     $Self->{CacheType}   = 'GeneralCatalog';
     $Self->{OSCacheType} = 'ObjectSearch_GeneralCatalog';
     $Self->{CacheTTL}    = 60 * 60 * 3;
+
+    # init of event handler
+    $Self->EventHandlerInit(
+        Config => 'GeneralCatalog::EventModulePost',
+    );
 
     return $Self;
 }
@@ -586,6 +593,15 @@ sub ItemAdd {
         Type => $Self->{OSCacheType},
     );
 
+    # event
+    $Self->EventHandler(
+        Event => 'GeneralCatalogAdd',
+        Data  => {
+            ID => $ItemID,
+        },
+        UserID => $Param{UserID},
+    );
+
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
@@ -735,6 +751,16 @@ sub ItemUpdate {
 
     return if !$Result;
 
+    # event
+    $Self->EventHandler(
+        Event => 'GeneralCatalogUpdate',
+        Data  => {
+            ID    => $Param{ItemID},
+            Class => $Class
+        },
+        UserID => $Param{UserID},
+    );
+
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
@@ -878,6 +904,11 @@ sub GeneralCatalogItemDelete {
         }
     }
 
+    # get old data
+    my $Item = $Self->ItemGet(
+        ItemID => $Param{GeneralCatalogItemID}
+    );
+
     # delete all preferences
     $Self->GeneralCatalogPreferencesDelete(
         ItemID => $Param{GeneralCatalogItemID},
@@ -900,11 +931,21 @@ sub GeneralCatalogItemDelete {
         Type => $Self->{OSCacheType},
     );
 
+    # event
+    $Self->EventHandler(
+        Event => 'GeneralCatalogDelete',
+        Data  => {
+            ID    => $Param{GeneralCatalogItemID},
+            Class => $Item->{Class}
+        },
+        UserID => $Param{UserID},
+    );
+
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'GeneralCatalog',
-        ObjectID  => $Param{ItemID},
+        ObjectID  => $Param{GeneralCatalogItemID},
     );
 
     return 1;

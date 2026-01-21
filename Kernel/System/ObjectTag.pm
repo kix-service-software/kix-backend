@@ -11,6 +11,8 @@ package Kernel::System::ObjectTag;
 use strict;
 use warnings;
 
+use base qw(Kernel::System::EventHandler);
+
 use Kernel::System::VariableCheck qw(:all);
 
 our @ObjectDependencies = qw(
@@ -55,6 +57,11 @@ sub new {
 
     $Self->{CacheType} = 'ObjectTag';
     $Self->{CacheTTL}  = 60 * 60 * 24 * 20;
+
+    # init of event handler
+    $Self->EventHandlerInit(
+        Config => 'ObjectTag::EventModulePost',
+    );
 
     return $Self;
 }
@@ -223,6 +230,17 @@ END
     # delete cache
     $Self->_CacheCleanUp();
 
+    # event
+    $Self->EventHandler(
+        Event => 'ObjectTagAdd',
+        Data  => {
+            ID         => $ID,
+            ObjectID   => $Param{ObjectID},
+            ObjectType => $Param{ObjectType}
+        },
+        UserID => $Param{UserID},
+    );
+
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
@@ -333,6 +351,18 @@ sub ObjectTagDelete {
 
     # reset cache
     $Self->_CacheCleanUp();
+
+    # event
+    $Self->EventHandler(
+        Event => 'ObjectTagDelete',
+        Data  => {
+            ID         => $Param{ID},
+            Name       => $Param{Name},
+            ObjectID   => $Param{ObjectID},
+            ObjectType => $Param{ObjectType}
+        },
+        UserID => $Param{UserID},
+    );
 
     return 1;
 }
