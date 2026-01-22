@@ -134,15 +134,9 @@ sub AttributePrepare {
     if (
         defined $Param{PrepareType}
         && $Param{PrepareType} eq 'Condition'
-        && IsArrayRefWithData( $Param{WholeSearch} )
+        && $Param{Flags}->{ArticleID}
     ) {
-        for my $SearchEntry ( @{ $Param{WholeSearch} } ) {
-            if ($SearchEntry->{Field} eq 'ArticleID') {
-                $HasArticleIDSearch = 1;
-
-                last;
-            }
-        }
+        $HasArticleIDSearch = 1;
     }
 
     # check if static search should be used. Only if search for ArticleID is NOT used and static search index is active

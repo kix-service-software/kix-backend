@@ -201,18 +201,21 @@ sub PermissionTypeLookup {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(Name)) {
-        if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!"
-            );
-            return;
-        }
+    if (
+        !$Param{ID}
+        && !$Param{Name}
+    ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Need ID or Name!"
+        );
+        return;
     }
 
     # create cache key
-    my $CacheKey = 'PermissionTypeLookup::' . $Param{Name};
+    my $CacheKey = 'PermissionTypeLookup'
+        . ( $Param{Name} ? "::$Param{Name}" : q{} )
+        . ( $Param{ID} ? "::$Param{ID}" : q{} );
 
     # read cache
     my $Cache = $Kernel::OM->Get('Cache')->Get(
@@ -221,11 +224,25 @@ sub PermissionTypeLookup {
     );
     return $Cache if $Cache;
 
+    my @SQL = ('SELECT');
+    if ( $Param{Name} ) {
+        push( @SQL, 'id' );
+    } else {
+        push( @SQL, 'name' );
+    }
+
+    my @Bind;
+    if ( $Param{Name} ) {
+        push( @SQL , 'FROM permission_type WHERE name = ?' );
+        push( @Bind, \$Param{Name} );
+    } else {
+        push( @SQL , 'FROM permission_type WHERE id = ?' );
+        push( @Bind, \$Param{ID} );
+    }
+
     return if !$Kernel::OM->Get('DB')->Prepare(
-        SQL  => 'SELECT id FROM permission_type WHERE name = ?',
-        Bind => [
-            \$Param{Name},
-        ]
+        SQL  => join( q{ }, @SQL ),
+        Bind => \@Bind
     );
 
     my $Result;
@@ -485,7 +502,7 @@ sub PermissionAdd {
     return if !$Kernel::OM->Get('DB')->Do(
         SQL => 'UPDATE roles SET '
             . 'change_time = current_timestamp, change_by = ? WHERE id = ?',
-        Bind => [            
+        Bind => [
             \$Param{UserID}, \$Param{RoleID}
         ],
     );
@@ -621,10 +638,10 @@ sub PermissionUpdate {
     return if !$Kernel::OM->Get('DB')->Do(
         SQL => 'UPDATE roles SET '
             . 'change_time = current_timestamp, change_by = ? WHERE id = ?',
-        Bind => [            
+        Bind => [
             \$Param{UserID}, \$Data{RoleID}
         ],
-    );    
+    );
 
     # delete whole cache
     $Kernel::OM->Get('Cache')->CleanUp();

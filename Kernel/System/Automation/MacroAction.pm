@@ -546,7 +546,8 @@ sub MacroActionList {
 deletes an MacroAction
 
     my $Success = $AutomationObject->MacroActionDelete(
-        ID => 123,
+        ID     => 123,
+        UserID => 123
     );
 
 =cut
@@ -555,7 +556,7 @@ sub MacroActionDelete {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(ID)) {
+    for (qw(ID UserID)) {
         if ( !$Param{$_} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
@@ -607,7 +608,8 @@ sub MacroActionDelete {
         )
     ) {
         my $Success = $Self->MacroDelete(
-            ID => $Data{ReferencedMacroID}
+            ID     => $Data{ReferencedMacroID},
+            UserID => $Param{UserID}
         );
         if (!$Success) {
             $Kernel::OM->Get('Log')->Log(
@@ -634,12 +636,24 @@ deletes MacroActions of a Macro
 
     my $Success = $AutomationObject->MacroActionListDelete(
         MacroID => 123,
+        UserID  => 123,
     );
 
 =cut
 
 sub MacroActionListDelete {
     my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(MacroID UserID)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!"
+            );
+            return;
+        }
+    }
 
     # get all macro actions
     my %MacroActionList = $Self->MacroActionList(
@@ -650,7 +664,8 @@ sub MacroActionListDelete {
     if (IsHashRefWithData(\%MacroActionList)) {
         for my $ActionID (keys %MacroActionList) {
             return if !$Self->MacroActionDelete(
-                ID => $ActionID
+                ID     => $ActionID,
+                UserID => $Param{UserID}
             );
         }
     }

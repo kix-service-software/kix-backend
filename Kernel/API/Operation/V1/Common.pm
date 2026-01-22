@@ -2626,7 +2626,7 @@ sub _ApplyExpand {
         return;
     }
 
-    if ( $ENV{'REQUEST_METHOD'} ne 'GET' || !$Self->{OperationConfig}->{ObjectID} || !$Self->{RequestData}->{ $Self->{OperationConfig}->{ObjectID} } ) {
+    if ( $Self->{RequestMethod} ne 'GET' || !$Self->{OperationConfig}->{ObjectID} || !$Self->{RequestData}->{ $Self->{OperationConfig}->{ObjectID} } ) {
 
         # no GET request or no ObjectID configured or given
         return;
