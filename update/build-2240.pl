@@ -43,7 +43,7 @@ sub _MigrateOOOPrefs {
     $DBObject->Prepare(
         SQL => "SELECT user_id, preferences_key, preferences_value FROM user_preferences WHERE "
              . "preferences_key IN ('OutOfOfficeStart', 'OutOfOfficeEnd', 'OutOfOfficeSubstitute') AND "
-             . "preferences_value IS NOT NULL OR preferences_value != ''",
+             . "(preferences_value IS NOT NULL OR preferences_value != '')",
     );
 
     my $Data = $DBObject->FetchAllArrayRef(
