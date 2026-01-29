@@ -255,11 +255,27 @@ sub _ArticleCreate {
 
         # set From by contact if "send" from contact else ArticleCreate in core will handle From
         if ($Article->{SenderType} ne 'agent') {
+            # determin relevant contact
+            my $ContactID;
+            # check if request is from customer user
+            if ( $Self->{Authorization}->{UserType} eq 'Customer' ) {
+                $ContactID = $Kernel::OM->Get('Contact')->ContactLookup(
+                    UserID => $Self->{Authorization}->{UserID},
+                    Silent => 1,
+                );
+            }
+
+            # when request is not from an customer user, or the user has no contact assigned, fallback to ticket contact
+            if ( !$ContactID ) {
+                $ContactID = $Ticket->{ContactID};
+            }
+
             # get customer information
             # with information will be used to create the ticket if customer is not defined in the
             # database, customer ticket information need to be empty strings
             my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
-                ID => $Ticket->{ContactID},
+                ID     => $ContactID,
+                Silent => 1,
             );
 
             # use data from contact (if contact is in database)
