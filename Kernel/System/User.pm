@@ -131,32 +131,14 @@ sub GetUserData {
     }
 
     # check if result is cached
-    if ( $Param{Valid} ) {
-        $Param{Valid} = 1;
-    }
-    else {
-        $Param{Valid} = 0;
-    }
-    if ( $Param{NoPreferences} ) {
-        $Param{NoPreferences} = 1;
-    }
-    else {
-        $Param{NoPreferences} = 0;
+    for my $Key ( qw{Valid NoPreferences} ) {
+        $Param{$Key} = (defined $Param{$Key} && $Param{$Key} ? 1 : 0);
     }
 
-    my $CacheKey;
-    if ( $Param{User} ) {
-        $CacheKey = join '::', 'GetUserData', 'User',
-            $Param{User},
-            $Param{Valid},
-            $Param{NoPreferences};
-    }
-    else {
-        $CacheKey = join '::', 'GetUserData', 'UserID',
-            $Param{UserID},
-            $Param{Valid},
-            $Param{NoPreferences};
-    }
+    my $CacheKey = 'GetUserData'
+        . q{::} . ( $Param{User} ? "User::$Param{User}" : "UserID::$Param{UserID}")
+        . q{::} . $Param{Valid}
+        . q{::} . $Param{NoPreferences};
 
     # check cache
     my $Cache = $Kernel::OM->Get('Cache')->Get(
@@ -167,8 +149,13 @@ sub GetUserData {
 
     # get initial data
     my @Bind;
-    my $SQL = "SELECT $Self->{UserTableUserID}, $Self->{UserTableUser}, $Self->{UserTableUserPW},"
-        . " comments, valid_id, create_time, change_time, create_by, change_by, is_agent, is_customer FROM $Self->{UserTable} WHERE ";
+    my $SQL = <<"END";
+SELECT $Self->{UserTableUserID}, $Self->{UserTableUser}, $Self->{UserTableUserPW},
+comments, outofoffice_start, outofoffice_end, outofoffice_substitute, valid_id,
+is_agent, is_customer, create_time, create_by, change_by, change_time
+FROM $Self->{UserTable}
+WHERE
+END
 
     if ( $Param{User} ) {
         my $User = lc $Param{User};
@@ -186,19 +173,20 @@ sub GetUserData {
         Limit => 1,
     );
 
+    # fetch the result
+    my $Result = $Kernel::OM->Get('DB')->FetchAllArrayRef(
+        Columns => [
+            'UserID', 'UserLogin', 'UserPw', 'UserComment',
+            'OutOfOfficeStart', 'OutOfOfficeEnd', 'OutOfOfficeSubstitute',
+            'ValidID', 'IsAgent', 'IsCustomer','CreateTime', 'CreateBy',
+            'ChangeBy', 'ChangeTime'
+        ]
+    );
+
+    # data found...
     my %Data;
-    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
-        $Data{UserID}      = $Row[0];
-        $Data{UserLogin}   = $Row[1];
-        $Data{UserPw}      = $Row[2];
-        $Data{UserComment} = $Row[3];
-        $Data{ValidID}     = $Row[4];
-        $Data{CreateTime}  = $Row[5];
-        $Data{ChangeTime}  = $Row[6];
-        $Data{CreateBy}    = $Row[7];
-        $Data{ChangeBy}    = $Row[8];
-        $Data{IsAgent}     = $Row[9];
-        $Data{IsCustomer}  = $Row[10];
+    if ( IsArrayRefWithData($Result) ) {
+        %Data = %{$Result->[0]};
     }
 
     # set usage context
@@ -294,8 +282,13 @@ to add new users
         UserComment   => 'some comment',        # optional
         ValidID       => 1,
         ChangeUserID  => 123,
-        IsAgent       => 0 | 1                  # optional
-        IsCustomer    => 0 | 1                  # optional
+        IsAgent       => 0 | 1,                 # optional
+        IsCustomer    => 0 | 1,                 # optional
+
+        # OutOfOffice
+        OutOfOfficeStart      => '2026-01-01',  # optional, required OutOfOfficeEnd
+        OutOfOfficeEnd        => '2026-01-02',  # optional, required OutOfOfficeStart
+        OutOfOfficeSubstitute => '123'          # optional
     );
 
 =cut
@@ -333,20 +326,30 @@ sub UserAdd {
     $Param{IsAgent}    = ( defined $Param{IsAgent} && IsInteger( $Param{IsAgent} ) ) ? $Param{IsAgent} : 0;
     $Param{IsCustomer} = ( defined $Param{IsCustomer} && IsInteger( $Param{IsCustomer} ) ) ? $Param{IsCustomer} : 0;
 
+    for my $Key ( qw(OutOfOfficeStart OutOfOfficeEnd OutOfOfficeSubstitute) ) {
+        $Param{$Key} ||= undef;
+    }
+
     # Don't store the user's password in plaintext initially. It will be stored in a
     #   hashed version later with SetPassword().
     my $RandomPassword = $Self->GenerateRandomPassword();
 
     # sql
     return if !$Kernel::OM->Get('DB')->Do(
-        SQL  => "INSERT INTO $Self->{UserTable} "
-            . " ( $Self->{UserTableUser}, $Self->{UserTableUserPW}, "
-            . " comments, valid_id, create_time, create_by, change_time, change_by, is_agent, is_customer )"
-            . " VALUES "
-            . " (?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?, ?, ?)",
+        SQL  => <<"END",
+INSERT INTO $Self->{UserTable}
+(
+    $Self->{UserTableUser}, $Self->{UserTableUserPW},
+    comments, valid_id, create_time, create_by, change_time,
+    change_by, is_agent, is_customer,
+    outofoffice_start, outofoffice_end, outofoffice_substitute
+)
+VALUES (?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?, ?, ?, ?, ?, ?)
+END
         Bind => [
             \$Param{UserLogin}, \$RandomPassword, \$Param{UserComment}, \$Param{ValidID},
             \$Param{ChangeUserID}, \$Param{ChangeUserID}, \$Param{IsAgent}, \$Param{IsCustomer},
+            \$Param{OutOfOfficeStart}, \$Param{OutOfOfficeEnd}, \$Param{OutOfOfficeSubstitute}
         ],
     );
 
@@ -438,6 +441,11 @@ to update users
         IsCustomer    => 0 | 1,                 # optional
         ValidID       => 1,
         ChangeUserID  => 123,
+
+        # OutOfOffice
+        OutOfOfficeStart      => '2026-01-01',  # optional, required OutOfOfficeEnd
+        OutOfOfficeEnd        => '2026-01-02',  # optional, required OutOfOfficeStart
+        OutOfOfficeSubstitute => '123'          # optional
     );
 
 =cut
@@ -479,16 +487,24 @@ sub UserUpdate {
     $Param{IsAgent}    = ( defined $Param{IsAgent} && IsInteger( $Param{IsAgent} ) ) ? $Param{IsAgent} : 0;
     $Param{IsCustomer} = ( defined $Param{IsCustomer} && IsInteger( $Param{IsCustomer} ) ) ? $Param{IsCustomer} : 0;
 
+    for my $Key ( qw(OutOfOfficeStart OutOfOfficeEnd OutOfOfficeSubstitute) ) {
+        $Param{$Key} ||= undef;
+    }
+
     # update db
     return if !$Kernel::OM->Get('DB')->Do(
-        SQL => "UPDATE $Self->{UserTable} SET "
-            . " $Self->{UserTableUser} = ?, comments = ?, valid_id = ?, "
-            . " change_time = current_timestamp, change_by = ? , is_customer = ?, is_agent = ?"
-            . " WHERE $Self->{UserTableUserID} = ?",
+        SQL => <<"END",
+UPDATE $Self->{UserTable} SET
+    $Self->{UserTableUser} = ?, comments = ?, valid_id = ?,
+    change_time = current_timestamp, change_by = ? , is_customer = ?, is_agent = ?,
+    outofoffice_start = ?, outofoffice_end = ?, outofoffice_substitute = ?
+WHERE $Self->{UserTableUserID} = ?
+END
         Bind => [
             \$Param{UserLogin},    \$Param{UserComment}, \$Param{ValidID},
             \$Param{ChangeUserID}, \$Param{IsCustomer},  \$Param{IsAgent},
-            \$Param{UserID},
+            \$Param{OutOfOfficeStart}, \$Param{OutOfOfficeEnd}, \$Param{OutOfOfficeSubstitute},
+            \$Param{UserID}
         ],
     );
 
@@ -615,20 +631,21 @@ sub DeleteNewlyCreatedUser {
 to search users
 
     my %List = $UserObject->UserSearch(
-        Search          => '*some*',                  # optional - also 'hans+huber' possible, searches in login and also in contact attrbutes (e.g. firstname, lastname, ...)
-        UserLogin       => '*some*',                  # optional
-        UserLoginEquals => 'some',                    # optional - exact match
-        IsAgent         => 1,                         # optional
-        IsCustomer      => 1,                         # optional
-        IsOutOfOffice   => 1,                         # optional
-        Limit           => 50,                        # optional
-        ValidID         => 2,                         # optional - if given "Valid" is ignored
-        Valid           => 1,                         # optional - if omitted, 1 is used
-        UserIDs         => [1,2,3],                   # optional
-        SearchUserID    => 1,                         # optional
-        HasPermission   => {...},                     # optional
-        RoleIDs         => {...},                     # optional - which roles the user schould have (one is enough)
-        NotRoleIDs      => {...},                     # optional - which roles the user schould NOT have (one is enough)
+        Search           => '*some*',                  # optional - also 'hans+huber' possible, searches in login and also in contact attrbutes (e.g. firstname, lastname, ...)
+        UserLogin        => '*some*',                  # optional
+        UserLoginEquals  => 'some',                    # optional - exact match
+        IsAgent          => 1,                         # optional
+        IsCustomer       => 1,                         # optional
+        IsOutOfOffice    => 1,                         # optional
+        IsOutOfOfficeEnd => 1,                         # optional - looks for users for whom the end of absence is before the current date
+        Limit            => 50,                        # optional
+        ValidID          => 2,                         # optional - if given "Valid" is ignored
+        Valid            => 1,                         # optional - if omitted, 1 is used
+        UserIDs          => [1,2,3],                   # optional
+        SearchUserID     => 1,                         # optional
+        HasPermission    => {...},                     # optional
+        RoleIDs          => {...},                     # optional - which roles the user schould have (one is enough)
+        NotRoleIDs       => {...},                     # optional - which roles the user schould NOT have (one is enough)
         ExcludeUsersByRoleIDsIgnoreUserIDs => [1]     # optional - used for filter of sysconfig ExcludeUsersByRoleIDs (do not consider check for given users; relevant if HasPermission is given)
     );
 
@@ -656,6 +673,7 @@ sub UserSearch {
         && !defined( $Param{IsAgent} )
         && !defined( $Param{IsCustomer} )
         && !defined( $Param{IsOutOfOffice} )
+        && !defined( $Param{IsOutOfOfficeEnd} )
         && !$Param{ValidID}
         && !$Param{SearchUserID}
         && !IsArrayRefWithData($Param{UserIDs})
@@ -667,7 +685,7 @@ sub UserSearch {
         if ( !$Param{Silent} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => 'Need Search or UserLogin or UserLoginEquals or IsAgent or IsCustomer or IsOutOfOffice or ValidID or SearchUserID or UserIDs or NotUserIDs or HasPermission or RoleIDs or NotRoleIDs - else use UserList!',
+                Message  => 'Need Search or UserLogin or UserLoginEquals or IsAgent or IsCustomer or IsOutOfOffice or IsOutOfOfficeEnd or ValidID or SearchUserID or UserIDs or NotUserIDs or HasPermission or RoleIDs or NotRoleIDs - else use UserList!',
             );
         }
         return;
@@ -690,8 +708,11 @@ sub UserSearch {
         . ( IsArrayRefWithData($Param{NotRoleIDs}) ? join(',', @{ $Param{NotRoleIDs} }) : '' ) . '::'
         . ( IsArrayRefWithData($Param{ExcludeUsersByRoleIDsIgnoreUserIDs}) ? join(',', @{ $Param{ExcludeUsersByRoleIDsIgnoreUserIDs} }) : '' );
 
-    # skip cache check if IsOutOfOffice is defined (time relative search)
-    if ( !defined( $Param{IsOutOfOffice} ) ) {
+    # skip cache check if IsOutOfOffice and IsOutOfOfficeEnd is defined (time relative search)
+    if (
+        !defined( $Param{IsOutOfOffice} )
+        && !defined( $Param{IsOutOfOfficeEnd} )
+    ) {
         # check cache
         my $Cache = $Kernel::OM->Get('Cache')->Get(
             Type => $Self->{CacheType},
@@ -761,6 +782,22 @@ sub UserSearch {
         else {
             push(@Where,"( u.outofoffice_start IS NULL OR u.outofoffice_start > ? OR u.outofoffice_end IS NULL OR u.outofoffice_end < ? )");
             push(@Bind, \$CurrDate, \$CurrDate);
+        }
+    }
+
+    if ( defined( $Param{IsOutOfOfficeEnd} ) ) {
+        my $CurrDate = $Kernel::OM->Get('Time')->CurrentTimestamp();
+        $CurrDate =~ s/^(\d{4}-\d{2}-\d{2}).+$/$1 23:59:59/;
+
+        # handle true value
+        if ( $Param{IsOutOfOfficeEnd} ) {
+            push(@Where," u.outofoffice_end < ? ");
+            push(@Bind, \$CurrDate);
+        }
+        # handle false value
+        else {
+            push(@Where,"( u.outofoffice_end IS NULL OR u.outofoffice_end >= ? )");
+            push(@Bind, \$CurrDate);
         }
     }
 
@@ -893,8 +930,11 @@ sub UserSearch {
         $Users{ $Row[0] } = $Row[1];
     }
 
-    # skip cache set if IsOutOfOffice is defined (time relative search)
-    if ( !defined( $Param{IsOutOfOffice} ) ) {
+    # skip cache set if IsOutOfOffice and IsOutOfOfficeEnd is defined (time relative search)
+    if (
+        !defined( $Param{IsOutOfOffice} )
+        && !defined( $Param{IsOutOfOfficeEnd} )
+    ) {
         # set cache
         $Kernel::OM->Get('Cache')->Set(
             Type  => $Self->{CacheType},

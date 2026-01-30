@@ -154,10 +154,10 @@ $Self->True(
 
 # second user
 my $UserID2 = $Kernel::OM->Get('User')->UserAdd(
-    UserLogin     => 'UnitTest2',
-    ValidID       => 1,
-    ChangeUserID  => 1,
-    IsAgent       => 1
+    UserLogin        => 'UnitTest2',
+    ValidID          => 1,
+    ChangeUserID     => 1,
+    IsAgent          => 1
 );
 $Self->True(
     $UserID2,
@@ -174,6 +174,10 @@ $Self->True(
     "Second user role '$Role1' added"
 );
 
+my %User2 = $Kernel::OM->Get('User')->GetUserData(
+    UserID => $UserID2
+);
+
 # third user
 my $UserID3 = $Kernel::OM->Get('User')->UserAdd(
     UserLogin     => 'UnitTest3',
@@ -184,33 +188,6 @@ my $UserID3 = $Kernel::OM->Get('User')->UserAdd(
 $Self->True(
     $UserID3,
     'Third user created'
-);
-my $Pref1 = $Kernel::OM->Get('User')->SetPreferences(
-    Key    => 'OutOfOfficeStart',
-    Value  => '2025-10-29',
-    UserID => $UserID2
-);
-$Self->True(
-    $Pref1,
-    'Set preference "OutOfOfficeStart" to second user'
-);
-my $Pref2 = $Kernel::OM->Get('User')->SetPreferences(
-    Key    => 'OutOfOfficeEnd',
-    Value  => '2025-10-31',
-    UserID => $UserID2
-);
-$Self->True(
-    $Pref2,
-    'Set preference "OutOfOfficeEnd" to second user'
-);
-my $Pref3 = $Kernel::OM->Get('User')->SetPreferences(
-    Key    => 'OutOfOfficeSubstitute',
-    Value  => $UserID3,
-    UserID => $UserID2
-);
-$Self->True(
-    $Pref3,
-    'Set preferences OutOfOfficeSubstitute for third user'
 );
 
 $Kernel::OM->Get('Role')->RoleUserAdd(
@@ -232,6 +209,19 @@ $Self->True(
     $UserID2,
     "Third user role '$Role2' added"
 );
+
+my $Success = $Kernel::OM->Get('User')->UserUpdate(
+    %User2,
+    OutOfOfficeStart      => '2025-10-29',
+    OutOfOfficeEnd        => '2025-10-31',
+    OutOfOfficeSubstitute => $UserID3,
+    ChangeUserID          => 1
+);
+$Self->True(
+    $Success,
+    'Update User | OutOfOfficeStart, OutOfOfficeEnd, OutOfOfficeSubstitute for second user'
+);
+
 # discard user and role object to process events
 $Kernel::OM->ObjectsDiscard(
     Objects => ['User','Role'],

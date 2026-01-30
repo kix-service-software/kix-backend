@@ -7,6 +7,11 @@
         "RoleIDs": [
             3
         ],
-        "ValidID": 1
+        "ValidID": 1,
+        "OutOfOffice": {
+            "Start": "2018-12-22",
+            "End": "2019-01-02",
+            "Substitute": null
+        }
     }
 }
