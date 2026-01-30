@@ -57,6 +57,13 @@
       "type": "integer",
       "readOnly": true
     },
+    "OutOfOffice": {
+      "type": "object",
+      "description": "special object of out of office",
+      "items": {
+        "$ref": "OutOfOffice.json"
+      }
+    },
     "UserComment": {
       "anyOf": [
         {"type": "string"},

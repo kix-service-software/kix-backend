@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "OutOfOffice.json",
+  "type": "object",
+  "description": "The OutOfOffice object.",
+  "properties": {
+    "Start": {
+      "description": "Is a date that defines the start of the absence.",
+      "type": "string"
+    },
+    "End": {
+      "description": "Is a date that defines the end of the absence.",
+      "type": "string"
+    },
+    "Substitute": {
+      "description": "The substitute for the absentee is defined here as the UserID. The specified substitute must be an agent and have at least the same MyQueues queue as the person absent.",
+      "type": "integer"
+    }
+  },
+  "required": []
+}

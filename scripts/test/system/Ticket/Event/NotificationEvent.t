@@ -1291,6 +1291,10 @@ my $SetPostMasterUserID = sub {
 my $SetOutOfOffice = sub {
     my %Param = @_;
 
+    my %User = $Kernel::OM->Get('User')->GetUserData( UserID => $Param{UserID} );
+    my $Name = 'Update User | ';
+    my %OutOfOffice;
+
     if ( $Param{OutOfOffice} ) {
 
         my ( $StartSec, $StartMin, $StartHour, $StartDay, $StartMonth, $StartYear, $StartWeekDay ) = $Kernel::OM->Get('Time')->SystemTime2Date(
@@ -1300,41 +1304,32 @@ my $SetOutOfOffice = sub {
             SystemTime => $Kernel::OM->Get('Time')->SystemTime() + $Param{SetOutOfOfficeDiffEnd},
         );
 
-        my %Preferences = (
+        %OutOfOffice = (
             OutOfOfficeStart => sprintf( '%04d-%02d-%02d', $StartYear, $StartMonth, $StartDay ),
             OutOfOfficeEnd   => sprintf( '%04d-%02d-%02d', $EndYear, $EndMonth, $EndDay ),
         );
 
-        for my $Key ( qw( OutOfOfficeStart OutOfOfficeEnd ) ) {
-            # pref update db
-            my $PreferenceSet = $Kernel::OM->Get('User')->SetPreferences(
-                UserID => $Param{UserID},
-                Key    => $Key,
-                Value  => $Preferences{ $Key },
-            );
-            $Self->True(
-                $PreferenceSet,
-                "User preference $Key set to $Preferences{ $Key }",
-            );
-
-            if ( !$PreferenceSet ) {
-                return;
-            }
-        }
+        $Name .= join( q(, ), map { "$_: $OutOfOffice{$_}" } keys %OutOfOffice );
     }
     else {
-        for my $Key ( qw( OutOfOfficeStart OutOfOfficeEnd ) ) {
-            # pref update db
-            my $IsSuccess = $Kernel::OM->Get('User')->DeletePreferences(
-                UserID => $Param{UserID},
-                Key    => $Key,
-            );
-            $Self->True(
-                $IsSuccess,
-                "User preference $Key deleted",
-            );
-        }
+        %OutOfOffice = (
+            OutOfOfficeStart => undef,
+            OutOfOfficeEnd   => undef,
+        );
+
+        $Name .= 'OutOfOffice Reset';
     }
+
+    my $Succes = $Kernel::OM->Get('User')->UserUpdate(
+        %User,
+        %OutOfOffice,
+        ChangeUserID => 1
+    );
+
+    $Self->True(
+        $Succes,
+        $Name
+    );
 
     return 1;
 

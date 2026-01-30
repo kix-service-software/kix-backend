@@ -30,36 +30,22 @@ sub Run {
 
     $Self->Print("<yellow>Check OutOfOffice...</yellow>\n");
 
-    my %Result = $Kernel::OM->Get('User')->SearchPreferences(
-        Key    => 'OutOfOfficeEnd',
-        UserID => 1,
+    my %Users = $Kernel::OM->Get('User')->UserSearch(
+        IsOutOfOfficeEnd => 1
     );
 
-    if ( %Result ) {
-        my @CurrDate = $Kernel::OM->Get('Time')->SystemTime2Date(
-            SystemTime => $Kernel::OM->Get('Time')->SystemTime()
+    for my $UserID ( keys %Users ) {
+        my %User = $Kernel::OM->Get('User')->GetUserData(
+            UserID => $UserID
         );
-        my $CurrStamp = $CurrDate[5]
-            . $CurrDate[4]
-            . $CurrDate[3];
 
-        for my $UserID ( keys %Result ) {
-            my $Date = $Result{$UserID};
-            next if !$Date;
-            $Date =~ s/\s+\d{2}:\d{2}:\d{2}$//g;
-            $Date =~ s/-//g;
-
-            next if $Date >= $CurrStamp;
-
-            $Kernel::OM->Get('User')->DeletePreferences(
-                UserID => $UserID,
-                Key    => 'OutOfOfficeStart'
-            );
-            $Kernel::OM->Get('User')->DeletePreferences(
-                UserID => $UserID,
-                Key    => 'OutOfOfficeEnd'
-            );
-        }
+        $Kernel::OM->Get('User')->UserUpdate(
+            %User,
+            OutOfOfficeEnd        => undef,
+            OutOfOfficeStart      => undef,
+            OutOfOfficeSubstitute => undef,
+            ChangeUserID          => 1
+        );
     }
 
     $Self->Print("<green>Done.</green>\n");

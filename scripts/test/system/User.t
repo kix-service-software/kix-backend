@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/ 
+# Modified version of the work: Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -323,7 +323,7 @@ my %UserSearchResult = $Kernel::OM->Get('User')->UserSearch(
 );
 $Self->False(
     $UserSearchResult{ $UserID },
-    'UserSearch() - IsOutOfOffice = 1, Preference not set',
+    'UserSearch() - IsOutOfOffice = 1, OutOfOffice not set',
 );
 %UserSearchResult = $Kernel::OM->Get('User')->UserSearch(
     IsOutOfOffice => 0,
@@ -331,30 +331,31 @@ $Self->False(
 );
 $Self->True(
     $UserSearchResult{ $UserID },
-    'UserSearch() - IsOutOfOffice = 0, Preference not set',
+    'UserSearch() - IsOutOfOffice = 0, OutOfOffice not set',
 );
 
-## Check with set preference on same day ##
+## Check with set OutOfOffice on same day ##
 my $CurrDate = $Kernel::OM->Get('Time')->CurrentTimestamp();
 $CurrDate =~ s/^(\d{4}-\d{2}-\d{2}).+$/$1/;
 my %Values = (
     'OutOfOfficeStart' => $CurrDate,
     'OutOfOfficeEnd'   => $CurrDate,
 );
-for my $Key ( sort( keys( %Values ) ) ) {
-    $Kernel::OM->Get('User')->SetPreferences(
-        UserID => $UserID,
-        Key    => $Key,
-        Value  => $Values{ $Key },
-    );
-}
+my %CurrUser = $Kernel::OM->Get('User')->GetUserData(
+    UserID => $UserID
+);
+$Kernel::OM->Get('User')->UserUpdate(
+    %CurrUser,
+    %Values,
+    ChangeUserID => 1
+);
 %UserSearchResult = $Kernel::OM->Get('User')->UserSearch(
     IsOutOfOffice => 1,
     Valid         => 0,
 );
 $Self->True(
     $UserSearchResult{ $UserID },
-    'UserSearch() - IsOutOfOffice = 1, Preference set, correct day',
+    'UserSearch() - IsOutOfOffice = 1, OutOfOffice set, correct day',
 );
 %UserSearchResult = $Kernel::OM->Get('User')->UserSearch(
     IsOutOfOffice => 0,
@@ -362,10 +363,10 @@ $Self->True(
 );
 $Self->False(
     $UserSearchResult{ $UserID },
-    'UserSearch() - IsOutOfOffice = 0, Preference set, correct day',
+    'UserSearch() - IsOutOfOffice = 0, OutOfOffice set, correct day',
 );
 
-## Check with set preference on day before ##
+## Check with set OutOfOffice on day before ##
 $SystemTime = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
     String => '2024-02-08 00:00:00',
 );
@@ -376,7 +377,7 @@ $Helper->FixedTimeSet($SystemTime);
 );
 $Self->False(
     $UserSearchResult{ $UserID },
-    'UserSearch() - IsOutOfOffice = 1, Preference set, day before',
+    'UserSearch() - IsOutOfOffice = 1, OutOfOffice set, day before',
 );
 %UserSearchResult = $Kernel::OM->Get('User')->UserSearch(
     IsOutOfOffice => 0,
@@ -384,10 +385,10 @@ $Self->False(
 );
 $Self->True(
     $UserSearchResult{ $UserID },
-    'UserSearch() - IsOutOfOffice = 0, Preference set, day before',
+    'UserSearch() - IsOutOfOffice = 0, OutOfOffice set, day before',
 );
 
-## Check with set preference on day after ##
+## Check with set OutOfOffice on day after ##
 $SystemTime = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
     String => '2024-02-10 00:00:00',
 );
@@ -398,7 +399,7 @@ $Helper->FixedTimeSet($SystemTime);
 );
 $Self->False(
     $UserSearchResult{ $UserID },
-    'UserSearch() - IsOutOfOffice = 1, Preference set, day after',
+    'UserSearch() - IsOutOfOffice = 1, OutOfOffice set, day after',
 );
 %UserSearchResult = $Kernel::OM->Get('User')->UserSearch(
     IsOutOfOffice => 0,
@@ -406,7 +407,7 @@ $Self->False(
 );
 $Self->True(
     $UserSearchResult{ $UserID },
-    'UserSearch() - IsOutOfOffice = 0, Preference set, day after',
+    'UserSearch() - IsOutOfOffice = 0, OutOfOffice set, day after',
 );
 
 my $DeleteResult = $Kernel::OM->Get('User')->DeleteNewlyCreatedUser(
