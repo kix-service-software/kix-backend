@@ -93,7 +93,7 @@
       | 1            | 0          |                 | Ticket     | TicketFlag.Seen                           | TEXTUAL   |
       | 1            | 1          |                 | Ticket     | TicketID                                  | NUMERIC   |
       | 1            | 1          |                 | Ticket     | TicketNumber                              | TEXTUAL   |
-      | 1            | 0          |                 | Ticket     | TicketOutOfOfficeSubstitute               | TEXTUAL   |
+      | 1            | 0          |                 | Ticket     | TicketOutOfOfficeSubstitute               | NUMERIC   |
       | 1            | 1          |                 | Ticket     | Title                                     | TEXTUAL   |
       | 1            | 0          |                 | Ticket     | To                                        | TEXTUAL   |
       | 1            | 1          |                 | Ticket     | Type                                      | TEXTUAL   |
