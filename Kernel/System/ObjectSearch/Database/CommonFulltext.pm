@@ -105,9 +105,10 @@ sub FulltextSearch {
     return if ( !$Self->_CheckSearchParams( %Param ) );
 
     my $Condition = $Self->_FulltextCondition(
-        Columns => $Param{Columns},
-        Value   => $Param{Search}->{Value},
-        Silent  => $Param{Silent}
+        Columns       => $Param{Columns},
+        StaticColumns => $Param{StaticColumns},
+        Value         => $Param{Search}->{Value},
+        Silent        => $Param{Silent}
     );
 
     return if !$Condition;
@@ -122,7 +123,6 @@ sub _CheckSearchParams {
     my ($Self, %Param) = @_;
 
     # check required columns parameter
-
     if (
         !defined( $Param{Columns} )
         || ref( $Param{Columns} ) ne 'ARRAY'
@@ -130,6 +130,19 @@ sub _CheckSearchParams {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Invalid Columns!',
+            Silent   => $Param{Silent}
+        );
+        return;
+    }
+
+    # check static columns parameter
+    if (
+        defined( $Param{StaticColumns} )
+        && ref( $Param{StaticColumns} ) ne 'ARRAY'
+    ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => 'Invalid StaticColumns!',
             Silent   => $Param{Silent}
         );
         return;
@@ -307,9 +320,9 @@ sub _ValidateValueType {
 generate SQL condition query based on a search expression
 
     my $SQL = $Self->_FulltextCondition(
-        Columns  => ['some_col'],
-        Value    => 'ABC+DEF',
-        Operator => 'LIKE'      # supported are LIKE, CONTAINS, STARTSWITH, ENDSWITH
+        Columns       => ['some_col'],
+        StaticColumns => ['some_static_col'],
+        Value         => 'ABC+DEF',
     );
 
     example of a more complex search condition
@@ -334,7 +347,6 @@ sub _FulltextCondition {
     }
 
     my @Columns;
-    my %StaticColumns;
     if ( defined $Param{Columns} ) {
         if ( !IsArrayRefWithData($Param{Columns}) ) {
             $Kernel::OM->Get('Log')->Log(
@@ -347,19 +359,6 @@ sub _FulltextCondition {
         push (@Columns, @{$Param{Columns}});
     }
 
-    if ( $Param{IsStaticSearch} ) {
-        if ( !IsArrayRefWithData($Param{StaticColumns}) ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "StaticColumns is not an array ref or is empty!",
-                Silent   => $Param{Silent}
-            );
-            return;
-        }
-        push (@Columns, @{$Param{StaticColumns}});
-        %StaticColumns = map { $_ => 1 } @{$Param{StaticColumns}};
-    }
-
     if ( !scalar( @Columns ) ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
@@ -367,6 +366,11 @@ sub _FulltextCondition {
             Silent   => $Param{Silent}
         );
         return;
+    }
+
+    my %StaticColumns;
+    if ( IsArrayRefWithData($Param{StaticColumns}) ) {
+        %StaticColumns = map { $_ => 1 } @{$Param{StaticColumns}};
     }
 
     # set case sensitive
