@@ -1816,10 +1816,10 @@ my $ContactFirstName2 = 'Bert';
 my $ContactLastName1  = 'test';
 my $ContactLastName2  = 'Test';
 my $UserID1 = $Kernel::OM->Get('User')->UserAdd(
-    UserLogin     => $UserLogin1,
-    ValidID       => 1,
-    ChangeUserID  => 1,
-    IsAgent       => 1
+    UserLogin    => $UserLogin1,
+    ValidID      => 1,
+    ChangeUserID => 1,
+    IsAgent      => 1
 );
 $Kernel::OM->Get('Role')->RoleUserAdd(
     AssignUserID => $UserID1,
@@ -1831,39 +1831,21 @@ $Self->True(
     'First user created'
 );
 my $ContactID1 = $Kernel::OM->Get('Contact')->ContactAdd(
-    Firstname             => $ContactFirstName1,
-    Lastname              => $ContactLastName1,
-    AssignedUserID        => $UserID1,
-    ValidID               => 1,
-    UserID                => 1,
+    Firstname      => $ContactFirstName1,
+    Lastname       => $ContactLastName1,
+    AssignedUserID => $UserID1,
+    ValidID        => 1,
+    UserID         => 1,
 );
 $Self->True(
     $ContactID1,
     'Contact for first user created'
 );
-my $UserPOOOOS1 = $Kernel::OM->Get('User')->SetPreferences(
-    Key    => 'OutOfOfficeStart',
-    Value  => '2014-01-01',
-    UserID => $UserID1,
-);
-$Self->True(
-    $UserPOOOOS1,
-    'OutOfOfficeStart for first user created'
-);
-my $UserPOOOOE1 = $Kernel::OM->Get('User')->SetPreferences(
-    Key    => 'OutOfOfficeEnd',
-    Value  => '2014-01-01',
-    UserID => $UserID1,
-);
-$Self->True(
-    $UserPOOOOE1,
-    'OutOfOfficeEnd for first user created'
-);
 my $UserID2 = $Kernel::OM->Get('User')->UserAdd(
-    UserLogin     => $UserLogin2,
-    ValidID       => 1,
-    ChangeUserID  => 1,
-    IsAgent       => 1
+    UserLogin    => $UserLogin2,
+    ValidID      => 1,
+    ChangeUserID => 1,
+    IsAgent      => 1
 );
 $Kernel::OM->Get('Role')->RoleUserAdd(
     AssignUserID => $UserID2,
@@ -1875,33 +1857,15 @@ $Self->True(
     'Second user created'
 );
 my $ContactID2 = $Kernel::OM->Get('Contact')->ContactAdd(
-    Firstname             => $ContactFirstName2,
-    Lastname              => $ContactLastName2,
-    AssignedUserID        => $UserID2,
-    ValidID               => 1,
-    UserID                => 1,
+    Firstname      => $ContactFirstName2,
+    Lastname       => $ContactLastName2,
+    AssignedUserID => $UserID2,
+    ValidID        => 1,
+    UserID         => 1,
 );
 $Self->True(
     $ContactID2,
     'Contact for second user created'
-);
-my $UserPOOOOS2 = $Kernel::OM->Get('User')->SetPreferences(
-    Key    => 'OutOfOfficeStart',
-    Value  => '2014-01-02',
-    UserID => $UserID2,
-);
-$Self->True(
-    $UserPOOOOS2,
-    'OutOfOfficeStart for second user created'
-);
-my $UserPOOOOE2 = $Kernel::OM->Get('User')->SetPreferences(
-    Key    => 'OutOfOfficeEnd',
-    Value  => '2014-01-02',
-    UserID => $UserID2,
-);
-$Self->True(
-    $UserPOOOOE2,
-    'OutOfOfficeEnd for second user created'
 );
 my $UserID3 = $Kernel::OM->Get('User')->UserAdd(
     UserLogin     => $UserLogin3,
@@ -1919,24 +1883,34 @@ $Self->True(
     'Third user created'
 );
 
-my $UserPOOOOSub1 = $Kernel::OM->Get('User')->SetPreferences(
-    Key    => 'OutOfOfficeSubstitute',
-    Value  => $UserID2,
-    UserID => $UserID1,
+my $UserUpdate1 = $Kernel::OM->Get('User')->UserUpdate(
+    UserID                => $UserID1,
+    UserLogin             => $UserLogin1,
+    ValidID               => 1,
+    ChangeUserID          => 1,
+    IsAgent               => 1,
+    OutOfOfficeStart      => '2014-01-01',
+    OutOfOfficeEnd        => '2014-01-01',
+    OutOfOfficeSubstitute => $UserID2
 );
 $Self->True(
-    $UserPOOOOSub1,
-    'OutOfOfficeSubstitute for first user created'
+    $UserUpdate1,
+    'Updated first user with OutOfOffice-data'
 );
 
-my $UserPOOOOSub2 = $Kernel::OM->Get('User')->SetPreferences(
-    Key    => 'OutOfOfficeSubstitute',
-    Value  => $UserID3,
-    UserID => $UserID2,
+my $UserUpdate2 = $Kernel::OM->Get('User')->UserUpdate(
+    UserID                => $UserID2,
+    UserLogin             => $UserLogin2,
+    ValidID               => 1,
+    ChangeUserID          => 1,
+    IsAgent               => 1,
+    OutOfOfficeStart      => '2014-01-02',
+    OutOfOfficeEnd        => '2014-01-02',
+    OutOfOfficeSubstitute => $UserID3
 );
 $Self->True(
-    $UserPOOOOSub2,
-    'OutOfOfficeSubstitute for second user created'
+    $UserUpdate2,
+    'Updated second user with OutOfOffice-data'
 );
 
 # discard contact object to process events
