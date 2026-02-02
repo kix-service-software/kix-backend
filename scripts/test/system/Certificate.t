@@ -54,8 +54,19 @@ my @NegativTests = (
     {
         Function => 'CertificateCreate',
         Data     => {
-            Type       => 'Cert',
-            CType      => 'SMIME'
+            File   => $Certificates[0],
+            Type   => 'Cert',
+            CType  => 'SMIME'
+        },
+        Expected => undef,
+        Name     => 'Certificate: Create / No UserID given'
+    },
+    {
+        Function => 'CertificateCreate',
+        Data     => {
+            Type   => 'Cert',
+            CType  => 'SMIME',
+            UserID => 1
         },
         Expected => undef,
         Name     => 'Certificate: Create / No File given'
@@ -63,12 +74,13 @@ my @NegativTests = (
     {
         Function => 'CertificateCreate',
         Data     => {
-            File => {
+            File   => {
                 %{$Certificates[0]},
                 Content => undef
             },
-            Type       => 'Cert',
-            CType      => 'SMIME'
+            Type   => 'Cert',
+            CType  => 'SMIME',
+            UserID => 1
         },
         Expected => undef,
         Name     => 'Certificate: Create / No Content given'
@@ -76,8 +88,9 @@ my @NegativTests = (
     {
         Function => 'CertificateCreate',
         Data     => {
-            File  => $Certificates[0],
-            CType => 'SMIME'
+            File   => $Certificates[0],
+            CType  => 'SMIME',
+            UserID => 1
         },
         Expected => undef,
         Name     => 'Certificate: Create / No Type given'
@@ -85,9 +98,10 @@ my @NegativTests = (
     {
         Function => 'CertificateCreate',
         Data     => {
-            File  => $Certificates[0],
-            Type  => 'Private',
-            CType => 'SMIME'
+            File   => $Certificates[0],
+            Type   => 'Private',
+            CType  => 'SMIME',
+            UserID => 1
         },
         Expected => undef,
         Name     => 'Certificate: Create / No Passphrase when type Private given'
@@ -145,10 +159,18 @@ my @NegativTests = (
     {
         Function => 'CertificateDelete',
         Data     => {
-            ID => undef
+            UserID => 1
         },
         Expected => undef,
         Name     => 'Certificate: Delete / No ID'
+    },
+    {
+        Function => 'CertificateDelete',
+        Data     => {
+            ID => 1
+        },
+        Expected => undef,
+        Name     => 'Certificate: Delete / No UserID'
     },
     # EO CERTIFICATEDELETE
 );
@@ -177,6 +199,7 @@ my @TestsCGE = (
             Type       => 'Private',
             Passphrase => 'start123',
             CType      => 'SMIME',
+            UserID     => 1,
             Silent     => 1
         },
         Expected => undef,
@@ -185,9 +208,10 @@ my @TestsCGE = (
     {
         Function => 'CertificateCreate',
         Data     => {
-            File  => $Certificates[0],
-            Type  => 'Cert',
-            CType => 'SMIME'
+            File   => $Certificates[0],
+            Type   => 'Cert',
+            CType  => 'SMIME',
+            UserID => 1,
         },
         Expected => 1,
         Name     => 'Certificate: Create / Type .PEM | application/x-x509-ca-cert / Certificate'
@@ -289,7 +313,8 @@ END
             File       => $Certificates[1],
             Type       => 'Private',
             Passphrase => 'start123',
-            CType      => 'SMIME'
+            CType      => 'SMIME',
+            UserID     => 1
         },
         Expected => 1,
         Name     => 'Certificate: Create / Type .PEM | application/x-x509-ca-cert / Private Key '
@@ -405,9 +430,10 @@ END
     {
         Function => 'CertificateCreate',
         Data     => {
-            File  => $Certificates[2],
-            Type  => 'Cert',
-            CType => 'SMIME'
+            File   => $Certificates[2],
+            Type   => 'Cert',
+            CType  => 'SMIME',
+            UserID => 1
         },
         Expected => 1,
         Name     => 'Certificate: Create / Type .CRT | application/pkix-cert / Certificate'
@@ -503,9 +529,10 @@ END
     {
         Function => 'CertificateCreate',
         Data     => {
-            File  => $Certificates[3],
-            Type  => 'Cert',
-            CType => 'SMIME'
+            File   => $Certificates[3],
+            Type   => 'Cert',
+            CType  => 'SMIME',
+            UserID => 1
         },
         Expected => 1,
         Name     => 'Certificate: Create / Type .CSR | application/pkcs10 / Certificate'
@@ -587,7 +614,8 @@ END
             File       => $Certificates[4],
             Type       => 'Private',
             Passphrase => 'start123',
-            CType      => 'SMIME'
+            CType      => 'SMIME',
+            UserID     => 1
         },
         Expected => 1,
         Name     => 'Certificate: Create / Type .KEY | application/x-iwork-keynote-sffkey / Private Key '
@@ -1290,7 +1318,8 @@ my @DeleteTests = (
     {
         Function => 'CertificateDelete',
         Data     => {
-            ID  => $CertificateIDs[0]->{ID}
+            ID     => $CertificateIDs[0]->{ID},
+            UserID => 1
         },
         Expected => 1,
         Name     => 'Certificate: Delete / Type .PEM | application/x-x509-ca-cert / Certificate'
@@ -1306,7 +1335,8 @@ my @DeleteTests = (
     {
         Function => 'CertificateDelete',
         Data     => {
-            ID  => $CertificateIDs[1]->{ID}
+            ID     => $CertificateIDs[1]->{ID},
+            UserID => 1
         },
         Expected => 1,
         Name     => 'Certificate: Delete / Type .PEM | application/x-x509-ca-cert / Private Key '
@@ -1322,7 +1352,8 @@ my @DeleteTests = (
     {
         Function => 'CertificateDelete',
         Data     => {
-            ID  => $CertificateIDs[2]->{ID}
+            ID     => $CertificateIDs[2]->{ID},
+            UserID => 1
         },
         Expected => 1,
         Name     => 'Certificate: Delete / Type .CRT | application/pkix-cert / Certificate'
@@ -1338,7 +1369,8 @@ my @DeleteTests = (
     {
         Function => 'CertificateDelete',
         Data     => {
-            ID  => $CertificateIDs[3]->{ID}
+            ID  => $CertificateIDs[3]->{ID},
+            UserID => 1
         },
         Expected => 1,
         Name     => 'Certificate: Delete / Type .CSR | application/pkcs10 / Certificate'
@@ -1354,7 +1386,8 @@ my @DeleteTests = (
     {
         Function => 'CertificateDelete',
         Data     => {
-            ID  => $CertificateIDs[4]->{ID}
+            ID     => $CertificateIDs[4]->{ID},
+            UserID => 1
         },
         Expected => 1,
         Name     => 'Certificate: Delete / Type .KEY | application/x-iwork-keynote-sffkey / Private Key '
