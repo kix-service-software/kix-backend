@@ -203,7 +203,6 @@ sub _ArticleUpdate {
 
     # prepare body data
     if ( $Article->{Body} ) {
-
         # check ContentType vs. Charset & MimeType
         if ( !$Article->{ContentType} ) {
             for my $Needed ( qw(Charset MimeType) ) {
@@ -290,10 +289,21 @@ sub _ArticleUpdate {
 
         # process html article
         if ( $Article->{MimeType} =~ /text\/html/i ) {
+            my %Safe = $Kernel::OM->Get('HTMLUtils')->Safety(
+                String       => $Article->{Body},
+                NoApplet     => 1,
+                NoObject     => 1,
+                NoEmbed      => 1,
+                NoSVG        => 1,
+                NoImg        => 0,
+                NoIntSrcLoad => 0,
+                NoExtSrcLoad => 0,
+                NoJavaScript => 1,
+            );
 
             # add html article as attachment
             my $Attachment = {
-                Content     => $Article->{Body},
+                Content     => $Safe{String},
                 ContentType => "text/html; charset=\"$Article->{Charset}\"",
                 Filename    => 'file-2',
             };
@@ -303,7 +313,7 @@ sub _ArticleUpdate {
             $Article->{MimeType}    = 'text/plain';
             $Article->{ContentType} =~ s/html/plain/i;
             $Article->{Body}        = $Kernel::OM->Get('HTMLUtils')->ToAscii(
-                String => $Article->{Body},
+                String => $Safe{String},
             );
         }
         elsif ( $Article->{MimeType} eq "application/json" ) {
