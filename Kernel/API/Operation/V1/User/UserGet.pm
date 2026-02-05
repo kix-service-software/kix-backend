@@ -147,6 +147,12 @@ sub _GetUserData {
         return;
     }
 
+    # nesting of OutOfOffice data
+    for my $Key ( qw(Start End Substitute) ) {
+        $UserData{OutOfOffice}->{$Key} = $UserData{"OutOfOffice$Key"} || undef;
+        delete $UserData{"OutOfOffice$Key"};
+    }
+
     # add flags array if included
     if ( $Param{Data}->{include}->{Preferences} ) {
         my @PrefList = ();

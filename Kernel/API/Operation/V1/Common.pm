@@ -757,7 +757,6 @@ sub PrepareData {
                     Value     => $Parameters{$Parameter}->{Default},
                 );
             }
-
             # check if we have an optional parameter that needs a value
             if ( $Parameters{$Parameter}->{RequiresValueIfUsed} && exists( $Data{$Parameter} ) && !defined( $Data{$Parameter} ) ) {
                 $Result->{Success} = 0;
@@ -4305,7 +4304,7 @@ sub _FilterCustomerUserVisibleObjectIds {
                 } elsif ($Param{LogFiltered}) {
                     $Kernel::OM->Get('Log')->Log(
                         Priority => 'notice',
-                        Message  => "No access for $Param{ObjectType} with id $ObjectID" 
+                        Message  => "No access for $Param{ObjectType} with id $ObjectID"
                     );
                 }
             }
@@ -4316,7 +4315,7 @@ sub _FilterCustomerUserVisibleObjectIds {
                 for my $ObjectID ( @ObjectIDList ) {
                     $Kernel::OM->Get('Log')->Log(
                         Priority => 'notice',
-                        Message  => "No access for $Param{ObjectType} with id $ObjectID" 
+                        Message  => "No access for $Param{ObjectType} with id $ObjectID"
                     );
                 }
             }

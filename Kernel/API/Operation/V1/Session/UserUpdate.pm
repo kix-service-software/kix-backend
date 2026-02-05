@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/ 
+# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -58,6 +58,19 @@ sub ParameterDefinition {
         'User::UserLogin' => {
             RequiresValueIfUsed => 1
         },
+        'User::OutOfOffice' => {
+            RequiresValueIfUsed => 1,
+            Type                => 'HASH'
+        },
+        'User::OutOfOffice::Start' => {
+            Type => 'DATE'
+        },
+        'User::OutOfOffice::End' => {
+            Type => 'DATE'
+        },
+        'User::OutOfOffice::Substitute' => {
+            DataType => 'NUMERIC'
+        }
     }
 }
 
@@ -122,6 +135,14 @@ sub Run {
             );
         }
     }
+
+    # prepare OutOfOffice for core
+    if ( IsHashRefWithData( $User->{OutOfOffice} ) ) {
+        for my $Key ( qw(Start End Substitute) ) {
+            $User->{"OutOfOffice$Key"} = exists $User->{OutOfOffice}->{$Key} ? $User->{OutOfOffice}->{$Key} : $UserData{"OutOfOffice$Key"};
+        }
+    }
+    delete $User->{OutOfOffice};
 
     # update User
     my $Success = $Kernel::OM->Get('User')->UserUpdate(

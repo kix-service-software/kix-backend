@@ -66,6 +66,19 @@ sub ParameterDefinition {
             RequiresValueIfUsed => 1,
             OneOf => [ 0, 1 ]
         },
+        'User::OutOfOffice' => {
+            RequiresValueIfUsed => 1,
+            Type                => 'HASH'
+        },
+        'User::OutOfOffice::Start' => {
+            Type => 'DATE'
+        },
+        'User::OutOfOffice::End' => {
+            Type => 'DATE'
+        },
+        'User::OutOfOffice::Substitute' => {
+            DataType => 'NUMERIC'
+        }
     }
 }
 
@@ -76,20 +89,25 @@ perform UserCreate Operation. This will return the created UserLogin.
     my $Result = $OperationObject->Run(
         Data => {
             User => {
-                UserLogin       => '...'                                        # required
-                UserPassword    => '...'                                        # optional
+                UserLogin       => '...'            # required
+                UserPassword    => '...'            # optional
                 ValidID         => 1,
-                IsAgent         => 0 | 1,                                       # optional
-                IsCustomer      => 0 | 1,                                       # optional
-                RoleIDs         => [                                            # optional
+                IsAgent         => 0 | 1,           # optional
+                IsCustomer      => 0 | 1,           # optional
+                RoleIDs         => [                # optional
                     123
                 ],
-                Preferences     => [                                            # optional
+                Preferences     => [                # optional
                     {
                         ID    => '...',
                         Value => '...'
                     }
-                ]
+                ],
+                OutOfOffice     => {                 # requires, if used
+                    Start      => '2026-01-01',      # optional
+                    End        => '2026-01-20',      # optional
+                    Substitute => 123                # optional
+                }
             },
         },
     );
@@ -123,6 +141,16 @@ sub Run {
             Message => "Cannot create user. Another user with same login already exists.",
         );
     }
+
+    # prepare OutOfOffice for core
+    if ( IsHashRefWithData( $User->{OutOfOffice} ) ) {
+
+        for my $Key ( qw(Start End Substitute) ) {
+            next if !defined $User->{OutOfOffice}->{$Key};
+            $User->{"OutOfOffice$Key"} = $User->{OutOfOffice}->{$Key};
+        }
+    }
+    delete $User->{OutOfOffice};
 
     # create User
     my $UserID = $Kernel::OM->Get('User')->UserAdd(
