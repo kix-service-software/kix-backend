@@ -222,23 +222,34 @@ sub ArticleCreate {
 
         # process html article
         if ( $Param{MimeType} =~ /text\/html/i ) {
+            my %Safe = $Kernel::OM->Get('HTMLUtils')->Safety(
+                String       => $Param{Body},
+                NoApplet     => 1,
+                NoObject     => 1,
+                NoEmbed      => 1,
+                NoSVG        => 1,
+                NoImg        => 0,
+                NoIntSrcLoad => 0,
+                NoExtSrcLoad => 0,
+                NoJavaScript => 1,
+            );
 
             # add html article as attachment
             my $Attach = {
-                Content     => $Param{Body},
+                Content     => $Safe{String},
                 ContentType => "text/html; charset=\"$Param{Charset}\"",
                 Filename    => 'file-2',
             };
             push @AttachmentConvert, $Attach;
 
             # save HTML body for later use
-            $Param{HTMLBody} = $Param{Body};
+            $Param{HTMLBody} = $Safe{String};
 
             # get ascii body
             $Param{MimeType} = 'text/plain';
             $Param{ContentType} =~ s/html/plain/i;
             $Param{Body} = $HTMLUtilsObject->ToAscii(
-                String            => $Param{Body},
+                String            => $Safe{String},
                 NoForcedLinebreak => 1
             );
         }
