@@ -605,13 +605,10 @@ my @IntegrationSearchTests = (
     {
         Name     => "Search: Field Fulltext | Operator LIKE | FulltextAttributes: Title | Value Unit Test",
         ConfigSet => {
-            %{$DefaultCnf},
-            Ticket => {
-                %{$DefaultCnf->{Ticket}},
-                FulltextAttributes => [
-                    'Title',
-                ]
-            }
+            %{$DefaultCnf->{Ticket}},
+            FulltextAttributes => [
+                'Title',
+            ]
         },
         Search   => {
             'AND' => [
@@ -640,14 +637,11 @@ my @IntegrationSearchTests = (
     {
         Name     => "Search: Field Fulltext | Operator LIKE | FulltextAttributes: To,Cc | Value \$To1",
         ConfigSet => {
-            %{$DefaultCnf},
-            Ticket => {
-                %{$DefaultCnf->{Ticket}},
-                FulltextAttributes => [
-                    'To',
-                    'Cc'
-                ]
-            }
+            %{$DefaultCnf->{Ticket}},
+            FulltextAttributes => [
+                'To',
+                'Cc'
+            ]
         },
         Search   => {
             'AND' => [
@@ -676,17 +670,17 @@ my @IntegrationSearchTests = (
 );
 for my $Test ( @IntegrationSearchTests ) {
     if ( IsHashRefWithData($Test->{ConfigSet}) ) {
-        $Kernel::OM->Get('Config')->Set(
-            Key   => 'ObjectSearch::Database::ObjectType',
+        $Helper->ConfigSettingChange(
+            Key   => 'ObjectSearch::Database::ObjectType###Ticket',
             Value => $Test->{ConfigSet}
         );
 
         my $Config = $Kernel::OM->Get('Config')->Get('ObjectSearch::Database::ObjectType');
 
         $Self->IsDeeply(
-            $Config,
+            $Config->{Ticket},
             $Test->{ConfigSet},
-            'Search: Field Fulltext | SET FulltextAttributes: ' . join(q(,), @{$Test->{ConfigSet}->{Ticket}->{FulltextAttributes}})
+            'Search: Field Fulltext | SET FulltextAttributes: ' . join(q(,), @{$Test->{ConfigSet}->{FulltextAttributes}})
         );
 
         # discard ObjectSearch object to process events
