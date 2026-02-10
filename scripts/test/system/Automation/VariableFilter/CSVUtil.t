@@ -12,8 +12,6 @@ use utf8;
 
 use vars (qw($Self));
 
-my $TimeObject = $Kernel::OM->Get('Time');
-
 # get helper object
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
