@@ -3765,12 +3765,11 @@ sub _CheckPermissionCondition {
 
     PART:
     foreach my $Part ( @Parts ) {
-        my ( $Object, $Attribute, $Operator, $Value );
         $Not = 0; # reset Not
 
-        next if $Part !~ /^(\w+)\.(\w+)\s+(!?\w+)\s+(.*?)$/;
+        next if $Part !~ /^(\w+)\.(\w+)(?::(\w+))?\s+(!?\w+)\s+(.*?)$/;
 
-        ( $Object, $Attribute, $Operator, $Value ) = ( $1, $2, $3, $4 );
+        my ( $Object, $Attribute, $Type, $Operator, $Value ) = ( $1, $2, $3, $4, $5 );
         if ( $Operator =~ /^!(.*?)$/ ) {
             $Not      = 1;
             $Operator = $1;
@@ -3807,6 +3806,7 @@ sub _CheckPermissionCondition {
             Object   => $Object,
             Field    => $Attribute,
             Operator => $Operator,
+            Type     => $Type,
             Value    => $Value,
             Not      => $Not,
             UseAnd   => $UseAnd,
@@ -3870,6 +3870,7 @@ create a filter
         Field          => 'QueueID',
         Operator       => 'EQ',
         Value          => 12,
+        Type           => 'NUMERIC',               # optional, default STRING
         Not            => 0|1,                     # optional, default 0
         UseAnd         => 0|1,                     # optional, default 0
         StopAfterMatch => 0|1,                     # optional, default 0
