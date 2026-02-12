@@ -8958,4 +8958,16 @@ Notes:
             </Hash>
         </Setting>
     </ConfigItem>
+    
+    <ConfigItem AccessLevel="internal" Name="Organisation::VirtuallyAssignContactsToSubOrganisations" Required="1" Valid="1">
+        <Description Translatable="1">When enabled, a contact assigned to an organisation is also virtually assigned to all its suborganisations. PLEASE NOTE: this will affect the system performance.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core</SubGroup>
+        <Setting>
+            <Option SelectedID="0">
+                <Item Key="0" Translatable="1">No</Item>
+                <Item Key="1" Translatable="1">Yes</Item>
+            </Option>
+        </Setting>
+    </ConfigItem>
 </kix_config>

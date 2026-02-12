@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<database Name="kix">
+
+    <TableAlter Name="organisation">
+        <ColumnAdd Name="parent_id" Required="false" Type="INTEGER" />
+        <ForeignKeyAdd ForeignTable="organisation">
+            <Reference Local="parent_id" Foreign="id"/>
+        </ForeignKeyAdd>
+        <IndexCreate Name="organisation_parent_id">
+            <IndexColumn Name="parent_id" />
+        </IndexCreate>
+    </TableAlter>
+
+</database>

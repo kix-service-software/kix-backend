@@ -1,54 +1,57 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "OrganisationPostRequest.json",
-  "type": "object",
-  "description": "The organisation request object for creation.",
-  "properties": {
-    "Organisation": {
-      "type": "object",
-      "properties": {
-        "City": {
-          "type": "string"
-        },
-        "Comment": {
-          "type": "string"
-        },
-        "Country": {
-          "type": "string"
-        },
-        "DynamicFields": {
-          "type": "array",
-          "description": "list of dynamic field values to be set",
-          "items": {
-            "$ref": "DynamicFieldValueSetItem.json"
-          }
-        },
-        "Number": {
-          "type": "string"
-        },
-        "Name": {
-          "type": "string"
-        },
-        "Street": {
-          "type": "string"
-        },
-        "Url": {
-          "type": "string"
-        },
-        "ValidID": {
-          "type": "integer"
-        },
-        "Zip": {
-          "type": "string"
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "$id": "OrganisationPostRequest.json",
+    "type": "object",
+    "description": "The organisation request object for creation.",
+    "properties": {
+        "Organisation": {
+            "type": "object",
+            "properties": {
+                "City": {
+                    "type": "string"
+                },
+                "Comment": {
+                    "type": "string"
+                },
+                "Country": {
+                    "type": "string"
+                },
+                "DynamicFields": {
+                    "type": "array",
+                    "description": "list of dynamic field values to be set",
+                    "items": {
+                        "$ref": "DynamicFieldValueSetItem.json"
+                    }
+                },
+                "Number": {
+                    "type": "string"
+                },
+                "Name": {
+                    "type": "string"
+                },
+                "ParentID": {
+                    "type": "integer"
+                },
+                "Street": {
+                    "type": "string"
+                },
+                "Url": {
+                    "type": "string"
+                },
+                "ValidID": {
+                    "type": "integer"
+                },
+                "Zip": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "Name",
+                "Number"
+            ]
         }
-      },
-      "required": [
-        "Name",
-        "Number"
-      ]
-    }
-  },
-  "required": [
-    "Organisation"
-  ]
+    },
+    "required": [
+        "Organisation"
+    ]
 }

@@ -170,6 +170,56 @@ sub AttributePrepare {
     return \%Attribute;
 }
 
+sub Search {
+    my ( $Self, %Param ) = @_;
+
+    if (
+        ref( $Param{Search} ) eq 'HASH'
+        && $Param{Search}->{Field}
+        && (
+            $Param{Search}->{Field} eq 'OrganisationID'
+            || $Param{Search}->{Field} eq 'OrganisationIDs'
+        )
+        && $Param{Search}->{Operator}
+        && $Param{Search}->{Operator} ne 'EMPTY'
+    ) {
+        my $WithSubOrgs = $Kernel::OM->Get('Config')->Get('Organisation::VirtuallyAssignContactsToSubOrganisations') || 0;
+        if ( $WithSubOrgs ) {
+            # prepare given values as array
+            my @OrganisationIDs = ();
+            if ( !IsArrayRef( $Param{Search}->{Value} ) ) {
+                push( @OrganisationIDs,  $Param{Search}->{Value} );
+            }
+            else {
+                @OrganisationIDs = @{ $Param{Search}->{Value} };
+            }
+
+            my @NewOrganisationIDs = ();
+            for my $OrganisationID ( @OrganisationIDs ) {
+                push( @NewOrganisationIDs, $OrganisationID );
+
+                my @SubOrganisationIDs = $Kernel::OM->Get('Organisation')->GetAllSubOrganisationIDs(
+                    OrgID => $OrganisationID,
+                );
+                push( @NewOrganisationIDs, @SubOrganisationIDs );
+            }
+
+            $Param{Search}->{Value} = \@NewOrganisationIDs;
+            if (
+                $Param{Search}->{Operator} eq 'EQ'
+                || $Param{Search}->{Operator} eq 'IN'
+            ) {
+                $Param{Search}->{Operator} = 'IN';
+            }
+            else {
+                $Param{Search}->{Operator} = '!IN';
+            }
+        }
+    }
+
+    return $Self->SUPER::Search(%Param);
+}
+
 sub _JoinGet {
     my ( $Self, %Param ) = @_;
 

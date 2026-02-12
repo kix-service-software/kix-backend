@@ -77,6 +77,7 @@ add a new organisation
     my $ID = $OrganisationObject->OrganisationAdd(
         Number   => 'example.com',
         Name     => 'New Customer Inc.',
+        ParentID => 123,                         # optional
         Street   => '5201 Blue Lagoon Drive',    # optional
         Zip      => '33126',                     # optional
         City     => 'Miami',                     # optional
@@ -107,11 +108,11 @@ sub OrganisationAdd {
 
     return if !$Kernel::OM->Get('DB')->Do(
         SQL  => "INSERT INTO organisation "
-             . "(number, name, street, zip, city, country, "
+             . "(parent_id, number, name, street, zip, city, country, "
              . "url, comments, valid_id, create_time, create_by, change_time, change_by) "
-             . "VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?)",
+             . "VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, current_timestamp, ?, current_timestamp, ?)",
         Bind => [
-            \$Param{Number}, \$Param{Name}, \$Param{Street},
+            \$Param{ParentID}, \$Param{Number}, \$Param{Name}, \$Param{Street},
             \$Param{Zip}, \$Param{City}, \$Param{Country},
             \$Param{Url}, \$Param{Comment}, \$Param{ValidID},
             \$Param{UserID}, \$Param{UserID}
@@ -184,6 +185,7 @@ Returns:
 
     %Organisation = (
         'ID'         => 123,
+        'ParentID'   => 1,
         'Number'     => 'example.com',
         'Name'       => 'Customer Inc.',
         'Street'     => '5201 Blue Lagoon Drive',
@@ -225,7 +227,7 @@ sub OrganisationGet {
 
     # ask database
     $Kernel::OM->Get('DB')->Prepare(
-        SQL => 'SELECT id, number, name, street, zip, city, country, url, comments, valid_id, '
+        SQL => 'SELECT id, parent_id, number, name, street, zip, city, country, url, comments, valid_id, '
              . 'create_time, create_by, change_time, change_by FROM organisation WHERE id = ?',
         Bind  => [ \$Param{ID} ],
         Limit => 1,
@@ -235,19 +237,20 @@ sub OrganisationGet {
     my %Organisation;
     while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
         $Organisation{ID}         = $Row[0];
-        $Organisation{Number}     = $Row[1];
-        $Organisation{Name}       = $Row[2];
-        $Organisation{Street}     = $Row[3];
-        $Organisation{Zip}        = $Row[4];
-        $Organisation{City}       = $Row[5];
-        $Organisation{Country}    = $Row[6];
-        $Organisation{Url}        = $Row[7];
-        $Organisation{Comment}    = $Row[8] || '';
-        $Organisation{ValidID}    = $Row[9];
-        $Organisation{CreateTime} = $Row[10];
-        $Organisation{CreateBy}   = $Row[11];
-        $Organisation{ChangeTime} = $Row[12];
-        $Organisation{ChangeBy}   = $Row[13];
+        $Organisation{ParentID}   = $Row[1];
+        $Organisation{Number}     = $Row[2];
+        $Organisation{Name}       = $Row[3];
+        $Organisation{Street}     = $Row[4];
+        $Organisation{Zip}        = $Row[5];
+        $Organisation{City}       = $Row[6];
+        $Organisation{Country}    = $Row[7];
+        $Organisation{Url}        = $Row[8];
+        $Organisation{Comment}    = $Row[9] || '';
+        $Organisation{ValidID}    = $Row[10];
+        $Organisation{CreateTime} = $Row[11];
+        $Organisation{CreateBy}   = $Row[12];
+        $Organisation{ChangeTime} = $Row[13];
+        $Organisation{ChangeBy}   = $Row[14];
     }
 
     # check item
@@ -425,6 +428,7 @@ update organisation attributes
 
     $OrganisationObject->OrganisationUpdate(
         ID       => 123,
+        ParentID => 1,
         Number   => 'example.com',
         Name     => 'New Customer Inc.',
         Street   => '5201 Blue Lagoon Drive',
@@ -465,13 +469,28 @@ sub OrganisationUpdate {
         return;
     }
 
+    # check parent loop
+    if ( $Param{ParentID} ) {
+        my @ParentOrgIDs = $Self->GetAllParentOrganisationIDs(
+            OrgID => $Param{ParentID}
+        );
+        my %Parents = map { $_ => 1 } @ParentOrgIDs;
+        if ( $Parents{$Param{ID}} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Organisation with ID $Param{ID} is already assigned as an upline parent and cannot be a sub-organisation!",
+            );
+            return;
+        }
+    }
+
     # set default value
     $Param{Comment} ||= '';
 
     # check if update is required
     my $ChangeRequired;
     KEY:
-    for my $Key (qw(Number Name Street Zip City Country Url Comment ValidID)) {
+    for my $Key (qw(ParentID Number Name Street Zip City Country Url Comment ValidID)) {
 
         next KEY if defined $Organisation{$Key} && $Organisation{$Key} eq $Param{$Key};
 
@@ -484,11 +503,11 @@ sub OrganisationUpdate {
 
     # update role in database
     return if !$Kernel::OM->Get('DB')->Do(
-        SQL => 'UPDATE organisation SET number = ?, name = ?, street = ?, '
+        SQL => 'UPDATE organisation SET parent_id = ?, number = ?, name = ?, street = ?, '
             . 'zip = ?, city = ?, country = ?, url = ?, comments = ?, valid_id = ?, '
             . 'change_time = current_timestamp, change_by = ? WHERE id = ?',
         Bind => [
-            \$Param{Number}, \$Param{Name}, \$Param{Street},
+            \$Param{ParentID}, \$Param{Number}, \$Param{Name}, \$Param{Street},
             \$Param{Zip}, \$Param{City}, \$Param{Country},
             \$Param{Url}, \$Param{Comment}, \$Param{ValidID},
             \$Param{UserID}, \$Param{ID}
@@ -606,6 +625,95 @@ sub OrganisationDelete {
     );
 
     return 1;
+}
+
+=item GetAllSubOrganisationIDs()
+
+recursively get all sub organisations of the given org ID
+
+    my @SubOrgIDs = $Object->GetAllSubOrganisationIDs(
+        OrgID    => 123,
+    );
+
+=cut
+
+sub GetAllSubOrganisationIDs {
+    my ( $Self, %Param ) = @_;
+
+    for my $Needed (qw(OrgID)) {
+        if (!$Param{$Needed}) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!",
+            );
+
+            return;
+        }
+    }
+
+    # get all directly assigned suborg IDs
+    my @DirectSubOrgIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Organisation',
+        Result     => 'ARRAY',
+        Search     => {
+            AND => [
+                { "Field" => "ParentID", "Operator" => "EQ", "Value" => $Param{OrgID} }
+            ]
+        },
+        UserType   => 'Agent',
+        UserID     => 1,
+    );
+    my @AllSubOrgIDs = @DirectSubOrgIDs;
+
+    # recursively get all suborg IDs of the directly assigned orgs
+    foreach my $SubOrgID ( @DirectSubOrgIDs ) {
+        my @SubOrgIDs = $Self->GetAllSubOrganisationIDs( 
+            OrgID => $SubOrgID,
+        );
+
+        push @AllSubOrgIDs, @SubOrgIDs;
+    }
+
+    return @AllSubOrgIDs;
+}
+
+=item GetAllParentOrganisationIDs()
+
+get all parent organisations of the given org ID
+
+    my @ParentOrgIDs = $Object->GetAllParentOrganisationIDs(
+        OrgID => 123,
+    );
+
+=cut
+
+sub GetAllParentOrganisationIDs {
+    my ( $Self, %Param ) = @_;
+
+    for my $Needed (qw(OrgID)) {
+        if (!$Param{$Needed}) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!",
+            );
+
+            return;
+        }
+    }
+
+    my $OrgID = $Param{OrgID};
+    my @AllParentOrgIDs;
+
+    do {
+        my %OrgData = $Self->OrganisationGet(
+            ID => $OrgID
+        );
+        push @AllParentOrgIDs, $OrgID if $OrgID != $Param{OrgID};
+
+        $OrgID = $OrgData{ParentID};
+    } while ($OrgID);
+
+    return @AllParentOrgIDs;
 }
 
 sub DESTROY {

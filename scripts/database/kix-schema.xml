@@ -1144,6 +1144,7 @@
 <!-- organisation -->
 <Table Name="organisation">
     <Column Name="id" Required="true" PrimaryKey="true" AutoIncrement="true" Type="INTEGER"/>
+    <Column Name="parent_id" Required="false" Type="INTEGER" />
     <Column Name="number" Required="true" Size="150" Type="VARCHAR"/>
     <Column Name="name" Required="true" Size="200" Type="VARCHAR"/>
     <Column Name="street" Required="false" Size="200" Type="VARCHAR"/>
@@ -1156,7 +1157,7 @@
     <Column Name="create_time" Required="true" Type="DATE"/>
     <Column Name="create_by" Required="true" Type="INTEGER"/>
     <Column Name="change_time" Required="true" Type="DATE"/>
-    <Column Name="change_by" Required="true" Type="INTEGER"/>
+    <Column Name="change_by" Required="true" Type="INTEGER"/>        
     <Unique Name="organisation_number">
         <UniqueColumn Name="number"/>
     </Unique>
@@ -1167,6 +1168,12 @@
         <Reference Local="create_by" Foreign="id"/>
         <Reference Local="change_by" Foreign="id"/>
     </ForeignKey>
+    <ForeignKey ForeignTable="organisation">
+        <Reference Local="parent_id" Foreign="id"/>
+    </ForeignKey>
+    <Index Name="organisation_parent_id">
+        <IndexColumn Name="parent_id" />
+    </Index>
 </Table>
 
 <Table Name="contact_organisation">

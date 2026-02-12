@@ -199,8 +199,9 @@ sub _GetContactData {
 
     # get the Contact data
     my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
-        ID            => $ContactID,
-        DynamicFields => $Param{Data}->{include}->{DynamicFields},
+        ID                       => $ContactID,
+        DynamicFields            => $Param{Data}->{include}->{DynamicFields},
+        OnlyDirectAssignedOrgIDs => $Param{Data}->{ignoreVirtuallyAssignedOrganisations}
     );
 
     if ( !IsHashRefWithData( \%ContactData ) ) {
