@@ -111,6 +111,27 @@ sub Run {
             );
         }
 
+        # include SubOrganisations if requested
+        if ( $Param{Data}->{include}->{SubOrganisations} ) {
+            my @OrganisationIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+                ObjectType => 'Organisation',
+                Result     => 'ARRAY',
+                Search     => {
+                    AND => [
+                        { "Field" => "ParentID", "Operator" => "EQ", "Value" => $ID }
+                    ]
+                },
+                UserType   => $Self->{Authorization}->{UserType},
+                UserID     => $Self->{Authorization}->{UserID},
+            );
+
+            # force numeric IDs
+            foreach my $Value ( @OrganisationIDs ) {
+                $Value = 0 + $Value;
+            }
+            $OrganisationData{SubOrganisations} = \@OrganisationIDs;
+        }
+
         if ( $Param{Data}->{include}->{DynamicFields} ) {
             my @DynamicFields;
 

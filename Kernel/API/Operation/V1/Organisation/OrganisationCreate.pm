@@ -108,6 +108,21 @@ sub Run {
         );
     }
 
+    # check ParentID exists if given
+    if ( $Organisation->{ParentID} ) {
+        my $ID = $Kernel::OM->Get('Organisation')->OrganisationLookup(
+            ID => $Organisation->{ParentID},
+            Silent => 1,
+        );
+
+        if ( !$ID ) {
+            return $Self->_Error(
+                Code    => 'Object.NotFound',
+                Message => 'Cannot create organisation. Property ParentID does not reference an existing organisation.',
+            );
+        }
+    }
+
     # create Organisation
     my $OrganisationID = $Kernel::OM->Get('Organisation')->OrganisationAdd(
         %{$Organisation},

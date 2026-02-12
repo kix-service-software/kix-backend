@@ -51,6 +51,12 @@ $Self->IsDeeply(
             IsSortable   => 1,
             Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
+        ParentID => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EMPTY','EQ','NE','IN','!IN'],
+            ValueType    => 'NUMERIC'
+        },
         Street => {
             IsSearchable => 1,
             IsSortable   => 1,
@@ -411,6 +417,84 @@ my @SearchTests = (
         Expected     => {
             'Where' => [
                 $CaseSensitive ? 'LOWER(o.number) LIKE \'test\'' : 'o.number LIKE \'test\''
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field ParentID / Operator EQ',
+        Search       => {
+            Field    => 'ParentID',
+            Operator => 'EQ',
+            Value    => 1
+        },
+        Expected     => {
+            'Where' => [
+                'o.parent_id = 1'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field ParentID / Operator NE',
+        Search       => {
+            Field    => 'ParentID',
+            Operator => 'NE',
+            Value    => 1
+        },
+        Expected     => {
+            'Where' => [
+                '(o.parent_id <> 1 OR o.parent_id IS NULL)'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field ParentID / Operator IN',
+        Search       => {
+            Field    => 'ParentID',
+            Operator => 'IN',
+            Value    => [1]
+        },
+        Expected     => {
+            'Where' => [
+                'o.parent_id IN (1)'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field ParentID / Operator !IN',
+        Search       => {
+            Field    => 'ParentID',
+            Operator => '!IN',
+            Value    => [1]
+        },
+        Expected     => {
+            'Where' => [
+                'o.parent_id NOT IN (1)'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field ParentID / Operator EMPTY / Value 1',
+        Search       => {
+            Field    => 'ParentID',
+            Operator => 'EMPTY',
+            Value    => 1
+        },
+        Expected     => {
+            'Where' => [
+                'o.parent_id IS NULL'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field ParentID / Operator EMPTY / Value 0',
+        Search       => {
+            Field    => 'ParentID',
+            Operator => 'EMPTY',
+            Value    => 0
+        },
+        Expected     => {
+            'Where' => [
+                'o.parent_id IS NOT NULL'
             ]
         }
     },
@@ -1391,6 +1475,14 @@ my @SortTests = (
         Expected  => {
             'Select'  => ['o.number'],
             'OrderBy' => ['LOWER(o.number)']
+        }
+    },
+    {
+        Name      => 'Sort: Attribute "ParentID"',
+        Attribute => 'ParentID',
+        Expected  => {
+            'Select'  => ['o.parent_id'],
+            'OrderBy' => ['o.parent_id']
         }
     },
     {
