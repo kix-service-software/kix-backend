@@ -32,6 +32,12 @@ sub Configure {
         Required    => 0,
         HasValue    => 0,
     );
+    $Self->AddOption(
+        Name        => 'json',
+        Description => 'Output JSON instead of perl dump to console.',
+        Required    => 0,
+        HasValue    => 0,
+    );
 
     return;
 }
@@ -43,7 +49,20 @@ sub Run {
 
     $Self->Print("<yellow>Collecting support data...</yellow>\n");
     my %SupportData = $Kernel::OM->Get('SupportData')->SupportDataCollect();
-    $Self->Print("\n".$Kernel::OM->Get('Main')->Dump(\%SupportData)."\n");
+
+    my $Output = '';
+    if ( $Self->GetOption('json') ) {
+        $Output = $Kernel::OM->Get('JSON')->Encode(
+            Data     => \%SupportData,
+            SortKeys => 1,
+            Pretty   => 1,
+        );
+    }
+    else {
+        $Output = $Kernel::OM->Get('Main')->Dump(\%SupportData);
+    }
+
+    $Self->Print("\n$Output\n");
 
     if ( $DoSend ) {
         if ( $Self->{SupportDataConfig}->{SendTo} ) {

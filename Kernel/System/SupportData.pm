@@ -385,7 +385,7 @@ sub _CollectSystemInfo {
     $Result{TimeZoneOffset} = $TimeZoneObject->offset_for_datetime(DateTime->now);
 
     $Result{CPU} = `lscpu`;
-    $Result{Memory} = `free`;
+    $Result{Memory} = `cat /proc/meminfo`;
 
     return \%Result;
 }
@@ -474,7 +474,7 @@ sub _CollectAPIMetrics {
         foreach my $Line ( @{$Content||[]} ) {
             chomp $Line;
             my @Columns = split /\t/, $Line;
-            next LINE if $Columns[3] < 150;
+            next LINE if $Columns[7] < 150;         # ignore all durations below 150ms
             push @Result, $Line;
         }
     }
