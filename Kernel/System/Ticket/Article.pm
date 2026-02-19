@@ -2410,7 +2410,7 @@ sub ArticleFlagSet {
     return 1 if defined $Flag{ $Param{Key} } && $Flag{ $Param{Key} } eq $Param{Value};
 
     my $UserID = $Param{UserID};
-    if ( $Param{Key} =~ /^(?:SMIME|NotSend|RetryEncrypt)/smx ) {
+    if ( $Param{Key} =~ /^(?:SMIME|NotSent|RetryEncrypt)/smx ) {
         $UserID = 1;
     }
 
@@ -2423,14 +2423,14 @@ sub ArticleFlagSet {
                 INSERT INTO article_flag
                 (article_id, article_key, article_value, create_time, create_by)
                 VALUES (?, ?, ?, current_timestamp, ?)',
-            Bind => [ \$Param{ArticleID}, \$Param{Key}, \$Param{Value}, \$Param{UserID} ],
+            Bind => [ \$Param{ArticleID}, \$Param{Key}, \$Param{Value}, \$UserID ],
         );
     }
     else {
         return if !$DBObject->Do(
             SQL => 'UPDATE article_flag SET article_value = ?, create_time = current_timestamp
                     WHERE article_id = ? AND article_key = ? AND create_by = ?',
-            Bind => [ \$Param{Value}, \$Param{ArticleID}, \$Param{Key}, \$Param{UserID} ],
+            Bind => [ \$Param{Value}, \$Param{ArticleID}, \$Param{Key}, \$UserID ],
         );
     }
 
@@ -2701,7 +2701,7 @@ sub ArticleFlagGet {
         );
 
         while ( my @Row = $DBObject->FetchrowArray() ) {
-            next if ( $Row[0] !~ /^(?:SMIME|NotSend|RetryEncrypt)/smx );
+            next if ( $Row[0] !~ /^(?:SMIME|NotSent|RetryEncrypt)/smx );
             $Flag{ $Row[0] } = $Row[1];
         }
     }

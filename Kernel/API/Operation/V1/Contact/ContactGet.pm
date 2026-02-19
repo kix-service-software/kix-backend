@@ -199,8 +199,9 @@ sub _GetContactData {
 
     # get the Contact data
     my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
-        ID            => $ContactID,
-        DynamicFields => $Param{Data}->{include}->{DynamicFields},
+        ID                       => $ContactID,
+        DynamicFields            => $Param{Data}->{include}->{DynamicFields},
+        OnlyDirectAssignedOrgIDs => $Param{Data}->{ignoreVirtuallyAssignedOrganisations}
     );
 
     if ( !IsHashRefWithData( \%ContactData ) ) {
@@ -352,7 +353,8 @@ sub _GetContactData {
             $UserData = $Self->ExecOperation(
                 OperationType => 'V1::User::UserGet',
                 Data          => {
-                    UserID => $ContactData{AssignedUserID},
+                    UserID      => $ContactData{AssignedUserID},
+                    ContactData => \%ContactData                    # use the data we already have (saves at least 2ms)
                 }
             );
         }

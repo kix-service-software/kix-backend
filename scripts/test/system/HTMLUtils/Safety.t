@@ -343,7 +343,7 @@ You should be able to continue reading these lessons, however.
             '<html><head><style type="text/css"> #some_css {color: #FF0000} </style><body>Important Text about "javascript"!<style type="text/css"> #some_more_css{ color: #00FF00 } </style> Some more text.</body></html>',
         Result => {
             Output =>
-                '<html><head><style type="text/css">#some_css{color:#FF0000}</style><body>Important Text about &quot;javascript&quot;!<style type="text/css">#some_more_css{color:#00FF00}</style> Some more text.</body></html>',
+                '<html><head><style type="text/css"> #some_css {color: #FF0000} </style><body>Important Text about &quot;javascript&quot;!<style type="text/css"> #some_more_css{ color: #00FF00 } </style> Some more text.</body></html>',
             Replace => 1,
         },
         Name =>
@@ -354,7 +354,7 @@ You should be able to continue reading these lessons, however.
             '<html><head><style type="text/javascript"> alert("some evil stuff!);</style><body>Important Text about "javascript"!<style type="text/css"> #some_more_css{ color: #00FF00 } </style> Some more text.</body></html>',
         Result => {
             Output =>
-                '<html><head><body>Important Text about &quot;javascript&quot;!<style type="text/css">#some_more_css{color:#00FF00}</style> Some more text.</body></html>',
+                '<html><head><body>Important Text about &quot;javascript&quot;!<style type="text/css"> #some_more_css{ color: #00FF00 } </style> Some more text.</body></html>',
             Replace => 1,
         },
         Name =>
@@ -433,7 +433,15 @@ div > span > div {
 </style>
 EOF
         Result => {
-            Output => '<style type="text/css">div > span{width:200px;}</style><style type="text/css"></style><style type="text/css">div > span > div{width:200px;}</style>',
+            Output => '<style type="text/css">
+div > span {
+    width: 200px;
+}
+</style><style type="text/css"></style><style type="text/css">
+div > span > div {
+    width: 200px;
+}
+</style>',
             Replace => 1,
         },
         Name => 'Safety - Style tags with CSS expressions are filtered out'
@@ -860,7 +868,13 @@ to="javascript:alert(document.location.origin)"> </set>',
             NoJavaScript => 1
         },
         Result => {
-            Output  => '<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Open+Sans:400,400italic&amp;subset=latin,cyrillic" /><style type="text/css" media="all">*{-webkit-text-size-adjust:none;-ms-text-size-adjust:none;}</style>',
+            Output  => '<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Open+Sans:400,400italic&amp;subset=latin,cyrillic" /><style type="text/css" media="all">
+*
+{
+        -webkit-text-size-adjust:none;
+        -ms-text-size-adjust:none
+}
+</style>',
             Replace => 1,
         },
     },

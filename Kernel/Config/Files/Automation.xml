@@ -210,6 +210,13 @@
             <String>Kernel::System::Automation::VariableFilter::BaseUtil</String>
         </Setting>
     </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Automation::VariableFilter###CharsetUtil" Required="0" Valid="1">
+        <Description Translatable="1">Registration of a variable filter module.</Description>
+        <Group>Automation</Group>
+        <Setting>
+            <String>Kernel::System::Automation::VariableFilter::CharsetUtil</String>
+        </Setting>
+    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="Automation::VariableFilter###CSVUtil" Required="0" Valid="1">
         <Description Translatable="1">Registration of a variable filter module.</Description>
         <Group>Automation</Group>

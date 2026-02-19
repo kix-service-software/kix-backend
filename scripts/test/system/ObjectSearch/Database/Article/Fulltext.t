@@ -430,14 +430,11 @@ my @IntegrationSearchTests = (
     {
         Name     => "Search: Field Fulltext | Operator LIKE | FulltextAttributes: From,To | Value \$From1",
         ConfigSet => {
-            %{$DefaultCnf},
-            Article => {
-                %{$DefaultCnf->{Article}},
-                FulltextAttributes => [
-                    'From',
-                    'To'
-                ]
-            }
+            %{$DefaultCnf->{Article}},
+            FulltextAttributes => [
+                'From',
+                'To'
+            ]
         },
         Search   => {
             'AND' => [
@@ -466,13 +463,10 @@ my @IntegrationSearchTests = (
     {
         Name     => "Search: Field Fulltext | Operator LIKE | FulltextAttributes: Subject | Value \$Subject1",
         ConfigSet => {
-            %{$DefaultCnf},
-            Article => {
-                %{$DefaultCnf->{Article}},
-                FulltextAttributes => [
-                    'Subject'
-                ]
-            }
+            %{$DefaultCnf->{Article}},
+            FulltextAttributes => [
+                'Subject'
+            ]
         },
         Search   => {
             'AND' => [
@@ -497,21 +491,34 @@ my @IntegrationSearchTests = (
             ]
         },
         Expected => [$ArticleID2]
+    },
+    {
+        Name     => "Search: Field Fulltext | Operator LIKE | FulltextAttributes: Subject | Value $To1",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Fulltext',
+                    Operator => 'LIKE',
+                    Value    => $To1
+                }
+            ]
+        },
+        Expected => []
     }
 );
 for my $Test ( @IntegrationSearchTests ) {
     if ( IsHashRefWithData($Test->{ConfigSet}) ) {
-        $Kernel::OM->Get('Config')->Set(
-            Key   => 'ObjectSearch::Database::ObjectType',
+        $Helper->ConfigSettingChange(
+            Key   => 'ObjectSearch::Database::ObjectType###Article',
             Value => $Test->{ConfigSet}
         );
 
         my $Config = $Kernel::OM->Get('Config')->Get('ObjectSearch::Database::ObjectType');
 
         $Self->IsDeeply(
-            $Config,
+            $Config->{Article},
             $Test->{ConfigSet},
-            'Search: Field Fulltext | SET FulltextAttributes: ' . join(q(,), @{$Test->{ConfigSet}->{Article}->{FulltextAttributes}})
+            'Search: Field Fulltext | SET FulltextAttributes: ' . join(q(,), @{$Test->{ConfigSet}->{FulltextAttributes}})
         );
 
         # discard ObjectSearch object to process events
@@ -535,7 +542,7 @@ for my $Test ( @IntegrationSearchTests ) {
         }
     );
 
-    my @Result = $ObjectSearch->Search(
+    my @Result = $Kernel::OM->Get('ObjectSearch')->Search(
         ObjectType => 'Article',
         Result     => 'ARRAY',
         Search     => \%Search,

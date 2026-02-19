@@ -43,6 +43,12 @@ sub GetSupportedAttributes {
             IsSortable   => 1,
             Operators    => ['EQ','NE','IN','!IN','STARTSWITH','ENDSWITH','CONTAINS','LIKE']
         },
+        ParentID => {
+            IsSearchable => 1,
+            IsSortable   => 1,
+            Operators    => ['EMPTY','EQ','NE','IN','!IN'],
+            ValueType    => 'NUMERIC'
+        },
         Street => {
             IsSearchable => 1,
             IsSortable   => 1,
@@ -90,6 +96,11 @@ sub Search {
         Number  => {
             Column    => 'o.number'
         },
+        ParentID  => {
+            Column    => 'o.parent_id',
+            ValueType => 'NUMERIC',
+            NULLValue => 1
+        },
         Street  => {
             Column    => 'o.street',
             NULLValue => 1
@@ -116,13 +127,19 @@ sub Search {
         }
     );
 
+    my $CaseInsensitive = 1;
+    if ( $AttributeMapping{$Param{Search}->{Field}}->{ValueType} && $AttributeMapping{$Param{Search}->{Field}}->{ValueType} eq 'NUMERIC' ) {
+        $CaseInsensitive = 0;
+    }
+
     # prepare condition
     my $Condition = $Self->_GetCondition(
         Operator        => $Param{Search}->{Operator},
         Column          => $AttributeMapping{ $Param{Search}->{Field} }->{Column},
         NULLValue       => $AttributeMapping{ $Param{Search}->{Field} }->{NULLValue},
         Value           => $Param{Search}->{Value},
-        CaseInsensitive => 1,
+        ValueType       => $AttributeMapping{$Param{Search}->{Field}}->{ValueType},
+        CaseInsensitive => $CaseInsensitive,
         Silent          => $Param{Silent}
     );
     return if ( !$Condition );
@@ -148,6 +165,10 @@ sub Sort {
         Number  => {
             Select  => ['o.number'],
             OrderBy => ['LOWER(o.number)']
+        },
+        ParentID  => {
+            Select  => ['o.parent_id'],
+            OrderBy => ['o.parent_id']
         },
         Street  => {
             Select  => ['LOWER(COALESCE(o.street,\'\')) AS SortStreet'],

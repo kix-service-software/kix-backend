@@ -121,6 +121,35 @@ sub Run {
         }
     }
 
+    # check ParentID exists if given
+    if ( $Organisation->{ParentID} ) {
+        my $ID = $Kernel::OM->Get('Organisation')->OrganisationLookup(
+            ID => $Organisation->{ParentID},
+            Silent => 1,
+        );
+
+        if ( !$ID ) {
+            return $Self->_Error(
+                Code    => 'Object.NotFound',
+                Message => 'Cannot create organisation. Property ParentID does not reference an existing organisation.',
+            );
+        }
+
+        # check parent loop
+        my @ParentOrgIDs = $Kernel::OM->Get('Organisation')->GetAllParentOrganisationIDs(
+            OrgID => $Organisation->{ParentID}
+        );
+        push @ParentOrgIDs, $Organisation->{ParentID};
+
+        my %Parents = map { $_ => 1 } @ParentOrgIDs;
+        if ( $Parents{$Param{Data}->{OrganisationID}} ) {
+            return $Self->_Error(
+                Code    => 'Conflict',
+                Message => "Organisation with ID $Param{Data}->{OrganisationID} is already assigned as an upline parent and cannot be a sub-organisation!",
+            );
+        }
+    }
+
     # update Organisation
     my $Success = $Kernel::OM->Get('Organisation')->OrganisationUpdate(
         %OrganisationData,
