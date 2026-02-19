@@ -210,4 +210,21 @@ When qr/added a contact with a login that already exists$/, sub {
    );
 };
 
-
+When qr/added a contact with umlauts$/, sub {
+   ( S->{Response}, S->{ResponseContent} ) = _Post(
+      URL     => S->{API_URL}.'/contacts',
+      Token   => S->{Token},
+      Content => {
+         Contact => {
+            Email => "info\@schröder.de",
+            Firstname => "Max",
+            Lastname => "Schröder",
+            Login => "masch",
+            OrganisationIDs => [
+                S->{OrganisationID}
+            ],
+            PrimaryOrganisationID => S->{OrganisationID}
+         }
+      }
+   );
+};
