@@ -7,6 +7,14 @@
             <String Regex="">&lt;KIX_CONFIG_Home&gt;/var/tmp</String>
         </Setting>
     </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectIcon###Directory" Required="1" Valid="1">
+        <Description Translatable="1">The directory to use for object icons.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Web</SubGroup>
+        <Setting>
+            <String Regex="">&lt;KIX_CONFIG_Home&gt;/var/objecticons</String>
+        </Setting>
+    </ConfigItem>
     <ConfigItem AccessLevel="external" Name="ImprintLink" Required="0" Valid="1">
         <Description Translatable="1">Defines the language dependent link to an online imprint.</Description>
         <Group>Framework</Group>
