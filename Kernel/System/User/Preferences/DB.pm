@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
+# Modified version of the work: Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -66,16 +66,16 @@ sub SetPreferences {
         }
     }
 
+    my $DBObject = $Kernel::OM->Get('DB');
+
     # prepare multiple values (i.e. MyQueues, MyServices, ...)
     my @Values;
-    if ( IsArrayRefWithData($Param{Value}) ) {
+    if ( IsArrayRef($Param{Value}) ) {
         @Values = @{$Param{Value}};
     }
     else {
         push @Values, ($Param{Value} // '');
     }
-
-    my $DBObject = $Kernel::OM->Get('DB');
 
     # delete old data
     return if !$DBObject->Do(
@@ -86,7 +86,8 @@ sub SetPreferences {
         Bind => [ \$Param{UserID}, \$Param{Key} ],
     );
 
-    foreach my $Value ( @Values ) {
+    for my $Value ( @Values ) {
+        next if ( !defined( $Value ) );
         # insert new data
         return if !$DBObject->Do(
             SQL => "
@@ -196,6 +197,8 @@ sub DeletePreferences {
         }
     }
 
+    my $Key = $Param{Key}   || '';
+
     my $DBObject = $Kernel::OM->Get('DB');
 
     my $SQL = "DELETE FROM $Self->{PreferencesTable} WHERE $Self->{PreferencesTableUserID} = ?";
@@ -203,8 +206,8 @@ sub DeletePreferences {
         \$Param{UserID}
     );
 
-    if ( $Param{Key} ) {
-        push @Bind, \$Param{Key};
+    if ( $Key ) {
+        push @Bind, \$Key;
         $SQL .= " AND $Self->{PreferencesTableKey} = ?";
     }
 
@@ -221,7 +224,7 @@ sub DeletePreferences {
 
     # TODO: find another solution to delete caches depending on user language
     # trigger special cache delete for cached transaltions/localisation
-    if ( $Param{Key} eq 'UserLanguage' ) {
+    if ( $Key eq 'UserLanguage' ) {
         $Kernel::OM->Get('Cache')->CleanUp(
             Type => 'UserLanguage',
         );
@@ -229,7 +232,7 @@ sub DeletePreferences {
 
     # TODO: find another solution to delete caches depending on 'MyQueues'
     # trigger special cache delete for cached ticket searches
-    if ( $Param{Key} eq 'MyQueues' ) {
+    if ( $Key eq 'MyQueues' ) {
         $Kernel::OM->Get('Cache')->CleanUp(
             Type => 'ObjectSearch_Ticket',
         );
@@ -245,6 +248,8 @@ sub SearchPreferences {
     my $Value = $Param{Value} // '';
 
     my $DBObject = $Kernel::OM->Get('DB');
+
+    my %UserID;
 
     my $Lower = '';
     if ( $DBObject->GetDatabaseFunction('CaseSensitive') ) {
@@ -270,7 +275,6 @@ sub SearchPreferences {
     );
 
     # fetch the result
-    my %UserID;
     while ( my @Row = $DBObject->FetchrowArray() ) {
         $UserID{ $Row[0] } = $Row[1];
     }

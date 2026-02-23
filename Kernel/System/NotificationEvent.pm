@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
+# Modified version of the work: Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -12,6 +12,8 @@ package Kernel::System::NotificationEvent;
 
 use strict;
 use warnings;
+
+use base qw(Kernel::System::EventHandler);
 
 use Kernel::System::VariableCheck qw(:all);
 
@@ -56,6 +58,11 @@ sub new {
 
     $Self->{CacheType} = 'NotificationEvent';
     $Self->{CacheTTL}  = 60 * 60 * 24 * 20;
+
+    # init of event handler
+    $Self->EventHandlerInit(
+        Config => 'NotificationEvent::EventModulePost',
+    );
 
     return $Self;
 }
@@ -468,6 +475,15 @@ sub NotificationAdd {
         Type => $Self->{CacheType},
     );
 
+    # event
+    $Self->EventHandler(
+        Event => 'NotificationAdd',
+        Data  => {
+            ID => $ID
+        },
+        UserID => $Param{UserID},
+    );
+
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
@@ -641,6 +657,15 @@ sub NotificationUpdate {
         Type => $Self->{CacheType},
     );
 
+    # event
+    $Self->EventHandler(
+        Event => 'NotificationUpdate',
+        Data  => {
+            ID => $Param{ID}
+        },
+        UserID => $Param{UserID},
+    );
+
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
@@ -744,6 +769,15 @@ sub NotificationDelete {
     $Kernel::OM->Get('Log')->Log(
         Priority => 'notice',
         Message  => "NotificationEvent notification '$Check{Name}' deleted (UserID=$Param{UserID}).",
+    );
+
+    # event
+    $Self->EventHandler(
+        Event => 'NotificationDelete',
+        Data  => {
+            ID => $Param{ID},
+        },
+        UserID => $Param{UserID},
     );
 
     # push client callback event

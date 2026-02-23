@@ -359,6 +359,17 @@
             </Hash>
         </Setting>
     </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="API::Validator::Module###OutOfOfficeValidator" Required="0" Valid="1">
+        <Description Translatable="1">API module registration for the validator layer.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::API::Validator::OutOfOfficeValidator</Item>
+                <Item Key="Validates">OutOfOffice</Item>
+                <Item Key="ConsiderOperationRegEx"></Item>
+                <Item Key="IgnoreOperationRegEx">(UserCreate|UserUpdate)</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="API::Validator::Module###UserPasswordValidator" Required="0" Valid="1">
         <Description Translatable="1">API module registration for the validator layer.</Description>
         <Setting>
@@ -435,7 +446,7 @@
         <Setting>
             <Hash>
                 <Item Key="Module">Kernel::API::Validator::ObjectIconValidator</Item>
-                <Item Key="Validates">Content</Item>
+                <Item Key="Validates">ObjectIcon</Item>
                 <Item Key="ConsiderOperationRegEx">ObjectIconCreate|ObjectIconUpdate</Item>
                 <Item Key="IgnoreOperationRegEx"></Item>
             </Hash>

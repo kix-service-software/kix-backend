@@ -81,7 +81,6 @@
      Then response contains the following items type of Value
        | ConnectedTo | DependsOn |
        | Both        | Source    |
-      
-      
-      
+
+ 
 

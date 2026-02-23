@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
+# Modified version of the work: Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/ 
 # based on the original work of:
 # Copyright (C) 2001-2020 OTRS AG, https://otrs.com/
 # --
@@ -282,6 +282,17 @@ sub TicketIndexGetQueueStats {
     );
 
     my %Data = map { $_->{QueueID} => { TotalCount => $_->{TotalCount}, LockCount => $_->{LockCount} } } @{$Result || []};
+
+    if ( @QueueIDs ) {
+        for my $QueueID ( @QueueIDs ) {
+            if ( !IsHashRefWithData( $Data{ $QueueID } ) ) {
+                $Data{ $QueueID } = {
+                    LockCount  => 0,
+                    TotalCount => 0,
+                }
+            }
+        }
+    }
 
     $Kernel::OM->Get('Cache')->Set(
         Type  => 'TicketIndex',

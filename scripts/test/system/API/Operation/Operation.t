@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
+# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -24,6 +24,7 @@ $Helper->SSLVerify(
 
 # create object with false options
 my $OperationObject;
+my $APIModule = 'V1::User::UserSearch';
 
 # provide no objects
 $OperationObject = Kernel::API::Operation->new();
@@ -32,10 +33,26 @@ $Self->IsNot(
     'API::Operation',
     'Operation::new() fail check, no arguments',
 );
+my $APIModulesRef = $Kernel::OM->Get('Config')->Get('API::Operation::Module');
+$Self->True(
+    IsHashRefWithData($APIModulesRef->{ $APIModule }),
+    "Opation: Module $APIModule exists!"
+);
+
+# get webservice
+my $Webservice = _GetWebservice(
+    Operation  => $APIModule,
+    APIModules => $APIModulesRef,
+    UserID     => 1,
+);
+$Self->True(
+    IsHashRefWithData($Webservice),
+    "Opation: Get Webserice"
+);
 
 # provide empty operation
 $OperationObject = Kernel::API::Operation->new(
-    WebserviceID   => 1,
+    WebserviceID   => $Webservice->{ID},
     OperationType  => {},
 );
 $Self->IsNot(
@@ -46,7 +63,7 @@ $Self->IsNot(
 
 # provide incorrect operation
 $OperationObject = Kernel::API::Operation->new(
-    WebserviceID   => 1,
+    WebserviceID   => $Webservice->{ID},
     OperationType  => 'Test::ThisIsCertainlyNotBeingUsed',
 );
 $Self->IsNot(
@@ -67,15 +84,16 @@ $Self->IsNot(
 
 # create object
 $OperationObject = Kernel::API::Operation->new(
-    WebserviceID   => 1,
-    Operation      => 'UserSearch',
-    OperationType  => 'V1::User::UserSearch',
-    OperationRouteMapping => {},
+    WebserviceID                 => $Webservice->{ID},
+    Operation                    => 'UserSearch',
+    OperationType                => $APIModule,
+    OperationRouteMapping        => {},
     ParentMethodOperationMapping => {},
-    AvailableMethods => {},
-    RequestMethod => 'GET',
-    RequestURI    => '/system/users',
-    CurrentRoute  => '/system/users'
+    AvailableMethods             => {},
+    RequestMethod                => 'GET',
+    RequestURI                   => '/system/users',
+    CurrentRoute                 => '/system/users',
+    TransportConfig              => $Webservice->{Config}->{Provider}->{Transport}->{Config}
 );
 $Self->Is(
     ref $OperationObject,
@@ -134,9 +152,35 @@ $Self->True(
     'OperationObject call data provided',
 );
 
+
+sub _GetWebservice {
+    my ( %Param ) = @_;
+
+    # get webservice
+    my $Service = $Kernel::OM->Get('Webservice')->WebserviceGet(
+        Name => lc( $Param{APIModules}->{ $Param{Operation} }->{APIVersion} ),
+    );
+    $Self->True(
+        IsHashRefWithData( $Service ),
+        "Webservice: get webservice for APIVersion $Param{APIModules}->{ $Param{Operation} }->{APIVersion}"
+    );
+    $Self->True(
+        $Service->{ValidID},
+        "Webservice: '$Service->{Name}' is valid and could loaded"
+    );
+    $Self->True(
+        IsHashRefWithData( $Service->{Config}->{Provider}->{Transport}->{Config}->{RouteOperationMapping} ),
+        "Webservice: '$Service->{Name}' has RouteOperationMapping"
+    );
+    $Self->True(
+        IsHashRefWithData( $Service->{Config}->{Provider}->{Transport}->{Config}->{RouteOperationMapping}->{ $Param{Operation} } ),
+        "Webservice: get RouteOperation for $Param{Operation} }"
+    );
+
+    return $Service;
+}
+
 1;
-
-
 
 =back
 

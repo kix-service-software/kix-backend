@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
+# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/ 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -11,7 +11,7 @@ package Kernel::API::Validator::ObjectIconValidator;
 use strict;
 use warnings;
 
-use bytes;
+use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
     Kernel::API::Validator::Common
@@ -64,11 +64,11 @@ sub Validate {
     }
 
     my $Found;
-    if ( $Param{Attribute} eq 'Content' ) {
+    if ( $Param{Attribute} eq 'ObjectIcon' && IsHashRefWithData($Param{Data}->{$Param{Attribute}}) ) {
         $Found = 1;
         # check size
         my $IsValid = $Kernel::OM->Get('ObjectIcon')->ObjectIconValidate(
-            Content => $Param{Data}->{$Param{Attribute}},
+            %{ $Param{Data}->{$Param{Attribute}} },
             Silent  => 1
         );
         if ( !$IsValid ) {

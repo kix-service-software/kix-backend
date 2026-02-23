@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
+# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
@@ -54,7 +54,10 @@ $Self->IsDeeply(
     {
         Select  => ['st.id', 'st.tn'],
         From    => ['ticket st'],
-        OrderBy => ['st.id ASC']
+        OrderBy => ['st.id ASC'],
+        Extract => {
+            ArticleID => 1,
+        }
     },
     'GetBaseDef provides expected data'
 );

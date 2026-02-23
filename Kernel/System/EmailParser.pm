@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
+# Modified version of the work: Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -357,7 +357,9 @@ sub SplitAddressLine {
     my ( $Self, %Param ) = @_;
 
     my @GetParam;
+    LINE:
     for my $Line ( $Self->_MailAddressParse( Email => $Param{Line} ) ) {
+        next LINE if !$Line->is_valid();
         push @GetParam, $Line->format();
     }
 

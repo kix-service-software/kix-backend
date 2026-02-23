@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
+# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
@@ -718,7 +718,8 @@ for my $File ( @Files ) {
         },
         CType      => $File->{CType},
         Type       => $File->{Type},
-        Passphrase => $File->{Passphrase}
+        Passphrase => $File->{Passphrase},
+        UserID     => 1
     );
 
     $Self->True(

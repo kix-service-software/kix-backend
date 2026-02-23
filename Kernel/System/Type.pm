@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
+# Modified version of the work: Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -12,6 +12,8 @@ package Kernel::System::Type;
 
 use strict;
 use warnings;
+
+use base qw(Kernel::System::EventHandler);
 
 our @ObjectDependencies = qw(
     ClientRegistration
@@ -56,6 +58,11 @@ sub new {
 
     $Self->{CacheType} = 'Type';
     $Self->{CacheTTL}  = 60 * 60 * 24 * 20;
+
+    # init of event handler
+    $Self->EventHandlerInit(
+        Config => 'Type::EventModulePost',
+    );
 
     return $Self;
 }
@@ -127,6 +134,15 @@ sub TypeAdd {
     # reset cache
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
+    );
+
+    # trigger event
+    $Self->EventHandler(
+        Event => 'TypeAdd',
+        Data  => {
+            ID => $ID
+        },
+        UserID => $Param{UserID},
     );
 
     # push client callback event
@@ -330,8 +346,7 @@ sub TypeUpdate {
     if (
         $Kernel::OM->Get('Config')->Get('Ticket::Type::Default') eq $Type{Name}
         && $Type{Name} ne $Param{Name}
-        )
-    {
+    ) {
 
         # update default ticket type SySConfig item
         $Kernel::OM->Get('SysConfig')->ValueSet(
@@ -339,12 +354,20 @@ sub TypeUpdate {
             Key   => 'Ticket::Type::Default',
             Value => $Param{Name}
         );
-
     }
 
     # reset cache
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
+    );
+
+    # trigger event
+    $Self->EventHandler(
+        Event => 'TypeUpdate',
+        Data  => {
+            ID  => $Param{ID}
+        },
+        UserID => $Param{UserID}
     );
 
     # push client callback event
@@ -546,6 +569,15 @@ sub TypeDelete {
     # reset cache
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
+    );
+
+    # trigger event
+    $Self->EventHandler(
+        Event => 'TypeDelete',
+        Data  => {
+            ID => $Param{TypeID}
+        },
+        UserID => $Param{UserID}
     );
 
     # push client callback event

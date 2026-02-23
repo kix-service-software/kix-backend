@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
+# Modified version of the work: Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -136,6 +136,15 @@ sub CategoryAdd {
     # clear cache
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
+    );
+
+    # event
+    $Self->EventHandler(
+        Event => 'FAQCategoryAdd',
+        Data  => {
+            ID => $CategoryID
+        },
+        UserID => $Param{UserID},
     );
 
     # push client callback event
@@ -276,6 +285,15 @@ sub CategoryDelete {
     # reset cache object search
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{OSCacheType},
+    );
+
+    # event
+    $Self->EventHandler(
+        Event => 'FAQCategoryDelete',
+        Data  => {
+            ID => $Param{CategoryID},
+        },
+        UserID => $Param{UserID},
     );
 
     # push client callback event
@@ -1084,6 +1102,15 @@ sub CategoryUpdate {
     # clear cache
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
+    );
+
+    # event
+    $Self->EventHandler(
+        Event => 'FAQCategoryUpdate',
+        Data  => {
+            ID => $Param{CategoryID}
+        },
+        UserID => $Param{UserID},
     );
 
     # push client callback event

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
+# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
@@ -108,44 +108,54 @@ for my $Time (@RelativeTimes ) {
 
 my @TestData = (
     {
-        Name     => "Check: OutOfOffice / SetPreference: NO / Reset: NO",
+        Name     => "Check: OutOfOffice / Set Date: NO / Reset: NO",
         Expected => 0
     },
     {
         Data => {
-            Start  => $Dates[5],
-            End    => $Dates[4],
-            UserID => $UserID1
+            OutOfOfficeStart => $Dates[5],
+            OutOfOfficeEnd   => $Dates[4],
+            UserID           => $UserID1
+        },
+        Expected => 0,
+        Name     => "Check: OutOfOffice / Set Date: YES / Reset: NO / Value: [\$Dates[5],\$Dates[4]]/ User: \$UserID1"
+    },
+    {
+        Data => {
+            OutOfOfficeStart  => $Dates[2],
+            OutOfOfficeEnd    => $Dates[3],
+            UserID            => $UserID2
+        },
+        Expected => 0,
+        Name     => "Check: OutOfOffice / Set Date: YES / Reset: NO / Value: [\$Dates[2],\$Dates[3]]/ User: \$UserID2"
+    },
+    {
+        Data => {
+            OutOfOfficeStart  => $Dates[0],
+            OutOfOfficeEnd    => $Dates[1],
+            UserID            => $UserID3
         },
         Expected => 1,
-        Name     => "Check: OutOfOffice / SetPreference: YES / Reset: NO / Value: [\$Dates[5],\$Dates[4]]/ User: \$UserID1"
+        Name     => "Check: OutOfOffice / Set Date: YES / Reset: YES / Value: [\$Dates[0],\$Dates[1]]/ User: \$UserID3"
     },
     {
         Data => {
-            Start  => $Dates[2],
-            End    => $Dates[3],
-            UserID => $UserID2
-        },
-        Expected => 2,
-        Name     => "Check: OutOfOffice / SetPreference: YES / Reset: NO / Value: [\$Dates[2],\$Dates[3]]/ User: \$UserID2"
-    },
-    {
-        Data => {
-            Start  => $Dates[0],
-            End    => $Dates[1],
-            UserID => $UserID3
-        },
-        Expected => 2,
-        Name     => "Check: OutOfOffice / SetPreference: YES / Reset: YES / Value: [\$Dates[0],\$Dates[1]]/ User: \$UserID3"
-    },
-    {
-        Data => {
-            Start  => $Dates[4],
-            End    => $Dates[5],
-            UserID => $UserID1
+            OutOfOfficeStart  => $Dates[4],
+            OutOfOfficeEnd    => $Dates[5],
+            UserID            => $UserID1
         },
         Expected => 1,
-        Name     => "Check: OutOfOffice / SetPreference: YES / Reset: YES / Value: [\$Dates[4],\$Dates[5]]/ User: \$UserID1"
+        Name     => "Check: OutOfOffice / Set Date: YES / Reset: YES / Value: [\$Dates[4],\$Dates[5]]/ User: \$UserID1"
+    },
+    {
+        Data => {
+            OutOfOfficeStart      => $Dates[4],
+            OutOfOfficeEnd        => $Dates[5],
+            OutOfOfficeSubstitute => 1,
+            UserID                => $UserID1
+        },
+        Expected => 1,
+        Name     => "Check: OutOfOffice / Set Date: YES / Reset: YES / Value: [\$Dates[4],\$Dates[5], 1]/ User: \$UserID1"
     }
 );
 
@@ -153,42 +163,40 @@ my @TestData = (
 for my $Test ( @TestData ) {
 
     if ( $Test->{Data} ) {
-        my $Success = $Kernel::OM->Get('User')->SetPreferences(
-            Key    => 'OutOfOfficeStart',
-            Value  => $Test->{Data}->{Start},
+        my %User = $Kernel::OM->Get('User')->GetUserData(
             UserID => $Test->{Data}->{UserID}
         );
+        my $Success = $Kernel::OM->Get('User')->UserUpdate(
+            %User,
+            %{$Test->{Data}},
+            ChangeUserID => 1
+        );
+
+        my $Name = 'Update User | ';
+        for my $Key ( qw(OutOfOfficeStart OutOfOfficeEnd OutOfOfficeSubstitute UserID) ){
+            $Name .= "$Key: " . (defined $Test->{Data}->{$Key} ? $Test->{Data}->{$Key} : 'None') . q( | );
+        }
 
         $Self->True(
             $Success,
-            "SetPreference: OutOfOfficeStart / Value $Test->{Start} / UserID $Test->{UserID}"
+            $Name
         );
 
-        $Success = $Kernel::OM->Get('User')->SetPreferences(
-            Key    => 'OutOfOfficeEnd',
-            Value  => $Test->{Data}->{End},
-            UserID => $Test->{Data}->{UserID}
+        my %Users = $Kernel::OM->Get('User')->UserSearch(
+            IsOutOfOfficeEnd => 1
         );
+        my @UserIDs = keys %Users;
 
-        $Self->True(
-            $Success,
-            "SetPreference: OutOfOfficeEnd / Value $Test->{End} / UserID $Test->{UserID}"
+        $Self->Is(
+            scalar( @UserIDs ),
+            $Test->{Expected},
+            $Test->{Name}
         );
     }
 
     $CommandObject->Execute();
 
-    my %Result = $Kernel::OM->Get('User')->SearchPreferences(
-        Key => 'OutOfOfficeEnd'
-    );
 
-    my $Count = %Result ? scalar(keys %Result) : 0;
-
-    $Self->Is(
-        $Count,
-        $Test->{Expected},
-        $Test->{Name}
-    );
 }
 
 # rollback transaction on database

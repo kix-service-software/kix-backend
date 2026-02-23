@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
+# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -147,6 +147,12 @@ sub _GetUserData {
         return;
     }
 
+    # nesting of OutOfOffice data
+    for my $Key ( qw(Start End Substitute) ) {
+        $UserData{OutOfOffice}->{$Key} = $UserData{"OutOfOffice$Key"} || undef;
+        delete $UserData{"OutOfOffice$Key"};
+    }
+
     # add flags array if included
     if ( $Param{Data}->{include}->{Preferences} ) {
         my @PrefList = ();
@@ -178,10 +184,17 @@ sub _GetUserData {
 
     #FIXME: workaoround KIX2018-3308###########
     $Self->AddCacheDependency(Type => 'Contact');
-    my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
-        UserID        => $UserID,
-        DynamicFields => $Param{Data}->{include}->{DynamicFields},
-    );
+    my %ContactData;
+    if ( !IsHashRefWithData($Param{Data}->{ContactData}) ) {
+        %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
+            UserID        => $UserID,
+            DynamicFields => $Param{Data}->{include}->{DynamicFields},
+        );
+    }
+    else {
+        # use what we have been given by ContactGet 
+        %ContactData = %{$Param{Data}->{ContactData}};
+    }
     $UserData{UserFirstname} = %ContactData ? $ContactData{Firstname} : undef;
     $UserData{UserLastname} = %ContactData ? $ContactData{Lastname} : undef;
     $UserData{UserFullname} = %ContactData ? $ContactData{Fullname} : undef;

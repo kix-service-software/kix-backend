@@ -44,6 +44,11 @@
             2,
             13
         ],
+        "OutOfOffice": {
+            "Start": "2018-12-22 00:00:00",
+            "End": "2019-01-02 00:00:00",
+            "Substitute": 25
+        },
         "UsageContext": 1,
         "UserComment": null,
         "UserID": 3,

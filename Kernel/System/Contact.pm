@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
+# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -379,6 +379,9 @@ sub ContactGet {
         return;
     }
 
+    my $WithSubOrgs = $Kernel::OM->Get('Config')->Get('Organisation::VirtuallyAssignContactsToSubOrganisations') || 0;
+    $WithSubOrgs = 0 if $Param{OnlyDirectAssignedOrgIDs};
+
     my $SQLWhere = ' WHERE ';
     my @BindVars;
     my $CacheKey;
@@ -391,7 +394,7 @@ sub ContactGet {
         return if $Param{ID} !~ /^\d+$/;
 
         # check cache
-        $CacheKey = "ContactGet::ContactID::$Param{ID}::$FetchDynamicFields";
+        $CacheKey = "ContactGet::ContactID::$Param{ID}::".$FetchDynamicFields."::".$WithSubOrgs;
         my $Data = $Kernel::OM->Get('Cache')->Get(
             Type => $Self->{CacheType},
             Key  => $CacheKey,
@@ -406,7 +409,7 @@ sub ContactGet {
     elsif ($Param{UserID}) {
         return if $Param{UserID} !~ /^\d+$/;
 
-        $CacheKey = "ContactGet::UserID::$Param{UserID}::$FetchDynamicFields";
+        $CacheKey = "ContactGet::UserID::$Param{UserID}::".$FetchDynamicFields."::".$WithSubOrgs;
         my $Data = $Kernel::OM->Get('Cache')->Get(
             Type => $Self->{CacheType},
             Key  => $CacheKey,
@@ -466,8 +469,19 @@ sub ContactGet {
     while (my @Row =$Kernel::OM->Get('DB')->FetchrowArray()) {
         push(@OrganisationIDs,$Row[0]);
         $Contact{PrimaryOrganisationID} = $Row[0] if ($Row[1]);
-
     }
+    if ( $WithSubOrgs ) {
+        # get all suborganisations
+        my @AllOrgIDs = @OrganisationIDs;
+        foreach my $OrgID ( @OrganisationIDs ) {
+            my @SubOrgIDs = $Kernel::OM->Get('Organisation')->GetAllSubOrganisationIDs(
+                OrgID  => $OrgID,
+            );
+            push @AllOrgIDs, @SubOrgIDs;
+        }
+        @OrganisationIDs = $Kernel::OM->Get('Main')->GetUnique(@AllOrgIDs);
+    }
+
     $Contact{OrganisationIDs} = \@OrganisationIDs;
 
     # check item
@@ -866,8 +880,9 @@ sub ContactUpdate {
         );
 
         if (
-            !%OrgData
-            || $OrgData{ValidID} != 1
+            !%OrgData ||
+             # accept already set organisations even if invalid
+            ($OrgData{ValidID} != 1 && $Param{PrimaryOrganisationID} != $Contact{PrimaryOrganisationID})
         ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
@@ -879,6 +894,7 @@ sub ContactUpdate {
     }
 
     if (IsArrayRefWithData($Param{OrganisationIDs})) {
+        my %CurrentOrgs = map {$_ => 1} @{$Contact{OrganisationIDs}};
         foreach my $OrgID (@{$Param{OrganisationIDs}}) {
             next if ($OrgaIDs{$OrgID});
 
@@ -886,8 +902,9 @@ sub ContactUpdate {
                 ID => $OrgID,
             );
             if (
-                !%OrgData
-                || $OrgData{ValidID} != 1
+                !%OrgData ||
+                # accept already set organisations even if invalid
+                ($OrgData{ValidID} != 1 && !$CurrentOrgs{$OrgID})
             ) {
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',

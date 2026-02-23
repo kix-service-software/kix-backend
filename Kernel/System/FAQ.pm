@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
+# Modified version of the work: Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -662,6 +662,15 @@ END
         }
     }
 
+    # event
+    $Self->EventHandler(
+        Event => 'FAQArticleAdd',
+        Data  => {
+            ID => $FAQ{FAQArticleID},
+        },
+        UserID => $Param{UserID},
+    );
+
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
@@ -850,6 +859,15 @@ END
     $Self->FAQHistoryAdd(
         Name   => 'Updated',
         ItemID => $Param{ItemID},
+        UserID => $Param{UserID},
+    );
+
+    # event
+    $Self->EventHandler(
+        Event => 'FAQArticleUpdate',
+        Data  => {
+            ID => $Param{ItemID}
+        },
         UserID => $Param{UserID},
     );
 
@@ -1511,6 +1529,15 @@ sub FAQDelete {
     # reset cache object search
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{OSCacheType},
+    );
+
+    # event
+    $Self->EventHandler(
+        Event => 'FAQArticleDelete',
+        Data  => {
+            ID => $Param{ItemID},
+        },
+        UserID => $Param{UserID},
     );
 
     # push client callback event

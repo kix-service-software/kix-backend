@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
+# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -127,6 +127,7 @@ $Self->False(
 );
 my $MacroDelete4 = $AutomationObject->MacroDelete(
     ID     => $TestMacros{'test-macro-4'},
+    UserID => 1,
     Silent => 1,
 );
 $Self->False(
@@ -157,7 +158,8 @@ $Self->True(
     'IsMacroDeletable() - 6 should be deletable',
 );
 my $MacroDelete6 = $AutomationObject->MacroDelete(
-    ID => $TestMacros{'test-macro-6'}
+    ID     => $TestMacros{'test-macro-6'},
+    UserID => 1
 );
 $Self->True(
     $MacroDelete6 || 0,
@@ -217,7 +219,8 @@ $Self->True(
     'IsMacroDeletable() - 7 should be deletable',
 );
 my $MacroDelete7 = $AutomationObject->MacroDelete(
-    ID => $TestMacros{'test-macro-7'}
+    ID     => $TestMacros{'test-macro-7'},
+    UserID => 1
 );
 $Self->True(
     $MacroDelete7 || 0,
@@ -317,7 +320,8 @@ $Self->True(
     'IsMacroDeletable() - macro (ignore) should be deletable again',
 );
 my $IgnoreMacroDelete = $AutomationObject->MacroDelete(
-    ID => $IgnoreMacroID
+    ID     => $IgnoreMacroID,
+    UserID => 1
 );
 $Self->True(
     $IgnoreMacroDelete || 0,
@@ -341,7 +345,8 @@ $Self->True(
 # clean up
 delete $AutomationObject->{IgnoreMacroIDsForDelete};
 my $IgnoreMacroDelete_Sub = $AutomationObject->MacroDelete(
-    ID => $IgnoreMacroID_Sub
+    ID     => $IgnoreMacroID_Sub,
+    UserID => 1
 );
 $Self->True(
     $IgnoreMacroDelete_Sub || 0,
@@ -415,7 +420,8 @@ my %MacroActionsOf2 = $AutomationObject->MacroActionList(
 );
 # clean up
 my $NegativeMacroDelete1 = $AutomationObject->MacroDelete(
-    ID => $TestMacros{'test-macro-1'}
+    ID     => $TestMacros{'test-macro-1'},
+    UserID => 1
 );
 $Self->True(
     $NegativeMacroDelete1 || 0,
@@ -546,7 +552,8 @@ $Self->False(
 );
 # delete job 1
 my $JobDelete1 = $AutomationObject->JobDelete(
-    ID => $TestMacros{'test-job-1'},
+    ID     => $TestMacros{'test-job-1'},
+    UserID => 1
 );
 $Self->True(
     $JobDelete1 || 0,
@@ -568,7 +575,8 @@ $Self->True(
 );
 # delete job 2
 my $JobDelete2 = $AutomationObject->JobDelete(
-    ID => $TestMacros{'test-job-2'},
+    ID     => $TestMacros{'test-job-2'},
+    UserID => 1
 );
 $Self->True(
     $JobDelete2 || 0,

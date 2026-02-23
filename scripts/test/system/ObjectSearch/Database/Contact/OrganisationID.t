@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
+# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
@@ -1385,7 +1385,8 @@ $Self->True(
 # second organisation
 my $OrganisationID2 = $Kernel::OM->Get('Organisation')->OrganisationAdd(
     %{$OrgaData[1]},
-    UserID => 1
+    ParentID => $OrganisationID1,
+    UserID   => 1
 );
 $Self->True(
     $OrganisationID2,
@@ -1394,7 +1395,8 @@ $Self->True(
 # third organisation
 my $OrganisationID3 = $Kernel::OM->Get('Organisation')->OrganisationAdd(
     %{$OrgaData[2]},
-    UserID => 1
+    ParentID => $OrganisationID2,
+    UserID   => 1
 );
 $Self->True(
     $OrganisationID3,
@@ -2668,6 +2670,361 @@ for my $Test ( @IntegrationSortTests ) {
         Result     => 'ARRAY',
         Sort       => $Test->{Sort},
         Language   => $Test->{Language},
+        UserType   => 'Agent',
+        UserID     => 1,
+    );
+    $Self->IsDeeply(
+        \@Result,
+        $Test->{Expected},
+        $Test->{Name}
+    );
+}
+
+## KIX2018-8633 ##
+# activate Organisation::VirtuallyAssignContactsToSubOrganisations
+my $Success = $Helper->ConfigSettingChange(
+    Valid => 1,
+    Key   => 'Organisation::VirtuallyAssignContactsToSubOrganisations',
+    Value => '1',
+);
+$Self->True(
+    $Success,
+    "Enable Organisation::VirtuallyAssignContactsToSubOrganisations",
+);
+
+# clear cache
+$Kernel::OM->Get('Cache')->CleanUp(
+    Type => 'ObjectSearch_Contact'
+);
+
+# check Search
+my @SearchTests2 = (
+    {
+        Name         => 'Search: valid search / Field OrganisationID / Operator EQ / Value $OrganisationID2',
+        Search       => {
+            Field    => 'OrganisationID',
+            Operator => 'EQ',
+            Value    => $OrganisationID2
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT JOIN contact_organisation co ON co.contact_id = c.id'
+            ],
+            'Where' => [
+                'co.org_id IN (' . $OrganisationID2 . ',' . $OrganisationID3 . ')'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field OrganisationID / Operator NE / Value $OrganisationID2',
+        Search       => {
+            Field    => 'OrganisationID',
+            Operator => 'NE',
+            Value    => $OrganisationID2
+        },
+        Expected     => {
+            'IsRelative' => undef,
+            'Join'       => [
+                'LEFT JOIN contact_organisation co ON co.contact_id = c.id'
+            ],
+            'Where'      => [
+                'co.org_id NOT IN (' . $OrganisationID2 . ',' . $OrganisationID3 . ')'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field OrganisationID / Operator IN / Value [$OrganisationID2]',
+        Search       => {
+            Field    => 'OrganisationID',
+            Operator => 'IN',
+            Value    => [$OrganisationID2]
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT JOIN contact_organisation co ON co.contact_id = c.id'
+            ],
+            'Where' => [
+                'co.org_id IN (' . $OrganisationID2 . ',' . $OrganisationID3 . ')'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field OrganisationID / Operator !IN / Value [$OrganisationID2]',
+        Search       => {
+            Field    => 'OrganisationID',
+            Operator => '!IN',
+            Value    => [$OrganisationID2]
+        },
+        Expected     => {
+            'IsRelative' => undef,
+            'Join'       => [
+                'LEFT JOIN contact_organisation co ON co.contact_id = c.id'
+            ],
+            'Where'      => [
+                'co.org_id NOT IN (' . $OrganisationID2 . ',' . $OrganisationID3 . ')'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field OrganisationID / Operator EMPTY / Value 1',
+        Search       => {
+            Field    => 'OrganisationID',
+            Operator => 'EMPTY',
+            Value    => 1
+        },
+        Expected     => {
+            'IsRelative' => undef,
+            'Join'       => [
+                'LEFT JOIN contact_organisation co ON co.contact_id = c.id'
+            ],
+            'Where'      => [
+                'co.org_id IS NULL'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field OrganisationID / Operator EMPTY / Value 0',
+        Search       => {
+            Field    => 'OrganisationID',
+            Operator => 'EMPTY',
+            Value    => 0
+        },
+        Expected     => {
+            'IsRelative' => undef,
+            'Join'       => [
+                'LEFT JOIN contact_organisation co ON co.contact_id = c.id'
+            ],
+            'Where'      => [
+                'co.org_id IS NOT NULL'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field OrganisationIDs / Operator EQ / Value $OrganisationID2',
+        Search       => {
+            Field    => 'OrganisationIDs',
+            Operator => 'EQ',
+            Value    => $OrganisationID2
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT JOIN contact_organisation co ON co.contact_id = c.id'
+            ],
+            'Where' => [
+                'co.org_id IN (' . $OrganisationID2 . ',' . $OrganisationID3 . ')'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field OrganisationIDs / Operator NE / Value $OrganisationID2',
+        Search       => {
+            Field    => 'OrganisationIDs',
+            Operator => 'NE',
+            Value    => $OrganisationID2
+        },
+        Expected     => {
+            'IsRelative' => undef,
+            'Join'       => [
+                'LEFT JOIN contact_organisation co ON co.contact_id = c.id'
+            ],
+            'Where'      => [
+                'co.org_id NOT IN (' . $OrganisationID2 . ',' . $OrganisationID3 . ')'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field OrganisationIDs / Operator IN / Value [$OrganisationID2]',
+        Search       => {
+            Field    => 'OrganisationIDs',
+            Operator => 'IN',
+            Value    => [$OrganisationID2]
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT JOIN contact_organisation co ON co.contact_id = c.id'
+            ],
+            'Where' => [
+                'co.org_id IN (' . $OrganisationID2 . ',' . $OrganisationID3 . ')'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field OrganisationIDs / Operator !IN / Value [$OrganisationID2]',
+        Search       => {
+            Field    => 'OrganisationIDs',
+            Operator => '!IN',
+            Value    => [$OrganisationID2]
+        },
+        Expected     => {
+            'Join' => [
+                'LEFT JOIN contact_organisation co ON co.contact_id = c.id'
+            ],
+            'Where' => [
+                'co.org_id NOT IN (' . $OrganisationID2 . ',' . $OrganisationID3 . ')'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field OrganisationIDs / Operator EMPTY / Value 1',
+        Search       => {
+            Field    => 'OrganisationIDs',
+            Operator => 'EMPTY',
+            Value    => 1
+        },
+        Expected     => {
+            'IsRelative' => undef,
+            'Join'       => [
+                'LEFT JOIN contact_organisation co ON co.contact_id = c.id'
+            ],
+            'Where'      => [
+                'co.org_id IS NULL'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field OrganisationIDs / Operator EMPTY / Value 0',
+        Search       => {
+            Field    => 'OrganisationIDs',
+            Operator => 'EMPTY',
+            Value    => 0
+        },
+        Expected     => {
+            'IsRelative' => undef,
+            'Join'       => [
+                'LEFT JOIN contact_organisation co ON co.contact_id = c.id'
+            ],
+            'Where'      => [
+                'co.org_id IS NOT NULL'
+            ]
+        }
+    }
+);
+for my $Test ( @SearchTests2 ) {
+    my $Result = $AttributeObject->Search(
+        Search       => $Test->{Search},
+        BoolOperator => 'AND',
+        UserID       => 1,
+        Silent       => defined( $Test->{Expected} ) ? 0 : 1
+    );
+    $Self->IsDeeply(
+        $Result,
+        $Test->{Expected},
+        $Test->{Name}
+    );
+}
+
+# test Search
+my @IntegrationSearchTests2 = (
+    {
+        Name     => "Search: Field OrganisationID / Operator EQ / Value \$OrganisationID2",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'OrganisationID',
+                    Operator => 'EQ',
+                    Value    => $OrganisationID2
+                }
+            ]
+        },
+        Expected => [$ContactID1,$ContactID2,$ContactID3]
+    },
+    {
+        Name     => "Search: Field OrganisationID / Operator NE / Value \$OrganisationID2",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'OrganisationID',
+                    Operator => 'NE',
+                    Value    => $OrganisationID2
+                }
+            ]
+        },
+        Expected => ['1',$ContactID1,$ContactID2]
+    },
+    {
+        Name     => "Search: Field OrganisationID / Operator IN / Value [\$OrganisationID2]",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'OrganisationID',
+                    Operator => 'IN',
+                    Value    => [$OrganisationID2]
+                }
+            ]
+        },
+        Expected => [$ContactID1,$ContactID2,$ContactID3]
+    },
+    {
+        Name     => "Search: Field OrganisationID / Operator !IN / Value [\$OrganisationID2]",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'OrganisationID',
+                    Operator => '!IN',
+                    Value    => [$OrganisationID2]
+                }
+            ]
+        },
+        Expected => ['1',$ContactID1,$ContactID2]
+    },
+    {
+        Name     => "Search: Field OrganisationIDs / Operator EQ / Value \$OrganisationID2",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'OrganisationIDs',
+                    Operator => 'EQ',
+                    Value    => $OrganisationID2
+                }
+            ]
+        },
+        Expected => [$ContactID1,$ContactID2,$ContactID3]
+    },
+    {
+        Name     => "Search: Field OrganisationIDs / Operator NE / Value \$OrganisationID2",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'OrganisationIDs',
+                    Operator => 'NE',
+                    Value    => $OrganisationID2
+                }
+            ]
+        },
+        Expected => ['1',$ContactID1,$ContactID2]
+    },
+    {
+        Name     => "Search: Field OrganisationIDs / Operator IN / Value [\$OrganisationID2]",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'OrganisationIDs',
+                    Operator => 'IN',
+                    Value    => [$OrganisationID2]
+                }
+            ]
+        },
+        Expected => [$ContactID1,$ContactID2,$ContactID3]
+    },
+    {
+        Name     => "Search: Field OrganisationIDs / Operator !IN / Value [\$OrganisationID2]",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'OrganisationIDs',
+                    Operator => '!IN',
+                    Value    => [$OrganisationID2]
+                }
+            ]
+        },
+        Expected => ['1',$ContactID1,$ContactID2]
+    }
+);
+for my $Test ( @IntegrationSearchTests2 ) {
+    my @Result = $ObjectSearch->Search(
+        ObjectType => 'Contact',
+        Result     => 'ARRAY',
+        Search     => $Test->{Search},
         UserType   => 'Agent',
         UserID     => 1,
     );

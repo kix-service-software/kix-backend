@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
+# Modified version of the work: Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -152,6 +152,34 @@ $Kernel::OM->Get('Config')->Set(
 $Kernel::OM->Get('Config')->Set(
     Key => 'Ticket::EventModulePost###TicketDynamicFieldDefault',
 );
+
+# check log when To header is missing
+my $Location = $Kernel::OM->Get('Config')->Get('Home')
+    . "/scripts/test/system/sample/PostMaster/PostMaster-Test-NoToHeader.box";
+my $ContentRef = $Kernel::OM->Get('Main')->FileRead(
+    Location => $Location,
+    Mode     => 'binmode',
+    Result   => 'ARRAY',
+);
+{
+    my $PostMasterObject = Kernel::System::PostMaster->new(
+        Email => $ContentRef,
+    );
+
+    $PostMasterObject->Run();
+}
+
+my $Message = $Kernel::OM->Get('Log')->GetLogEntry(
+    Type  => 'info',
+    What  => 'Message',
+    Index => -3,
+);
+ $Self->Is(
+     $Message,
+     'Email (<20011221002814.A3599.no.to.header@avro>) contains no To header.',
+     'log message when To header is missing',
+ );
+
 
 # use different subject format
 for my $TicketSubjectConfig ( 'Right', 'Left' ) {
@@ -833,10 +861,10 @@ for my $TicketSubjectConfig ( 'Right', 'Left' ) {
                 $NamePrefix . ' TicketDelete()',
             );
         }
-        $PostMasterFilter->FilterDelete( Name => $FilterRand1 );
-        $PostMasterFilter->FilterDelete( Name => $FilterRand2 );
-        $PostMasterFilter->FilterDelete( Name => $FilterRand3 );
-        $PostMasterFilter->FilterDelete( Name => $FilterRand4 );
+        $PostMasterFilter->FilterDelete( Name => $FilterRand1, UserID => 1 );
+        $PostMasterFilter->FilterDelete( Name => $FilterRand2, UserID => 1 );
+        $PostMasterFilter->FilterDelete( Name => $FilterRand3, UserID => 1 );
+        $PostMasterFilter->FilterDelete( Name => $FilterRand4, UserID => 1 );
     }
 }
 
@@ -1011,7 +1039,7 @@ Some Content in Body
     # remove filter
     for my $Test (@Tests) {
         if ( $Type eq 'DB' ) {
-            $PostMasterFilter->FilterDelete( Name => $Test->{Name} );
+            $PostMasterFilter->FilterDelete( Name => $Test->{Name}, UserID => 1 );
         }
         else {
             $Kernel::OM->Get('Config')->Set(
@@ -1159,7 +1187,7 @@ for my $Test (@Tests) {
         # remove filter
         for my $Test (@Tests) {
             if ( $Type eq 'DB' ) {
-                $PostMasterFilter->FilterDelete( Name => $Test->{Name} );
+                $PostMasterFilter->FilterDelete( Name => $Test->{Name}, UserID => 1 );
             }
             else {
                 $Kernel::OM->Get('Config')->Set(

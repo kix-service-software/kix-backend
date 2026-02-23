@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
+# Modified version of the work: Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, http://otrs.com/
 # --
@@ -346,7 +346,7 @@ they are different, undef otherwise.
 Data parameters need to be passed by reference and can be SCALAR,
 ARRAY or HASH.
 
-    my $DataIsDifferent = DataDiff(
+    my $DataIsDifferent = DataIsDifferent(
         Data1 => \$Data1,
         Data2 => \$Data2,
     );

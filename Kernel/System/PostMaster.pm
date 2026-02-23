@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
+# Modified version of the work: Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -166,6 +166,13 @@ sub Run {
 
     # ConfigObject section / get params
     my $GetParam = $Self->GetEmailParams();
+
+    if ( !$GetParam->{To} ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'info',
+            Message  => "Email ($GetParam->{'Message-ID'}) contains no To header.",
+        );
+    }
 
     $GetParam->{From} = $GetParam->{From} || $GetParam->{'MAIL FROM'} || $GetParam->{'X-KIX-From'};
 

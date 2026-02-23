@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
+# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -77,6 +77,19 @@ sub ParameterDefinition {
         'User::ExecMFAGenerateSecret' => {
             RequiresValueIfUsed => 1
         },
+        'User::OutOfOffice' => {
+            RequiresValueIfUsed => 1,
+            Type                => 'HASH'
+        },
+        'User::OutOfOffice::Start' => {
+            Type => 'DATE'
+        },
+        'User::OutOfOffice::End' => {
+            Type => 'DATE'
+        },
+        'User::OutOfOffice::Substitute' => {
+            DataType => 'NUMERIC'
+        }
     }
 }
 
@@ -87,18 +100,23 @@ perform UserUpdate Operation. This will return the updated UserID.
     my $Result = $OperationObject->Run(
         Data => {
             User => {
-                UserLogin       => '...',                                         # requires a value if given
-                UserPassword    => '...',                                         # optional
-                ValidID         => 0 | 1 | 2,                                     # optional
-                IsAgent         => 0 | 1,                                         # optional
-                IsCustomer      => 0 | 1,                                         # optional
+                UserLogin       => '...',            # requires a value if given
+                UserPassword    => '...',            # optional
+                ValidID         => 0 | 1 | 2,        # optional
+                IsAgent         => 0 | 1,            # optional
+                IsCustomer      => 0 | 1,            # optional
+                OutOfOffice     => {                 # requires, if used
+                    Start      => '2026-01-01',      # optional
+                    End        => '2026-01-20',      # optional
+                    Substitute => 123                # optional
+                }
             },
         },
     );
 
     $Result = {
         Success         => 1,                       # 0 or 1
-        Message    => '',                      # in case of error
+        Message    => '',                           # in case of error
         Data            => {                        # result data payload after Operation
             UserID  => '',                          # UserID
             Error => {                              # should not return errors
@@ -142,6 +160,14 @@ sub Run {
             );
         }
     }
+
+    # prepare OutOfOffice for core
+    if ( IsHashRefWithData( $User->{OutOfOffice} ) ) {
+        for my $Key ( qw(Start End Substitute) ) {
+            $User->{"OutOfOffice$Key"} = exists $User->{OutOfOffice}->{$Key} ? $User->{OutOfOffice}->{$Key} : $UserData{"OutOfOffice$Key"};
+        }
+    }
+    delete $User->{OutOfOffice};
 
     # update User
     my $Success = $Kernel::OM->Get('User')->UserUpdate(

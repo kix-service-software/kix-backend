@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
+# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -134,15 +134,9 @@ sub AttributePrepare {
     if (
         defined $Param{PrepareType}
         && $Param{PrepareType} eq 'Condition'
-        && IsArrayRefWithData( $Param{WholeSearch} )
+        && $Param{Flags}->{ArticleID}
     ) {
-        for my $SearchEntry ( @{ $Param{WholeSearch} } ) {
-            if ($SearchEntry->{Field} eq 'ArticleID') {
-                $HasArticleIDSearch = 1;
-
-                last;
-            }
-        }
+        $HasArticleIDSearch = 1;
     }
 
     # check if static search should be used. Only if search for ArticleID is NOT used and static search index is active
