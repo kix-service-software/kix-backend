@@ -514,6 +514,25 @@ sub ObjectIconValidate {
     return 1;
 }
 
+sub SyncAllToFS {
+    my ( $Self, %Param ) = @_;
+
+    return if !$Kernel::OM->Get('DB')->Prepare(
+        SQL   => 'SELECT id, content_type, content FROM object_icon',
+    );
+
+    # fetch the result
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
+        $Self->_WriteToFS(
+            ID          => $Row[0],
+            ContentType => $Row[1],
+            Content     => $Row[2]
+        );
+    }
+
+    return 1;
+}
+
 sub _WriteToFS {
     my ( $Self, %Param ) = @_;
 

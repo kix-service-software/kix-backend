@@ -34,20 +34,7 @@ _SyncObjectIconsToFS();
 sub _SyncObjectIconsToFS {
     my ( $Self, %Param ) = @_;
 
-    return if !$Kernel::OM->Get('DB')->Prepare(
-        SQL   => 'SELECT id, content_type, content FROM object_icon',
-    );
-
-    # fetch the result
-    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
-        $Kernel::OM->Get('ObjectIcon')->_WriteToFS(
-            ID          => $Row[0],
-            ContentType => $Row[1],
-            Content     => $Row[2]
-        );
-    }
-
-    return 1;
+    return $Kernel::OM->Get('ObjectIcon')->SyncAllToFS();
 }
 
 exit 0;
