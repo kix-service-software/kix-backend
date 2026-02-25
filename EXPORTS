@@ -69,6 +69,7 @@ Console::Command::Admin::ITSM::ImportExport::Export                           = 
 Console::Command::Admin::ITSM::ImportExport::Import                           = Kernel::System::Console::Command::Admin::ITSM::ImportExport::Import
 Console::Command::Admin::ITSM::IncidentState::Recalculate                     = Kernel::System::Console::Command::Admin::ITSM::IncidentState::Recalculate
 Console::Command::Admin::ObjectIcon::Import                                   = Kernel::System::Console::Command::Admin::ObjectIcon::Import
+Console::Command::Admin::ObjectIcon::SyncAllToFS                              = Kernel::System::Console::Command::Admin::ObjectIcon::SyncAllToFS
 Console::Command::Admin::Organisation::Add                                    = Kernel::System::Console::Command::Admin::Organisation::Add
 Console::Command::Admin::Organisation::List                                   = Kernel::System::Console::Command::Admin::Organisation::List
 Console::Command::Admin::HTMLToPDF::Convert                                   = Kernel::System::Console::Command::Admin::HTMLToPDF::Convert
