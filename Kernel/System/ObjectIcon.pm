@@ -106,7 +106,7 @@ sub ObjectIconGet {
     my $DBObject = $Kernel::OM->Get('DB');
 
     return if !$DBObject->Prepare(
-        SQL   => "SELECT id, object, object_id, content_type, create_by, create_time, change_by, change_time
+        SQL   => "SELECT id, object, object_id, content, content_type, create_by, create_time, change_by, change_time
                   FROM object_icon WHERE id = ?",
         Bind => [ \$Param{ID} ],
     );
@@ -119,7 +119,8 @@ sub ObjectIconGet {
             ID          => $Data[0],
             Object      => $Data[1],
             ObjectID    => $Data[2],
-            ContentType => $Data[3],
+            Content     => $Data[3],
+            ContentType => $Data[4],
             CreateBy    => $Data[5],
             CreateTime  => $Data[6],
             ChangeBy    => $Data[7],
@@ -135,8 +136,6 @@ sub ObjectIconGet {
         );
         return;
     }
-
-    $Data{Content} = $Self->_ReadFromFS(%Data);
 
     # set cache
     $Kernel::OM->Get('Cache')->Set(
@@ -180,11 +179,12 @@ sub ObjectIconAdd {
 
     # do the db insert...
     my $DBInsert = $Kernel::OM->Get('DB')->Do(
-        SQL  => "INSERT INTO object_icon (object, object_id, content_type, create_by, create_time, change_by, change_time)
-                 VALUES (?, ?, ?, ?, current_timestamp, ?, current_timestamp)",
+        SQL  => "INSERT INTO object_icon (object, object_id, content, content_type, create_by, create_time, change_by, change_time)
+                 VALUES (?, ?, ?, ?, ?, current_timestamp, ?, current_timestamp)",
         Bind => [
             \$Param{Object},
             \$Param{ObjectID},
+            \$Param{Content},
             \$Param{ContentType},
             \$Param{UserID},
             \$Param{UserID},
@@ -274,6 +274,12 @@ sub ObjectIconUpdate {
     }
 
     return if !$Self->ObjectIconValidate( %Param );
+
+    # check if icon exists
+    my %Icon = $Self->ObjectIconGet(
+        ID => $Param{ID},
+    );
+    return if !%Icon;
 
     # do the db insert...
     my $DBUpdate = $Kernel::OM->Get('DB')->Do(
@@ -432,7 +438,7 @@ sub ObjectIconDelete {
         Bind => [ \$Param{ID} ],
     );
 
-    $Self->_SyncToFS(
+    $Self->_WriteToFS(
         OldData => \%OldData,
     );
 
@@ -530,33 +536,6 @@ sub _WriteToFS {
     );
 
     return $Success;
-}
-
-sub _ReadFromFS {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for (qw(ID ContentType)) {
-        if ( !defined( $Param{$_} ) ) {
-            $Kernel::OM->Get('Log')->Log( Priority => 'error', Message => "Need $_!" );
-            return;
-        }
-    }
-
-    my $ContentSCALARRef = $Kernel::OM->Get('Main')->FileRead(
-        Directory       => $Self->{Config}->{Directory},
-        Filename        => $Param{ID},
-        Mode            => 'binmode',
-        Type            => 'Local',
-        Result          => 'SCALAR',
-        DisableWarnings => 1,
-    );
-
-    if ( $Param{ContentType} ne 'text' ) {
-        return MIME::Base64::encode_base64( $$ContentSCALARRef );
-    }
-
-    return $$ContentSCALARRef;
 }
 
 sub DESTROY {

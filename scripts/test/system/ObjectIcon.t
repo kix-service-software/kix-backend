@@ -208,7 +208,7 @@ foreach my $Test ( @CreateTests ) {
         # check FS
         my $Content = $Kernel::OM->Get('Main')->FileRead(
             Directory => $ObjectIconObject->{Config}->{Directory},
-            Filename  => "$Test->{Expect}->{Object}_$Test->{Expect}->{ObjectID}.".$ObjectIconObject->{Config}->{ContentTypeMapping}->{$Test->{Expect}->{ContentType}},
+            Filename  => $ObjectIconIDs{"$Test->{Expect}->{Object}-$Test->{Expect}->{ObjectID}"},
         );
         $Self->Is(
             $$Content,
@@ -371,7 +371,7 @@ my @UpdateTests = (
         },
     },
     {
-        Name   => 'ObjectIconUpdate(): change ContentType to non mapped',
+        Name   => 'ObjectIconUpdate(): change ContentType to non image',
         Data   => {
             ID          => $ObjectIconIDs{'object1-objectid1'},
             Object      => 'object3',
@@ -404,6 +404,7 @@ foreach my $Test ( @UpdateTests ) {
         Content => $Test->{Data}->{Content} ? MIME::Base64::encode_base64($Test->{Data}->{Content}) : undef
     );
 
+print STDERR "Success: $Success\n";
     if ( !$Test->{Expect} ) {
         $Self->False(
           $Success,
@@ -436,24 +437,12 @@ foreach my $Test ( @UpdateTests ) {
         if ( $ObjectIconObject->{Config}->{ContentTypeMapping}->{$Test->{Expect}->{ContentType}} ) {
             my $Content = $Kernel::OM->Get('Main')->FileRead(
                 Directory => $ObjectIconObject->{Config}->{Directory},
-                Filename  => "$Test->{Expect}->{Object}_$Test->{Expect}->{ObjectID}.".$ObjectIconObject->{Config}->{ContentTypeMapping}->{$Test->{Expect}->{ContentType}},
+                Filename  => $ObjectIconIDs{"$Test->{Expect}->{Object}-$Test->{Expect}->{ObjectID}"},
             );
             $Self->Is(
                 $$Content,
                 $Test->{Data}->{Content},
                 $Test->{Name} . ' - FS sync :: file updated',
-            );
-        }
-
-        if ( $Test->{Data}->{Object} ne $ObjectIconOld{Object} || $Test->{Data}->{ObjectID} ne $ObjectIconOld{ObjectID} || 
-             $Test->{Data}->{ContentType} ne $ObjectIconOld{ContentType}) {
-            my $Content = $Kernel::OM->Get('Main')->FileRead(
-                Directory => $ObjectIconObject->{Config}->{Directory},
-                Filename  => "$ObjectIconOld{Object}_$ObjectIconOld{ObjectID}.".$ObjectIconObject->{Config}->{ContentTypeMapping}->{$ObjectIconOld{ContentType}},
-            );
-            $Self->False(
-                $Content,
-                $Test->{Name} . ' - FS sync :: old file removed',
             );
         }
     }
