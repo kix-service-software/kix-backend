@@ -437,10 +437,19 @@ sub ObjectIconDelete {
         SQL  => 'DELETE FROM object_icon WHERE id = ?',
         Bind => [ \$Param{ID} ],
     );
-
-    $Self->_WriteToFS(
-        OldData => \%OldData,
+    
+    my $Success = $Kernel::OM->Get('Main')->FileDelete(
+        Directory       => $Self->{Config}->{Directory},
+        Filename        => $Param{ID},
+        DisableWarnings => 1,
     );
+    if ( !$Success ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => 'Could not delete object icon ' . $Param{ID} . ' from FS!',
+            Silent   => $Param{Silent}
+        );
+    }
 
     # delete cache
     $Kernel::OM->Get('Cache')->CleanUp(

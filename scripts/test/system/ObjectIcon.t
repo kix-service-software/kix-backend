@@ -404,7 +404,6 @@ foreach my $Test ( @UpdateTests ) {
         Content => $Test->{Data}->{Content} ? MIME::Base64::encode_base64($Test->{Data}->{Content}) : undef
     );
 
-print STDERR "Success: $Success\n";
     if ( !$Test->{Expect} ) {
         $Self->False(
           $Success,
