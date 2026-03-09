@@ -446,7 +446,7 @@
         <Setting>
             <Hash>
                 <Item Key="Module">Kernel::API::Validator::ObjectIconValidator</Item>
-                <Item Key="Validates">Content</Item>
+                <Item Key="Validates">ObjectIcon</Item>
                 <Item Key="ConsiderOperationRegEx">ObjectIconCreate|ObjectIconUpdate</Item>
                 <Item Key="IgnoreOperationRegEx"></Item>
             </Hash>

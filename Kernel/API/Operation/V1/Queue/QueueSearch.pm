@@ -159,8 +159,9 @@ sub Run {
             OperationType            => 'V1::Queue::QueueGet',
             SuppressPermissionErrors => 1,
             Data                     => {
-                QueueID => join( q{,}, sort { $a <=> $b } keys %QueueList ),
-                QueueList => \%QueueList,
+                QueueID                 => join( q{,}, sort { $a <=> $b } keys %QueueList ),
+                QueueList               => \%QueueList,
+                'TicketStats.StateType' => $Param{Data}->{'TicketStats.StateType'},
             }
         );
         if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {

@@ -265,24 +265,9 @@ sub Get {
     }
 
     # replace config variables in value
-    if ( defined $Self->{Config}->{$What} && IsStringWithData($Self->{Config}->{$What}) ) {
-
-        # special handling for FQDN
-        if ($Self->{Config}->{$What} =~ m/\<KIX_CONFIG_FQDN_?(.*?)\>/ ) {
-            my $FQDNConfig = $Self->{Config}->{FQDN} // '';
-            if ( IsHashRefWithData($FQDNConfig) ) {
-                if ($1) {
-                    my $Replace = $FQDNConfig->{$1} || '';
-                    $Self->{Config}->{$What} =~ s/\<KIX_CONFIG_FQDN_$1\>/$Replace/g;
-                } else {
-                    my $Replace = $FQDNConfig->{Frontend} || '';
-                    $Self->{Config}->{$What} =~ s/\<KIX_CONFIG_FQDN\>/$Replace/g;
-                }
-            }
-        } else {
-            $Self->{Config}->{$What} =~ s/\<KIX_CONFIG_(.+?)\>/$Self->{Config}->{$1}/g;
-        }
-    }
+    $Self->{Config}->{$What} = $Self->_ReplaceConfigVariables(
+        Value => $Self->{Config}->{$What}
+    );
 
     return $Self->{Config}->{$What};
 }
@@ -329,6 +314,46 @@ sub Set {
 
 sub Translatable {
     return shift;
+}
+
+sub _ReplaceConfigVariables {
+    my ( $Self, %Param ) = @_;
+
+    return $Param{Value} if !$Param{Value};
+
+    if ( IsStringWithData($Param{Value}) ) {
+        # special handling for FQDN
+        if ($Param{Value} =~ m/\<KIX_CONFIG_FQDN_?(.*?)\>/ ) {
+            my $FQDNConfig = $Param{Value} // '';
+            if ( IsHashRefWithData($FQDNConfig) ) {
+                if ($1) {
+                    my $Replace = $FQDNConfig->{$1} || '';
+                    $Param{Value} =~ s/\<KIX_CONFIG_FQDN_$1\>/$Replace/g;
+                } else {
+                    my $Replace = $FQDNConfig->{Frontend} || '';
+                    $Param{Value} =~ s/\<KIX_CONFIG_FQDN\>/$Replace/g;
+                }
+            }
+        } else {
+            $Param{Value} =~ s/\<KIX_CONFIG_(.+?)\>/$Self->{Config}->{$1}/g;
+        }
+    }
+    elsif ( IsHashRefWithData($Param{Value}) ) {
+        foreach my $Key ( keys %{$Param{Value}} ) {
+            $Param{Value}->{$Key} = $Self->_ReplaceConfigVariables(
+                Value => $Param{Value}->{$Key}
+            );
+        }
+    }
+    elsif ( IsArrayRefWithData($Param{Value}) ) {
+        foreach my $Value ( @{$Param{Value}} ) {
+            $Value = $Self->_ReplaceConfigVariables(
+                Value => $Value
+            );
+        }
+    }
+
+    return $Param{Value};
 }
 
 1;

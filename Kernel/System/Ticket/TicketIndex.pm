@@ -283,6 +283,17 @@ sub TicketIndexGetQueueStats {
 
     my %Data = map { $_->{QueueID} => { TotalCount => $_->{TotalCount}, LockCount => $_->{LockCount} } } @{$Result || []};
 
+    if ( @QueueIDs ) {
+        for my $QueueID ( @QueueIDs ) {
+            if ( !IsHashRefWithData( $Data{ $QueueID } ) ) {
+                $Data{ $QueueID } = {
+                    LockCount  => 0,
+                    TotalCount => 0,
+                }
+            }
+        }
+    }
+
     $Kernel::OM->Get('Cache')->Set(
         Type  => 'TicketIndex',
         TTL   => $Self->{CacheTTL},
