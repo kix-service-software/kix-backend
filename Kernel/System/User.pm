@@ -18,7 +18,10 @@ use Digest::SHA;
 use Data::Dumper;
 use Time::HiRes;
 
-use base qw(Kernel::System::EventHandler);
+use base qw(
+    Kernel::System::AsynchronousExecutor
+    Kernel::System::EventHandler
+);
 
 use Kernel::System::Role;
 use Kernel::System::VariableCheck qw(:all);
@@ -2532,57 +2535,91 @@ sub UpdateUserCounterObject {
     );
 
     # update counters for every agent
+    USERID:
     for my $UserID ( keys( %UserList ) ) {
-        my $UserCounters = $Self->PrepareUserCounters(
-            UserID => $UserID,
+        # skip current user
+        next USERID if (
+            $Param{CurrentUserID}
+            && $Param{CurrentUserID} == $UserID
+        );
+
+        # trigger async update
+        $Self->AsyncCall(
+            ObjectName               => $Kernel::OM->GetModuleFor('User'),
+            FunctionName             => '_UpdateUserCounterObject',
+            FunctionParams           => {
+                Category => $Param{Category},
+                ObjectID => $Param{ObjectID},
+                UserID   => $UserID,
+            },
+            TaskName                 => 'UpdateUserCounterObject::' . $Param{Category} . '::' . $Param{ObjectID} . '::' . $UserID,
+            MaximumParallelInstances => 1,
+        );
+    }
+
+    if ( $Param{CurrentUserID} ) {
+        $Self->_UpdateUserCounterObject(
+            UserID   => $Param{CurrentUserID},
             Category => $Param{Category},
             ObjectID => $Param{ObjectID},
         );
+    }
 
-        for my $Category ( keys( %{ $UserCounters } ) ) {
-            for my $Counter ( keys( %{ $UserCounters->{ $Category } } ) ) {
-                # map prepared objects
-                my %ObjectIDsMap = map { $_ => 1 } @{ $UserCounters->{ $Category }->{ $Counter } };
+    return 1;
+}
 
-                # get existing counter objects
-                my @ExistingObjectIDs = $Self->GetObjectIDsForCounter(
-                    UserID   => $UserID,
+sub _UpdateUserCounterObject {
+    my ( $Self, %Param ) = @_;
+
+    my $UserCounters = $Self->PrepareUserCounters(
+        UserID   => $Param{UserID},
+        Category => $Param{Category},
+        ObjectID => $Param{ObjectID},
+    );
+
+    for my $Category ( keys( %{ $UserCounters } ) ) {
+        for my $Counter ( keys( %{ $UserCounters->{ $Category } } ) ) {
+            # map prepared objects
+            my %ObjectIDsMap = map { $_ => 1 } @{ $UserCounters->{ $Category }->{ $Counter } };
+
+            # get existing counter objects
+            my @ExistingObjectIDs = $Self->GetObjectIDsForCounter(
+                UserID   => $Param{UserID},
+                Category => $Category,
+                Counter  => $Counter,
+            );
+
+            # prepare objects to delete and add
+            my @ObjectIDsToDelete = ();
+            for my $ObjectID ( @ExistingObjectIDs ) {
+                # existing object to delete
+                if ( !$ObjectIDsMap{ $ObjectID } ) {
+                    push( @ObjectIDsToDelete, $ObjectID );
+                }
+                # existing object is unchanged
+                else {
+                    delete( $ObjectIDsMap{ $ObjectID } );
+                }
+            }
+
+            # delete obsolete counter
+            for my $ObjectID ( @ObjectIDsToDelete ) {
+                $Self->DeleteUserCounterObject(
                     Category => $Category,
                     Counter  => $Counter,
+                    ObjectID => $ObjectID,
+                    UserID   => $Param{UserID},
                 );
+            }
 
-                # prepare objects to delete and add
-                my @ObjectIDsToDelete = ();
-                for my $ObjectID ( @ExistingObjectIDs ) {
-                    # existing object to delete
-                    if ( !$ObjectIDsMap{ $ObjectID } ) {
-                        push( @ObjectIDsToDelete, $ObjectID );
-                    }
-                    # existing object is unchanged
-                    else {
-                        delete( $ObjectIDsMap{ $ObjectID } );
-                    }
-                }
-
-                # delete obsolete counter
-                for my $ObjectID ( @ObjectIDsToDelete ) {
-                    $Self->DeleteUserCounterObject(
-                        Category => $Category,
-                        Counter  => $Counter,
-                        ObjectID => $ObjectID,
-                        UserID   => $UserID,
-                    );
-                }
-
-                # add new counter
-                for my $ObjectID ( keys( %ObjectIDsMap ) ) {
-                    $Self->AddUserCounterObject(
-                        Category => $Category,
-                        Counter  => $Counter,
-                        ObjectID => $ObjectID,
-                        UserID   => $UserID,
-                    );
-                }
+            # add new counter
+            for my $ObjectID ( keys( %ObjectIDsMap ) ) {
+                $Self->AddUserCounterObject(
+                    Category => $Category,
+                    Counter  => $Counter,
+                    ObjectID => $ObjectID,
+                    UserID   => $Param{UserID},
+                );
             }
         }
     }

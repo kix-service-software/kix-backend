@@ -114,8 +114,8 @@ sub AsyncCall {
         return;
     }
 
-    # define the task name with object name and concatenate the function name
-    my $TaskName = substr "$ObjectName-$FunctionName()", 0, 255;
+    # define the task name with object name and concatenate the function name, if not given by parameter
+    my $TaskName = $Param{TaskName} || substr("$ObjectName-$FunctionName()", 0, 255);
 
     # create a new task
     my $TaskID = $Kernel::OM->Get('Scheduler')->TaskAdd(

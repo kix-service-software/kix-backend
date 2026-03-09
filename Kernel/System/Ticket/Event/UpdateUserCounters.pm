@@ -443,8 +443,9 @@ sub HandleTicketQueueUpdate {
     my ($Self, %Param) = @_;
 
     $Kernel::OM->Get('User')->UpdateUserCounterObject(
-        Category => 'Ticket',
-        ObjectID => $Param{Ticket}->{TicketID}
+        Category      => 'Ticket',
+        ObjectID      => $Param{Ticket}->{TicketID},
+        CurrentUserID => $Param{UserID}
     );
 
     return 1;
