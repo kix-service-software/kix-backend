@@ -231,6 +231,7 @@ ObjectSearch::Database::Ticket                                                = 
 ObjectSearch::Database::Article                                               = Kernel::System::ObjectSearch::Database::Article
 ObjectSearch::Database::ObjectTag                                             = Kernel::System::ObjectSearch::Database::ObjectTag
 ObjectSearch::Database::ObjectTagLink                                         = Kernel::System::ObjectSearch::Database::ObjectTagLink
+ObjectSearch::Database::Role                                                  = Kernel::System::ObjectSearch::Database::Role
 ObjectTag                                                                     = Kernel::System::ObjectTag
 Organisation                                                                  = Kernel::System::Organisation
 OTP                                                                           = Kernel::System::OTP

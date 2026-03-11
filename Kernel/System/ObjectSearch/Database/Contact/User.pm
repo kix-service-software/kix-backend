@@ -71,17 +71,17 @@ sub GetSupportedAttributes {
 sub AttributePrepare {
     my ( $Self, %Param ) = @_;
 
-    my $TableAlias = $Param{Flags}->{FlagMap}->{UserJoin} // 'u';
+    my $TableAlias = $Param{Flags}->{JoinMap}->{UserJoin} // 'u';
     my @SQLJoin;
     if ( $Param{Attribute} =~ m/Login$/sm ){
-        if ( !$Param{Flags}->{FlagMap}->{UserJoin} ) {
+        if ( !$Param{Flags}->{JoinMap}->{UserJoin} ) {
             my $Count = $Param{Flags}->{UserCounter}++;
             $TableAlias .= $Count;
             push(
                 @SQLJoin,
                 "LEFT JOIN users $TableAlias ON c.user_id = $TableAlias.id"
             );
-            $Param{Flags}->{UserJoin} = $TableAlias;
+            $Param{Flags}->{JoinMap}->{UserJoin} = $TableAlias;
         }
     }
 
