@@ -639,7 +639,7 @@ sub GetSupportedAttributes {
                         IsSortable      => $AttributeRef->{IsSortable}     || 0,
                         IsFulltextable  => $AttributeRef->{IsFulltextable} || 0,
                         Operators       => $AttributeRef->{Operators}      || [],
-                        ValueType       => $AttributeRef->{ValueType}      || 'TEXTUAL',
+                        ValueType       => $AttributeRef->{ValueType}      || 'STRING',
                         Requires        => $AttributeRef->{Requires}
                     }
                 );
@@ -656,7 +656,7 @@ sub GetSupportedAttributes {
                     IsSortable      => $AttributeRef->{IsSortable}     || 0,
                     IsFulltextable  => $AttributeRef->{IsFulltextable} || 0,
                     Operators       => $AttributeRef->{Operators}      || [],
-                    ValueType       => $AttributeRef->{ValueType}      || 'TEXTUAL',
+                    ValueType       => $AttributeRef->{ValueType}      || 'STRING',
                     Requires        => $AttributeRef->{Requires}
                 }
             );

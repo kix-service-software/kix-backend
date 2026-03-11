@@ -54,7 +54,7 @@ defines the list of attributes this module is supporting
             IsSortable     => 0|1,
             IsFulltextable => 0|1,
             Operators      => [...],
-            ValueType      => 'NUMERIC|TEXTUAL|DATE|DATETIME'
+            ValueType      => 'NUMERIC|STRING|DATE|DATETIME'
         }
     };
 
