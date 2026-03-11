@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
-"POT-Creation-Date: 2026-3-10 19:42+0000\n"
+"POT-Creation-Date: 2026-3-11 10:21+0000\n"
 "PO-Revision-Date: 2025-10-22 10:58+0000\n"
 "Last-Translator: DeepL <noreply-mt-deepl@weblate.org>\n"
 "Language-Team: French <http://weblate.vm.devel.cape-it.de/projects/kix18/"
@@ -5658,6 +5658,16 @@ msgid ""
 msgstr ""
 "Définit le module d'arrière-plan à utiliser pour la recherche "
 "d'organisations."
+
+#. SysConfig: Kernel/Config/Files/ObjectSearch.xml
+msgid ""
+"Defines the backend module that should be used to search for roles by "
+"permission properties."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/ObjectSearch.xml
+msgid "Defines the backend module that should be used to search for roles."
+msgstr ""
 
 #. SysConfig: Kernel/Config/Files/ObjectSearch.xml
 msgid "Defines the backend module that should be used to search for tickets."
