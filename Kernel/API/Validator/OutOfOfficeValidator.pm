@@ -75,7 +75,6 @@ sub Validate {
                    $Found = 0;
                 }
                 elsif ( $Key eq 'Substitute' ) {
-                    print STDERR Data::Dumper::Dumper($Param{Data}->{$Param{Attribute}}->{$Key});
                     if ( !IsInteger($Param{Data}->{$Param{Attribute}}->{$Key}) ) {
                         $Found = 0;
                     }
@@ -84,7 +83,6 @@ sub Validate {
                             UserIDs => [$Param{Data}->{$Param{Attribute}}->{$Key}],
                             IsAgent => 1
                         );
-                        print STDERR Data::Dumper::Dumper(\%User,$Param{Data}->{$Param{Attribute}}->{$Key});
                         if ( !IsHashRefWithData(\%User) ) {
                             $Found = 0;
                         }
