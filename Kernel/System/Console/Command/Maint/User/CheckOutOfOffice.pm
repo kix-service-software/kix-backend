@@ -39,6 +39,9 @@ sub Run {
             UserID => $UserID
         );
 
+        # remove UserPw from update data to keep current password
+        delete $User{'UserPw'};
+
         $Kernel::OM->Get('User')->UserUpdate(
             %User,
             OutOfOfficeEnd        => undef,
