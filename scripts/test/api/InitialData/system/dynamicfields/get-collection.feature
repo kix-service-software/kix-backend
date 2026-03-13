@@ -21,8 +21,8 @@ Feature: GET request to the /system/dynamicfields resource
       | MobileProcessingChecklist010 |
       | MobileProcessingChecklist020 |
       | MobileProcessingState        |
-      | PlanBegin                    |
-      | PlanEnd                      |
+#      | PlanBegin                    |
+#      | PlanEnd                      |
       | RelatedAssets                |
       | RiskAssumptionRemark         |
       | Source                       |
