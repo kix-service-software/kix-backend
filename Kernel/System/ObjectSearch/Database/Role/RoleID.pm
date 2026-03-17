@@ -6,7 +6,7 @@
 # did not receive this file, see https://www.gnu.org/licenses/gpl-3.0.txt.
 # --
 
-package Kernel::System::ObjectSearch::Database::Role::General;
+package Kernel::System::ObjectSearch::Database::Role::RoleID;
 
 use strict;
 use warnings;
@@ -21,7 +21,7 @@ our $ObjectManagerDisabled = 1;
 
 =head1 NAME
 
-Kernel::System::ObjectSearch::Database::Role::General - attribute module for database object search
+Kernel::System::ObjectSearch::Database::Role::RoleID - attribute module for database object search
 
 =head1 SYNOPSIS
 
@@ -35,14 +35,7 @@ sub GetSupportedAttributes {
     my ( $Self, %Param ) = @_;
 
     return {
-        Name => {
-            IsSelectable   => 1,
-            IsSearchable   => 1,
-            IsSortable     => 1,
-            IsFulltextable => 0,
-            Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
-        },
-        UsageContext => {
+        RoleID => {
             IsSelectable   => 1,
             IsSearchable   => 1,
             IsSortable     => 1,
@@ -50,12 +43,13 @@ sub GetSupportedAttributes {
             Operators      => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE'],
             ValueType      => 'NUMERIC'
         },
-        Comment => {
+        ID        => {
             IsSelectable   => 1,
             IsSearchable   => 1,
             IsSortable     => 1,
             IsFulltextable => 0,
-            Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+            Operators      => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE'],
+            ValueType      => 'NUMERIC'
         }
     };
 }
@@ -63,42 +57,20 @@ sub GetSupportedAttributes {
 sub AttributePrepare {
     my ( $Self, %Param ) = @_;
 
-    # map search attributes to table attributes
-    my %AttributeDefinition = (
-        Name => {
-            Column => 'r.name',
-            ConditionDef => {
-                ValueType       => "STRING",
-                CaseInsensitive => 1
-            }
-        },
-        UsageContext => {
-            Column => 'r.usage_context',
-            ConditionDef => {
-                ValueType       => "NUMERIC",
-            }
-        },
-        Comment => {
-            Column => 'r.comments',
-            ConditionDef => {
-                ValueType       => "STRING",
-                CaseInsensitive => 1
-            }
-        }
-    );
-
     my %Attribute = (
-        Column => $AttributeDefinition{ $Param{Attribute} }->{Column},
+        Column => 'r.id'
     );
     if ( $Param{PrepareType} eq 'Condition' ) {
-        $Attribute{ConditionDef} = $AttributeDefinition{ $Param{Attribute} }->{ConditionDef};
+        $Attribute{ConditionDef} = {
+            ValueType => 'NUMERIC'
+        };
     }
 
     return \%Attribute;
 }
 
-1;
 
+1;
 
 =back
 
