@@ -198,7 +198,7 @@ sub Search {
             for my $OrganisationID ( @OrganisationIDs ) {
                 push( @NewOrganisationIDs, $OrganisationID );
 
-                my @SubOrganisationIDs = $Kernel::OM->Get('Organisation')->GetAllSubOrganisationIDs(
+                my @SubOrganisationIDs = $Kernel::OM->Get('Organisation')->GetAllParentOrganisationIDs(
                     OrgID => $OrganisationID,
                 );
                 push( @NewOrganisationIDs, @SubOrganisationIDs );
