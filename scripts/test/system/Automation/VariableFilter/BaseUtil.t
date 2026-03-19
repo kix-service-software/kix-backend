@@ -63,6 +63,7 @@ else {
             'ToBase64',
             'FromBase64',
             'AsConditionString',
+            'IfNull',
         ],
         'GetFilterHandler()',
         1
@@ -458,6 +459,41 @@ SU1FLU5hY2hyaWNodGVu',
         Value     => '$Test,%Test,@Test,\'Test\'',
         Parameter => undef,
         Expected  => "'\$Test,\%Test,\@Test,\\\'Test\\\''"
+    },
+    {
+        Name      => 'IfNull: undef value',
+        Handler   => 'IfNull',
+        Value     => undef,
+        Parameter => 'test',
+        Expected  => 'test'
+    },
+    {
+        Name      => 'IfNull: undef parameter',
+        Handler   => 'IfNull',
+        Value     => '',
+        Parameter => undef,
+        Expected  => ''
+    },
+    {
+        Name      => 'IfNull: value is HasRef',
+        Handler   => 'IfNull',
+        Value     => {},
+        Parameter => 'test',
+        Expected  => {}
+    },
+    {
+        Name      => 'IfNull: value is ArrayRef',
+        Handler   => 'IfNull',
+        Value     => [],
+        Parameter => 'test',
+        Expected  => []
+    },
+    {
+        Name      => 'IfNull: value is StringRef',
+        Handler   => 'IfNull',
+        Value     => \'',
+        Parameter => 'test',
+        Expected  => \''
     }
 );
 for my $Test ( @Tests ) {
