@@ -39,6 +39,12 @@ sub Configure {
         HasValue    => 0,
     );
     $Self->AddOption(
+        Name        => 'remove-pid',
+        Description => "Delete registered process in the database.",
+        Required    => 0,
+        HasValue    => 0,
+    );
+    $Self->AddOption(
         Name        => 'debug',
         Description => "Print debug info to the KIX log.",
         Required    => 0,
@@ -51,27 +57,24 @@ sub Configure {
 sub PreRun {
     my ($Self) = @_;
 
-    my $PIDObject = $Kernel::OM->Get('PID');
-
-    my $PIDCreated = $PIDObject->PIDCreate(
-        Name  => $Self->Name(),
-        Force => $Self->GetOption('force-pid'),
-        TTL   => 60 * 60 * 1,
-    );
-    if ( !$PIDCreated ) {
-        my $Error = "Unable to register the process in the database. Is another instance still running?\n";
-        $Error .= "You can use --force-pid to override this check.\n";
-        die $Error;
-    }
-
-    my $Debug = $Self->GetOption('debug');
-    my $Name  = $Self->Name();
-
-    if ($Debug) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'debug',
-            Message  => "KIX email handle ($Name) started.",
+    if ( !$Self->GetOption('remove-pid') ) {
+        my $PIDCreated = $Kernel::OM->Get('PID')->PIDCreate(
+            Name  => $Self->Name(),
+            Force => $Self->GetOption('force-pid'),
+            TTL   => 60 * 60 * 1,
         );
+        if ( !$PIDCreated ) {
+            my $Error = "Unable to register the process in the database. Is another instance still running?\n";
+            $Error .= "You can use --force-pid to override this check.\n";
+            die $Error;
+        }
+
+        if ( $Self->GetOption('debug') ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'debug',
+                Message  => 'KIX email handle (' . $Self->Name() . ') started.',
+            );
+        }
     }
 
     return;
@@ -80,20 +83,26 @@ sub PreRun {
 sub Run {
     my ( $Self, %Param ) = @_;
 
+    if ( $Self->GetOption('remove-pid') ) {
+        $Self->Print("<yellow>Deleting registered process from the database...</yellow>\n\n");
+
+        # PIDDelete is done by PostRun
+        return $Self->ExitCodeOk();
+    }
+
     $Self->Print("<yellow>Fetching incoming mails from mail accounts...</yellow>\n\n");
 
-    my $MailAccountObject = $Kernel::OM->Get('MailAccount');
-    my $MailAccountID     = $Self->GetOption('mail-account-id');
+    my $MailAccountID = $Self->GetOption('mail-account-id');
 
-    my %List = $MailAccountObject->MailAccountList( Valid => 1 );
+    my %List = $Kernel::OM->Get('MailAccount')->MailAccountList( Valid => 1 );
     my ( $ErrorCount, $FetchedCount );
 
     KEY:
     for my $Key ( sort keys %List ) {
         next KEY if ( $MailAccountID && $Key != $MailAccountID );
-        my %Data = $MailAccountObject->MailAccountGet( ID => $Key );
+        my %Data = $Kernel::OM->Get('MailAccount')->MailAccountGet( ID => $Key );
         $Self->Print("<yellow>$Data{Host} ($Data{Type})...</yellow>\n");
-        my $Status = $MailAccountObject->MailAccountFetch(
+        my $Status = $Kernel::OM->Get('MailAccount')->MailAccountFetch(
             %Data,
             Debug  => $Self->GetOption('debug'),
             CMD    => 1,
@@ -108,7 +117,6 @@ sub Run {
     }
 
     if ($ErrorCount) {
-
         # Error messages printed by backend
         return $Self->ExitCodeError();
     }
@@ -125,14 +133,16 @@ sub Run {
 sub PostRun {
     my ($Self) = @_;
 
-    my $Debug = $Self->GetOption('debug');
-    my $Name  = $Self->Name();
+    if ( !$Self->GetOption('remove-pid') ) {
+        my $Debug = $Self->GetOption('debug');
+        my $Name  = $Self->Name();
 
-    if ($Debug) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'debug',
-            Message  => "KIX email handle ($Name) stopped.",
-        );
+        if ($Debug) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'debug',
+                Message  => "KIX email handle ($Name) stopped.",
+            );
+        }
     }
 
     return $Kernel::OM->Get('PID')->PIDDelete( Name => $Self->Name() );
