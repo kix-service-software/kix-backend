@@ -68,7 +68,6 @@ sub AttributePrepare {
         Name => {
             Column => 'r.name',
             ConditionDef => {
-                ValueType       => "STRING",
                 CaseInsensitive => 1
             }
         },
@@ -81,7 +80,6 @@ sub AttributePrepare {
         Comment => {
             Column => 'r.comments',
             ConditionDef => {
-                ValueType       => "STRING",
                 CaseInsensitive => 1
             }
         }

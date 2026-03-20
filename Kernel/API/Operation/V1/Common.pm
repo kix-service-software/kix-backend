@@ -576,19 +576,11 @@ sub PrepareData {
             my ( $Object, $FieldSort ) = split( /\./, $Sorter, 2 );
             my ( $Field, $Type ) = split( /\:/, $FieldSort );
             my $Direction = 'ascending';
-            $Type = uc( $Type || 'STRING' );
-
-            # Deprecated TEXTUAL. Fallback to STRING data type. Should be removed in future version.
-            if ( $Type eq 'TEXTUAL' ) {
-                $Type = 'STRING';
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Datatype TEXTUAL is deprecated for sort. Use STRING instead.",
-                );
-            }
+            $Type = uc( $Type || 'TEXTUAL' );
 
             # check if sort type is valid
-            if ( $Type && $Type !~ /(NUMERIC|STRING|NATURAL|DATE|DATETIME)/g ) {
+            # types provided by thirdparty Data::Sorting
+            if ( $Type && $Type !~ /(NUMERIC|TEXTUAL|NATURAL|DATE|DATETIME)/g ) {
                 return $Self->_Error(
                     Code    => 'PrepareData.InvalidSort',
                     Message => "Unknown type $Type in $Sorter!",
@@ -1056,7 +1048,7 @@ suppress a sub-resource include if it's already done somewhere else (due to perf
             {
                 Field     => 'Title',
                 Direction => 'descending',      # optional, default: ascending
-                Type      => 'NATURAL',         # optional, default: STRING
+                Type      => 'NATURAL',         # optional, default: TEXTUAL
             }
         ]
     );
@@ -2396,7 +2388,7 @@ sub _ApplySort {
                 }
 
                 # special handling for "number-strings"
-                if (lc($Type) eq 'textual') {
+                if (uc($Type) eq 'TEXTUAL') {
                     my $HasNotNumeric = grep {
                         $_->{$SortField} && $_->{$SortField} !~ m/^\d+$/
                     } @{ $Param{Data}->{$Object} };

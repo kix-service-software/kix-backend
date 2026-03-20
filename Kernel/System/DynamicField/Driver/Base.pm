@@ -226,7 +226,7 @@ sub SQLParameterGet {
         && $SQLParameter->{ConditionDef}->{ValueType} eq 'NUMERIC'
         && $SQLParameter->{Column} =~ m/\.value_text$/
     ) {
-        $SQLParameter->{ConditionDef}->{ValueType} = 'STRING';
+        $SQLParameter->{ConditionDef}->{ValueType} = 'TEXTUAL';
     }
 
     return $SQLParameter;

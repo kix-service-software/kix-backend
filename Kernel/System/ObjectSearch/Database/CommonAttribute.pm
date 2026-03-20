@@ -54,7 +54,7 @@ defines the list of attributes this module is supporting
             IsSortable     => 0|1,
             IsFulltextable => 0|1,
             Operators      => [...],
-            ValueType      => 'NUMERIC|STRING|DATE|DATETIME'
+            ValueType      => 'NUMERIC|TEXTUAL|DATE|DATETIME'
         }
     };
 
@@ -369,7 +369,7 @@ sub _OperationEMPTY {
             if ( $Value ) {
                 if (
                     !$Param{ValueType}
-                    || $Param{ValueType} eq 'STRING'
+                    || $Param{ValueType} eq 'TEXTUAL'
                 ) {
                     push( @Conditions, ( $Column . ' = \'\'' ) );
                 }
@@ -382,7 +382,7 @@ sub _OperationEMPTY {
                 my $Condition = q{};
                 if (
                     !$Param{ValueType}
-                    || $Param{ValueType} eq 'STRING'
+                    || $Param{ValueType} eq 'TEXTUAL'
                 ) {
                     $Condition .= $Column . ' != \'\'';
                 }

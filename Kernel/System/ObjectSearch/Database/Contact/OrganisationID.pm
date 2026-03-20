@@ -119,7 +119,6 @@ sub AttributePrepare {
         Organisation => {
             Column       =>"$JoinData{OAlias}.name",
             ConditionDef => {
-                ValueType       => 'STRING',
                 CaseInsensitive => 1,
                 NULLValue       => 1
             }
@@ -127,7 +126,6 @@ sub AttributePrepare {
         OrganisationNumber => {
             Column       => "$JoinData{OAlias}.number",
             ConditionDef => {
-                ValueType       => 'STRING',
                 CaseInsensitive => 1,
                 NULLValue       => 1
             }
@@ -142,7 +140,6 @@ sub AttributePrepare {
         PrimaryOrganisation => {
             Column       => "$JoinData{POAlias}.name",
             ConditionDef => {
-                ValueType       => 'STRING',
                 CaseInsensitive => 1,
                 NULLValue       => 1
             }
@@ -150,7 +147,6 @@ sub AttributePrepare {
         PrimaryOrganisationNumber => {
             Column       => "$JoinData{POAlias}.number",
             ConditionDef => {
-                ValueType       => 'STRING',
                 CaseInsensitive => 1,
                 NULLValue       => 1
             }
