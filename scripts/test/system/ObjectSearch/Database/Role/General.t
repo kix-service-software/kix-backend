@@ -56,6 +56,13 @@ $Self->IsDeeply(
             Operators      => ['EQ','NE','IN','!IN','LT','LTE','GT','GTE'],
             ValueType      => 'NUMERIC'
         },
+        Comment => {
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+        }
     },
     'GetSupportedAttributes provides expected data'
 );
@@ -286,6 +293,110 @@ my @SearchTests = (
             ]
         }
     },
+    {
+        Name         => 'Search: valid search / Field Comment / Operator EQ',
+        Search       => {
+            Field    => 'Comment',
+            Operator => 'EQ',
+            Value    => 'Test'
+        },
+        Expected     => {
+            'Where' => [
+                $CaseSensitive ? 'LOWER(r.comments) = \'test\'' : 'r.comments = \'test\''
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field Comment / Operator NE',
+        Search       => {
+            Field    => 'Comment',
+            Operator => 'NE',
+            Value    => 'Test'
+        },
+        Expected     => {
+            'Where' => [
+                $CaseSensitive ? 'LOWER(r.comments) != \'test\'' : 'r.comments != \'test\''
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field Comment / Operator IN',
+        Search       => {
+            Field    => 'Comment',
+            Operator => 'IN',
+            Value    => ['Test']
+        },
+        Expected     => {
+            'Where' => [
+                $CaseSensitive ? 'LOWER(r.comments) IN (\'test\')' : 'r.comments IN (\'test\')'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field Comment / Operator !IN',
+        Search       => {
+            Field    => 'Comment',
+            Operator => '!IN',
+            Value    => ['Test']
+        },
+        Expected     => {
+            'Where' => [
+                $CaseSensitive ? 'LOWER(r.comments) NOT IN (\'test\')' : 'r.comments NOT IN (\'test\')'
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field Comment / Operator STARTSWITH',
+        Search       => {
+            Field    => 'Comment',
+            Operator => 'STARTSWITH',
+            Value    => 'Test'
+        },
+        Expected     => {
+            'Where' => [
+                $CaseSensitive ? 'LOWER(r.comments) LIKE \'test%\'' : 'r.comments LIKE \'test%\''
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field Comment / Operator ENDSWITH',
+        Search       => {
+            Field    => 'Comment',
+            Operator => 'ENDSWITH',
+            Value    => 'Test'
+        },
+        Expected     => {
+            'Where' => [
+                $CaseSensitive ? 'LOWER(r.comments) LIKE \'%test\'' : 'r.comments LIKE \'%test\''
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field Comment / Operator CONTAINS',
+        Search       => {
+            Field    => 'Comment',
+            Operator => 'CONTAINS',
+            Value    => 'Test'
+        },
+        Expected     => {
+            'Where' => [
+                $CaseSensitive ? 'LOWER(r.comments) LIKE \'%test%\'' : 'r.comments LIKE \'%test%\''
+            ]
+        }
+    },
+    {
+        Name         => 'Search: valid search / Field Comment / Operator LIKE',
+        Search       => {
+            Field    => 'Comment',
+            Operator => 'LIKE',
+            Value    => 'Test'
+        },
+        Expected     => {
+            'Where' => [
+                $CaseSensitive ? 'LOWER(r.comments) LIKE \'test\'' : 'r.comments LIKE \'test\''
+            ]
+        }
+    },
 );
 for my $Test ( @SearchTests ) {
     my $Result = $AttributeObject->Search(
@@ -334,6 +445,18 @@ my @SortTests = (
             ],
             'Select' => [
                 'r.usage_context AS SortAttr0'
+            ]
+        }
+    },
+    {
+        Name      => 'Sort: Attribute "Comment"',
+        Attribute => 'Comment',
+        Expected  => {
+            'OrderBy' => [
+                'SortAttr0'
+            ],
+            'Select' => [
+                'r.comments AS SortAttr0'
             ]
         }
     },
@@ -397,7 +520,7 @@ foreach my $RoleID ( sort keys %ExistingRoleIDs ) {
 my %RoleParam;
 for my $Key (
     qw(
-        Name
+        Name Comment
     )
 ) {
     my $Count  = 658_849;
@@ -413,6 +536,7 @@ for my $Key (
 my $RoleID1 = $Kernel::OM->Get('Role')->RoleAdd(
     Name         => $RoleParam{Name}[0],
     UsageContext => Kernel::System::Role->USAGE_CONTEXT->{AGENT},
+    Comment      => $RoleParam{Comment}[0],
     ValidID      => 1,
     UserID       => 1,
 );
@@ -424,6 +548,7 @@ $Self->True(
 my $RoleID2 = $Kernel::OM->Get('Role')->RoleAdd(
     Name         => $RoleParam{Name}[1],
     UsageContext => Kernel::System::Role->USAGE_CONTEXT->{CUSTOMER},
+    Comment      => $RoleParam{Comment}[1],
     ValidID      => 1,
     UserID       => 1,
 );
@@ -435,6 +560,7 @@ $Self->True(
 my $RoleID3 = $Kernel::OM->Get('Role')->RoleAdd(
     Name         => $RoleParam{Name}[2],
     UsageContext => Kernel::System::Role->USAGE_CONTEXT->{CUSTOMER} + Kernel::System::Role->USAGE_CONTEXT->{AGENT},
+    Comment      => $RoleParam{Comment}[2],
     ValidID      => 1,
     UserID       => 1,
 );
@@ -447,6 +573,7 @@ $Self->True(
 my $RoleID4 = $Kernel::OM->Get('Role')->RoleAdd(
     Name         => $RoleParam{Name}[3],
     UsageContext => Kernel::System::Role->USAGE_CONTEXT->{AGENT},
+    Comment      => $RoleParam{Comment}[3],
     ValidID      => 1,
     UserID       => 1,
 );
@@ -724,6 +851,162 @@ my @IntegrationSearchTests = (
         },
         Expected => [$RoleID1,$RoleID2,$RoleID3,$RoleID4]
     },
+    {
+        Name     => "Search: Field Comment / Operator EQ / Value \$RoleParam{Comment}[0]",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Comment',
+                    Operator => 'EQ',
+                    Value    => $RoleParam{Comment}[0]
+                }
+            ]
+        },
+        Expected => [$RoleID1]
+    },
+    {
+        Name     => "Search: Field Comment / Operator NE / Value \$RoleParam{Comment}[0]",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Comment',
+                    Operator => 'NE',
+                    Value    => $RoleParam{Comment}[0]
+                }
+            ]
+        },
+        Expected => [$RoleID2,$RoleID3,$RoleID4]
+    },
+    {
+        Name     => "Search: Field Comment / Operator IN / Value \$RoleParam{Comment}[0]",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Comment',
+                    Operator => 'IN',
+                    Value    => $RoleParam{Comment}[0]
+                }
+            ]
+        },
+        Expected => [$RoleID1]
+    },
+    {
+        Name     => "Search: Field Comment / Operator !IN / Value \$RoleParam{Comment}[0]",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Comment',
+                    Operator => '!IN',
+                    Value    => $RoleParam{Comment}[0]
+                }
+            ]
+        },
+        Expected => [$RoleID2,$RoleID3,$RoleID4]
+    },
+    {
+        Name     => "Search: Field Comment / Operator STARTSWITH / Value \$RoleParam{Comment}[1]",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Comment',
+                    Operator => 'STARTSWITH',
+                    Value    => $RoleParam{Comment}[1]
+                }
+            ]
+        },
+        Expected => [$RoleID2]
+    },
+    {
+        Name     => "Search: Field Comment / Operator STARTSWITH / Value substr(\$RoleParam{Comment}[1],0,5)",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Comment',
+                    Operator => 'STARTSWITH',
+                    Value    => substr($RoleParam{Comment}[1],0,5)
+                }
+            ]
+        },
+        Expected => [$RoleID1,$RoleID2,$RoleID3,$RoleID4]
+    },
+    {
+        Name     => "Search: Field Comment / Operator ENDSWITH / Value \$RoleParam{Comment}[2]",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Comment',
+                    Operator => 'ENDSWITH',
+                    Value    => $RoleParam{Comment}[2]
+                }
+            ]
+        },
+        Expected => [$RoleID3]
+    },
+    {
+        Name     => "Search: Field Comment / Operator ENDSWITH / Value substr(\$RoleParam{Comment}[2],-5)",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Comment',
+                    Operator => 'ENDSWITH',
+                    Value    => substr($RoleParam{Comment}[2],-5)
+                }
+            ]
+        },
+        Expected => [$RoleID3]
+    },
+    {
+        Name     => "Search: Field Comment / Operator CONTAINS / Value \$RoleParam{Comment}[0]",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Comment',
+                    Operator => 'CONTAINS',
+                    Value    => $RoleParam{Comment}[0]
+                }
+            ]
+        },
+        Expected => [$RoleID1]
+    },
+    {
+        Name     => "Search: Field Comment / Operator CONTAINS / Value substr(\$RoleParam{Comment}[0],5,-5)",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Comment',
+                    Operator => 'CONTAINS',
+                    Value    => substr($RoleParam{Comment}[0],5,-5)
+                }
+            ]
+        },
+        Expected => [$RoleID1,$RoleID2,$RoleID3,$RoleID4]
+    },
+    {
+        Name     => "Search: Field Comment / Operator LIKE / Value \$RoleParam{Comment}[0]",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Comment',
+                    Operator => 'LIKE',
+                    Value    => $RoleParam{Comment}[0]
+                }
+            ]
+        },
+        Expected => [$RoleID1]
+    },
+    {
+        Name     => "Search: Field Comment / Operator LIKE / Value *substr(\$RoleParam{Comment}[0],5)",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'Comment',
+                    Operator => 'LIKE',
+                    Value    => q{*} . substr($RoleParam{Comment}[0],5)
+                }
+            ]
+        },
+        Expected => [$RoleID1]
+    },
 );
 for my $Test ( @IntegrationSearchTests ) {
     my @Result = $ObjectSearch->Search(
@@ -799,6 +1082,35 @@ my @IntegrationSortTests = (
             }
         ],
         Expected => [$RoleID3, $RoleID2, $RoleID1, $RoleID4]
+    },
+    {
+        Name     => 'Sort: Field Comment',
+        Sort     => [
+            {
+                Field => 'Comment'
+            }
+        ],
+        Expected => [$RoleID1, $RoleID2, $RoleID3, $RoleID4]
+    },
+    {
+        Name     => 'Sort: Field Comment / Direction ascending',
+        Sort     => [
+            {
+                Field     => 'Comment',
+                Direction => 'ascending'
+            }
+        ],
+        Expected => [$RoleID1, $RoleID2, $RoleID3, $RoleID4]
+    },
+    {
+        Name     => 'Sort: Field Comment / Direction descending',
+        Sort     => [
+            {
+                Field     => 'Comment',
+                Direction => 'descending'
+            }
+        ],
+        Expected => [$RoleID4, $RoleID3, $RoleID2, $RoleID1]
     },
 );
 for my $Test ( @IntegrationSortTests ) {
