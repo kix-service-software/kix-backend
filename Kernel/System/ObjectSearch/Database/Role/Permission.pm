@@ -79,14 +79,12 @@ sub AttributePrepare {
         'Permissions.Target' => {
             Column       => "$JoinData{RPAlias}.target",
             ConditionDef => {
-                ValueType       => "STRING",
                 CaseInsensitive => 1
             }
         },
         'Permissions.Type' => {
             Column       => "$JoinData{PTAlias}.name",
             ConditionDef => {
-                ValueType       => "STRING",
                 CaseInsensitive => 1
             }
         },
