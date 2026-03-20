@@ -104,9 +104,7 @@ sub AttributePrepare {
         },
         Valid => {
             Column       => 'rv.name',
-            ConditionDef => {
-                ValueType => 'STRING'
-            }
+            ConditionDef => {}
         }
     );
     
