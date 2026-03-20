@@ -104,7 +104,6 @@ sub AttributePrepare {
         Login          => {
             Column       => $TableAlias . '.login',
             ConditionDef => {
-                ValueType       => 'STRING',
                 CaseInsensitive => 1,
                 NULLValue       => 1
             }
@@ -112,7 +111,6 @@ sub AttributePrepare {
         UserLogin      => {
             Column       => $TableAlias . '.login',
             ConditionDef => {
-                ValueType       => 'STRING',
                 CaseInsensitive => 1,
                 NULLValue       => 1
             }
