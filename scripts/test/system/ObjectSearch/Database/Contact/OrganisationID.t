@@ -2711,7 +2711,7 @@ my @SearchTests2 = (
                 'LEFT JOIN contact_organisation co ON co.contact_id = c.id'
             ],
             'Where' => [
-                'co.org_id IN (' . $OrganisationID2 . ',' . $OrganisationID3 . ')'
+                'co.org_id IN (' . $OrganisationID2 . ',' . $OrganisationID1 . ')'
             ]
         }
     },
@@ -2728,7 +2728,7 @@ my @SearchTests2 = (
                 'LEFT JOIN contact_organisation co ON co.contact_id = c.id'
             ],
             'Where'      => [
-                'co.org_id NOT IN (' . $OrganisationID2 . ',' . $OrganisationID3 . ')'
+                'co.org_id NOT IN (' . $OrganisationID2 . ',' . $OrganisationID1 . ')'
             ]
         }
     },
@@ -2744,7 +2744,7 @@ my @SearchTests2 = (
                 'LEFT JOIN contact_organisation co ON co.contact_id = c.id'
             ],
             'Where' => [
-                'co.org_id IN (' . $OrganisationID2 . ',' . $OrganisationID3 . ')'
+                'co.org_id IN (' . $OrganisationID2 . ',' . $OrganisationID1 . ')'
             ]
         }
     },
@@ -2761,7 +2761,7 @@ my @SearchTests2 = (
                 'LEFT JOIN contact_organisation co ON co.contact_id = c.id'
             ],
             'Where'      => [
-                'co.org_id NOT IN (' . $OrganisationID2 . ',' . $OrganisationID3 . ')'
+                'co.org_id NOT IN (' . $OrganisationID2 . ',' . $OrganisationID1 . ')'
             ]
         }
     },
@@ -2811,7 +2811,7 @@ my @SearchTests2 = (
                 'LEFT JOIN contact_organisation co ON co.contact_id = c.id'
             ],
             'Where' => [
-                'co.org_id IN (' . $OrganisationID2 . ',' . $OrganisationID3 . ')'
+                'co.org_id IN (' . $OrganisationID2 . ',' . $OrganisationID1 . ')'
             ]
         }
     },
@@ -2828,7 +2828,7 @@ my @SearchTests2 = (
                 'LEFT JOIN contact_organisation co ON co.contact_id = c.id'
             ],
             'Where'      => [
-                'co.org_id NOT IN (' . $OrganisationID2 . ',' . $OrganisationID3 . ')'
+                'co.org_id NOT IN (' . $OrganisationID2 . ',' . $OrganisationID1 . ')'
             ]
         }
     },
@@ -2844,7 +2844,7 @@ my @SearchTests2 = (
                 'LEFT JOIN contact_organisation co ON co.contact_id = c.id'
             ],
             'Where' => [
-                'co.org_id IN (' . $OrganisationID2 . ',' . $OrganisationID3 . ')'
+                'co.org_id IN (' . $OrganisationID2 . ',' . $OrganisationID1 . ')'
             ]
         }
     },
@@ -2860,7 +2860,7 @@ my @SearchTests2 = (
                 'LEFT JOIN contact_organisation co ON co.contact_id = c.id'
             ],
             'Where' => [
-                'co.org_id NOT IN (' . $OrganisationID2 . ',' . $OrganisationID3 . ')'
+                'co.org_id NOT IN (' . $OrganisationID2 . ',' . $OrganisationID1 . ')'
             ]
         }
     },
@@ -2926,7 +2926,7 @@ my @IntegrationSearchTests2 = (
                 }
             ]
         },
-        Expected => [$ContactID1,$ContactID2,$ContactID3]
+        Expected => [$ContactID1,$ContactID2]
     },
     {
         Name     => "Search: Field OrganisationID / Operator NE / Value \$OrganisationID2",
@@ -2939,7 +2939,7 @@ my @IntegrationSearchTests2 = (
                 }
             ]
         },
-        Expected => ['1',$ContactID1,$ContactID2]
+        Expected => ['1',$ContactID1,$ContactID3]
     },
     {
         Name     => "Search: Field OrganisationID / Operator IN / Value [\$OrganisationID2]",
@@ -2952,7 +2952,7 @@ my @IntegrationSearchTests2 = (
                 }
             ]
         },
-        Expected => [$ContactID1,$ContactID2,$ContactID3]
+        Expected => [$ContactID1,$ContactID2]
     },
     {
         Name     => "Search: Field OrganisationID / Operator !IN / Value [\$OrganisationID2]",
@@ -2965,7 +2965,7 @@ my @IntegrationSearchTests2 = (
                 }
             ]
         },
-        Expected => ['1',$ContactID1,$ContactID2]
+        Expected => ['1',$ContactID1,$ContactID3]
     },
     {
         Name     => "Search: Field OrganisationIDs / Operator EQ / Value \$OrganisationID2",
@@ -2978,7 +2978,7 @@ my @IntegrationSearchTests2 = (
                 }
             ]
         },
-        Expected => [$ContactID1,$ContactID2,$ContactID3]
+        Expected => [$ContactID1,$ContactID2]
     },
     {
         Name     => "Search: Field OrganisationIDs / Operator NE / Value \$OrganisationID2",
@@ -2991,7 +2991,7 @@ my @IntegrationSearchTests2 = (
                 }
             ]
         },
-        Expected => ['1',$ContactID1,$ContactID2]
+        Expected => ['1',$ContactID1,$ContactID3]
     },
     {
         Name     => "Search: Field OrganisationIDs / Operator IN / Value [\$OrganisationID2]",
@@ -3004,7 +3004,7 @@ my @IntegrationSearchTests2 = (
                 }
             ]
         },
-        Expected => [$ContactID1,$ContactID2,$ContactID3]
+        Expected => [$ContactID1,$ContactID2]
     },
     {
         Name     => "Search: Field OrganisationIDs / Operator !IN / Value [\$OrganisationID2]",
@@ -3017,7 +3017,7 @@ my @IntegrationSearchTests2 = (
                 }
             ]
         },
-        Expected => ['1',$ContactID1,$ContactID2]
+        Expected => ['1',$ContactID1,$ContactID3]
     }
 );
 for my $Test ( @IntegrationSearchTests2 ) {

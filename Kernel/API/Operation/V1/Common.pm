@@ -576,10 +576,19 @@ sub PrepareData {
             my ( $Object, $FieldSort ) = split( /\./, $Sorter, 2 );
             my ( $Field, $Type ) = split( /\:/, $FieldSort );
             my $Direction = 'ascending';
-            $Type = uc( $Type || 'TEXTUAL' );
+            $Type = uc( $Type || 'STRING' );
+
+            # Deprecated TEXTUAL. Fallback to STRING data type. Should be removed in future version.
+            if ( $Type eq 'TEXTUAL' ) {
+                $Type = 'STRING';
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Datatype TEXTUAL is deprecated for sort. Use STRING instead.",
+                );
+            }
 
             # check if sort type is valid
-            if ( $Type && $Type !~ /(NUMERIC|TEXTUAL|NATURAL|DATE|DATETIME)/g ) {
+            if ( $Type && $Type !~ /(NUMERIC|STRING|NATURAL|DATE|DATETIME)/g ) {
                 return $Self->_Error(
                     Code    => 'PrepareData.InvalidSort',
                     Message => "Unknown type $Type in $Sorter!",
@@ -1047,7 +1056,7 @@ suppress a sub-resource include if it's already done somewhere else (due to perf
             {
                 Field     => 'Title',
                 Direction => 'descending',      # optional, default: ascending
-                Type      => 'NATURAL',         # optional, default: TEXTUAL
+                Type      => 'NATURAL',         # optional, default: STRING
             }
         ]
     );

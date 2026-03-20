@@ -99,22 +99,25 @@ sub PIDCreate {
     my %ProcessID = $Self->PIDGet(%Param);
 
     if ( %ProcessID && !$Param{Force} ) {
+        # check if process is running
+        my $RunningPID = kill( 0, $ProcessID{PID} );
+        if ( $RunningPID ) {
+            my $TTL = $Param{TTL} || 3600;
+            if ( $ProcessID{Created} > ( time() - $TTL ) ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'notice',
+                    Message  => "Can't create PID $ProcessID{Name}, because it's already running "
+                        . "($ProcessID{Host}/$ProcessID{PID})!",
+                );
+                return;
+            }
 
-        my $TTL = $Param{TTL} || 3600;
-        if ( $ProcessID{Created} > ( time() - $TTL ) ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'notice',
-                Message  => "Can't create PID $ProcessID{Name}, because it's already running "
-                    . "($ProcessID{Host}/$ProcessID{PID})!",
+                Message  => "Removed PID ($ProcessID{Name}/$ProcessID{Host}/$ProcessID{PID}, "
+                    . "because 1 hour old!",
             );
-            return;
         }
-
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'notice',
-            Message  => "Removed PID ($ProcessID{Name}/$ProcessID{Host}/$ProcessID{PID}, "
-                . "because 1 hour old!",
-        );
     }
 
     # do nothing if PID is the same

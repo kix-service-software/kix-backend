@@ -2277,6 +2277,7 @@
     <Column Name="id" Required="true" Type="INTEGER" PrimaryKey="true" AutoIncrement="true"/>
     <Column Name="object" Required="true" Type="VARCHAR" Size="255"/>
     <Column Name="object_id" Required="true" Type="VARCHAR" Size="255"/>
+    <Column Name="content" Required="false"  Type="LONGBLOB"/>
     <Column Name="content_type" Required="false" Size="255" Type="VARCHAR"/>
     <Column Name="create_time" Required="true" Type="DATE"/>
     <Column Name="create_by" Required="true" Type="INTEGER"/>
