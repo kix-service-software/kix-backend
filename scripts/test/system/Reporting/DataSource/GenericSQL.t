@@ -343,7 +343,7 @@ my @DataTests = (
         }
     },
     {
-        Test   => 'simple row SELECT with WHERE variable and fallback',
+        Test   => 'simple row SELECT with WHERE variable and ? fallback (no parameter value)',
         Config => {
             DataSource => {
                 SQL => {
@@ -356,6 +356,76 @@ my @DataTests = (
                     DataType => 'STRING'
                 }
             ]
+        },
+        Expect => {
+            Columns => ['id', 'name'],
+            Data => [
+                { id => 2, name => 'invalid' }
+            ],
+        }
+    },
+    {
+        Test   => 'simple row SELECT with WHERE variable and ! fallback (no parameter value)',
+        Config => {
+            DataSource => {
+                SQL => {
+                    any => "SELECT id, name FROM valid WHERE name LIKE '\${Parameters.NameVar!inv}%' ORDER BY id LIMIT 1"
+                },
+            },
+            Parameters => [
+                {
+                    Name => 'NameVar',
+                    DataType => 'STRING'
+                }
+            ]
+        },
+        Expect => {
+            Columns => ['id', 'name'],
+            Data => [
+                { id => 2, name => 'invalid' }
+            ],
+        }
+    },
+    {
+        Test   => 'simple row SELECT with WHERE variable and ? fallback (parameter value is empty string)',
+        Config => {
+            DataSource => {
+                SQL => {
+                    any => "SELECT id, name FROM valid WHERE name LIKE '\${Parameters.NameVar?inv}%' ORDER BY id LIMIT 1"
+                },
+            },
+            Parameters => [
+                {
+                    Name => 'NameVar',
+                    DataType => 'STRING',
+                }
+            ]
+        },
+        Parameters => {
+            NameVar => ''
+        },
+        Expect => {
+            Columns => ['id', 'name'],
+            Data => [],
+        }
+    },
+    {
+        Test   => 'simple row SELECT with WHERE variable and ! fallback (parameter value is empty string)',
+        Config => {
+            DataSource => {
+                SQL => {
+                    any => "SELECT id, name FROM valid WHERE name LIKE '\${Parameters.NameVar!inv}%' ORDER BY id LIMIT 1"
+                },
+            },
+            Parameters => [
+                {
+                    Name => 'NameVar',
+                    DataType => 'STRING',
+                }
+            ]
+        },
+        Parameters => {
+            NameVar => ''
         },
         Expect => {
             Columns => ['id', 'name'],
