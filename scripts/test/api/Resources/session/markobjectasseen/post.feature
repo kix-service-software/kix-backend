@@ -6,7 +6,9 @@ Feature: POST request to the /session/markobjectasseen resource
     Given I am logged in as agent user "admin" with password "Passw0rd"
     
   Scenario: create a session markobjectasseen
+    Given a ticket with one article
     When I create a session markobjectasseen
+    Then the response content
     Then the response code is 204
 
 

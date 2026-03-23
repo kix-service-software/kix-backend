@@ -51,3 +51,42 @@ When qr/I create a session markobjectasseen$/, sub {
    );
 };
 
+Given qr/a ticket with one article$/, sub {
+   ( S->{Response}, S->{ResponseContent} ) = _Post(
+      URL     => S->{API_URL}.'/tickets',
+      Token   => S->{Token},
+      Content => {
+        Ticket => {
+            Title => "test ticket for unknown contact",
+            ContactID => 1,
+            OrganisationID => 1,
+            StateID => 4,
+            PriorityID => 3,
+            QueueID => 1,
+            TypeID => 2,
+            Articles => [
+                {
+                    Subject => "d  fsd fds ",
+                    Body => "<p>sd fds sd</p>",
+                    ContentType => "text/html; charset=utf8",
+                    MimeType => "text/html",
+                    Charset => "utf8",
+                    ChannelID => 1,
+                    SenderTypeID => 1,
+                    From => 'root@nomail.org',
+                    CustomerVisible => 0,
+                    To => 'contact222@nomail.org'
+                }
+            ]
+        }
+     }
+   );
+};
+
+
+
+
+
+
+
+
