@@ -159,6 +159,16 @@
             </Hash>
         </Setting>
     </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::ObjectType###Role" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Register object type for backend "ObjectSearch::Database"</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">ObjectSearch::Database::Role</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
 
     <!-- TICKET OBJECTSEARCH ATTRIBUTES -->
     <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::Ticket::Module###ArchiveFlag" Required="1" Valid="1" ConfigLevel="200">
@@ -1159,4 +1169,47 @@
         </Setting>
     </ConfigItem>
     <!-- EO OBJECT TAG LINK OBJECTSEARCH ATTRIBUTES -->
+
+    <!-- ROLE OBJECTSEARCH ATTRIBUTES -->
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::Role::Module###General" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for roles.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::Role::General</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::Role::Module###Valid" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for roles.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::Role::Valid</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::Role::Module###Permission" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for roles by permission properties.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::Role::Permission</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectSearch::Database::Role::Module###RoleID" Required="1" Valid="1" ConfigLevel="200">
+        <Description Translatable="1">Defines the backend module that should be used to search for roles by permission properties.</Description>
+        <Group>ObjectSearch</Group>
+        <SubGroup>Core::ObjectSearch</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::ObjectSearch::Database::Role::RoleID</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <!-- EO ROLE OBJECTSEARCH ATTRIBUTES -->
 </kix_config>

@@ -324,7 +324,7 @@ sub _ReplaceConfigVariables {
     if ( IsStringWithData($Param{Value}) ) {
         # special handling for FQDN
         if ($Param{Value} =~ m/\<KIX_CONFIG_FQDN_?(.*?)\>/ ) {
-            my $FQDNConfig = $Param{Value} // '';
+            my $FQDNConfig = $Self->{Config}->{FQDN} // '';
             if ( IsHashRefWithData($FQDNConfig) ) {
                 if ($1) {
                     my $Replace = $FQDNConfig->{$1} || '';

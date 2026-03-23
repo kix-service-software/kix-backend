@@ -369,7 +369,7 @@ sub _OperationEMPTY {
             if ( $Value ) {
                 if (
                     !$Param{ValueType}
-                    || $Param{ValueType} eq 'STRING'
+                    || $Param{ValueType} eq 'TEXTUAL'
                 ) {
                     push( @Conditions, ( $Column . ' = \'\'' ) );
                 }
@@ -382,7 +382,7 @@ sub _OperationEMPTY {
                 my $Condition = q{};
                 if (
                     !$Param{ValueType}
-                    || $Param{ValueType} eq 'STRING'
+                    || $Param{ValueType} eq 'TEXTUAL'
                 ) {
                     $Condition .= $Column . ' != \'\'';
                 }

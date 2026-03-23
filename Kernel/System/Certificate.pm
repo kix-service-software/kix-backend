@@ -875,7 +875,10 @@ sub Encrypt {
         next RECIPIENT if !$Param{$Recipient};
         for my $Email ( Email::Address::XS->parse($Param{$Recipient}) ) {
             my $EmailAddress = $Email->address();
-            if ( $EmailAddress !~ /$Param{IgnoreEmailPattern}/gix ) {
+            if (
+                $EmailAddress
+                && $EmailAddress !~ /$Param{IgnoreEmailPattern}/gix
+            ) {
                 push(@ToArray, $EmailAddress);
             }
         }
@@ -1365,6 +1368,13 @@ sub Sign {
     my $From;
     foreach my $MailAddress (@ParsedMailAddresses) {
         $From = $MailAddress->address;
+    }
+    if ( !$From ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'debug',
+            Message  => "Impossible to sign: invalid mail address $Param{From}!"
+        );
+        return;
     }
 
     my $CurrTime = $Kernel::OM->Get('Time')->CurrentTimestamp();

@@ -56,18 +56,24 @@ perform RoleSearch Operation. This will return a Role ID list.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    # perform Role search
-    my %RoleList = $Kernel::OM->Get('Role')->RoleList(
-        Result => 'HASH',
+    my @RoleList = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Role',
+        Result     => 'ARRAY',
+        Search     => $Self->{Search}->{Role}      || {},
+        Limit      => $Self->{SearchLimit}->{Role} || $Self->{SearchLimit}->{'__COMMON'},
+        Sort       => $Self->{Sort}->{Role}        || $Self->{DefaultSort}->{Role},
+        UserType   => $Self->{Authorization}->{UserType},
+        UserID     => $Self->{Authorization}->{UserID},
+        Debug      => $Param{Data}->{debug} || 0
     );
 
 	# get already prepared Role data from RoleGet operation
-    if ( IsHashRefWithData(\%RoleList) ) {
+    if ( @RoleList ) {
         my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::Role::RoleGet',
             SuppressPermissionErrors => 1,
             Data      => {
-                RoleID => join(',', sort keys %RoleList),
+                RoleID => join(',', @RoleList),
             }
         );
         if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {

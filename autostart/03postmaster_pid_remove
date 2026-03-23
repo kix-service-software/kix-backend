@@ -1,0 +1,2 @@
+# remove registered process of postmaster on startup
+Maint::PostMaster::MailAccountFetch --allow-root --remove-pid

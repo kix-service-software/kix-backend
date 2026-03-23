@@ -579,6 +579,7 @@ sub PrepareData {
             $Type = uc( $Type || 'TEXTUAL' );
 
             # check if sort type is valid
+            # types provided by thirdparty Data::Sorting
             if ( $Type && $Type !~ /(NUMERIC|TEXTUAL|NATURAL|DATE|DATETIME)/g ) {
                 return $Self->_Error(
                     Code    => 'PrepareData.InvalidSort',
@@ -2387,7 +2388,7 @@ sub _ApplySort {
                 }
 
                 # special handling for "number-strings"
-                if (lc($Type) eq 'textual') {
+                if (uc($Type) eq 'TEXTUAL') {
                     my $HasNotNumeric = grep {
                         $_->{$SortField} && $_->{$SortField} !~ m/^\d+$/
                     } @{ $Param{Data}->{$Object} };
