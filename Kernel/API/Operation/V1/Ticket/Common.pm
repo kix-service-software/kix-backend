@@ -11,6 +11,7 @@ package Kernel::API::Operation::V1::Ticket::Common;
 use strict;
 use warnings;
 
+use JSON::WebToken;
 use MIME::Base64();
 
 use Kernel::System::VariableCheck qw(:all);
@@ -494,7 +495,56 @@ sub _CheckAttachment {
 
     my $Attachment = $Param{Attachment};
 
-    if ( !defined $Attachment->{Content}  ) {
+    if (
+        !defined( $Attachment->{Content} )
+        && $Attachment->{ContentToken}
+    ) {
+        my $TokenData = decode_jwt(
+            $Attachment->{ContentToken},
+            'ContentToken'
+        );
+        if ( !$TokenData ) {
+            return $Self->_Error(
+                Code    => 'BadRequest',
+                Message => 'Parameter Attachment::ContentToken is invalid!'
+            );
+        }
+
+        NEEDED:
+        for my $Needed ( qw(TicketID ArticleID AttachmentID) ) {
+            next NEEDED if ( $TokenData->{ $Needed } );
+
+            return $Self->_Error(
+                Code    => 'BadRequest',
+                Message => 'Parameter Attachment::ContentToken is invalid!'
+            );
+        }
+
+        my $TicketArticleAttachmentGetResult = $Self->ExecOperation(
+            OperationType            => 'V1::Ticket::ArticleAttachmentGet',
+            SuppressPermissionErrors => 1,
+            IgnoreInclude            => 1,
+            Data                     => {
+                TicketID     => $TokenData->{TicketID},
+                ArticleID    => $TokenData->{ArticleID},
+                AttachmentID => $TokenData->{AttachmentID},
+                include      => ['Content']
+            },
+        );
+        if (
+            !IsHashRefWithData($TicketArticleAttachmentGetResult)
+            || !$TicketArticleAttachmentGetResult->{Success}
+        ) {
+            return $Self->_Error(
+                Code    => 'BadRequest',
+                Message => 'Parameter Attachment::ContentToken is invalid!'
+            );
+        }
+
+        $Attachment->{Content} = $TicketArticleAttachmentGetResult->{Data}->{Attachment}->{Content};
+    }
+
+    if ( !defined $Attachment->{Content} ) {
         return $Self->_Error(
             Code    => 'BadRequest',
             Message => "Parameter Attachment::Content is missing!",
