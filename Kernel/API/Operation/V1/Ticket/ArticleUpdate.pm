@@ -286,6 +286,26 @@ sub _ArticleUpdate {
                 }
             }
         }
+        else {
+            # check Attachment internal structure
+            foreach my $AttachmentItem (@{$Article->{Attachments}}) {
+                if ( !IsHashRefWithData($AttachmentItem) ) {
+                    return $Self->_Error(
+                        Code    => 'BadRequest',
+                        Message => "Parameter Article::Attachments is invalid!",
+                    );
+                }
+
+                # check Attachment attribute values
+                my $AttachmentCheck = $Self->_CheckAttachment( Attachment => $AttachmentItem );
+
+                if ( !$AttachmentCheck->{Success} ) {
+                    return $Self->_Error(
+                        %{$AttachmentCheck}
+                    );
+                }
+            }
+        }
 
         # process html article
         if ( $Article->{MimeType} =~ /text\/html/i ) {
