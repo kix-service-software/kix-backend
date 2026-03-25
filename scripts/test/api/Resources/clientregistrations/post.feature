@@ -15,5 +15,4 @@ Feature: POST request /clientregistration resource
 
   Scenario: added a clientregistration ohne authorization
     When added a clientregistration ohne authorization
-Then the response content is
     Then the response code is 201

@@ -8,7 +8,6 @@ Feature: POST request to the /session/markobjectasseen resource
   Scenario: create a session markobjectasseen
     Given a ticket with one article
     When I create a session markobjectasseen
-    Then the response content
     Then the response code is 204
 
 
