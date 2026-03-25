@@ -15,6 +15,7 @@ Feature: POST request to the /system/certificates resource
   Scenario: create a second certificate
     When I create a second certificate
     Then the response code is 201
+    Then the response content
 #    Then the response object is ConfigItemClassDefinitionPostResponse
     When I delete this certificate
     Then the response code is 204
