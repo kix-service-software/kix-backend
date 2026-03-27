@@ -99,14 +99,17 @@ sub PIDCreate {
     my %ProcessID = $Self->PIDGet(%Param);
 
     if ( %ProcessID && !$Param{Force} ) {
-        # check if process is running
-        my $RunningPID = kill( 0, $ProcessID{PID} );
-        if ( $RunningPID ) {
-            my $TTL = $Param{TTL} || 3600;
-            if ( $ProcessID{Created} > ( time() - $TTL ) ) {
+        # check if process is registered on other host
+        if ( $ProcessID{Host} ne $Self->{Host} ) {
+            if (
+                $Self->_PIDCheckTTL(
+                    Created => $ProcessID{Created},
+                    TTL     => $Param{TTL} || 3600
+                )
+            ) {
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'notice',
-                    Message  => "Can't create PID $ProcessID{Name}, because it's already running "
+                    Message  => "Can't create PID $ProcessID{Name}, because it's running on another host "
                         . "($ProcessID{Host}/$ProcessID{PID})!",
                 );
                 return;
@@ -114,18 +117,50 @@ sub PIDCreate {
 
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'notice',
-                Message  => "Removed PID ($ProcessID{Name}/$ProcessID{Host}/$ProcessID{PID}, "
-                    . "because 1 hour old!",
+                Message  => "Removed existing PID $ProcessID{Name}, because TTL is expired "
+                    . "($ProcessID{Host}/$ProcessID{PID})!",
             );
+        }
+        else {
+            # check if process is running
+            my $RunningPID = kill( 0, $ProcessID{PID} );
+            if ( $RunningPID ) {
+                if (
+                    $Self->_PIDCheckTTL(
+                        Created => $ProcessID{Created},
+                        TTL     => $Param{TTL} || 3600
+                    )
+                ) {
+                    $Kernel::OM->Get('Log')->Log(
+                        Priority => 'notice',
+                        Message  => "Can't create PID $ProcessID{Name}, because it's already running "
+                            . "($ProcessID{Host}/$ProcessID{PID})!",
+                    );
+                    return;
+                }
+
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'notice',
+                    Message  => "Removed existing PID $ProcessID{Name}, because TTL is expired "
+                        . "($ProcessID{Host}/$ProcessID{PID})!",
+                );
+            }
         }
     }
 
-    # do nothing if PID is the same
+    # do nothing if PID is the same on the same host
     my $PIDCurrent = $$;
-    return 1 if $ProcessID{PID} && $PIDCurrent eq $ProcessID{PID};
+    return 1 if (
+        $ProcessID{PID}
+        && $PIDCurrent eq $ProcessID{PID}
+        && $Self->{Host} eq $ProcessID{Host}
+    );
 
     # delete if exists
-    $Self->PIDDelete(%Param);
+    $Self->PIDDelete(
+        %Param,
+        Force => 1,         # always remove 
+    );
 
     # add new entry
     my $Time = time();
@@ -136,6 +171,14 @@ sub PIDCreate {
             VALUES (?, ?, ?, ?, ?)',
         Bind => [ \$Param{Name}, \$PIDCurrent, \$Self->{Host}, \$Time, \$Time ],
     );
+
+    return 1;
+}
+
+sub _PIDCheckTTL {
+    my ( $Self, %Param ) = @_;
+
+    return 0 if ( $Param{Created} > ( time() - $Param{TTL} ) );
 
     return 1;
 }
