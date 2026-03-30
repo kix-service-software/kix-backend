@@ -178,7 +178,8 @@ sub PIDCreate {
 sub _PIDCheckTTL {
     my ( $Self, %Param ) = @_;
 
-    return 0 if ( $Param{Created} > ( time() - $Param{TTL} ) );
+    # check if TTL is expired
+    return 0 if ( ( $Param{Created} + $Param{TTL} ) < time() );
 
     return 1;
 }
