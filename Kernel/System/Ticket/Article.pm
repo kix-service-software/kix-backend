@@ -3151,11 +3151,9 @@ sub ArticleAttachmentIndex {
             # find plain attachment
             if (
                 !$AttachmentIDPlain
-                &&
-                $File{Filename} eq 'file-1'
+                && $File{Filename} eq 'file-1'
                 && $File{ContentType} =~ /text\/plain/i
-                )
-            {
+            ) {
                 $AttachmentIDPlain = $AttachmentID;
             }
 
@@ -3164,11 +3162,12 @@ sub ArticleAttachmentIndex {
             #  o file-1.html, is only html attachment
             if (
                 !$AttachmentIDHTML
-                &&
-                ( $File{Filename} =~ /^file-[12]$/ || $File{Filename} eq 'file-1.html' )
-                && $File{ContentType} =~ /text\/html/i
+                && (
+                    $File{Filename} =~ /^file-[12]$/
+                    || $File{Filename} eq 'file-1.html'
                 )
-            {
+                && $File{ContentType} =~ /text\/html/i
+            ) {
                 $AttachmentIDHTML = $AttachmentID;
             }
         }
@@ -3197,8 +3196,7 @@ sub ArticleAttachmentIndex {
                         $File{ContentID}
                         && $Attachment{Content} =~ /\Q$File{ContentID}\E/i
                         && $File{Disposition} eq 'inline'
-                        )
-                    {
+                    ) {
                         delete $Attachments{$AttachmentID};
                     }
                 }
@@ -3208,8 +3206,7 @@ sub ArticleAttachmentIndex {
             if (
                 $Param{StripPlainBodyAsAttachment} eq 1
                 || $Param{StripPlainBodyAsAttachment} eq 3
-                )
-            {
+            ) {
                 delete $Attachments{$AttachmentIDHTML};
             }
             $Param{Article}->{AttachmentIDOfHTMLBody} = $AttachmentIDHTML;
@@ -3228,8 +3225,7 @@ sub ArticleAttachmentIndex {
                 if (
                     $File{Filename} eq 'file-1'
                     && $File{ContentType} =~ /text\/plain/i
-                    )
-                {
+                ) {
                     $AttachmentIDPlain   = $AttachmentID;
                     %AttachmentFilePlain = %File;
                     last ATTACHMENT_ID;
@@ -3246,8 +3242,7 @@ sub ArticleAttachmentIndex {
                 if (
                     $BodySize / 1.1 < $AttachmentFilePlain{FilesizeRaw}
                     && $BodySize * 1.1 > $AttachmentFilePlain{FilesizeRaw}
-                    )
-                {
+                ) {
                     delete $Attachments{$AttachmentIDPlain};
                 }
             }
