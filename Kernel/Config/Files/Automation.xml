@@ -187,6 +187,16 @@
             </Hash>
         </Setting>
     </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="Automation::MacroActionType::Common###ContactSearch" Required="0" Valid="1">
+        <Description Translatable="1">Registration of a macro action type for automation.</Description>
+        <Group>Automation</Group>
+        <Setting>
+            <Hash>
+                <Item Key="DisplayName" Translatable="1">ContactSearch</Item>
+                <Item Key="Module">Kernel::System::Automation::MacroAction::Common::ContactSearch</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
     
     <ConfigItem AccessLevel="internal" Name="Automation::MacroReferenceObject###Job" Required="0" Valid="1">
         <Description Translatable="1">Registration of a object (module) which uses macros.</Description>
