@@ -832,6 +832,7 @@ sub MacroActionExecute {
     # get macro action defintion
     my %Definition = $BackendObject->DefinitionGet();
 
+    my $MacroActionRunSuccess;
     do {
         # unset RepeatExecution of backend
         $BackendObject->UnsetRepeatExecution();
@@ -899,14 +900,14 @@ sub MacroActionExecute {
             );
         }
 
-        my $Success = $BackendObject->Run(
+        $MacroActionRunSuccess = $BackendObject->Run(
             %Param,
             MacroType => $Macro{Type},
             Config    => \%Parameters,
             ConfigRaw => \%{$MacroAction{Parameters} || {}},
         );
 
-        if ( !$Success ) {
+        if ( !$MacroActionRunSuccess ) {
             # get last error message from system log
             my $Message = $Kernel::OM->Get('Log')->GetLogEntry(
                 Type => 'error',
@@ -916,10 +917,8 @@ sub MacroActionExecute {
                 Message  => "Macro action \"$MacroAction{Type}\" returned execution error.",
                 UserID   => $Param{UserID},
             );
-
-            last;
         }
-    } while ( $BackendObject->RepeatExecution() );
+    } while ( $MacroActionRunSuccess && $BackendObject->RepeatExecution() );
 
     # remove MacroActionID from log reference
     delete $Self->{MacroActionID};
