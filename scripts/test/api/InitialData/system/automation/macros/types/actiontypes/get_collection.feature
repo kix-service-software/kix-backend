@@ -11,30 +11,31 @@ Feature: GET request to the /system/automation/macros/types/:MacroType/actiontyp
     Then the macroactiontype output is "<Name>"
 
      Examples:
-      | Name                 |
-      | ArticleCreate        |
-      | ArticleDelete        |
-      | AssembleObject       |
-      | Conditional          |
-      | ContactSet           |
-      | CreateReport         |
-      | DynamicFieldSet      |
-      | ExecuteMacro         |
-      | ExtractText          |
-      | FetchAssetAttributes |
-      | LockSet              |
-      | Loop                 |
-      | OrganisationSet      |
-      | OwnerSet             |
-      | PrioritySet          |
-      | ResponsibleSet       |
-      | StateSet             |
-      | TeamSet              |
-      | TicketCreate         |
-      | TicketDelete         |
-      | TitleSet             |
-      | TypeSet              |
-      | VariableSet          |
+       | Name                     |
+       | ArticleAttachmentsDelete |
+       | ArticleCreate            |
+       | ArticleDelete            |
+       | AssembleObject           |
+       | Conditional              |
+       | ContactSet               |
+       | CreateReport             |
+       | DynamicFieldSet          |
+       | ExecuteMacro             |
+       | ExtractText              |
+       | FetchAssetAttributes     |
+       | LockSet                  |
+       | Loop                     |
+       | OrganisationSet          |
+       | OwnerSet                 |
+       | PrioritySet              |
+       | ResponsibleSet           |
+       | StateSet                 |
+       | TeamSet                  |
+       | TicketCreate             |
+       | TicketDelete             |
+       | TitleSet                 |
+       | TypeSet                  |
+       | VariableSet              |
 
   Scenario Outline: get the list of automation macro type actiontypes Synchronisation
     When I query the collection of automation macro type "Synchronisation" actiontypes
@@ -84,7 +85,7 @@ Feature: GET request to the /system/automation/macros/types/:MacroType/actiontyp
   Scenario: get the list of automation macro type actiontypes
     When I query the collection of automation macro type "Ticket" actiontypes
     Then the response code is 200
-    And the response contains 24 items of type "MacroActionType"
+    And the response contains 25 items of type "MacroActionType"
     And the response contains the following items of type MacroActionType
       | Name                     | Description                                                                                                                                                                                          | MacroType |
       | ArticleAttachmentsDelete | Deletes attachments of all articles of a ticket. All pattern of a rule have to match. Any keep rule has to match to ignore file for deletion. Any delete rule has to match for a file to be deleted. | Ticket    |
@@ -92,6 +93,7 @@ Feature: GET request to the /system/automation/macros/types/:MacroType/actiontyp
       | ArticleDelete            | Deletes an article of a ticket. Inlcuding dynamic fields, attachments, flags and accounted time.                                                                                                     | Ticket    |
       | AssembleObject           | Assembles a new object to be used later in the execution.                                                                                                                                            | Ticket    |
       | Conditional              | Execute the depending macro if the logical expression is true.                                                                                                                                       | Ticket    |
+      | ContactSearch            | Search for ContactID or UserID.                                                                                                                                                                      | Ticket    |
       | ContactSet               | Sets the contact (and its primary organisation as organisation) of a ticket.                                                                                                                         | Ticket    |
       | CreateReport             | Create a report from a report definition.                                                                                                                                                            | Ticket    |
       | DynamicFieldSet          | Sets a dynamic field value of a ticket.                                                                                                                                                              | Ticket    |
