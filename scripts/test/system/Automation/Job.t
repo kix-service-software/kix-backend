@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
+# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -340,7 +340,7 @@ $Self->IsDeeply(
 
 # some additional filter tests
 # create a job with valid filter
-my $JobID = $AutomationObject->JobAdd(
+$JobID = $AutomationObject->JobAdd(
     Name    => 'job-with-valid filter-'.$NameRandom,
     Type    => 'Ticket',
     Filter  => {
@@ -355,7 +355,7 @@ $Self->True(
     $JobID,
     'JobAdd() for new job with valid filter',
 );
-my %Job = $AutomationObject->JobGet(
+%Job = $AutomationObject->JobGet(
     ID => $JobID
 );
 $Self->IsDeeply(
@@ -374,7 +374,7 @@ $Self->IsDeeply(
     'JobGet() for new job with valid filter',
 );
 # set empty filter
-my $Result = $AutomationObject->JobUpdate(
+$Result = $AutomationObject->JobUpdate(
     ID => $JobID,
     %Job,
     Filter  => [],
@@ -384,7 +384,7 @@ $Self->True(
     $JobID,
     'JobAdd() for new job with valid filter',
 );
-my %Job = $AutomationObject->JobGet(
+%Job = $AutomationObject->JobGet(
     ID => $JobID
 );
 $Self->IsDeeply(
@@ -393,7 +393,7 @@ $Self->IsDeeply(
     'JobGet() for upddated job with valid (now empty) filter',
 );
 # create a job with empty filter
-my $JobID = $AutomationObject->JobAdd(
+$JobID = $AutomationObject->JobAdd(
     Name    => 'job-with-empty filter-'.$NameRandom,
     Type    => 'Ticket',
     Filter  => [],
@@ -404,7 +404,7 @@ $Self->True(
     $JobID,
     'JobAdd() for new job with empty filter',
 );
-my %Job = $AutomationObject->JobGet(
+%Job = $AutomationObject->JobGet(
     ID => $JobID
 );
 $Self->IsDeeply(
@@ -413,7 +413,7 @@ $Self->IsDeeply(
     'JobGet() for new job with empty filter',
 );
 # create a job with filter list
-my $JobID = $AutomationObject->JobAdd(
+$JobID = $AutomationObject->JobAdd(
     Name    => 'job-with-list filter-'.$NameRandom,
     Type    => 'Ticket',
     Filter  => [
@@ -435,7 +435,7 @@ $Self->True(
     $JobID,
     'JobAdd() for new job with filter list',
 );
-my %Job = $AutomationObject->JobGet(
+%Job = $AutomationObject->JobGet(
     ID => $JobID
 );
 $Self->IsDeeply(

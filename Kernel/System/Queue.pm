@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
+# Modified version of the work: Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -828,6 +828,11 @@ sub QueueUpdate {
     # get queue data with updated name for QueueUpdate event
     my %Queue = $Self->QueueGet( Name => $Param{Name} );
 
+    # reset cache
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
+
     # trigger event
     $Self->EventHandler(
         Event => 'QueueUpdate',
@@ -836,11 +841,6 @@ sub QueueUpdate {
             OldQueue => \%OldQueue,
         },
         UserID => $Param{UserID},
-    );
-
-    # reset cache
-    $Kernel::OM->Get('Cache')->CleanUp(
-        Type => $Self->{CacheType},
     );
 
     # updated all sub queue names if queue name changed
@@ -1080,6 +1080,15 @@ sub QueueDelete {
     # reset cache
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
+    );
+
+    # trigger event
+    $Self->EventHandler(
+        Event => 'QueueDelete',
+        Data  => {
+            ID => $Param{QueueID},
+        },
+        UserID => $Param{UserID},
     );
 
     # push client callback event

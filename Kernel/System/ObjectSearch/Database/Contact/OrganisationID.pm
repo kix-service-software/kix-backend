@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
+# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -119,7 +119,6 @@ sub AttributePrepare {
         Organisation => {
             Column       =>"$JoinData{OAlias}.name",
             ConditionDef => {
-                ValueType       => 'STRING',
                 CaseInsensitive => 1,
                 NULLValue       => 1
             }
@@ -127,7 +126,6 @@ sub AttributePrepare {
         OrganisationNumber => {
             Column       => "$JoinData{OAlias}.number",
             ConditionDef => {
-                ValueType       => 'STRING',
                 CaseInsensitive => 1,
                 NULLValue       => 1
             }
@@ -142,7 +140,6 @@ sub AttributePrepare {
         PrimaryOrganisation => {
             Column       => "$JoinData{POAlias}.name",
             ConditionDef => {
-                ValueType       => 'STRING',
                 CaseInsensitive => 1,
                 NULLValue       => 1
             }
@@ -150,7 +147,6 @@ sub AttributePrepare {
         PrimaryOrganisationNumber => {
             Column       => "$JoinData{POAlias}.number",
             ConditionDef => {
-                ValueType       => 'STRING',
                 CaseInsensitive => 1,
                 NULLValue       => 1
             }
@@ -168,6 +164,56 @@ sub AttributePrepare {
     }
 
     return \%Attribute;
+}
+
+sub Search {
+    my ( $Self, %Param ) = @_;
+
+    if (
+        ref( $Param{Search} ) eq 'HASH'
+        && $Param{Search}->{Field}
+        && (
+            $Param{Search}->{Field} eq 'OrganisationID'
+            || $Param{Search}->{Field} eq 'OrganisationIDs'
+        )
+        && $Param{Search}->{Operator}
+        && $Param{Search}->{Operator} ne 'EMPTY'
+    ) {
+        my $WithSubOrgs = $Kernel::OM->Get('Config')->Get('Organisation::VirtuallyAssignContactsToSubOrganisations') || 0;
+        if ( $WithSubOrgs ) {
+            # prepare given values as array
+            my @OrganisationIDs = ();
+            if ( !IsArrayRef( $Param{Search}->{Value} ) ) {
+                push( @OrganisationIDs,  $Param{Search}->{Value} );
+            }
+            else {
+                @OrganisationIDs = @{ $Param{Search}->{Value} };
+            }
+
+            my @NewOrganisationIDs = ();
+            for my $OrganisationID ( @OrganisationIDs ) {
+                push( @NewOrganisationIDs, $OrganisationID );
+
+                my @SubOrganisationIDs = $Kernel::OM->Get('Organisation')->GetAllParentOrganisationIDs(
+                    OrgID => $OrganisationID,
+                );
+                push( @NewOrganisationIDs, @SubOrganisationIDs );
+            }
+
+            $Param{Search}->{Value} = \@NewOrganisationIDs;
+            if (
+                $Param{Search}->{Operator} eq 'EQ'
+                || $Param{Search}->{Operator} eq 'IN'
+            ) {
+                $Param{Search}->{Operator} = 'IN';
+            }
+            else {
+                $Param{Search}->{Operator} = '!IN';
+            }
+        }
+    }
+
+    return $Self->SUPER::Search(%Param);
 }
 
 sub _JoinGet {

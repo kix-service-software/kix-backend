@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
+# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
@@ -364,14 +364,11 @@ my @IntegrationSearchTests = (
     {
         Name     => "Search: Field Fulltext | Operator LIKE | FulltextAttributes: Firstname,Lastname | Value Mustermann",
         ConfigSet => {
-            %{$DefaultCnf},
-            Contact => {
-                %{$DefaultCnf->{Contact}},
-                FulltextAttributes => [
-                    'Firstname',
-                    'Lastname'
-                ]
-            }
+            %{$DefaultCnf->{Contact}},
+            FulltextAttributes => [
+                'Firstname',
+                'Lastname'
+            ]
         },
         Search   => {
             'AND' => [
@@ -400,13 +397,10 @@ my @IntegrationSearchTests = (
     {
         Name     => "Search: Field Fulltext | Operator LIKE | FulltextAttributes: Email | Value \$TestData3",
         ConfigSet => {
-            %{$DefaultCnf},
-            Contact => {
-                %{$DefaultCnf->{Contact}},
-                FulltextAttributes => [
-                    'Email'
-                ]
-            }
+            %{$DefaultCnf->{Contact}},
+            FulltextAttributes => [
+                'Email'
+            ]
         },
         Search   => {
             'AND' => [
@@ -435,17 +429,17 @@ my @IntegrationSearchTests = (
 );
 for my $Test ( @IntegrationSearchTests ) {
     if ( IsHashRefWithData($Test->{ConfigSet}) ) {
-        $Kernel::OM->Get('Config')->Set(
-            Key   => 'ObjectSearch::Database::ObjectType',
+        $Helper->ConfigSettingChange(
+            Key   => 'ObjectSearch::Database::ObjectType###Contact',
             Value => $Test->{ConfigSet}
         );
 
         my $Config = $Kernel::OM->Get('Config')->Get('ObjectSearch::Database::ObjectType');
 
         $Self->IsDeeply(
-            $Config,
+            $Config->{Contact},
             $Test->{ConfigSet},
-            'Search: Field Fulltext | SET FulltextAttributes: ' . join(q(,), @{$Test->{ConfigSet}->{Contact}->{FulltextAttributes}})
+            'Search: Field Fulltext | SET FulltextAttributes: ' . join(q(,), @{$Test->{ConfigSet}->{FulltextAttributes}})
         );
 
         # discard ObjectSearch object to process events

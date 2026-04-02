@@ -1,6 +1,6 @@
 #!perl
 # --
-# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
+# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
@@ -94,6 +94,30 @@ sub _Delete {
 
     return ($Response);
 }
+
+sub _OPTIONS { 
+    my (%Param) = @_;
+
+    my $URIParams;
+    foreach my $Key ( qw( Search Filter Include) ) {
+        if ( $Param{$Key} ) {
+            $URIParams->{lc($Key)} = $Param{$Key};
+        }
+    }
+    if ( $URIParams ) {
+        $URIParams = encode_json($URIParams);
+    }
+
+    my $ua = LWP::UserAgent->new();
+    my $req = HTTP::Request->new('OPTIONS', $Param{URL}, undef, $URIParams);
+    $req->header('Authorization' => 'Token ' . ($Param{Token} || ''));      
+    $req->header('Content-Type' => 'application/json'); 
+  
+    my $Response = $ua->request($req);
+
+    return ($Response, decode_json($Response->decoded_content));
+}
+
 
 sub _ReplacePlaceholders {
     my $Text = shift;

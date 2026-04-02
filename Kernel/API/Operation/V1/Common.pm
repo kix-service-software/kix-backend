@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
+# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -579,6 +579,7 @@ sub PrepareData {
             $Type = uc( $Type || 'TEXTUAL' );
 
             # check if sort type is valid
+            # types provided by thirdparty Data::Sorting
             if ( $Type && $Type !~ /(NUMERIC|TEXTUAL|NATURAL|DATE|DATETIME)/g ) {
                 return $Self->_Error(
                     Code    => 'PrepareData.InvalidSort',
@@ -757,7 +758,6 @@ sub PrepareData {
                     Value     => $Parameters{$Parameter}->{Default},
                 );
             }
-
             # check if we have an optional parameter that needs a value
             if ( $Parameters{$Parameter}->{RequiresValueIfUsed} && exists( $Data{$Parameter} ) && !defined( $Data{$Parameter} ) ) {
                 $Result->{Success} = 0;
@@ -1614,26 +1614,15 @@ sub ExecOperation {
         }
     }
 
-    # get webservice config
-    my $Webservice = $Kernel::OM->Get('Webservice')->WebserviceGet(
-        ID => $Self->{WebserviceID},
-    );
-    if ( !IsHashRefWithData($Webservice) ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message =>
-                "Could not load web service configuration for web service with ID $Self->{WebserviceID}",
-        );
-
+    if ( !IsHashRefWithData( $Self->{TransportConfig}->{RouteOperationMapping} ) ) {
         return $Self->_Error(
             Code    => 'Operation.InternalError',
-            Message => "Could not load web service configuration for web service with ID $Self->{WebserviceID}!",
+            Message => "Can't find RouteOperationMapping in Operation module!",
         );
     }
-    my $TransportConfig = $Webservice->{Config}->{Provider}->{Transport}->{Config};
 
     # prepare RequestURI
-    my $RequestURI = $TransportConfig->{RouteOperationMapping}->{$Param{OperationType}}->{Route};
+    my $RequestURI = $Self->{TransportConfig}->{RouteOperationMapping}->{$Param{OperationType}}->{Route};
     my $CurrentRoute = $RequestURI;
     $RequestURI =~ s/:(\w*)/$Param{Data}->{$1}/egx;
 
@@ -1653,10 +1642,18 @@ sub ExecOperation {
 
     # determine available methods
     my %AvailableMethods;
-    for my $Op ( sort keys %{ $TransportConfig->{RouteOperationMapping} } ) {
 
-        my %RouteMapping = %{ $TransportConfig->{RouteOperationMapping}->{$Op} || {} };
+    OP:
+    for my $Op ( sort keys %{ $Self->{TransportConfig}->{RouteOperationMapping} } ) {
+
+        my %RouteMapping = %{ $Self->{TransportConfig}->{RouteOperationMapping}->{$Op} || {} };
         my $RouteRegEx = $RouteMapping{Route};
+
+        # ignore everything that has nothing to do with us
+        my $Pos = index($RouteRegEx, '/:');
+        $Pos = length $RequestURI if $Pos <= 0;
+        next OP if substr( $RequestURI, 0, $Pos) ne substr( $RouteRegEx, 0, $Pos);
+
         $RouteRegEx =~ s{:([a-z][a-z0-9]*)}{(?<$1>[^\/]+)}xmsgi;
 
         if ( $ParentObjectRoute ) {
@@ -1668,14 +1665,13 @@ sub ExecOperation {
                 # do nothing
             }
             else {
-                my $Method = $TransportConfig->{RouteOperationMapping}->{$Op}->{RequestMethod}->[0];
+                my $Method = $Self->{TransportConfig}->{RouteOperationMapping}->{$Op}->{RequestMethod}->[0];
                 $ParentMethodOperationMapping{$Method} = $Op;
             }
         }
 
         if (
-            eval { qr/^ $RouteRegEx $/xms }
-            && $RequestURI =~ m{^ $RouteRegEx $}xms
+            $RequestURI =~ m{^ $RouteRegEx $}xms
         ) {
             $AvailableMethods{ $RouteMapping{RequestMethod}->[0] } = {
                 Operation => $Op,
@@ -1687,14 +1683,14 @@ sub ExecOperation {
         next if $Op !~ /(Search|Get)$/;
 
         # ignore anything that has nothing to do with the current Ops route
-        if ( $CurrentRoute ne '/' && "$TransportConfig->{RouteOperationMapping}->{$Op}->{Route}/" !~ /^$CurrentRoute\// ) {
+        if ( $CurrentRoute ne '/' && "$Self->{TransportConfig}->{RouteOperationMapping}->{$Op}->{Route}/" !~ /^$CurrentRoute\// ) {
             next;
         }
-        elsif ( $CurrentRoute eq '/' && "$TransportConfig->{RouteOperationMapping}->{$Op}->{Route}/" !~ /^$CurrentRoute[:a-zA-Z_]+\/$/g ) {
+        elsif ( $CurrentRoute eq '/' && "$Self->{TransportConfig}->{RouteOperationMapping}->{$Op}->{Route}/" !~ /^$CurrentRoute[:a-zA-Z_]+\/$/g ) {
             next;
         }
 
-        $OperationRouteMapping{$Op} = $TransportConfig->{RouteOperationMapping}->{$Op}->{Route};
+        $OperationRouteMapping{$Op} = $Self->{TransportConfig}->{RouteOperationMapping}->{$Op}->{Route};
 
     }
 
@@ -1721,6 +1717,7 @@ sub ExecOperation {
         OperationRouteMapping    => \%OperationRouteMapping,
         ParentMethodOperationMapping => \%ParentMethodOperationMapping,
         Authorization            => $Self->{Authorization},
+        TransportConfig          => $Self->{TransportConfig},
         Level                    => ($Self->{Level} || 0) + 1,
         SuppressPermissionErrors => $Param{SuppressPermissionErrors},
         IgnorePermissions        => $Param{IgnorePermissions},
@@ -2391,7 +2388,7 @@ sub _ApplySort {
                 }
 
                 # special handling for "number-strings"
-                if (lc($Type) eq 'textual') {
+                if (uc($Type) eq 'TEXTUAL') {
                     my $HasNotNumeric = grep {
                         $_->{$SortField} && $_->{$SortField} !~ m/^\d+$/
                     } @{ $Param{Data}->{$Object} };
@@ -2626,7 +2623,7 @@ sub _ApplyExpand {
         return;
     }
 
-    if ( $ENV{'REQUEST_METHOD'} ne 'GET' || !$Self->{OperationConfig}->{ObjectID} || !$Self->{RequestData}->{ $Self->{OperationConfig}->{ObjectID} } ) {
+    if ( $Self->{RequestMethod} ne 'GET' || !$Self->{OperationConfig}->{ObjectID} || !$Self->{RequestData}->{ $Self->{OperationConfig}->{ObjectID} } ) {
 
         # no GET request or no ObjectID configured or given
         return;
@@ -3766,12 +3763,11 @@ sub _CheckPermissionCondition {
 
     PART:
     foreach my $Part ( @Parts ) {
-        my ( $Object, $Attribute, $Operator, $Value );
         $Not = 0; # reset Not
 
-        next if $Part !~ /^(\w+)\.(\w+)\s+(!?\w+)\s+(.*?)$/;
+        next if $Part !~ /^(\w+)\.(\w+)(?::(\w+))?\s+(!?\w+)\s+(.*?)$/;
 
-        ( $Object, $Attribute, $Operator, $Value ) = ( $1, $2, $3, $4 );
+        my ( $Object, $Attribute, $Type, $Operator, $Value ) = ( $1, $2, $3, $4, $5 );
         if ( $Operator =~ /^!(.*?)$/ ) {
             $Not      = 1;
             $Operator = $1;
@@ -3808,6 +3804,7 @@ sub _CheckPermissionCondition {
             Object   => $Object,
             Field    => $Attribute,
             Operator => $Operator,
+            Type     => $Type,
             Value    => $Value,
             Not      => $Not,
             UseAnd   => $UseAnd,
@@ -3871,6 +3868,7 @@ create a filter
         Field          => 'QueueID',
         Operator       => 'EQ',
         Value          => 12,
+        Type           => 'NUMERIC',               # optional, default STRING
         Not            => 0|1,                     # optional, default 0
         UseAnd         => 0|1,                     # optional, default 0
         StopAfterMatch => 0|1,                     # optional, default 0
@@ -4305,7 +4303,7 @@ sub _FilterCustomerUserVisibleObjectIds {
                 } elsif ($Param{LogFiltered}) {
                     $Kernel::OM->Get('Log')->Log(
                         Priority => 'notice',
-                        Message  => "No access for $Param{ObjectType} with id $ObjectID" 
+                        Message  => "No access for $Param{ObjectType} with id $ObjectID"
                     );
                 }
             }
@@ -4316,7 +4314,7 @@ sub _FilterCustomerUserVisibleObjectIds {
                 for my $ObjectID ( @ObjectIDList ) {
                     $Kernel::OM->Get('Log')->Log(
                         Priority => 'notice',
-                        Message  => "No access for $Param{ObjectType} with id $ObjectID" 
+                        Message  => "No access for $Param{ObjectType} with id $ObjectID"
                     );
                 }
             }

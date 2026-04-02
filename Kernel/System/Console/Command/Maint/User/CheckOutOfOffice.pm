@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
+# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
@@ -30,36 +30,25 @@ sub Run {
 
     $Self->Print("<yellow>Check OutOfOffice...</yellow>\n");
 
-    my %Result = $Kernel::OM->Get('User')->SearchPreferences(
-        Key    => 'OutOfOfficeEnd',
-        UserID => 1,
+    my %Users = $Kernel::OM->Get('User')->UserSearch(
+        IsOutOfOfficeEnd => 1
     );
 
-    if ( %Result ) {
-        my @CurrDate = $Kernel::OM->Get('Time')->SystemTime2Date(
-            SystemTime => $Kernel::OM->Get('Time')->SystemTime()
+    for my $UserID ( keys %Users ) {
+        my %User = $Kernel::OM->Get('User')->GetUserData(
+            UserID => $UserID
         );
-        my $CurrStamp = $CurrDate[5]
-            . $CurrDate[4]
-            . $CurrDate[3];
 
-        for my $UserID ( keys %Result ) {
-            my $Date = $Result{$UserID};
-            next if !$Date;
-            $Date =~ s/\s+\d{2}:\d{2}:\d{2}$//g;
-            $Date =~ s/-//g;
+        # remove UserPw from update data to keep current password
+        delete $User{'UserPw'};
 
-            next if $Date >= $CurrStamp;
-
-            $Kernel::OM->Get('User')->DeletePreferences(
-                UserID => $UserID,
-                Key    => 'OutOfOfficeStart'
-            );
-            $Kernel::OM->Get('User')->DeletePreferences(
-                UserID => $UserID,
-                Key    => 'OutOfOfficeEnd'
-            );
-        }
+        $Kernel::OM->Get('User')->UserUpdate(
+            %User,
+            OutOfOfficeEnd        => undef,
+            OutOfOfficeStart      => undef,
+            OutOfOfficeSubstitute => undef,
+            ChangeUserID          => 1
+        );
     }
 
     $Self->Print("<green>Done.</green>\n");

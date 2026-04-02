@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
+# Modified version of the work: Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -505,18 +505,22 @@ sub Run {
             # get unique references
             my @References = $Kernel::OM->Get('Main')->GetUnique(@ReferencesAll);
 
-            # get reference article with filter for channel 'email', visible for customer and relevant message id
+            # get latest article with filter for channel 'email' and relevant message id
             my @ReferenceArticles = $Kernel::OM->Get('Ticket')->ArticleGet(
                 TicketID        => $Param{TicketID},
                 Channel         => [ 'email' ],
-                CustomerVisible => 1,
                 MessageID       => \@References,
                 DynamicFields   => 0,
+                Order           => 'DESC',
+                Limit           => 1,
                 UserID          => 1,
             );
 
-            # check if reference article exists
-            if ( @ReferenceArticles ) {
+            # check if latest referenced article is visible => set incoming email visible
+            if (
+                @ReferenceArticles
+                && $ReferenceArticles[0]->{CustomerVisible}
+            ) {
                 $GetParam{CustomerVisible} = 1;
             }
         }

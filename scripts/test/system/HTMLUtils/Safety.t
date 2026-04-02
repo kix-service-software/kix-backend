@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
+# Modified version of the work: Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/ 
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -87,9 +87,7 @@ var topsy_style = "big";
 <script type="text/javascript" src="/pub/js/podpress.js"></script>
 ',
         Result => {
-            Output => '
-
-',
+            Output => '',
             Replace => 1,
         },
         Name => 'Safety - script tag'
@@ -102,9 +100,7 @@ You should be able to continue reading these lessons, however.
 </applet>
 </center>',
         Result => {
-            Output => '<center>
-
-</center>',
+            Output => '<center></center>',
             Replace => 1,
         },
         Name => 'Safety - applet tag'
@@ -114,9 +110,7 @@ You should be able to continue reading these lessons, however.
 <object width="384" height="236" align="right" vspace="5" hspace="5"><param name="movie" value="http://www.youtube.com/v/l1JdGPVMYNk&hl=en_US&fs=1&hd=1"></param><param name="allowFullScreen" value="true"></param><param name="allowscriptaccess" value="always"></param><embed src="http://www.youtube.com/v/l1JdGPVMYNk&hl=en_US&fs=1&hd=1" type="application/x-shockwave-flash" allowscriptaccess="always" allowfullscreen="true" width="384" height="236"></embed></object>
 </center>',
         Result => {
-            Output => '<center>
-
-</center>',
+            Output => '<center></center>',
             Replace => 1,
         },
         Name => 'Safety - object tag'
@@ -126,9 +120,7 @@ You should be able to continue reading these lessons, however.
 \'\';!--"<XSS>=&{()}
 </center>',
         Result => {
-            Output => '<center>
-&#39;&#39;;!--&quot;<xss>=&amp;{()}
-</center>',
+            Output => '<center> &#39;&#39;;!--&quot;<xss>=&amp;{()} </center>',
             Replace => 1,
         },
         Name => 'Safety - simple'
@@ -138,9 +130,7 @@ You should be able to continue reading these lessons, however.
 <SCRIPT SRC=http://ha.ckers.org/xss.js></SCRIPT>
 </center>',
         Result => {
-            Output => '<center>
-
-</center>',
+            Output => '<center></center>',
             Replace => 1,
         },
         Name => 'Safety - script/src tag'
@@ -150,9 +140,7 @@ You should be able to continue reading these lessons, however.
 <SCRIPT SRC=http://ha.ckers.org/xss.js><!-- some comment --></SCRIPT>
 </center>',
         Result => {
-            Output => '<center>
-
-</center>',
+            Output => '<center></center>',
             Replace => 1,
         },
         Name => 'Safety - script/src tag'
@@ -162,9 +150,7 @@ You should be able to continue reading these lessons, however.
 <IMG SRC="javascript:alert(\'XSS\');">
 </center>',
         Result => {
-            Output => '<center>
-<img />
-</center>',
+            Output => '<center><img /></center>',
             Replace => 1,
         },
         Name => 'Safety - img tag'
@@ -174,9 +160,7 @@ You should be able to continue reading these lessons, however.
 <IMG SRC=javascript:alert(\'XSS\');>
 </center>',
         Result => {
-            Output => '<center>
-<img />
-</center>',
+            Output => '<center><img /></center>',
             Replace => 1,
         },
         Name => 'Safety - img tag'
@@ -186,9 +170,7 @@ You should be able to continue reading these lessons, however.
 <IMG SRC=JaVaScRiPt:alert(\'XSS\')>
 </center>',
         Result => {
-            Output => '<center>
-<img />
-</center>',
+            Output => '<center><img /></center>',
             Replace => 1,
         },
         Name => 'Safety - img tag'
@@ -198,9 +180,7 @@ You should be able to continue reading these lessons, however.
 <img SRC=javascript:alert(&quot;XSS&quot;)>
 </center>',
         Result => {
-            Output => '<center>
-<img />
-</center>',
+            Output => '<center><img /></center>',
             Replace => 1,
         },
         Name => 'Safety - img tag'
@@ -210,9 +190,7 @@ You should be able to continue reading these lessons, however.
 <IMG """><SCRIPT>alert("XSS")</SCRIPT>">
 </center>',
         Result => {
-            Output => '<center>
-<img """="&quot;&quot;&quot;" />&quot;&gt;
-</center>',
+            Output => '<center><img """="&quot;&quot;&quot;" />&quot;&gt;</center>',
             Replace => 1,
         },
         Name => 'Safety - script/img tag'
@@ -222,9 +200,7 @@ You should be able to continue reading these lessons, however.
 <SCRIPT/XSS SRC="http://ha.ckers.org/xss.js"></SCRIPT>
 </center>',
         Result => {
-            Output => '<center>
-
-</center>',
+            Output => '<center></center>',
             Replace => 1,
         },
         Name => 'Safety - script tag'
@@ -234,9 +210,7 @@ You should be able to continue reading these lessons, however.
 <SCRIPT/SRC="http://ha.ckers.org/xss.js"></SCRIPT>
 </center>',
         Result => {
-            Output => '<center>
-
-</center>',
+            Output => '<center></center>',
             Replace => 1,
         },
         Name => 'Safety - script tag'
@@ -246,9 +220,7 @@ You should be able to continue reading these lessons, however.
 <<SCRIPT>alert("XSS");//<</SCRIPT>
 </center>',
         Result => {
-            Output => '<center>
-&lt;
-</center>',
+            Output => '<center>&lt;</center>',
             Replace => 1,
         },
         Name => 'Safety - script tag'
@@ -258,9 +230,7 @@ You should be able to continue reading these lessons, however.
 <SCRIPT SRC=http://ha.ckers.org/xss.js?<B>
 </center>;\'',
         Result => {
-            Output => '&#39;<center>
-
-</center>;\'',
+            Output => '&#39;<center> </center>;\'',
             Replace => 1,
         },
         Name => 'Safety - script tag'
@@ -270,9 +240,7 @@ You should be able to continue reading these lessons, however.
 <SCRIPT SRC=//ha.ckers.org/.j>
 </center>',
         Result => {
-            Output => '<center>
-
-</center>',
+            Output => '<center></center>',
             Replace => 1,
         },
         Name => 'Safety - script tag'
@@ -282,9 +250,7 @@ You should be able to continue reading these lessons, however.
     <iframe src=http://ha.ckers.org/scriptlet.html >
 </center>',
         Result => {
-            Output => '<center>
-    <iframe>
-</center>',
+            Output => '<center><iframe></center>',
             Replace => 1,
         },
         Name => 'Safety - iframe'
@@ -294,9 +260,7 @@ You should be able to continue reading these lessons, however.
 <BODY ONLOAD=alert(\'XSS\')>
 </center>',
         Result => {
-            Output => '<center>
-<body>
-</center>',
+            Output => '<center><body></center>',
             Replace => 1,
         },
         Name => 'Safety - onload'
@@ -306,9 +270,7 @@ You should be able to continue reading these lessons, however.
 <TABLE BACKGROUND="javascript:alert(\'XSS\')">
 </center>',
         Result => {
-            Output => '<center>
-<table>
-</center>',
+            Output => '<center><table></center>',
             Replace => 1,
         },
         Name => 'Safety - background'
@@ -318,9 +280,7 @@ You should be able to continue reading these lessons, however.
 <SCRIPT a=">" SRC="http://ha.ckers.org/xss.js"></SCRIPT>
 </center>',
         Result => {
-            Output => '<center>
-
-</center>',
+            Output => '<center></center>',
             Replace => 1,
         },
         Name => 'Safety - script'
@@ -330,9 +290,7 @@ You should be able to continue reading these lessons, however.
 <SCRIPT =">" SRC="http://ha.ckers.org/xss.js"></SCRIPT>
 </center>',
         Result => {
-            Output => '<center>
-
-</center>',
+            Output => '<center></center>',
             Replace => 1,
         },
         Name => 'Safety - script'
@@ -343,9 +301,7 @@ You should be able to continue reading these lessons, however.
  SRC="http://ha.ckers.org/xss.js"></SCRIPT>
 </center>',
         Result => {
-            Output => '<center>
-
-</center>',
+            Output => '<center></center>',
             Replace => 1,
         },
         Name => 'Safety - script'
@@ -356,10 +312,7 @@ You should be able to continue reading these lessons, however.
  SRC="http://ha.ckers.org/xss.js"></SCRIPT>
 </center>',
         Result => {
-            Output => '<center>
-PT
- SRC=&quot;http://ha.ckers.org/xss.js&quot;&gt;
-</center>',
+            Output => '<center>PT SRC=&quot;http://ha.ckers.org/xss.js&quot;&gt;</center>',
             Replace => 1,
         },
         Name => 'Safety - script'
@@ -370,9 +323,7 @@ PT
  HREF="javascript:document.location=\'http://www.example.com/\'">XSS</A>
 </center>',
         Result => {
-            Output => '<center>
-<a>XSS</a>
-</center>',
+            Output => '<center> <a>XSS</a> </center>',
             Replace => 1,
         },
         Name => 'Safety - script'
@@ -382,9 +333,7 @@ PT
   <body style="background: #fff; color: #000;" onmouseover     ="var ga = document.createElement(\'script\'); ga.type = \'text/javascript\'; ga.src = (\'https:\' == document.location.protocol ? \'https://\' : \'http://\') + \'ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js\'; document.body.appendChild(ga); setTimeout(function() { jQuery(\'body\').append(jQuery(\'<div />\').attr(\'id\', \'hack-me\').css(\'display\', \'none\')); jQuery(\'#hack-me\').load(\'/kix/index.pl?Action=AgentPreferences\', null, function() { jQuery.ajax({url: \'/kix/index.pl\', type: \'POST\', data: ({Action: \'AgentPreferences\', ChallengeToken: jQuery(\'input[name=ChallengeToken]:first\', \'#hack-me\').val(), Group: \'Language\', \'Subaction\': \'Update\', UserLanguage: \'zh_CN\'})}); }); }, 500);">
 </center>',
         Result => {
-            Output => '<center>
-  <body style="background: #fff; color: #000;">
-</center>',
+            Output => '<center><body style="background: #fff; color: #000;"></center>',
             Replace => 1,
         },
         Name => 'Safety - script'
@@ -420,12 +369,7 @@ embed:+ADw-embed src=test+AD4-
 object:+ADw-object+AD4-alert(1);+ADw-/object+AD4-
 EOF
         Result => {
-            Output => <<EOF,
-script:
-applet:
-embed:
-object:
-EOF
+            Output => 'script:applet:embed:object:',
             Replace => 1,
         },
     },
@@ -435,10 +379,7 @@ EOF
 <div style='width: expression(alert("XSS");); height: 200px;' style='width: 400px'>
 EOF
         Result => {
-            Output => <<EOF,
-<div>
-<div>
-EOF
+            Output => '<div><div>',
             Replace => 1,
         },
         Name => 'Safety - Filter out MS CSS expressions'
@@ -448,9 +389,7 @@ EOF
 <div><XSS STYLE="xss:expression(alert('XSS'))"></div>
 EOF
         Result => {
-            Output => <<EOF,
-<div><xss></div>
-EOF
+            Output => '<div><xss></div>',
             Replace => 1,
         },
         Name => 'Safety - Microsoft CSS expression on invalid tag'
@@ -460,9 +399,7 @@ EOF
 <div class="svg"><svg some-attribute evil="true"><someevilsvgcontent></svg></div>
 EOF
         Result => {
-            Output => <<EOF,
-<div class="svg"></div>
-EOF
+            Output => '<div class="svg"></div>',
             Replace => 1,
         },
         Name => 'Safety - Filter out SVG'
@@ -472,9 +409,7 @@ EOF
 <div><script ></script ><applet ></applet ></div >
 EOF
         Result => {
-            Output => <<EOF,
-<div></div>
-EOF
+            Output => '<div></div>',
             Replace => 1,
         },
         Name => 'Safety - Closing tag with space'
@@ -498,19 +433,15 @@ div > span > div {
 </style>
 EOF
         Result => {
-            Output => <<EOF,
-<style type="text/css">
+            Output => '<style type="text/css">
 div > span {
     width: 200px;
 }
-</style>
-<style type="text/css"></style>
-<style type="text/css">
+</style><style type="text/css"></style><style type="text/css">
 div > span > div {
     width: 200px;
 }
-</style>
-EOF
+</style>',
             Replace => 1,
         },
         Name => 'Safety - Style tags with CSS expressions are filtered out'
@@ -522,11 +453,7 @@ document.write("Hello World!");
 </s<script>//<cript>
 EOF
         Result => {
-            Output => <<EOF,
-<sscript>......<cript type="text/javascript">
-document.write("Hello World!");
-</sscript>//<cript>
-EOF
+            Output => '<sscript>......<cript type="text/javascript"> document.write("Hello World!"); </sscript>//<cript>',
             Replace => 1,
         },
         Name => 'Safety - Nested script tags'
@@ -538,11 +465,7 @@ EOF
 <img src="/img2.png"/>
 EOF
         Result => {
-            Output => <<EOF,
-<img src="/img1.png" />
-<iframe></iframe>
-<img src="/img2.png" />
-EOF
+            Output => '<img src="/img1.png" /><iframe></iframe><img src="/img2.png" />',
             Replace => 1,
         },
         Name => 'Safety - javascript source with space'
@@ -554,11 +477,7 @@ EOF
 <img src="/img2.png"/>
 EOF
         Result => {
-            Output => <<EOF,
-<img src="/img1.png" />
-<iframe></iframe>
-<img src="/img2.png" />
-EOF
+            Output => '<img src="/img1.png" /><iframe></iframe><img src="/img2.png" />',
             Replace => 1,
         },
         Name => 'Safety - javascript source with space'
@@ -570,11 +489,7 @@ EOF
 <img src="/img2.png"/>
 EOF
         Result => {
-            Output => <<EOF,
-<img src="/img1.png" />
-<iframe></iframe>
-<img src="/img2.png" />
-EOF
+            Output => '<img src="/img1.png" /><iframe></iframe><img src="/img2.png" />',
             Replace => 1,
         },
         Name => 'Safety - javascript source without delimiters'
@@ -586,11 +501,7 @@ EOF
 <img src="/img2.png"/>
 EOF
         Result => {
-            Output => <<EOF,
-<img src="/img1.png" />
-<iframe src="" data-src="javascript:alert(&#39;XSS Exploit&#39;);"></iframe>
-<img src="/img2.png" />
-EOF
+            Output => '<img src="/img1.png" /><iframe src="" data-src="javascript:alert(&#39;XSS Exploit&#39;);"></iframe><img src="/img2.png" />',
             Replace => 1,
         },
         Name => 'Safety - javascript source in data tag, keep'
@@ -603,11 +514,7 @@ URL=http://www.rbrasileventos.com.br/9asdasd/">
 Content
 EOF
         Result => {
-            Output => <<EOF,
-Some
-
-Content
-EOF
+            Output => 'Some  Content',
             Replace => 1,
         },
         Name => 'Safety - meta refresh tag removed'
@@ -617,9 +524,7 @@ EOF
 <img/onerror="alert(\'XSS1\')"src=a>
 EOF
         Result => {
-            Output => <<EOF,
-<img src="a" />
-EOF
+            Output => '<img src="a" />',
             Replace => 1,
         },
         Name => 'Safety - / as attribute delimiter'
@@ -629,9 +534,7 @@ EOF
 <iframe src=javasc&#x72ipt:alert(\'XSS2\') >
 EOF
         Result => {
-            Output => <<EOF,
-<iframe>
-EOF
+            Output => '<iframe>',
             Replace => 1,
         },
         Name => 'Safety - entity encoding in javascript attribute'
@@ -641,9 +544,7 @@ EOF
 <iframe/src=javasc&#x72ipt:alert(\'XSS2\') >
 EOF
         Result => {
-            Output => <<EOF,
-<iframe>
-EOF
+            Output => '<iframe>',
             Replace => 1,
         },
         Name => 'Safety - entity encoding in javascript attribute with / separator'
@@ -653,9 +554,7 @@ EOF
 <img src="http://example.com/image.png"/>
 EOF
         Result => {
-            Output => <<EOF,
-<img />
-EOF
+            Output => '<img />',
             Replace => 1,
         },
         Name => 'Safety - external image'
@@ -665,9 +564,7 @@ EOF
 <img/src="http://example.com/image.png"/>
 EOF
         Result => {
-            Output => <<EOF,
-<img />
-EOF
+            Output => '<img />',
             Replace => 1,
         },
         Name => 'Safety - external image with / separator'
@@ -714,9 +611,7 @@ EOF
             NoImg => 1,
         },
         Result => {
-            Output => <<EOF,
-
-EOF
+            Output => '',
             Replace => 1,
         },
     },
@@ -730,9 +625,7 @@ EOF
             ReplacementStr => '...'
         },
         Result => {
-            Output => <<EOF,
-...
-EOF
+            Output => '...',
             Replace => 1,
         },
     },
@@ -746,9 +639,7 @@ EOF
             ReplacementStr => '...'
         },
         Result => {
-            Output => <<EOF,
-<div class="svg">...</div>
-EOF
+            Output => '<div class="svg">...</div>',
             Replace => 1,
         },
     },
@@ -762,9 +653,7 @@ EOF
             ReplacementStr => '...'
         },
         Result => {
-            Output => '<center>
-...
-</center>',
+            Output => '<center>...</center>',
             Replace => 1,
         },
     },
@@ -778,9 +667,7 @@ EOF
             ReplacementStr => '...'
         },
         Result => {
-            Output => '<center>
-<object width="384" height="236" align="right" vspace="5" hspace="5"><param name="movie" value="http://www.youtube.com/v/l1JdGPVMYNk&amp;hl=en_US&amp;fs=1&amp;hd=1" /><param name="allowFullScreen" value="true" /><param name="allowscriptaccess" value="always" />...</object>
-</center>',
+            Output => '<center><object width="384" height="236" align="right" vspace="5" hspace="5"><param name="movie" value="http://www.youtube.com/v/l1JdGPVMYNk&amp;hl=en_US&amp;fs=1&amp;hd=1" /><param name="allowFullScreen" value="true" /><param name="allowscriptaccess" value="always" />...</object></center>',
             Replace => 1,
         },
     },
@@ -797,9 +684,7 @@ You should be able to continue reading these lessons, however.
             ReplacementStr => '...'
         },
         Result => {
-            Output => '<center>
-...
-</center>',
+            Output => '<center>...</center>',
             Replace => 1,
         },
     },
@@ -833,12 +718,7 @@ You should be able to continue reading these lessons, however.
             NoJavaScript => 1
         },
         Result => {
-            Output  => '<a>XSS</a>
-<a>XSS</a>
-<a>XSS</a>
-<a>XSS</a>
-<a>XSS</a>
-<a>XSS</a>',
+            Output  => '<a>XSS</a> <a>XSS</a> <a>XSS</a> <a>XSS</a> <a>XSS</a> <a>XSS</a>',
             Replace => 1,
         },
     },
@@ -850,8 +730,7 @@ You should be able to continue reading these lessons, however.
             NoJavaScript => 1
         },
         Result => {
-            Output  => '<a>XSS</a>
-<a>XSS</a>',
+            Output  => '<a>XSS</a> <a>XSS</a>',
             Replace => 1,
         },
     },
@@ -865,8 +744,7 @@ type=submit value=XSS>',
             NoJavaScript => 1
         },
         Result => {
-            Output  => '<form><button>XSS</button></form>
-<form><input type="submit" value="XSS" />',
+            Output  => '<form><button>XSS</button></form><form><input type="submit" value="XSS" />',
             Replace => 1,
         },
     },
@@ -881,8 +759,7 @@ allow-modals"></iframe>',
             NoJavaScript => 1
         },
         Result => {
-            Output  => '<iframe srcdoc="&lt;img src=&quot;x&quot; /&gt;" sandbox="allow-same-origin allow-scripts
-allow-modals"></iframe>',
+            Output  => '<iframe srcdoc="&lt;img src=&quot;x&quot; /&gt;" sandbox="allow-same-origin allow-scripts allow-modals"></iframe>',
             Replace => 1,
         },
     },
@@ -923,12 +800,7 @@ to="javascript:alert(document.location.origin)"> </set>',
             NoJavaScript => 1
         },
         Result => {
-            Output  => '<svg width="12cm" height="9cm">
-    <a>
-        <image href="https://google.com/favicon.ico"></image>
-        
-    </a>
-</svg>',
+            Output  => '<svg width="12cm" height="9cm"> <a> <image href="https://google.com/favicon.ico"></image> </a> </svg>',
             Replace => 1,
         },
     },
@@ -944,12 +816,7 @@ to="javascript:alert(document.location.origin)"> </set>',
             NoJavaScript => 1
         },
         Result => {
-            Output  => '<svg width="12cm" height="9cm">
-    <a>
-        <image href="https://google.com/favicon.ico"></image>
-        
-    </a>
-</svg>',
+            Output  => '<svg width="12cm" height="9cm"> <a> <image href="https://google.com/favicon.ico"></image> </a> </svg>',
             Replace => 1,
         },
     },
@@ -965,12 +832,7 @@ to="javascript:alert(document.location.origin)"> </set>',
             NoJavaScript => 1
         },
         Result => {
-            Output  => '<svg width="12cm" height="9cm">
-    <a>
-        <image href="https://google.com/favicon.ico"></image>
-        
-    </a>
-</svg>',
+            Output  => '<svg width="12cm" height="9cm"> <a> <image href="https://google.com/favicon.ico"></image> </a> </svg>',
             Replace => 1,
         },
     },
@@ -979,7 +841,7 @@ to="javascript:alert(document.location.origin)"> </set>',
         Input  => 'Fix Schwyz! quäkt Jürgen blöd vom Paß ',
         Config => {},
         Result => {
-            Output  => 'Fix Schwyz! qu&auml;kt J&uuml;rgen bl&ouml;d vom Pa&szlig; ',
+            Output  => 'Fix Schwyz! qu&auml;kt J&uuml;rgen bl&ouml;d vom Pa&szlig;',
             Replace => 1,
         },
     },
@@ -1006,8 +868,7 @@ to="javascript:alert(document.location.origin)"> </set>',
             NoJavaScript => 1
         },
         Result => {
-            Output  => '<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Open+Sans:400,400italic&amp;subset=latin,cyrillic" />
-<style type="text/css" media="all">
+            Output  => '<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Open+Sans:400,400italic&amp;subset=latin,cyrillic" /><style type="text/css" media="all">
 *
 {
         -webkit-text-size-adjust:none;
@@ -1035,7 +896,8 @@ to="javascript:alert(document.location.origin)"> </set>',
             NoJavaScript => 1
         },
         Result => {
-            Output  => 'javascript:/*--&gt;</title></style></textarea></xmp><svg>',
+            Output  => 'javascript:/*--&gt;</title></style></textarea>
+</xmp><svg>',
             Replace => 1,
         },
     },
@@ -1497,7 +1359,8 @@ to="javascript:alert(document.location.origin)"> </set>',
             NoJavaScript => 1
         },
         Result => {
-            Output  => '<br size="&amp;{alert(&#39;XSS&#39;)}" />',
+            Output  => '<br size="&amp;{alert(&#39;XSS&#39;)}" />
+',
             Replace => 1,
         },
     },
@@ -1531,18 +1394,6 @@ to="javascript:alert(document.location.origin)"> </set>',
         },
         Result => {
             Output  => '<img />',
-            Replace => 1,
-        },
-    },
-    {
-        Name   => 'Safety - IMG STYLE with Expression',
-        Input  => 'exp/*<A STYLE=\'no\\xss:noxss("*//*");
-xss:ex/*XSS*//*/*/pression(alert("XSS"))\'>',
-        Config => {
-            NoJavaScript => 1
-        },
-        Result => {
-            Output  => 'exp/*<a>',
             Replace => 1,
         },
     },
@@ -1942,6 +1793,42 @@ xss:ex/*XSS*//*/*/pression(alert("XSS"))\'>',
         Result => {
             Output  => '<scrscript>ipt&gt;alert(document.cookie)',
             Replace => 1,
+        },
+    },
+    {
+        Name   => 'Safety - Minify text in span',
+        Input  => '<span>This   is 
+a simple
+Test</span>',
+        Config => {},
+        Result => {
+            Output  => '<span>This is a simple Test</span>',
+            Replace => 0,
+        },
+    },
+    {
+        Name   => 'Safety - Remove newlines, but append newline after paragraph',
+        Input  => '<p>Paragraph 1</p><span>Span 1</span>
+<span>Span 2</span>',
+        Config => {},
+        Result => {
+            Output  => '<p>Paragraph 1</p>
+<span>Span 1</span><span>Span 2</span>',
+            Replace => 0,
+        },
+    },
+    {
+        Name   => 'Safety - Keep newlinesin pre',
+        Input  => '<pre>This   is 
+a
+Test</pre>',
+        Config => {},
+        Result => {
+            Output  => '<pre>This   is 
+a
+Test</pre>
+',
+            Replace => 0,
         },
     },
 );

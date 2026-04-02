@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
+# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE for license information (AGPL). If you
@@ -452,7 +452,7 @@ sub HTMLDisplayValueRender {
     }
 
     $Output = <<"END";
-<table cellspacing="0" cellpadding="2" style="border:1px solid black; width: 100%">
+<table cellspacing="0" cellpadding="2" style="border:1px solid black; border-collapse: collapse; width: 100%">
     <thead>
         <tr>
 END

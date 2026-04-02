@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
+# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -117,6 +117,35 @@ sub Run {
             return $Self->_Error(
                 Code    => 'Object.AlreadyExists',
                 Message => 'Cannot update organisation. Another organisation with this number already exists.',
+            );
+        }
+    }
+
+    # check ParentID exists if given
+    if ( $Organisation->{ParentID} ) {
+        my $ID = $Kernel::OM->Get('Organisation')->OrganisationLookup(
+            ID => $Organisation->{ParentID},
+            Silent => 1,
+        );
+
+        if ( !$ID ) {
+            return $Self->_Error(
+                Code    => 'Object.NotFound',
+                Message => 'Cannot create organisation. Property ParentID does not reference an existing organisation.',
+            );
+        }
+
+        # check parent loop
+        my @ParentOrgIDs = $Kernel::OM->Get('Organisation')->GetAllParentOrganisationIDs(
+            OrgID => $Organisation->{ParentID}
+        );
+        push @ParentOrgIDs, $Organisation->{ParentID};
+
+        my %Parents = map { $_ => 1 } @ParentOrgIDs;
+        if ( $Parents{$Param{Data}->{OrganisationID}} ) {
+            return $Self->_Error(
+                Code    => 'Conflict',
+                Message => "Organisation with ID $Param{Data}->{OrganisationID} is already assigned as an upline parent and cannot be a sub-organisation!",
             );
         }
     }

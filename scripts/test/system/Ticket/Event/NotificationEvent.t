@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
+# Modified version of the work: Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -1128,6 +1128,7 @@ my @Tests = (
                 ToArray => [$Contact{Email}],
             },
         ],
+        ExpectedVisibleForCustomer => 1,
         Success => 1,
     },
     {
@@ -1190,6 +1191,7 @@ my @Tests = (
                 ToArray => [$Contact{Email}],
             },
         ],
+        ExpectedVisibleForCustomer => 1,
         Success => 1,
     },
     {
@@ -1267,6 +1269,7 @@ this is a URL: [1]KIXDesk
                 ToArray => [$Contact{Email}],
             },
         ],
+        ExpectedVisibleForCustomer => 1,
         Success => 1,
     },
 );
@@ -1288,6 +1291,10 @@ my $SetPostMasterUserID = sub {
 my $SetOutOfOffice = sub {
     my %Param = @_;
 
+    my %User = $Kernel::OM->Get('User')->GetUserData( UserID => $Param{UserID} );
+    my $Name = 'Update User | ';
+    my %OutOfOffice;
+
     if ( $Param{OutOfOffice} ) {
 
         my ( $StartSec, $StartMin, $StartHour, $StartDay, $StartMonth, $StartYear, $StartWeekDay ) = $Kernel::OM->Get('Time')->SystemTime2Date(
@@ -1297,41 +1304,32 @@ my $SetOutOfOffice = sub {
             SystemTime => $Kernel::OM->Get('Time')->SystemTime() + $Param{SetOutOfOfficeDiffEnd},
         );
 
-        my %Preferences = (
+        %OutOfOffice = (
             OutOfOfficeStart => sprintf( '%04d-%02d-%02d', $StartYear, $StartMonth, $StartDay ),
             OutOfOfficeEnd   => sprintf( '%04d-%02d-%02d', $EndYear, $EndMonth, $EndDay ),
         );
 
-        for my $Key ( qw( OutOfOfficeStart OutOfOfficeEnd ) ) {
-            # pref update db
-            my $PreferenceSet = $Kernel::OM->Get('User')->SetPreferences(
-                UserID => $Param{UserID},
-                Key    => $Key,
-                Value  => $Preferences{ $Key },
-            );
-            $Self->True(
-                $PreferenceSet,
-                "User preference $Key set to $Preferences{ $Key }",
-            );
-
-            if ( !$PreferenceSet ) {
-                return;
-            }
-        }
+        $Name .= join( q(, ), map { "$_: $OutOfOffice{$_}" } keys %OutOfOffice );
     }
     else {
-        for my $Key ( qw( OutOfOfficeStart OutOfOfficeEnd ) ) {
-            # pref update db
-            my $IsSuccess = $Kernel::OM->Get('User')->DeletePreferences(
-                UserID => $Param{UserID},
-                Key    => $Key,
-            );
-            $Self->True(
-                $IsSuccess,
-                "User preference $Key deleted",
-            );
-        }
+        %OutOfOffice = (
+            OutOfOfficeStart => undef,
+            OutOfOfficeEnd   => undef,
+        );
+
+        $Name .= 'OutOfOffice Reset';
     }
+
+    my $Succes = $Kernel::OM->Get('User')->UserUpdate(
+        %User,
+        %OutOfOffice,
+        ChangeUserID => 1
+    );
+
+    $Self->True(
+        $Succes,
+        $Name
+    );
 
     return 1;
 
@@ -1554,7 +1552,13 @@ for my $Test (@Tests) {
         );
 
         # check if the new article is customer visible
-        if ( IsArrayRefWithData($Test->{Data}->{VisibleForCustomer}) && $Test->{Data}->{VisibleForCustomer}->[0] ) {
+        if (
+            $Test->{ExpectedVisibleForCustomer}
+            || (
+                IsArrayRefWithData($Test->{Data}->{VisibleForCustomer})
+                && $Test->{Data}->{VisibleForCustomer}->[0]
+            )
+         ) {
             $Self->True(
                 ($ArticleBox[-1]->{CustomerVisible} == 1),
                 "$Test->{Name} - article is visible for the customer",

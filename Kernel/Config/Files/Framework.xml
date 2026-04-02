@@ -7,6 +7,14 @@
             <String Regex="">&lt;KIX_CONFIG_Home&gt;/var/tmp</String>
         </Setting>
     </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="ObjectIcon###Directory" Required="1" Valid="1">
+        <Description Translatable="1">The directory to use for object icons.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core::Web</SubGroup>
+        <Setting>
+            <String Regex="">&lt;KIX_CONFIG_Home&gt;/var/objecticons</String>
+        </Setting>
+    </ConfigItem>
     <ConfigItem AccessLevel="external" Name="ImprintLink" Required="0" Valid="1">
         <Description Translatable="1">Defines the language dependent link to an online imprint.</Description>
         <Group>Framework</Group>
@@ -1042,11 +1050,6 @@
         <SubGroup>Core::TicketStateWorkflow</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="Incident">processing</Item>
-                <Item Key="Problem">new</Item>
-                <Item Key="Service Request">processing</Item>
-                <Item Key="RfC">processing</Item>
-                <Item Key="Event">new</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -1069,7 +1072,7 @@
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="TicketStateWorkflow::PostmasterFollowUpState" Required="1" Valid="1">
-        <Description Translatable="1">The state if a ticket got a follow-up (use _PREVIOUS_ as placeholder for the very last state in ticket history before current).</Description>
+        <Description Translatable="1">Mapping of follow-up ticket states with key:value configuration ("key":"value"). Key can be a combination of current ticket type and state (e.g. "Incident:::pending reminder"), or only a state (e.g. "closed"). Combination of type and state has higher priority. Value is the new ticket state to set. You can use _PREVIOUS_ as placeholder for the very last state in ticket history before current (e.g. "Incident:::pending reminder":"_PREVIOUS_" or "closed":"_PREVIOUS_").</Description>
         <Group>Framework</Group>
         <SubGroup>Core::PostMaster</SubGroup>
         <Setting>
@@ -8940,6 +8943,39 @@ Notes:
                 <Item Key="Transaction">1</Item>
                 <Item Key="Event">UserUpdate</Item>
             </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem AccessLevel="internal" Name="Role::EventModulePost###010-MyQueuesValidation" Required="1" Valid="1">
+        <Description Translatable="1">Event module registration.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::Role::Event::MyQueuesValidation</Item>
+                <Item Key="Transaction">1</Item>
+                <Item Key="Event">(RoleUpdate|RolePermissionUpdate|RolePermissionDelete|RoleUserDelete)</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="User::EventModulePost###010-MyQueuesValidation" Required="1" Valid="1">
+        <Description Translatable="1">Event module registration.</Description>
+        <Setting>
+            <Hash>
+                <Item Key="Module">Kernel::System::User::Event::MyQueuesValidation</Item>
+                <Item Key="Transaction">1</Item>
+                <Item Key="Event">UserSetPreferences</Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem AccessLevel="external" Name="Organisation::VirtuallyAssignContactsToSubOrganisations" Required="1" Valid="1">
+        <Description Translatable="1">When enabled, a contact assigned to an organisation is also virtually assigned to all its suborganisations. PLEASE NOTE: this will affect the system performance.</Description>
+        <Group>Framework</Group>
+        <SubGroup>Core</SubGroup>
+        <Setting>
+            <Option SelectedID="0">
+                <Item Key="0" Translatable="1">No</Item>
+                <Item Key="1" Translatable="1">Yes</Item>
+            </Option>
         </Setting>
     </ConfigItem>
 </kix_config>

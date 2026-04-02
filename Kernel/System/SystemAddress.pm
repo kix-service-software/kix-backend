@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
+# Modified version of the work: Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -12,6 +12,8 @@ package Kernel::System::SystemAddress;
 
 use strict;
 use warnings;
+
+use base qw(Kernel::System::EventHandler);
 
 our @ObjectDependencies = qw(
     ClientRegistration
@@ -54,6 +56,11 @@ sub new {
 
     $Self->{CacheType} = 'SystemAddress';
     $Self->{CacheTTL}  = 60 * 60 * 24 * 20;
+
+    # init of event handler
+    $Self->EventHandlerInit(
+        Config => 'SystemAddress::EventModulePost',
+    );
 
     return $Self;
 }
@@ -113,6 +120,15 @@ sub SystemAddressAdd {
 
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
+    );
+
+    # trigger event
+    $Self->EventHandler(
+        Event => 'SystemAddressAdd',
+        Data  => {
+            ID => $ID
+        },
+        UserID => $Param{UserID}
     );
 
     # push client callback event
@@ -249,6 +265,15 @@ sub SystemAddressUpdate {
 
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
+    );
+
+    # trigger event
+    $Self->EventHandler(
+        Event => 'SystemAddressUpdate',
+        Data  => {
+            ID => $Param{ID}
+        },
+        UserID => $Param{UserID}
     );
 
     # push client callback event
@@ -570,11 +595,20 @@ sub SystemAddressDelete {
         Type => $Self->{CacheType},
     );
 
+    # trigger event
+    $Self->EventHandler(
+        Event => 'SystemAddressDelete',
+        Data  => {
+            ID => $Param{SystemAddressID}
+        },
+        UserID => $Param{UserID}
+    );
+
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
         Namespace => 'SystemAddress',
-        ObjectID  => $Param{ID},
+        ObjectID  => $Param{SystemAddressID},
     );
 
     return 1;

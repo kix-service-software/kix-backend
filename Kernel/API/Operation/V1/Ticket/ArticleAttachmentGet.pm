@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
+# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/ 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -11,6 +11,7 @@ package Kernel::API::Operation::V1::Ticket::ArticleAttachmentGet;
 use strict;
 use warnings;
 
+use JSON::WebToken;
 use MIME::Base64;
 
 use Kernel::System::VariableCheck qw(:all);
@@ -150,6 +151,17 @@ sub Run {
                 Code => 'Object.NotFound',
             );
         }
+
+        # add content token to attachment
+        $Attachment{ContentToken} = encode_jwt(
+            {
+                TicketID     => $Param{Data}->{TicketID},
+                ArticleID    => $Param{Data}->{ArticleID},
+                AttachmentID => $AttachmentID
+            },
+            'ContentToken',
+            'HS256'
+        );
 
         if ( $Param{Data}->{include}->{Content} ) {
             # encode content base64

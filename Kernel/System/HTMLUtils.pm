@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
+# Modified version of the work: Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -17,6 +17,7 @@ use utf8;
 
 use MIME::Base64;
 use HTML::Entities qw(decode_entities encode_entities);
+use HTML::Packer;
 use HTML::Parser;
 use HTML::Truncate;
 
@@ -1272,6 +1273,16 @@ sub Safety {
         $StringIsRef  = 1;
     }
 
+    my $Packer = HTML::Packer->init();
+    $Packer->minify(
+        \$String, {
+            remove_comments => 1,
+            remove_newlines => 1,
+            do_javascript   => 'shrink',
+            do_stylesheet   => 'minify',
+        }
+    );
+
     # get parser object
     my $Parser = HTML::Parser->new(
         api_version        => 3,
@@ -1326,6 +1337,22 @@ sub Safety {
         'source'  => 1,
         'track'   => 1,
         'wbr'     => 1
+    };
+    $Parser->{NewlineElements} = {
+        'br'       => 1,
+        'code'     => 1,
+        'h1'       => 1,
+        'h2'       => 1,
+        'h3'       => 1,
+        'h4'       => 1,
+        'h5'       => 1,
+        'h6'       => 1,
+        'hr'       => 1,
+        'li'       => 1,
+        'p'        => 1,
+        'pre'      => 1,
+        'textarea' => 1,
+        'tr'       => 1
     };
 
     # In UTF-7, < and > can be encoded to mask them from security filters like this one.
@@ -1512,7 +1539,7 @@ sub _SafetyTagStartHandler {
             if ( lc( $Attribute ) eq 'style' ) {
                 # prepare attribute value
                 my $AttributeValue = $Attributes->{ $Attribute };
-                $AttributeValue =~ s/\/\*.*?\*\///g;
+                $AttributeValue =~ s/\/\*[^*]*\*+([^\/*][^*]*\*+)*\///g;
 
                 if (
                     $AttributeValue =~ m/expression\(/i
@@ -1624,6 +1651,14 @@ sub _SafetyTagStartHandler {
     # close tag
     $String .= '>';
 
+    # handle linebreaks for void elements
+    if (
+        $Self->{VoidElements}->{ $TagName }
+        && $Self->{NewlineElements}->{ $TagName }
+    ) {
+        $String .= "\n";
+    }
+
     # append to safety string
     $Self->{Safety}->{String} .= $String;
 
@@ -1681,6 +1716,11 @@ sub _SafetyTagEndHandler {
 
     # append to safety string
     $Self->{Safety}->{String} .= '</' . $TagName . '>';
+
+    # handle line breaks
+    if ( $Self->{NewlineElements}->{ $TagName } ) {
+        $Self->{Safety}->{String} .= "\n";
+    }
 
     return;
 }

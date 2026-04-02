@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
+# Modified version of the work: Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/ 
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -106,11 +106,12 @@ END
         CustomerVisible       => 1,
     },
     {
-        Name                  => 'Organisation contact, CheckFromOrganisation inactive',
+        Name                  => 'Organisation contact, CheckFromOrganisation inactive (add invisible article with reference)',
         CheckFromOrganisation => '0',
         Email                 => <<"END",
 From: Foreign Contact <$Contact2{Email}>
 To: System <test\@localhost>
+Message-ID: <UnitTest-Invisible1\@kixdesk.com>
 Subject: FollowUp Ticket#$Ticket{TicketNumber}
 
 Some Content in Body
@@ -143,11 +144,12 @@ END
         CustomerVisible => 1,
     },
     {
-        Name            => 'Foreign contact, CheckReferences active, matching In-Reply-To',
+        Name            => 'Foreign contact, CheckReferences inactive, matching In-Reply-To (add invisible article with reference)',
         CheckReferences => '0',
         Email           => <<"END",
 From: Foreign Contact <foreign\@contact>
 To: System <test\@localhost>
+Message-ID: <UnitTest-Invisible2\@kixdesk.com>
 In-Reply-To: <UnitTest\@kixdesk.com>
 Subject: FollowUp Ticket#$Ticket{TicketNumber}
 
@@ -156,7 +158,7 @@ END
         CustomerVisible => 0,
     },
     {
-        Name            => 'Foreign contact, CheckReferences active, matching References',
+        Name            => 'Foreign contact, CheckReferences inactive, matching References',
         CheckReferences => '0',
         Email           => <<"END",
 From: Foreign Contact <foreign\@contact>
@@ -169,7 +171,7 @@ END
         CustomerVisible => 0,
     },
     {
-        Name            => 'Foreign contact, CheckReferences active, matching In-Reply-To and References',
+        Name            => 'Foreign contact, CheckReferences inactive, matching In-Reply-To and References',
         CheckReferences => '0',
         Email           => <<"END",
 From: Foreign Contact <foreign\@contact>
@@ -273,6 +275,62 @@ Subject: FollowUp Ticket#$Ticket{TicketNumber}
 Some Content in Body
 END
         CustomerVisible => 1,
+    },
+    {
+        Name            => 'Foreign contact, CheckReferences active, matching invisible In-Reply-To and matching visible References (visible is latest)',
+        CheckReferences => '1',
+        Email           => <<"END",
+From: Foreign Contact <foreign\@contact>
+To: System <test\@localhost>
+In-Reply-To: <UnitTest-Invisible1\@kixdesk.com>
+References: <UnitTest\@kixdesk.com>
+Subject: FollowUp Ticket#$Ticket{TicketNumber}
+
+Some Content in Body
+END
+        CustomerVisible => 1,
+    },
+    {
+        Name            => 'Foreign contact, CheckReferences active, matching visible In-Reply-To and matching invisible References (visible is latest)',
+        CheckReferences => '1',
+        Email           => <<"END",
+From: Foreign Contact <foreign\@contact>
+To: System <test\@localhost>
+In-Reply-To: <UnitTest\@kixdesk.com>
+References: <UnitTest-Invisible1\@kixdesk.com>
+Subject: FollowUp Ticket#$Ticket{TicketNumber}
+
+Some Content in Body
+END
+        CustomerVisible => 1,
+    },
+    {
+        Name            => 'Foreign contact, CheckReferences active, matching invisible In-Reply-To and matching visible References (invisible is latest)',
+        CheckReferences => '1',
+        Email           => <<"END",
+From: Foreign Contact <foreign\@contact>
+To: System <test\@localhost>
+In-Reply-To: <UnitTest-Invisible2\@kixdesk.com>
+References: <UnitTest\@kixdesk.com>
+Subject: FollowUp Ticket#$Ticket{TicketNumber}
+
+Some Content in Body
+END
+        CustomerVisible => 0,
+    },
+    {
+        Name            => 'Foreign contact, CheckReferences active, matching visible In-Reply-To and matching invisible References (invisible is latest)',
+        CheckReferences => '1',
+        Email           => <<"END",
+From: Foreign Contact <foreign\@contact>
+To: System <test\@localhost>
+In-Reply-To: <UnitTest\@kixdesk.com>
+References: <UnitTest-Invisible2\@kixdesk.com>
+Subject: FollowUp Ticket#$Ticket{TicketNumber}
+
+Some Content in Body
+END
+        CustomerVisible => 0,
     },
 );
 

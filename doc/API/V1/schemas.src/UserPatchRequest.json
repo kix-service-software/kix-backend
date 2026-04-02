@@ -15,6 +15,12 @@
                     "type": "string",
                     "description": "ACTION TRIGGER (non-persistent attribute)! If set with a valid secret new mfa secret will be generated for this user."
                 },
+                "OutOfOffice": {
+                    "type": "object",
+                    "items": {
+                        "$ref": "OutOfOffice.json"
+                    }
+                },
                 "IsAgent": {
                     "type": "integer"
                 },

@@ -1,6 +1,6 @@
 #!perl
 # --
-# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
+# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
@@ -176,6 +176,7 @@ Then qr/the response contains the following items type of (.*?)$/, sub {
 };
 
 Then qr/attribute "(.*?)" of the "(.*?)" item (\d+) is "(.*?)"$/, sub {
+    S->{ResponseContent}->{$2}->{$1} =~ s/\s*$//;
     is(S->{ResponseContent}->{$2}->{$1}, $4, 'Check attribute value in response');
 };
 

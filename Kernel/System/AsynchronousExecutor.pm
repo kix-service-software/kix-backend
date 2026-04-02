@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
+# Modified version of the work: Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/ 
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -114,8 +114,8 @@ sub AsyncCall {
         return;
     }
 
-    # define the task name with object name and concatenate the function name
-    my $TaskName = substr "$ObjectName-$FunctionName()", 0, 255;
+    # define the task name with object name and concatenate the function name, if not given by parameter
+    my $TaskName = $Param{TaskName} || substr("$ObjectName-$FunctionName()", 0, 255);
 
     # create a new task
     my $TaskID = $Kernel::OM->Get('Scheduler')->TaskAdd(

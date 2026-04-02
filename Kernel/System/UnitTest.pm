@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
+# Modified version of the work: Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -552,8 +552,8 @@ sub _Print {
         $Self->{Adapter}->SetTestSubSuite($Self->{runningTestId}, $Self->{Adapter}->GetContainerNameById($Self->{runningContainerId}));
         $Self->{Adapter}->SetTestStartTime($Self->{runningTestId}, $Self->{StartTime});
         $Self->{Adapter}->SetTestStopTime($Self->{runningTestId}, int(time() * 1000));
-        $Self->{Adapter}->SetTestSuite($Self->{runningTestId}, 'KIX18 Backend Unit Tests');
-        $Self->{Adapter}->SetTestPackage($Self->{runningTestId}, 'KIX18 Backend Unit Tests');
+        $Self->{Adapter}->SetTestSuite($Self->{runningTestId}, $ENV{ALLURE_TEST_PACKAGE} || 'Backend Unit Tests');
+        $Self->{Adapter}->SetTestPackage($Self->{runningTestId}, $ENV{ALLURE_TEST_PACKAGE} || 'Backend Unit Tests');
         #PASSED tests
         if ($Test == 1) {
             $Self->{Adapter}->SetTestPassed($Self->{runningTestId});

@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
+# Modified version of the work: Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -209,113 +209,6 @@ sub XMLImportValuePrepare {
     my $Value = $BackendObject->ImportValuePrepare(%Param);
 
     return $Value;
-}
-
-=item _XMLVersionSearch()
-
-Search xml data of a version and return a hash reference.
-The C<What> parameter is a bit like the parameter used in L<SQL::Abstract>.
-The returned hash reference has C<VersionID>s as keys and C<1> as value.
-
-    my $VersionIDs = $ConfigItemObject->_XMLVersionSearch(
-        ClassIDs => [1, 2, 3],  # (optional)
-
-        What => [
-            # each array element is a and condition
-            {
-                # or condition in hash
-                "[%]{'Version'}[%]{'ConfigItemAttrB'}[%]{'Content'}" => '%contentA%',
-                "[%]{'Version'}[%]{'ConfigItemAttrC'}[%]{'Content'}" => '%contentA%',
-            },
-            {
-                "[%]{'Version'}[%]{'ConfigItemAttrB'}[%]{'Content'}" => '%contentB%',
-                "[%]{'Version'}[%]{'ConfigItemAttrC'}[%]{'Content'}" => '%contentB%',
-            },
-            {
-                # use array reference if different content with same key was searched
-                "[%]{'Version'}[%]{'ConfigItemAttrB'}[%]{'Content'}" => [
-                    '%contentC%',
-                    '%contentD%',
-                    '%contentE%',
-                ],
-                "[%]{'Version'}[%]{'ConfigItemAttrC'}[%]{'Content'}" => [
-                    '%contentC%',
-                    '%contentD%',
-                    '%contentE%',
-                ],
-            },
-            {
-                # use hash reference for specifying comparison ops, apart from the default 'LIKE'
-                "[%]{'Version'}[%]{'ConfigItemAttrB'}[%]{'Content'}" => { '<'        => 'alphabetically_lower_or_equal' },
-                "[%]{'Version'}[%]{'ConfigItemAttrB'}[%]{'Content'}" => { '<='       => 'alphabetically_less_or_equal' },
-                "[%]{'Version'}[%]{'ConfigItemAttrB'}[%]{'Content'}" => { '='        => 'exact_match' },
-                "[%]{'Version'}[%]{'ConfigItemAttrB'}[%]{'Content'}" => { '>='       => 'alphabetically_larger_or_equal' },
-                "[%]{'Version'}[%]{'ConfigItemAttrB'}[%]{'Content'}" => { '>'        => 'alphabetically_larger' },
-                "[%]{'Version'}[%]{'ConfigItemAttrB'}[%]{'Content'}" => { '-between' => [ 'lower_bound', 'upper_bound' ] },
-            },
-        ],
-
-        PreviousVersionSearch => 1,  # (optional) default 0 (0|1)
-    );
-
-=cut
-
-sub _XMLVersionSearch {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    if ( !$Param{What} || ref $Param{What} ne 'ARRAY' ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Need What as array reference!",
-        );
-        return;
-    }
-
-    if ( !$Param{ClassIDs} || ref $Param{ClassIDs} ne 'ARRAY' || !@{ $Param{ClassIDs} } ) {
-
-        # get class list
-        my $ClassList = $Kernel::OM->Get('GeneralCatalog')->ItemList(
-            Class => 'ITSM::ConfigItem::Class',
-        );
-
-        @{ $Param{ClassIDs} } = keys %{$ClassList};
-    }
-
-    # search in active versions
-    my %VersionIDs;
-    for my $ClassID ( @{ $Param{ClassIDs} } ) {
-
-        # start xml search
-        my @Keys = $Self->_XMLHashSearch(
-            Type => "ITSM::ConfigItem::$ClassID",
-            What => $Param{What},
-        );
-
-        # add all ids to version id hash
-        for my $VersionID (@Keys) {
-            $VersionIDs{$VersionID} = 1;
-        }
-    }
-
-    return \%VersionIDs if !$Param{PreviousVersionSearch};
-
-    # search also in old versions (archiv)
-    for my $ClassID ( @{ $Param{ClassIDs} } ) {
-
-        # start xml search
-        my @Keys = $Self->_XMLHashSearch(
-            Type => "ITSM::ConfigItem::Archiv::$ClassID",
-            What => $Param{What},
-        );
-
-        # add all ids to version id hash
-        for my $VersionID (@Keys) {
-            $VersionIDs{$VersionID} = 1;
-        }
-    }
-
-    return \%VersionIDs;
 }
 
 =item _XMLVersionGet()

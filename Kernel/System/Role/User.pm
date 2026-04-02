@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
+# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -88,6 +88,16 @@ END
 
     # delete cache
     $Kernel::OM->Get('Cache')->CleanUp();
+
+    # event
+    $Self->EventHandler(
+        Event => 'RoleUserAdd',
+        Data  => {
+            RoleID => $Param{RoleID},
+            UserID => $Param{AssignUserID},
+        },
+        UserID => $Param{UserID},
+    );
 
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
@@ -379,7 +389,8 @@ sub RoleUserDelete {
         return;
     }
 
-    my $SQL = 'DELETE FROM role_user';
+    my $SelectSQL = 'SELECT DISTINCT user_id FROM role_user';
+    my $DeleteSQL = 'DELETE FROM role_user';
 
     my @Where;
     my @Bind;
@@ -404,17 +415,39 @@ sub RoleUserDelete {
     }
 
     if ( @Where ) {
-        $SQL .= ' WHERE ' . join( ' AND ', @Where );
+        $SelectSQL .= ' WHERE ' . join( ' AND ', @Where );
+        $DeleteSQL .= ' WHERE ' . join( ' AND ', @Where );
+    }
+
+    # get data
+    return if !$Kernel::OM->Get('DB')->Prepare(
+        SQL  => $SelectSQL,
+        Bind => \@Bind,
+    );
+
+    # fetch relevant users
+    my @UserIDs;
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
+        push(@UserIDs, $Row[0]);
     }
 
     # delete existing RoleUser relation
     return if !$Kernel::OM->Get('DB')->Do(
-        SQL  => $SQL,
+        SQL  => $DeleteSQL,
         Bind => \@Bind,
     );
 
     # delete cache
     $Kernel::OM->Get('Cache')->CleanUp();
+
+    # event
+    $Self->EventHandler(
+        Event => 'RoleUserDelete',
+        Data  => {
+            UserIDs => \@UserIDs,
+        },
+        UserID => 1,
+    );
 
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(

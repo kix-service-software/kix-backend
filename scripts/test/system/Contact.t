@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
+# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -59,6 +59,34 @@ my $OrganisationIDForUpdate = $OrganisationObject->OrganisationAdd(
     Comment => 'some comment',
     ValidID => 1,
     UserID  => 1,
+);
+
+my $SubOrganisationID = $OrganisationObject->OrganisationAdd(
+    ParentID => $OrganisationID,
+    Number   => $OrgRand.'_sub',
+    Name     => $OrgRand . '_sub Inc',
+    Street   => 'Some Street',
+    Zip      => '12345',
+    City     => 'Some city',
+    Country  => 'USA',
+    Url      => 'http://example.com',
+    Comment  => 'some comment',
+    ValidID  => 1,
+    UserID   => 1,
+);
+
+my $SubSubOrganisationID = $OrganisationObject->OrganisationAdd(
+    ParentID => $SubOrganisationID,
+    Number   => $OrgRand.'_sub_sub',
+    Name     => $OrgRand . '_sub_sub Inc',
+    Street   => 'Some Street',
+    Zip      => '12345',
+    City     => 'Some city',
+    Country  => 'USA',
+    Url      => 'http://example.com',
+    Comment  => 'some comment',
+    ValidID  => 1,
+    UserID   => 1,
 );
 
 my $ContactID = '';
@@ -136,6 +164,61 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_' ) {
         $Contact{ValidID},
         1,
         "ContactGet() - ValidID",
+    );
+
+    # check Organisation::VirtuallyAssignContactsToSubOrganisations
+    my $Success = $Helper->ConfigSettingChange(
+        Valid => 1,
+        Key   => 'Organisation::VirtuallyAssignContactsToSubOrganisations',
+        Value => '1',
+    );
+    $Self->True(
+        $Success,
+        "Enable Organisation::VirtuallyAssignContactsToSubOrganisations",
+    );
+
+    %Contact = $ContactObject->ContactGet(
+        ID => $ContactID,
+    );
+    $Self->Is(
+        scalar( @{ $Contact{OrganisationIDs} } ),
+        3,
+        "ContactGet() - length OrganisationIDs",
+    );
+    $Self->IsDeeply(
+        $Contact{OrganisationIDs},
+        [
+            $OrganisationID,
+            $SubOrganisationID,
+            $SubSubOrganisationID,
+        ],
+        "ContactGet() - OrganisationIDs",
+    );
+
+    $Success = $Helper->ConfigSettingChange(
+        Valid => 1,
+        Key   => 'Organisation::VirtuallyAssignContactsToSubOrganisations',
+        Value => '0',
+    );
+    $Self->True(
+        $Success,
+        "Disable Organisation::VirtuallyAssignContactsToSubOrganisations",
+    );
+
+    %Contact = $ContactObject->ContactGet(
+        ID => $ContactID,
+    );
+    $Self->Is(
+        scalar( @{ $Contact{OrganisationIDs} } ),
+        1,
+        "ContactGet() re-test - length OrganisationIDs",
+    );
+    $Self->IsDeeply(
+        $Contact{OrganisationIDs},
+        [
+            $OrganisationID,
+        ],
+        "ContactGet() re-test - OrganisationIDs",
     );
 
     my $Update = $ContactObject->ContactUpdate(

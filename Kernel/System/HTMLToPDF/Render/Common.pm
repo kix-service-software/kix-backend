@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
+# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
@@ -188,7 +188,7 @@ sub _ReplaceSpecialCurrent {
 
     my $Text = $Param{Text};
 
-    if ( $Text =~ m{<Current_(?:Time|Date)>}smx ) {
+    if ( $Text =~ m{<Current_(?:Time|Date).*>}smx ) {
         my @Data = $Kernel::OM->Get('Time')->SystemTime2Date(
             SystemTime => $Kernel::OM->Get('Time')->SystemTime(),
         );
@@ -217,6 +217,19 @@ sub _ReplaceSpecialCurrent {
                     $Value,
                     "DateFormatShort"
                 );
+            }
+            $Text =~ s/$Tag/$Value/gxsm;
+        }
+
+        $Tag = '<Current_DateLong>';
+        if ( $Text =~ m{$Tag}smx ) {
+
+            my @MonthInEN = qw{January February March April May June July August September October November December};
+            my @MonthInDE = qw{Januar Februar März April Mai Juni Juli August September Oktober November Dezember};
+
+            $Value = "$Data[3]. $MonthInEN[$Data[4]-1] $Data[5]";
+            if ( $Param{Translate} ) {
+                $Value = "$Data[3]. $MonthInDE[$Data[4]-1] $Data[5]";
             }
             $Text =~ s/$Tag/$Value/gxsm;
         }

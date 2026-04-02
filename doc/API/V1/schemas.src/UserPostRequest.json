@@ -19,6 +19,12 @@
                         "$ref": "UserPreferencePostItem.json"
                     }
                 },
+                "OutOfOffice": {
+                    "type": "object",
+                    "items": {
+                        "$ref": "OutOfOffice.json"
+                    }
+                },
                 "UserComment": {
                     "type": "string"
                 },
