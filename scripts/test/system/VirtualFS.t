@@ -36,6 +36,11 @@ my @Tests = (
         Preferences => {
             ContentType => 'text/plain',
             ContentID   => '<some_id_xls@example.com>',
+            ArrayKey    => [
+                'Value1',
+                'Value2',
+                'Value3'
+            ]
         },
         FindPreferences => {
             ContentType => 'text/plain',
@@ -168,11 +173,21 @@ for my $Backend (qw( FS DB )) {
 
         # preferences
         for my $Key ( sort keys %{ $Test->{Preferences} } ) {
-            $Self->Is(
-                $File{Preferences}->{$Key},
-                $Test->{Preferences}->{$Key},
-                "$Backend Read() - preferences - $Key - $Test->{Name}",
-            );
+            if ( ref($Test->{Preferences}->{$Key} ) eq 'ARRAY' ) {
+                $Self->IsDeeply(
+                    $File{Preferences}->{$Key},
+                    $Test->{Preferences}->{$Key},
+                    "$Backend Read() - preferences - $Key - $Test->{Name}",
+                    1
+                );
+            }
+            else {
+                $Self->Is(
+                    $File{Preferences}->{$Key},
+                    $Test->{Preferences}->{$Key},
+                    "$Backend Read() - preferences - $Key - $Test->{Name}",
+                );
+            }
         }
 
         # find

@@ -297,6 +297,14 @@ sub CertificateGet {
     $Certificate->{Filename} = $Filename;
     $Certificate->{Filepath} = $Self->{ $File{Preferences}->{Type} }->{Path} . '/' . $Filename;
 
+    # force array for Email
+    if (
+        defined( $Certificate->{Email} )
+        && !IsArrayRef( $Certificate->{Email} )
+    ) {
+        $Certificate->{Email} = [$Certificate->{Email}];
+    }
+
     if (
         defined $Param{Include}
         && $Param{Include} eq 'Content'
@@ -1824,9 +1832,6 @@ sub _FetchAttributes {
     }
 
     # prepare attributes data for use
-    if ( ref $AttributesRef->{Email} eq 'ARRAY' ) {
-        $AttributesRef->{Email} = join ', ', sort @{ $AttributesRef->{Email} };
-    }
     if ( $AttributesRef->{Issuer} ) {
         $AttributesRef->{Issuer} =~ s{=}{= }xmsg;
     }
