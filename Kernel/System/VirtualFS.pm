@@ -13,6 +13,8 @@ package Kernel::System::VirtualFS;
 use strict;
 use warnings;
 
+use Kernel::System::VariableCheck qw(:all);
+
 our @ObjectDependencies = qw(
     Config
     DB
@@ -148,7 +150,22 @@ END
     );
 
     while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
-        $Preferences{ $Row[0] } = $Row[1];
+        if (
+            exists( $Preferences{ $Row[0] } )
+            && !IsArrayRefWithData( $Preferences{ $Row[0] } )
+        ) {
+            # create array if there are multiple attributes
+            my $Value = $Preferences{ $Row[0] };
+            $Preferences{ $Row[0] } = [
+                $Value
+            ];
+        }
+        if ( IsArrayRefWithData($Preferences{ $Row[0] }) ) {
+            push @{$Preferences{ $Row[0] }}, $Row[1];
+        }
+        else {
+            $Preferences{ $Row[0] } = $Row[1];
+        }
     }
 
     # load backend (if not default)
@@ -264,14 +281,25 @@ END
 
     # insert preferences
     for my $Key ( sort keys %{ $Param{Preferences} } ) {
-        return if !$Kernel::OM->Get('DB')->Do(
-            SQL => <<'END',
+        # prepare multiple values
+        my @Values;
+        if ( IsArrayRef($Param{Preferences}->{$Key}) ) {
+            @Values = @{$Param{Preferences}->{$Key}};
+        }
+        else {
+            push @Values, ($Param{Preferences}->{$Key} // '');
+        }
+
+        for my $Value ( @Values ) {
+            return if !$Kernel::OM->Get('DB')->Do(
+                SQL => <<'END',
 INSERT INTO virtual_fs_preferences
     (virtual_fs_id, preferences_key, preferences_value)
 VALUES ( ?, ?, ?)
 END
-            Bind => [ \$FileID, \$Key, \$Param{Preferences}->{$Key} ],
-        );
+                Bind => [ \$FileID, \$Key, \$Value ],
+            );
+        }
     }
 
     # store file
