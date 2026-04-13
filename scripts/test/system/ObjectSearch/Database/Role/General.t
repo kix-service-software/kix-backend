@@ -48,6 +48,13 @@ $Self->IsDeeply(
             IsFulltextable => 0,
             Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
         },
+        Comment => {
+            IsSelectable   => 1,
+            IsSearchable   => 1,
+            IsSortable     => 1,
+            IsFulltextable => 0,
+            Operators      => ['EQ','NE','STARTSWITH','ENDSWITH','CONTAINS','LIKE','IN','!IN']
+        },
         UsageContext => {
             IsSelectable   => 1,
             IsSearchable   => 1,
