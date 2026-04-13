@@ -1473,9 +1473,9 @@ my $Issuer1 = $List[0]->{Issuer};
 my $Issuer2 = $List[2]->{Issuer};
 my $Issuer3 = $List[4]->{Issuer};
 
-my $Email1 = $List[0]->{Email};
-my $Email2 = $List[2]->{Email};
-my $Email3 = $List[4]->{Email};
+my $Email1 = $List[0]->{Email}->[0];
+my $Email2 = $List[2]->{Email}->[0];
+my $Email3 = $List[4]->{Email}->[0];
 
 my $Fingerprint1 = $List[1]->{Fingerprint};
 my $Fingerprint2 = $List[2]->{Fingerprint};
