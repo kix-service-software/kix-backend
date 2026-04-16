@@ -5338,7 +5338,7 @@ DefaultValue:
         "OutputHandler":[
             {
                 "States":[
-                    "new ",
+                    "new",
                     "open",
                     "pending reminder"
                 ],
