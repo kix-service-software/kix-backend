@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
+# Modified version of the work: Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/ 
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -68,12 +68,43 @@ else {
 
 $ExitCode = $CommandObject->Execute( '--mail-account-id', 99999 );
 
-# just check exit code; should be 0 also if no accounts are configured
+# just check exit code; should be 1
 $Self->Is(
     $ExitCode,
     1,
     "Maint::PostMaster::MailAccountFetch exit code for nonexisting mail account",
 );
+
+## KIX2018-11804 ##
+$Kernel::OM->Get('PID')->PIDCreate(
+    Name => $CommandObject->Name(),
+);
+
+my %PIDGet = $Kernel::OM->Get('PID')->PIDGet(
+    Name => $CommandObject->Name(),
+);
+$Self->True(
+    $PIDGet{PID},
+    "Maint::PostMaster::MailAccountFetch PID registered"
+);
+
+$ExitCode = $CommandObject->Execute( '--remove-pid' );
+
+# just check exit code; should be 0
+$Self->Is(
+    $ExitCode,
+    0,
+    "Maint::PostMaster::MailAccountFetch exit code for --remove-pid",
+);
+
+%PIDGet = $Kernel::OM->Get('PID')->PIDGet(
+    Name => $CommandObject->Name(),
+);
+$Self->False(
+    $PIDGet{PID},
+    "Maint::PostMaster::MailAccountFetch PID removed"
+);
+## EO KIX2018-11804 ##
 
 # rollback transaction on database
 $Helper->Rollback();

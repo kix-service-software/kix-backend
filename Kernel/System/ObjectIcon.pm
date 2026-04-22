@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
+# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -61,6 +61,8 @@ sub new {
     $Self->{CacheType} = 'ObjectIcon';
     $Self->{CacheTTL}  = 60 * 60 * 24 * 30;   # 30 days
 
+    $Self->{Config} = $Kernel::OM->Get('Config')->Get('ObjectIcon');
+
     # init of event handler
     $Self->EventHandlerInit(
         Config => 'ObjectIcon::EventModulePost',
@@ -88,7 +90,7 @@ sub ObjectIconGet {
     if ( !$Param{ID} ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => 'Need ClientID!'
+            Message  => 'Need ID!'
         );
         return;
     }
@@ -104,7 +106,7 @@ sub ObjectIconGet {
     my $DBObject = $Kernel::OM->Get('DB');
 
     return if !$DBObject->Prepare(
-        SQL   => "SELECT id, object, object_id, content_type, content, create_by, create_time, change_by, change_time
+        SQL   => "SELECT id, object, object_id, content, content_type, create_by, create_time, change_by, change_time
                   FROM object_icon WHERE id = ?",
         Bind => [ \$Param{ID} ],
     );
@@ -117,8 +119,8 @@ sub ObjectIconGet {
             ID          => $Data[0],
             Object      => $Data[1],
             ObjectID    => $Data[2],
-            ContentType => $Data[3],
-            Content     => $Data[4],
+            Content     => $Data[3],
+            ContentType => $Data[4],
             CreateBy    => $Data[5],
             CreateTime  => $Data[6],
             ChangeBy    => $Data[7],
@@ -168,24 +170,22 @@ sub ObjectIconAdd {
     # check needed stuff
     for (qw(Object ObjectID ContentType Content UserID)) {
         if ( !defined( $Param{$_} ) ) {
-            $Self->{LogObject}->Log( Priority => 'error', Message => "Need $_!" );
+            $Kernel::OM->Get('Log')->Log( Priority => 'error', Message => "Need $_!" );
             return;
         }
     }
 
     return if !$Self->ObjectIconValidate( %Param );
 
-    my $DBObject = $Kernel::OM->Get('DB');
-
     # do the db insert...
-    my $DBInsert = $DBObject->Do(
-        SQL  => "INSERT INTO object_icon (object, object_id, content_type, content, create_by, create_time, change_by, change_time)
+    my $DBInsert = $Kernel::OM->Get('DB')->Do(
+        SQL  => "INSERT INTO object_icon (object, object_id, content, content_type, create_by, create_time, change_by, change_time)
                  VALUES (?, ?, ?, ?, ?, current_timestamp, ?, current_timestamp)",
         Bind => [
             \$Param{Object},
             \$Param{ObjectID},
-            \$Param{ContentType},
             \$Param{Content},
+            \$Param{ContentType},
             \$Param{UserID},
             \$Param{UserID},
         ],
@@ -193,13 +193,7 @@ sub ObjectIconAdd {
 
     #handle the insert result...
     if ($DBInsert) {
-
-        # delete cache
-        $Kernel::OM->Get('Cache')->CleanUp(
-            Type => $Self->{CacheType}
-        );
-
-        return if !$DBObject->Prepare(
+        return if !$Kernel::OM->Get('DB')->Prepare(
             SQL => 'SELECT id FROM object_icon WHERE object = ? AND object_id = ?',
             Bind => [
                 \$Param{Object}, \$Param{ObjectID}
@@ -209,9 +203,19 @@ sub ObjectIconAdd {
 
         # fetch results
         my $ID;
-        while ( my @Row = $DBObject->FetchrowArray() ) {
+        while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
             $ID = $Row[0];
         }
+
+        $Self->_WriteToFS(
+            %Param,
+            ID => $ID
+        );
+
+        # delete cache
+        $Kernel::OM->Get('Cache')->CleanUp(
+            Type => $Self->{CacheType}
+        );
 
         # trigger event
         $Self->EventHandler(
@@ -271,6 +275,12 @@ sub ObjectIconUpdate {
 
     return if !$Self->ObjectIconValidate( %Param );
 
+    # check if icon exists
+    my %Icon = $Self->ObjectIconGet(
+        ID => $Param{ID},
+    );
+    return if !%Icon;
+
     # do the db insert...
     my $DBUpdate = $Kernel::OM->Get('DB')->Do(
         SQL  => "UPDATE object_icon SET object = ?, object_id = ?, content_type = ?, content = ?, change_by = ?, change_time = current_timestamp WHERE id = ?",
@@ -287,6 +297,8 @@ sub ObjectIconUpdate {
     #handle the insert result...
     if ($DBUpdate) {
 
+        $Self->_WriteToFS( %Param );
+
         # delete cache
         $Kernel::OM->Get('Cache')->CleanUp(
             Type => $Self->{CacheType}
@@ -298,7 +310,7 @@ sub ObjectIconUpdate {
             Data  => {
                 ID       => $Param{ID},
                 Object   => $Param{Object},
-                ObjectID => $Param{ObjectID},
+                ObjectID => $Param{ObjectID}
             },
             UserID => $Param{UserID},
         );
@@ -367,7 +379,7 @@ sub ObjectIconList {
     my $DBObject = $Kernel::OM->Get('DB');
 
     return if !$DBObject->Prepare(
-        SQL   => $SQL,
+        SQL   => $SQL . ' ORDER BY id',
         Bind  => \@BindVars,
     );
 
@@ -392,7 +404,8 @@ sub ObjectIconList {
 Delete an objecticon.
 
     my $Result = $ObjectIconObject->ObjectIconDelete(
-        ID      => 123,
+        ID     => 123,
+        UserID => 1,
     );
 
 =cut
@@ -401,7 +414,7 @@ sub ObjectIconDelete {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(ID)) {
+    for (qw(ID UserID)) {
         if ( !$Param{$_} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
@@ -415,6 +428,7 @@ sub ObjectIconDelete {
     my %OldData = $Self->ObjectIconGet(
         ID => $Param{ID},
     );
+    return if !%OldData;
 
     # get database object
     my $DBObject = $Kernel::OM->Get('DB');
@@ -423,6 +437,19 @@ sub ObjectIconDelete {
         SQL  => 'DELETE FROM object_icon WHERE id = ?',
         Bind => [ \$Param{ID} ],
     );
+    
+    my $Success = $Kernel::OM->Get('Main')->FileDelete(
+        Directory       => $Self->{Config}->{Directory},
+        Filename        => $Param{ID},
+        DisableWarnings => 1,
+    );
+    if ( !$Success ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => 'Could not delete object icon ' . $Param{ID} . ' from FS!',
+            Silent   => $Param{Silent}
+        );
+    }
 
     # delete cache
     $Kernel::OM->Get('Cache')->CleanUp(
@@ -454,7 +481,7 @@ sub ObjectIconValidate {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for my $Needed ( qw(Content) ) {
+    for my $Needed ( qw(Content ContentType) ) {
         if ( !IsString( $Param{ $Needed } ) ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
@@ -467,10 +494,16 @@ sub ObjectIconValidate {
 
     # check size
     my $MaxAllowedSize = $Kernel::OM->Get('Config')->Get('ObjectIcon::MaxAllowedSize');
-    my $ContentSize = bytes::length( MIME::Base64::decode_base64( $Param{Content} ) );
+    my $ContentSize;
+    if ( $Param{ContentType} ne 'text' ) {
+        $ContentSize = bytes::length( MIME::Base64::decode_base64( $Param{Content} ) );
+    }
+    else {
+        $ContentSize = bytes::length( $Param{Content} );
+    }
     if ( !$ContentSize ) {
-        $Kernel::OM->Get('Log')->Log( 
-            Priority => 'error', 
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
             Message  => 'Content is empty!',
             Silent   => $Param{Silent}
         );
@@ -478,8 +511,8 @@ sub ObjectIconValidate {
         return;
     }
     elsif ( $ContentSize > $MaxAllowedSize ) {
-        $Kernel::OM->Get('Log')->Log( 
-            Priority => 'error', 
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
             Message  => "Size exceeds maximum allowed size ($MaxAllowedSize bytes)!",
             Silent   => $Param{Silent}
         );
@@ -488,6 +521,49 @@ sub ObjectIconValidate {
     }
 
     return 1;
+}
+
+sub SyncAllToFS {
+    my ( $Self, %Param ) = @_;
+
+    return if !$Kernel::OM->Get('DB')->Prepare(
+        SQL   => 'SELECT id, content_type, content FROM object_icon',
+    );
+
+    # fetch the result
+    while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
+        $Self->_WriteToFS(
+            ID          => $Row[0],
+            ContentType => $Row[1],
+            Content     => $Row[2]
+        );
+    }
+
+    return 1;
+}
+
+sub _WriteToFS {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(ID Content ContentType)) {
+        if ( !defined( $Param{$_} ) ) {
+            $Kernel::OM->Get('Log')->Log( Priority => 'error', Message => "Need $_!" );
+            return;
+        }
+    }
+
+    if ( $Param{ContentType} ne 'text' ) {
+        $Param{Content} = MIME::Base64::decode_base64( $Param{Content} );
+    }
+
+    my $Success = $Kernel::OM->Get('Main')->FileWrite(
+        Directory => $Self->{Config}->{Directory},
+        Filename  => $Param{ID},
+        Content   => \$Param{Content},
+    );
+
+    return $Success;
 }
 
 sub DESTROY {

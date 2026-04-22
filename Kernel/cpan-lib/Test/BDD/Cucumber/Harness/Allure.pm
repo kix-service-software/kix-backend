@@ -36,8 +36,8 @@ sub scenario {
 
     $Self->currentTestId($adapter->NewTest($scenario->{name}, '', $Self->currentContainerId));
     $adapter->SetTestStartTime($Self->currentTestId, $Self->getEpochInMs);
-    $adapter->SetTestPackage($Self->currentTestId, 'Backend Cucumber API Tests');
-    $adapter->SetTestParentSuite($Self->currentTestId, 'Backend Cucumber API Tests');
+    $adapter->SetTestPackage($Self->currentTestId, $ENV{ALLURE_TEST_PACKAGE} || 'Backend API Tests');
+    $adapter->SetTestParentSuite($Self->currentTestId, $ENV{ALLURE_TEST_PACKAGE} || 'Backend API Tests');
     $adapter->SetTestSuite($Self->currentTestId, $Self->current_feature->{object}->{name});
     # $adapter->SetTestSubSuite($Self->currentTestId, $adapter->GetContainerNameById($Self->currentContainerId));
 }

@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
+# Modified version of the work: Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -385,7 +385,7 @@ sub _CollectSystemInfo {
     $Result{TimeZoneOffset} = $TimeZoneObject->offset_for_datetime(DateTime->now);
 
     $Result{CPU} = `lscpu`;
-    $Result{Memory} = `free`;
+    $Result{Memory} = `cat /proc/meminfo`;
 
     return \%Result;
 }
@@ -474,7 +474,7 @@ sub _CollectAPIMetrics {
         foreach my $Line ( @{$Content||[]} ) {
             chomp $Line;
             my @Columns = split /\t/, $Line;
-            next LINE if $Columns[3] < 150;
+            next LINE if $Columns[7] < 150;         # ignore all durations below 150ms
             push @Result, $Line;
         }
     }

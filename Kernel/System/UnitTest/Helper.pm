@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
+# Modified version of the work: Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -594,6 +594,9 @@ sub FixedTimeSet {
 
     $FixedTime = $TimeToSave // CORE::time();
 
+    # reset InMemory cache on changed time
+    delete( $Kernel::OM->Get('Cache')->{Cache} );
+
     return $FixedTime;
 }
 
@@ -607,6 +610,9 @@ sub FixedTimeUnset {
     my ($Self) = @_;
 
     undef $FixedTime;
+
+    # reset InMemory cache on changed time
+    delete( $Kernel::OM->Get('Cache')->{Cache} );
 
     return;
 }
@@ -623,6 +629,10 @@ sub FixedTimeAddSeconds {
 
     return if ( !defined $FixedTime );
     $FixedTime += $SecondsToAdd;
+
+    # reset InMemory cache on changed time
+    delete( $Kernel::OM->Get('Cache')->{Cache} );
+
     return;
 }
 
@@ -641,6 +651,47 @@ sub HTTPRequestOverwriteUnset {
     $HTTPRequestOverwrite = undef;
 
     return;
+}
+
+sub ObjectsDiscard {
+    my ( $Self, %Param ) = @_;
+
+    # process transaction event handler
+    EVENTHANDLERS:
+    for my $EventHandler ( @{ $Kernel::OM->{EventHandlers} } ) {
+        # since the event handlers are weak references,
+        # they might be undef by now.
+        next EVENTHANDLERS if !defined $EventHandler;
+        if ( $EventHandler->EventHandlerHasQueuedTransactions() ) {
+            $EventHandler->EventHandlerTransaction();
+        }
+    }
+
+    my $DatabaseHandle;
+    # when Rollback is used, prevent early rollback
+    if ( $Self->{RollbackDB} ) {
+        # get current handle
+        $DatabaseHandle = $Kernel::OM->Get('DB')->{dbh};
+        
+        # remove handle reference from current object
+        $Kernel::OM->Get('DB')->{dbh} = undef;
+    }
+
+    # discard objects passing given params
+    $Kernel::OM->ObjectsDiscard( %Param );
+
+    # restore database handle
+    if ( $Self->{RollbackDB} ) {
+        $Kernel::OM->Get('DB')->{dbh} = $DatabaseHandle;
+
+        $Kernel::OM->Get('Cache')->CleanUp(
+            Type => $Kernel::OM->Get('SysConfig')->{CacheType},
+        );
+        $Kernel::OM->Get('Config')->{Config} = $Kernel::OM->Get('Config')->GetLocalConfig() || {};
+        $Kernel::OM->Get('Config')->LoadSysConfig();
+    }
+
+    return 1;
 }
 
 # See http://perldoc.perl.org/5.10.0/perlsub.html#Overriding-Built-in-Functions
@@ -727,22 +778,30 @@ sub ConfigSettingChange {
 
     my $Valid = $Param{Valid} // 1;
     my $Key   = $Param{Key};
-    my $Value = $Param{Value};
+    my $Value = $Valid ? $Param{Value} : undef;
 
     die "Need 'Key'" if !defined $Key;
-
-    # set in SysConfig
-    $Kernel::OM->Get('SysConfig')->ValueSet(
-        Name   => $Key,
-        Value  => $Valid ? $Value : undef,
-        UserID => 1,
-        Silent => $Param{Silent},
+    
+    my %OptionData = $Kernel::OM->Get('SysConfig')->OptionGet(
+        Name => $Key,
     );
+    if ( %OptionData ) {
+        my $ValidID = 1;
+        if ( !$Valid ) {
+            $ValidID = 2;
+        }
+        my $Result = $Kernel::OM->Get('SysConfig')->OptionUpdate(
+            %OptionData,
+            Value   => $Value,
+            ValidID => $ValidID,
+            UserID => 1,
+        );
+    }
 
     # set in Config
     $Kernel::OM->Get('Config')->Set(
         Key   => $Param{Key},
-        Value => $Valid ? $Value : undef,
+        Value => $Value,
     );
 
     $Self->{SysConfigChanged} = 1;

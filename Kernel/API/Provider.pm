@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
+# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -144,6 +144,7 @@ sub Run {
     $Webservice = $Kernel::OM->Get('Webservice')->WebserviceGet(
         Name => $Self->{WebserviceName},
     );
+    $Self->{Webservice} = $Webservice;
 
     if ( !IsHashRefWithData($Webservice) ) {
         if ( !$Param{Silent} ) {
@@ -194,12 +195,12 @@ sub Run {
 
     # read request content
     my $ProcessedRequest = $Self->ProcessRequest();
-    
+
     # save for metrics and later use
     $Self->{ProcessedRequest} = $ProcessedRequest;
     $Self->{RequestMethod}    = $Self->{ProcessedRequest}->{RequestMethod};
     $Self->{RequestURI}       = $Self->{ProcessedRequest}->{RequestURI};
-    
+
     if ( $Self->{Debug} && $Self->{LogRequestHeaders} ) {
         use Data::Dumper;
         $Self->_Debug('', "Request Headers: ".Data::Dumper::Dumper($ProcessedRequest->{Headers}));
@@ -266,6 +267,7 @@ sub Run {
                 CurrentRoute            => $ProcessedRequest->{Route},
                 RequestURI              => $ProcessedRequest->{RequestURI},
                 Authorization           => $Self->{Authorization},
+                TransportConfig         => $Self->{TransportConfig},
             );
 
             # if operation init failed, bail out
@@ -281,7 +283,13 @@ sub Run {
                 # don't execute GET operation on collections
                 # (atm we simply check if the OperationType ends with 'Search', that will cover all critical collections so far)
                 # (Serialization is something we need to handle as well here, even if it comes with Pro)
-                if ( $Self->{ProviderConfig}->{Operation}->{$Operation}->{Type} !~ /(Serialization|Search)$/ || $Method ne 'GET' ) {
+                if (
+                    !$Self->{ProviderConfig}->{Operation}->{$Operation}->{NoPermissionCheckRun}
+                    && (
+                        $Self->{ProviderConfig}->{Operation}->{$Operation}->{Type} !~ /(Serialization|Search)$/
+                        || $Method ne 'GET'
+                    )
+                ) {
                     my $OperationResult = $OperationObject->Run(
                         Data                => $ProcessedRequest->{Data},
                         PermissionCheckOnly => 1
@@ -310,11 +318,9 @@ sub Run {
         }
 
         # add information about sub-resources
-        my $CurrentRoute = $ProcessedRequest->{Route};
-        $CurrentRoute = '' if $CurrentRoute eq '/';
-        my @ChildResources = grep(/^$CurrentRoute\/([:a-zA-Z_]+)$/g, values %{$ProcessedRequest->{ResourceOperationRouteMapping}});
-        if ( @ChildResources ) {
-            $Data->{Resources} = \@ChildResources;
+        if ( IsHashRefWithData( $ProcessedRequest->{OptionsRouteMapping} ) ) {
+            my @OptionsRoutes = sort keys %{ $ProcessedRequest->{OptionsRouteMapping} };
+            $Data->{Resources} = \@OptionsRoutes;
         }
 
         if ( $Self->{Debug} && $Self->{LogResponseContent} ) {
@@ -375,6 +381,7 @@ sub Run {
         CurrentRoute                 => $ProcessedRequest->{Route},
         RequestURI                   => $ProcessedRequest->{RequestURI},
         Authorization                => $Self->{Authorization},
+        TransportConfig              => $Self->{TransportConfig},
     );
 
     # if operation init failed, bail out
@@ -450,8 +457,8 @@ sub _GenerateErrorResponse {
 
     $Self->_MetricAdd(
         Metric   => $Param{Metric},
-        Response => $FunctionResult, 
-    );  
+        Response => $FunctionResult,
+    );
 
     return;
 }

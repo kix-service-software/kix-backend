@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 # --
-# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
+# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/ 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE for license information (AGPL). If you
@@ -66,7 +66,8 @@ sub _RemoveSLAPermission {
     );
     if($SLAPermissionID) {
         my $Result = $Kernel::OM->Get('Role')->PermissionDelete(
-            ID => $SLAPermissionID
+            ID     => $SLAPermissionID,
+            UserID => 1,
         );
     }
 
@@ -88,7 +89,8 @@ sub _RemoveSLAPermission {
     );
     if($SLAPermissionID) {
         $SLAPermissionID = $Kernel::OM->Get('Role')->PermissionDelete(
-            ID => $SLAPermissionID
+            ID     => $SLAPermissionID,
+            UserID => 1,
         );
     }
 

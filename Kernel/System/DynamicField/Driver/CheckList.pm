@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
+# Modified version of the work: Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -180,10 +180,10 @@ sub HTMLDisplayValueRender {
         my $Items = $Self->_GetChecklistRows(Items => $ChecklistItems);
 
         if (IsArrayRefWithData($Items)) {
-            $Value .= '<table style="border:none; width:90%">'
-                . '<thead><tr>'
-                    . '<th style="padding:10px 15px;">Action</th>'
-                    . '<th style="padding:10px 15px;">State</th>'
+            $Value .= '<table style="border:none; border-collapse: collapse; width:90%">'
+                . '<thead><tr style="background: lightgrey; font-weight: bold;">'
+                    . '<th style="border:1px solid; padding:10px 15px;">Action</th>'
+                    . '<th style="border:1px solid; padding:10px 15px;">State</th>'
                 . '<tr></thead>'
                 . '<tbody>';
 
@@ -191,8 +191,8 @@ sub HTMLDisplayValueRender {
                 my $ItemValue = $Item->{Value};
                 $ItemValue =~ s/\n/<br \/>/gxsm;
                 $Value .= '<tr>'
-                    . '<td style="padding:10px 15px;">' . $Item->{Title} . '</td>'
-                    . '<td style="padding:10px 15px;">' . $ItemValue . '</td>'
+                    . '<td style="border:1px solid; padding:10px 15px;">' . $Item->{Title} . '</td>'
+                    . '<td style="border:1px solid; padding:10px 15px;">' . $ItemValue . '</td>'
                     . '</tr>';
             }
 

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
+# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -369,7 +369,7 @@ sub _OperationEMPTY {
             if ( $Value ) {
                 if (
                     !$Param{ValueType}
-                    || $Param{ValueType} eq 'STRING'
+                    || $Param{ValueType} eq 'TEXTUAL'
                 ) {
                     push( @Conditions, ( $Column . ' = \'\'' ) );
                 }
@@ -382,7 +382,7 @@ sub _OperationEMPTY {
                 my $Condition = q{};
                 if (
                     !$Param{ValueType}
-                    || $Param{ValueType} eq 'STRING'
+                    || $Param{ValueType} eq 'TEXTUAL'
                 ) {
                     $Condition .= $Column . ' != \'\'';
                 }

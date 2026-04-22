@@ -70,4 +70,37 @@
         </Setting>
     </ConfigItem>
 
+    <ConfigItem AccessLevel="internal" Name="KIXMobileApp::WorkReport::External::Default" Required="0" Valid="1">
+        <Description Translatable="1">Defines the structure of external work reports created by the KIX Field Agent App when a ticket assignment is closed. If empty or invalid the app uses an internal fallback.</Description>
+        <Group>KIXMobileApp</Group>
+        <SubGroup>WorkReport</SubGroup>
+        <Context>mobile-app</Context>
+        <Setting>
+            <Hash>
+                <Item Key="HtmlTemplate">
+                    <Hash>
+                        <Item Key="de"></Item>
+                        <Item Key="en"></Item>
+                    </Hash>
+                </Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+    <ConfigItem AccessLevel="internal" Name="KIXMobileApp::WorkReport::Internal::Default" Required="0" Valid="1">
+        <Description Translatable="1">Defines the structure of internal work reports created by the KIX Field Agent App when a ticket assignment is closed. If empty or invalid the app uses an internal fallback.</Description>
+        <Group>KIXMobileApp</Group>
+        <SubGroup>WorkReport</SubGroup>
+        <Context>mobile-app</Context>
+        <Setting>
+            <Hash>
+                <Item Key="HtmlTemplate">
+                    <Hash>
+                        <Item Key="de"></Item>
+                        <Item Key="en"></Item>
+                    </Hash>
+                </Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
 </kix_config>

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
+# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/ 
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -29,20 +29,29 @@ $Helper->ConfigSettingChange(
 );
 
 my $ValidData = {
-    Content => MIME::Base64::encode_base64('1234567890')
+    ObjectIcon => {
+        Content     => MIME::Base64::encode_base64('1234567890'),
+        ContentType => 'text/plain'
+    }
 };
 
 my $InvalidData = {
-    Content => MIME::Base64::encode_base64('12345678901')
+    ObjectIcon => {
+        Content     => MIME::Base64::encode_base64('12345678901'),
+        ContentType => 'text/plain'
+    }
 };
 
 my $EmptyData = {
-    Content => ''
+    ObjectIcon => {
+        Content     => '',
+        ContentType => 'text'
+    }
 };
 
 # validate valid ObjectIcon
 my $Result = $ValidatorObject->Validate(
-    Attribute => 'Content',
+    Attribute => 'ObjectIcon',
     Data      => $ValidData,
 );
 
@@ -53,7 +62,7 @@ $Self->True(
 
 # validate invalid ObjectIcon
 $Result = $ValidatorObject->Validate(
-    Attribute => 'Content',
+    Attribute => 'ObjectIcon',
     Data      => $InvalidData,
 );
 $Self->False(
@@ -77,7 +86,7 @@ $Helper->ConfigSettingChange(
 
 # validate invalid ObjectIcon
 $Result = $ValidatorObject->Validate(
-    Attribute => 'Content',
+    Attribute => 'ObjectIcon',
     Data      => $InvalidData,
 );
 
@@ -88,7 +97,7 @@ $Self->True(
 
 # validate empty ObjectIcon
 $Result = $ValidatorObject->Validate(
-    Attribute => 'Content',
+    Attribute => 'ObjectIcon',
     Data      => $EmptyData,
 );
 

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
+# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -10,6 +10,8 @@ package Kernel::System::Role;
 
 use strict;
 use warnings;
+
+use base qw(Kernel::System::EventHandler);
 
 use base qw(
     Kernel::System::Role::Permission
@@ -65,6 +67,11 @@ sub new {
 
     $Self->{CacheType} = 'Role';
     $Self->{CacheTTL}  = 60 * 60 * 24 * 20;
+
+    # init of event handler
+    $Self->EventHandlerInit(
+        Config => 'Role::EventModulePost',
+    );
 
     return $Self;
 }
@@ -274,6 +281,15 @@ sub RoleAdd {
         Type => $Self->{CacheType}
     );
 
+    # event
+    $Self->EventHandler(
+        Event => 'RoleAdd',
+        Data  => {
+            RoleID => $RoleID,
+        },
+        UserID => $Param{UserID},
+    );
+
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'CREATE',
@@ -362,6 +378,16 @@ sub RoleUpdate {
         Type => ( $Param{ValidID} && $RoleData{ValidID} != $Param{ValidID} ) ? undef : $Self->{CacheType}
     );
 
+    # event
+    $Self->EventHandler(
+        Event => 'RoleUpdate',
+        Data  => {
+            RoleID  => $Param{ID},
+            OldData => \%RoleData
+        },
+        UserID => $Param{UserID},
+    );
+
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'UPDATE',
@@ -446,7 +472,8 @@ sub RoleList {
 delete a role
 
     my $Success = $RoleObject->RoleDelete(
-        ID => 123,
+        ID     => 123,
+        UserID => 123
     );
 
 =cut
@@ -455,7 +482,7 @@ sub RoleDelete {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(ID)) {
+    for (qw(ID UserID)) {
         if ( !$Param{$_} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
@@ -473,6 +500,15 @@ sub RoleDelete {
 
     # cleanup whole cache
     $Kernel::OM->Get('Cache')->CleanUp();
+
+    # event
+    $Self->EventHandler(
+        Event => 'RoleDelete',
+        Data  => {
+            RoleID => $Param{ID},
+        },
+        UserID => $Param{UserID},
+    );
 
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(

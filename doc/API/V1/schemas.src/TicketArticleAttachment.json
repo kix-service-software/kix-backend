@@ -17,6 +17,10 @@
          "type": "string",
          "readOnly": true
       },
+      "ContentToken": {
+         "type": "string",
+         "readOnly": true
+      },
       "ContentType": {
          "type": "string",
          "readOnly": true
@@ -45,6 +49,7 @@
    "required" : [
       "ContentAlternative",
       "ContentID",
+      "ContentToken",
       "ContentType",
       "Disposition",
       "Filename",

@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
+# Modified version of the work: Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -222,23 +222,34 @@ sub ArticleCreate {
 
         # process html article
         if ( $Param{MimeType} =~ /text\/html/i ) {
+            my %Safe = $Kernel::OM->Get('HTMLUtils')->Safety(
+                String       => $Param{Body},
+                NoApplet     => 1,
+                NoObject     => 1,
+                NoEmbed      => 1,
+                NoSVG        => 1,
+                NoImg        => 0,
+                NoIntSrcLoad => 0,
+                NoExtSrcLoad => 0,
+                NoJavaScript => 1,
+            );
 
             # add html article as attachment
             my $Attach = {
-                Content     => $Param{Body},
+                Content     => $Safe{String},
                 ContentType => "text/html; charset=\"$Param{Charset}\"",
                 Filename    => 'file-2',
             };
             push @AttachmentConvert, $Attach;
 
             # save HTML body for later use
-            $Param{HTMLBody} = $Param{Body};
+            $Param{HTMLBody} = $Safe{String};
 
             # get ascii body
             $Param{MimeType} = 'text/plain';
             $Param{ContentType} =~ s/html/plain/i;
             $Param{Body} = $HTMLUtilsObject->ToAscii(
-                String            => $Param{Body},
+                String            => $Safe{String},
                 NoForcedLinebreak => 1
             );
         }
@@ -1610,7 +1621,8 @@ sub ArticleGet {
     if ( !$Param{ArticleID} && !$Param{TicketID} ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => 'Need ArticleID or TicketID!'
+            Message  => 'Need ArticleID or TicketID!',
+            Silent   => $Param{Silent}
         );
         return;
     }
@@ -1864,6 +1876,7 @@ sub ArticleGet {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "No such article for ArticleID ($Param{ArticleID})!",
+                Silent   => $Param{Silent}
             );
         }
 
@@ -2397,7 +2410,7 @@ sub ArticleFlagSet {
     return 1 if defined $Flag{ $Param{Key} } && $Flag{ $Param{Key} } eq $Param{Value};
 
     my $UserID = $Param{UserID};
-    if ( $Param{Key} =~ /^(?:SMIME|NotSend|RetryEncrypt)/smx ) {
+    if ( $Param{Key} =~ /^(?:SMIME|NotSent|RetryEncrypt)/smx ) {
         $UserID = 1;
     }
 
@@ -2410,14 +2423,14 @@ sub ArticleFlagSet {
                 INSERT INTO article_flag
                 (article_id, article_key, article_value, create_time, create_by)
                 VALUES (?, ?, ?, current_timestamp, ?)',
-            Bind => [ \$Param{ArticleID}, \$Param{Key}, \$Param{Value}, \$Param{UserID} ],
+            Bind => [ \$Param{ArticleID}, \$Param{Key}, \$Param{Value}, \$UserID ],
         );
     }
     else {
         return if !$DBObject->Do(
             SQL => 'UPDATE article_flag SET article_value = ?, create_time = current_timestamp
                     WHERE article_id = ? AND article_key = ? AND create_by = ?',
-            Bind => [ \$Param{Value}, \$Param{ArticleID}, \$Param{Key}, \$Param{UserID} ],
+            Bind => [ \$Param{Value}, \$Param{ArticleID}, \$Param{Key}, \$UserID ],
         );
     }
 
@@ -2688,7 +2701,7 @@ sub ArticleFlagGet {
         );
 
         while ( my @Row = $DBObject->FetchrowArray() ) {
-            next if ( $Row[0] !~ /^(?:SMIME|NotSend|RetryEncrypt)/smx );
+            next if ( $Row[0] !~ /^(?:SMIME|NotSent|RetryEncrypt)/smx );
             $Flag{ $Row[0] } = $Row[1];
         }
     }

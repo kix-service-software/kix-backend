@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
+# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -109,6 +109,27 @@ sub Run {
             return $Self->_Error(
                 Code => 'Object.NotFound'
             );
+        }
+
+        # include SubOrganisations if requested
+        if ( $Param{Data}->{include}->{SubOrganisations} ) {
+            my @OrganisationIDs = $Kernel::OM->Get('ObjectSearch')->Search(
+                ObjectType => 'Organisation',
+                Result     => 'ARRAY',
+                Search     => {
+                    AND => [
+                        { "Field" => "ParentID", "Operator" => "EQ", "Value" => $ID }
+                    ]
+                },
+                UserType   => $Self->{Authorization}->{UserType},
+                UserID     => $Self->{Authorization}->{UserID},
+            );
+
+            # force numeric IDs
+            foreach my $Value ( @OrganisationIDs ) {
+                $Value = 0 + $Value;
+            }
+            $OrganisationData{SubOrganisations} = \@OrganisationIDs;
         }
 
         if ( $Param{Data}->{include}->{DynamicFields} ) {

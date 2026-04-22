@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
+# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
@@ -557,7 +557,7 @@ END
     #     # consider only test articles
     #     ObjectIDList => [ $TestData{EnglishFAQID}, $TestData{GermanFAQID} ]
     # );
-    my @EnglishArticleIDList = $Kernel::OM->Get('ObjectSearch')->Search(
+    @EnglishArticleIDList = $Kernel::OM->Get('ObjectSearch')->Search(
         ObjectType => 'FAQArticle',
         Result     => 'ARRAY',
         UserID     => 1,

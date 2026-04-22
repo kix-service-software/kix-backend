@@ -30,4 +30,13 @@ Feature: POST request /contacts resource
     Then the response code is 204
     And the response has no content
 
-
+  Scenario: added a contact with umlauts
+    Given a organisation
+    When added a contact with umlauts
+    Then the response code is 201
+    Then the response object is ContactPostPatchResponse
+    When I delete this contact
+    Then the response code is 204
+    When I delete this organisation
+    Then the response code is 204
+    And the response has no content

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
+# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -110,47 +110,23 @@ sub Run {
         || !$UserLogin
     );
 
-    # get preference OutOfOfficeSubstitute of user
-    my %Preferences = $Kernel::OM->Get('User')->GetPreferences(
-        UserID => $UserID,
+    # get OutOfOfficeSubstitute of user
+    my %UserData = $Kernel::OM->Get('User')->GetUserData(
+        UserID => $UserID
     );
     return if (
-        !%Preferences
-        || !$Preferences{OutOfOfficeSubstitute}
+        !%UserData
+        || !$UserData{OutOfOfficeSubstitute}
     );
 
     # get substitute contact data
     my %SubstituteUserContact = $Kernel::OM->Get('Contact')->ContactGet(
-        UserID => $Preferences{OutOfOfficeSubstitute},
+        UserID => $UserData{OutOfOfficeSubstitute},
     );
     return if (
         !%SubstituteUserContact
         || !$SubstituteUserContact{Email}
     );
-
-    # prepare notification body
-    if ( $Preferences{OutOfOfficeSubstituteNote} ) {
-        if (
-            $Notification{ContentType}
-            && $Notification{ContentType} eq 'text/html'
-        ) {
-            $Notification{Body} = $Kernel::OM->Get('HTMLUtils')->DocumentStrip(
-                String => $Notification{Body},
-            );
-            $Notification{Body} = $Preferences{OutOfOfficeSubstituteNote}
-                . "<br/>**********************************************************************<br/><br/>"
-                . $Notification{Body};
-            $Notification{Body} = $Kernel::OM->Get('HTMLUtils')->DocumentComplete(
-                String  => $Notification{Body},
-                Charset => 'utf-8',
-            );
-        }
-        else {
-            $Notification{Body} = $Preferences{OutOfOfficeSubstituteNote}
-                . "\n**********************************************************************\n\n"
-                . $Notification{Body};
-        }
-    }
 
     $Kernel::OM->Get('Log')->Log(
         Priority => 'notice',

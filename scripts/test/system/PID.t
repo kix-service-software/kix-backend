@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
+# Modified version of the work: Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/ 
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -35,7 +35,7 @@ $Self->True(
 my $PIDCreate2 = $PIDObject->PIDCreate( Name => 'Test' );
 $Self->False(
     $PIDCreate2,
-    'PIDCreate2()',
+    'PIDCreate()',
 );
 
 my %PIDGet = $PIDObject->PIDGet( Name => 'Test' );
@@ -158,6 +158,39 @@ $Self->False(
     $UpdatedPIDGet{PID},
     'PIDGet() for forced delete (PID should be deleted now)',
 );
+
+## KIX2018-11804 ##
+# 0 init variables
+my $Name    = 'Test';
+my $FakePID = '30000';
+
+# 1 create a new PIDEntry
+my $PIDCreate4 = $PIDObject->PIDCreate( Name => $Name );
+$Self->True(
+    $PIDCreate4,
+    'PIDCreate() for process check',
+);
+
+# 2 set fake PID in DB
+$UpdateSuccess = $Kernel::OM->Get('DB')->Do(
+    SQL => '
+        UPDATE process_id
+        SET process_id = ?
+        WHERE process_name = ?',
+    Bind => [ \$FakePID, \$Name ],
+);
+$Self->True(
+    $UpdateSuccess,
+    'Updated PID for process check',
+);
+
+# 3 create a new PIDEntry
+my $PIDRecreate4 = $PIDObject->PIDCreate( Name => $Name );
+$Self->True(
+    $PIDRecreate4,
+    'PIDCreate() for process check (Nonexisting PID should be ignored)',
+);
+## EO KIX2018-11804 ##
 
 # rollback transaction on database
 $Helper->Rollback();

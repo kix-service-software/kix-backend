@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 # --
-# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/ 
+# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE for license information (AGPL). If you
@@ -78,7 +78,8 @@ sub _AddMobileProcessingStateResetJob {
 
         # removed created execution plan
         $AutomationObject->ExecPlanDelete(
-            ID => $ExecPlanID,
+            ID     => $ExecPlanID,
+            UserID => 1
         );
         return;
     }
@@ -151,14 +152,17 @@ sub _AddMobileProcessingStateResetJob {
         # removed created actions, macro and execution plan
         for my $ActionID ( @ActionIDs ) {
             $AutomationObject->MacroActionDelete(
-                ID => $ActionID,
+                ID     => $ActionID,
+                UserID => 1
             );
         }
         $AutomationObject->MacroDelete(
-            ID => $MacroID,
+            ID     => $MacroID,
+            UserID => 1
         );
         $AutomationObject->ExecPlanDelete(
-            ID => $ExecPlanID,
+            ID     => $ExecPlanID,
+            UserID => 1
         );
         return;
     }

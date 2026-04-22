@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
+# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -16,6 +16,7 @@ use Time::HiRes qw(time);
 use Kernel::System::VariableCheck qw(:all);
 
 use base qw(
+    Kernel::System::EventHandler
     Kernel::System::Automation::ExecPlan
     Kernel::System::Automation::Job
     Kernel::System::Automation::Macro
@@ -103,6 +104,11 @@ sub new {
 
         $Self->{LogHandler}->{$Type} = $HandlerObject;
     }
+
+    # init of event handler
+    $Self->EventHandlerInit(
+        Config => 'Automation::EventModulePost',
+    );
 
     return $Self;
 }

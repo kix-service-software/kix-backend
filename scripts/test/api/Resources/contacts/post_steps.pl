@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
+# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
@@ -210,4 +210,21 @@ When qr/added a contact with a login that already exists$/, sub {
    );
 };
 
-
+When qr/added a contact with umlauts$/, sub {
+   ( S->{Response}, S->{ResponseContent} ) = _Post(
+      URL     => S->{API_URL}.'/contacts',
+      Token   => S->{Token},
+      Content => {
+         Contact => {
+            Email => "info\@schröder.de",
+            Firstname => "Max",
+            Lastname => "Schröder",
+            Login => "masch",
+            OrganisationIDs => [
+                S->{OrganisationID}
+            ],
+            PrimaryOrganisationID => S->{OrganisationID}
+         }
+      }
+   );
+};

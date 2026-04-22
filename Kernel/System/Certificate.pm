@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
+# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-AGPL for license information (AGPL). If you
@@ -10,6 +10,8 @@ package Kernel::System::Certificate;
 
 use strict;
 use warnings;
+
+use base qw(Kernel::System::EventHandler);
 
 our @ObjectDependencies = qw(
     Cache
@@ -56,6 +58,11 @@ sub new {
 
     return 0 if !$Self->_Init();
 
+    # init of event handler
+    $Self->EventHandlerInit(
+        Config => 'Certificate::EventModulePost',
+    );
+
     return $Self;
 }
 
@@ -71,9 +78,10 @@ create a local certificate
             ContentType => 'application/pcks7-mime'
             Filename    => 'some name'
         },
-        Type       => 'Cert'            # required
-        Passphrase => 'some secret'     # required, if type Private
-        CType      => 'SMIME'           # required
+        Type       => 'Cert',            # required
+        Passphrase => 'some secret',     # required, if type Private
+        CType      => 'SMIME',           # required
+        UserID     => 123                # required
     );
 
     return certificate id
@@ -159,11 +167,21 @@ sub CertificateCreate {
     return if !$Self->_WriteCertificate(
         Type    => $Preferences{Type},
         Content => $Content,
-        ID      => $FileID
+        ID      => $FileID,
+        UserID  => $Param{UserID}
     );
 
     # delete cache
     $Self->_CacheCleanUp();
+
+    # event
+    $Self->EventHandler(
+        Event => 'CertificateCreate',
+        Data  => {
+            ID => $FileID,
+        },
+        UserID => $Param{UserID},
+    );
 
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
@@ -322,7 +340,8 @@ sub CertificateGet {
 removes the certificate/private key in the file system and db-storage
 
     my $Success = $CertificateObject->CertificateDelete(
-        ID => 1
+        ID     => 1,
+        UserID => 123
     );
 
 =cut
@@ -330,13 +349,15 @@ removes the certificate/private key in the file system and db-storage
 sub CertificateDelete {
     my ( $Self, %Param ) = @_;
 
-    if ( !$Param{ID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "Need ID!",
-            Silent   => $Param{Silent}
-        );
-        return;
+    for my $Needed ( qw(ID UserID) ) {
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $Needed!",
+                Silent   => $Param{Silent}
+            );
+            return;
+        }
     }
 
     my %File = $Kernel::OM->Get('VirtualFS')->Read(
@@ -408,6 +429,15 @@ sub CertificateDelete {
 
     # delete cache
     $Self->_CacheCleanUp();
+
+    # event
+    $Self->EventHandler(
+        Event => 'CertificateDelete',
+        Data  => {
+            ID => $Param{ID},
+        },
+        UserID => $Param{UserID},
+    );
 
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
@@ -592,7 +622,8 @@ sub CertificateToFS {
             Content  => $Certificate->{Content},
             ID       => $ID,
             NoDelete => 1,
-            Silent   => $Debug
+            Silent   => $Debug,
+            UserID   => $Param{UserID}
         );
 
     }
@@ -844,7 +875,10 @@ sub Encrypt {
         next RECIPIENT if !$Param{$Recipient};
         for my $Email ( Email::Address::XS->parse($Param{$Recipient}) ) {
             my $EmailAddress = $Email->address();
-            if ( $EmailAddress !~ /$Param{IgnoreEmailPattern}/gix ) {
+            if (
+                $EmailAddress
+                && $EmailAddress !~ /$Param{IgnoreEmailPattern}/gix
+            ) {
                 push(@ToArray, $EmailAddress);
             }
         }
@@ -1335,6 +1369,13 @@ sub Sign {
     foreach my $MailAddress (@ParsedMailAddresses) {
         $From = $MailAddress->address;
     }
+    if ( !$From ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'debug',
+            Message  => "Impossible to sign: invalid mail address $Param{From}!"
+        );
+        return;
+    }
 
     my $CurrTime = $Kernel::OM->Get('Time')->CurrentTimestamp();
 
@@ -1516,7 +1557,7 @@ writes certificates / private keys to the file system
 sub _WriteCertificate {
     my ( $Self,%Param ) = @_;
 
-    for my $Needed ( qw(ID Type Content) ) {
+    for my $Needed ( qw(ID UserID Type Content) ) {
         if ( !$Param{$Needed} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
@@ -1553,6 +1594,7 @@ sub _WriteCertificate {
         if ( !$Param{NoDelete} ) {
             $Self->CertificateDelete(
                 ID     => $Param{ID},
+                UserID => $Param{UserID},
                 Silent => $Param{Silent}
             );
         }
@@ -1570,7 +1612,7 @@ checks the given certificate/private key, if all needed parameters are exists
 sub _CheckCertificate {
     my ( $Self, %Param ) = @_;
 
-    for my $Needed ( qw(File Type CType) ) {
+    for my $Needed ( qw(File Type CType UserID) ) {
         if ( !$Param{$Needed} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',

@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
+# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -201,18 +201,21 @@ sub PermissionTypeLookup {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(Name)) {
-        if ( !$Param{$_} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need $_!"
-            );
-            return;
-        }
+    if (
+        !$Param{ID}
+        && !$Param{Name}
+    ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Need ID or Name!"
+        );
+        return;
     }
 
     # create cache key
-    my $CacheKey = 'PermissionTypeLookup::' . $Param{Name};
+    my $CacheKey = 'PermissionTypeLookup'
+        . ( $Param{Name} ? "::$Param{Name}" : q{} )
+        . ( $Param{ID} ? "::$Param{ID}" : q{} );
 
     # read cache
     my $Cache = $Kernel::OM->Get('Cache')->Get(
@@ -221,11 +224,25 @@ sub PermissionTypeLookup {
     );
     return $Cache if $Cache;
 
+    my @SQL = ('SELECT');
+    if ( $Param{Name} ) {
+        push( @SQL, 'id' );
+    } else {
+        push( @SQL, 'name' );
+    }
+
+    my @Bind;
+    if ( $Param{Name} ) {
+        push( @SQL , 'FROM permission_type WHERE name = ?' );
+        push( @Bind, \$Param{Name} );
+    } else {
+        push( @SQL , 'FROM permission_type WHERE id = ?' );
+        push( @Bind, \$Param{ID} );
+    }
+
     return if !$Kernel::OM->Get('DB')->Prepare(
-        SQL  => 'SELECT id FROM permission_type WHERE name = ?',
-        Bind => [
-            \$Param{Name},
-        ]
+        SQL  => join( q{ }, @SQL ),
+        Bind => \@Bind
     );
 
     my $Result;
@@ -485,7 +502,7 @@ sub PermissionAdd {
     return if !$Kernel::OM->Get('DB')->Do(
         SQL => 'UPDATE roles SET '
             . 'change_time = current_timestamp, change_by = ? WHERE id = ?',
-        Bind => [            
+        Bind => [
             \$Param{UserID}, \$Param{RoleID}
         ],
     );
@@ -505,6 +522,16 @@ sub PermissionAdd {
 
     # delete whole cache
     $Kernel::OM->Get('Cache')->CleanUp();
+
+    # event
+    $Self->EventHandler(
+        Event => 'RolePermissionAdd',
+        Data  => {
+            ID     => $ID,
+            RoleID => $Param{RoleID},
+        },
+        UserID => $Param{UserID},
+    );
 
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
@@ -611,13 +638,24 @@ sub PermissionUpdate {
     return if !$Kernel::OM->Get('DB')->Do(
         SQL => 'UPDATE roles SET '
             . 'change_time = current_timestamp, change_by = ? WHERE id = ?',
-        Bind => [            
+        Bind => [
             \$Param{UserID}, \$Data{RoleID}
         ],
-    );    
+    );
 
     # delete whole cache
     $Kernel::OM->Get('Cache')->CleanUp();
+
+    # event
+    $Self->EventHandler(
+        Event => 'RolePermissionUpdate',
+        Data  => {
+            ID      => $Param{ID},
+            RoleID  => $Data{RoleID},
+            OldData => \%Data,
+        },
+        UserID => $Param{UserID},
+    );
 
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
@@ -772,7 +810,8 @@ sub PermissionListGet {
 delete a permission entry
 
     my $Success = $RoleObject->PermissionDelete(
-        ID => 123,
+        ID     => 123,
+        UserID => 123,
     );
 
 =cut
@@ -781,7 +820,7 @@ sub PermissionDelete {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    for (qw(ID)) {
+    for (qw(ID UserID)) {
         if ( !$Param{$_} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
@@ -804,6 +843,17 @@ sub PermissionDelete {
 
     # delete whole cache
     $Kernel::OM->Get('Cache')->CleanUp();
+
+    # event
+    $Self->EventHandler(
+        Event => 'RolePermissionDelete',
+        Data  => {
+            ID      => $Param{ID},
+            RoleID  => $Data{RoleID},
+            OldData => \%Data,
+        },
+        UserID => $Param{UserID},
+    );
 
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
@@ -904,7 +954,7 @@ sub ValidatePermission {
 
     if ( $PermissionTypeList{$Param{TypeID}} eq 'Object' ) {
         # check if the target contains a filter expression and the pattern matches the required format
-        if ( $Param{Target} !~ /^.*?\{(\w+)\.(\w+)\s+!?(\w+)\s+(.*?)\}$/ && $Param{Target} !~ /^.*?\{\}$/ ) {
+        if ( $Param{Target} !~ /^.*?\{(\w+)\.(\w+)(:\w+)?\s+!?(\w+)\s+(.*?)\}$/ && $Param{Target} !~ /^.*?\{\}$/ ) {
             return;
         }
     } elsif ( $PermissionTypeList{$Param{TypeID}} eq 'Property' ) {

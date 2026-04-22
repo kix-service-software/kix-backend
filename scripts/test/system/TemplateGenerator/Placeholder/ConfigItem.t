@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2025 KIX Service Software GmbH, https://www.kixdesk.com/
+# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -263,6 +263,105 @@ my @Tests = (
         ],
         Translate => 1
     },
+    {
+        Name => 'KIX_ASSET_CurrentVersion & Data',
+        Data => {
+            Version => {
+                Name    => 'SomeTest',
+                XMLData => [
+                    undef,
+                    {
+                        TagKey  => '[1]',
+                        Version => [
+                            undef,
+                            {
+                                SomeAttribute => [
+                                    undef,
+                                    {
+                                        Content => 'SomeValue1',
+                                        SubAttribute => [
+                                            undef,
+                                            {
+                                                Content => 'SomeValue1-1',
+                                                TagKey  => '[1]{\'Version\'}[1]{\'SomeAttribute\'}[1]{\'SomeSubAttribute\'}[1]'
+
+                                            }
+                                        ],
+                                        TagKey  => '[1]{\'Version\'}[1]{\'SomeAttribute\'}[1]'
+                                    },
+                                    {
+                                        Content => 'SomeValue2',
+                                        SubAttribute => [
+                                            undef,
+                                            {
+                                                Content => 'SomeValue2-1',
+                                                TagKey  => '[1]{\'Version\'}[1]{\'SomeAttribute\'}[2]{\'SomeSubAttribute\'}[1]'
+
+                                            },
+                                            {
+                                                Content => 'SomeValue2-2',
+                                                TagKey  => '[1]{\'Version\'}[1]{\'SomeAttribute\'}[2]{\'SomeSubAttribute\'}[2]'
+                                            }
+                                        ],
+                                        OtherSubAttribute => [
+                                            undef,
+                                            {
+                                                Content => 'OtherValue2-1',
+                                                TagKey  => '[1]{\'Version\'}[1]{\'SomeAttribute\'}[2]{\'SomeSubAttribute\'}[1]'
+
+                                            },
+                                        ],
+                                        TagKey  => '[1]{\'Version\'}[1]{\'SomeAttribute\'}[2]'
+                                    }
+                                ],
+                                TagKey => '[1]{\'Version\'}[1]'
+                            }
+                        ]
+                    }
+                ],
+                XMLDefinition => [
+                    {
+                        CountMax => 2,
+                        Key   => 'SomeAttribute',
+                        Name  => 'Some attribute',
+                        Input => {
+                            Type => 'Text'
+                        },
+                        Sub => [
+                            {
+                                CountMax => 3,
+                                Key   => 'SubAttribute',
+                                Name  => 'Sub attribute',
+                                Input => {
+                                    Type => 'Text'
+                                }
+                            },
+                            {
+                                CountMax => 3,
+                                Key   => 'OtherSubAttribute',
+                                Name  => 'Other sub attribute',
+                                Input => {
+                                    Type => 'Text'
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        Texts   => [
+            '<KIX_ASSET_CurrentVersion_Name>',
+            '<KIX_ASSET_CurrentVersion_Data_SomeAttribute>',
+            '<KIX_ASSET_CurrentVersion_Data_SubAttribute>',
+            '<KIX_ASSET_CurrentVersion_Data_OtherSubAttribute>'
+        ],
+        Results => [
+            'SomeTest',
+            'SomeValue1',
+            'SomeValue1-1',
+            'OtherValue2-1'
+        ],
+    },
 );
 
 for my $Test (@Tests) {
@@ -483,6 +582,62 @@ if ($ResultData->{ReplaceCIID}) {
                     $ResultData->{Now}, 'DateFormat', 'NoSeconds'
                 ),
                 Translation => 1
+            },
+            # current version test
+            {
+                Name   => 'KIX_ASSET_CurrentVersion_Name',
+                Text   => 'Name: <KIX_ASSET_CurrentVersion_Name>',
+                Result => 'Name: ReplaceCI'
+            },
+            {
+                Name   => 'KIX_ASSET_CurrentVersion_CurDeplState',
+                Text   => 'DeplState: <KIX_ASSET_CurrentVersion_CurDeplState>',
+                Result => 'DeplState: Production'
+            },
+            {
+                Name   => 'KIX_ASSET_CurrentVersion_Data_ Contact attribute',
+                Text   => 'Contact: <KIX_ASSET_CurrentVersion_Data_OwnerContact>',
+                Result => "Contact: $ContactValue->[0]"
+            },
+            {
+                Name   => 'KIX_ASSET_CurrentVersion_Data_ Orga attribute',
+                Text   => 'Orga: <KIX_ASSET_CurrentVersion_Data_OwnerOrganisation>',
+                Result => "Orga: $Data{Organisation}"
+            },
+            {
+                Name   => 'KIX_ASSET_CurrentVersion_Data_ Contact attribute',
+                Text   => 'Contact: <KIX_ASSET_CurrentVersion_Data_OwnerContact>',
+                Result => "Contact: $ContactValue->[0]"
+            },
+            {
+                Name   => 'KIX_ASSET_CurrentVersion_Data_ GeneralCatalog attribute',
+                Text   => 'GeneralCatalog: <KIX_ASSET_CurrentVersion_Data_NoMaintenance>',
+                Result => "GeneralCatalog: Yes"
+            },
+            {
+                Name   => 'KIX_ASSET_CurrentVersion_Data_ Date attribute',
+                Text   => 'Date: <KIX_ASSET_CurrentVersion_Data_MaintenanceDates>',
+                Result => "Date: $Data{MaintenanceDates}->[0]"
+            },
+            {
+                Name   => 'KIX_ASSET_CurrentVersion_Data_ DateTime attribute',
+                Text   => 'DateTime: <KIX_ASSET_CurrentVersion_Data_MaintenanceDateTimes>',
+                Result => "DateTime: $Data{MaintenanceDateTimes}->[0]"
+            },
+            {
+                Name   => 'KIX_ASSET_CurrentVersion_Data_ ConfigItemRef attribute',
+                Text   => 'ConfigItemRef: <KIX_ASSET_CurrentVersion_Data_RelevantAsset>',
+                Result => "ConfigItemRef: $RefAssetValue->[0]"
+            },
+            {
+                Name   => 'KIX_ASSET_CurrentVersion_Data_ TextArea attribute',
+                Text   => 'TextArea: <KIX_ASSET_CurrentVersion_Data_Comment>',
+                Result => "TextArea: $Data{Comment}"
+            },
+            {
+                Name   => 'KIX_ASSET_CurrentVersion_Data_Attachment attribute',
+                Text   => 'Attachment: <KIX_ASSET_CurrentVersion_Data_Attachment>',
+                Result => "Attachment: $Data{Attachment}"
             },
         );
 
