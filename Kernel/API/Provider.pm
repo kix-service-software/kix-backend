@@ -283,7 +283,13 @@ sub Run {
                 # don't execute GET operation on collections
                 # (atm we simply check if the OperationType ends with 'Search', that will cover all critical collections so far)
                 # (Serialization is something we need to handle as well here, even if it comes with Pro)
-                if ( $Self->{ProviderConfig}->{Operation}->{$Operation}->{Type} !~ /(Serialization|Search)$/ || $Method ne 'GET' ) {
+                if (
+                    !$Self->{ProviderConfig}->{Operation}->{$Operation}->{NoPermissionCheckRun}
+                    && (
+                        $Self->{ProviderConfig}->{Operation}->{$Operation}->{Type} !~ /(Serialization|Search)$/
+                        || $Method ne 'GET'
+                    )
+                ) {
                     my $OperationResult = $OperationObject->Run(
                         Data                => $ProcessedRequest->{Data},
                         PermissionCheckOnly => 1
