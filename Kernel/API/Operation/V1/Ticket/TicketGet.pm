@@ -359,7 +359,6 @@ sub _GetTicketData {
                     if (IsHashRefWithData($PreparedValue)) {
                         push(@DynamicFields, $PreparedValue);
                     }
-
                 }
             }
             next ATTRIBUTE;
