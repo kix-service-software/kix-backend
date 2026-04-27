@@ -312,7 +312,7 @@ sub NotificationEvent {
         next ARTICLE if !$ArticleData->{ArticleID};
 
         # get accounted time
-        my $AccountedTime = $TicketObject->ArticleAccountedTimeGet(
+        my $AccountedTime = $Kernel::OM->Get('TimeAccounting')->TimeAccountingTotal(
             ArticleID => $ArticleData->{ArticleID},
         );
 

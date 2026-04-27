@@ -869,8 +869,10 @@ sub TicketDelete {
     }
 
     # delete accounted time
-    my $Success = $Self->TicketAccountedTimeDelete(
-        TicketID => $Param{TicketID}
+    my $Success = $Kernel::OM->Get('TimeAccounting')->TimeAccountingDelete(
+        TicketID => $Param{TicketID},
+        UserID   => $Param{UserID},
+
     );
 
     # trigger event
@@ -1618,19 +1620,19 @@ sub _TicketCacheClear {
         Type => $Self->{CacheType},
     );
 
-    # cleanup search cache
-    $Kernel::OM->Get('Cache')->CleanUp(
-        Type => "ObjectSearch_Ticket",
-    );
-    # cleanup search cache also for article
-    $Kernel::OM->Get('Cache')->CleanUp(
-        Type => "ObjectSearch_Article",
-    );
+    # cleanup additonal types
+    for my $Type (
+        qw(
+            ObjectSearch_Ticket ObjectSearch_Article
+            TicketIndex
+        )
+    ) {
+        $Kernel::OM->Get('Cache')->CleanUp(
+            Type => $Type
+        );
+    }
 
-    # cleanup index cache
-    $Kernel::OM->Get('Cache')->CleanUp(
-        Type => "TicketIndex",
-    );
+    $Kernel::OM->Get('TimeAccounting')->ClearCache();
 
     return 1;
 }
@@ -5146,158 +5148,47 @@ sub HistoryDelete {
     return 1;
 }
 
-=item TicketAccountedTimeGet()
+=item TicketAccountedTimeSet ()
 
-returns the accounted time of a ticket.
+calculate the total accounted time of a ticket and sets to the ticket.
 
-    my $AccountedTime = $TicketObject->TicketAccountedTimeGet(TicketID => 1234);
+    my $TotalTime = $TicketObject->TicketAccountedTimeSet(
+        TicketID => 1234
+    );
 
 =cut
 
-sub TicketAccountedTimeGet {
+sub TicketAccountedTimeSet {
     my ( $Self, %Param ) = @_;
 
-    # check needed stuff
-    if ( !$Param{TicketID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Need TicketID!'
-        );
-        return;
-    }
-
-    # get database object
-    my $DBObject = $Kernel::OM->Get('DB');
-
-    # db query
-    return if !$DBObject->Prepare(
-        SQL  => 'SELECT SUM(time_unit) FROM time_accounting WHERE ticket_id = ?',
-        Bind => [ \$Param{TicketID} ],
-    );
-
-    my $AccountedTime = 0;
-    while ( my @Row = $DBObject->FetchrowArray() ) {
-        if (@Row && $Row[0]) {
-            $Row[0] =~ s/,/./g;
-            $AccountedTime = $AccountedTime + int($Row[0]);
-        }
-    }
-
-    return $AccountedTime;
-}
-
-=item TicketAccountTime()
-
-account time to a ticket.
-
-    my $Success = $TicketObject->TicketAccountTime(
-        TicketID  => 1234,
-        ArticleID => 23542,      # optional
-        TimeUnit  => '4.5',
-        UserID    => 1,
-    );
-
-Events:
-    TicketAccountTime
-
-=cut
-
-sub TicketAccountTime {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for my $Needed (qw(TicketID TimeUnit UserID)) {
-        if ( !defined $Param{$Needed} ) {
+    for my $Needed ( qw(TicketID UserID) ) {
+        if ( !$Param{$Needed} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "Need $Needed!"
+                Message  => "Need $Needed!",
+                Silent   => $Param{Silent}
             );
             return;
         }
     }
 
-    # check some wrong formats
-    $Param{TimeUnit} =~ s/,/\./g;
-    $Param{TimeUnit} =~ s/ //g;
-    $Param{TimeUnit} =~ s/^(-?\d{1,10}\.\d\d).+?$/$1/g;
-    chomp $Param{TimeUnit};
-
-    if ( !IsNumber($Param{TimeUnit}) ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "TimeUnit is not a number!"
-        );
-        return;
-    }
-
-    if (
-        $Param{TimeUnit} >= 86400 ||
-        $Param{TimeUnit} <= -86400
-    ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "TimeUnit has to be between -86400 and 86400!"
-        );
-        return;
-    }
-
-    # get database object
-    my $DBObject = $Kernel::OM->Get('DB');
-
-    # db quote
-    $Param{TimeUnit} = $DBObject->Quote( $Param{TimeUnit}, 'Number' );
-
-    # db update
-    return if !$DBObject->Do(
-        SQL => "INSERT INTO time_accounting "
-            . " (ticket_id, article_id, time_unit, create_time, create_by, change_time, change_by) "
-            . " VALUES (?, ?, $Param{TimeUnit}, current_timestamp, ?, current_timestamp, ?)",
-        Bind => [
-            \$Param{TicketID}, \$Param{ArticleID}, \$Param{UserID}, \$Param{UserID},
-        ],
+    my $Result = $Kernel::OM->Get('TimeAccounting')->TimeAccountingTotal(
+        TicketID => $Param{TicketID}
     );
 
-    my $AccountedTime = $Self->TicketAccountedTimeGet( TicketID => $Param{TicketID} );
+    return if !defined $Result;
 
-    # update ticket data
-    return if !$DBObject->Do(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL => 'UPDATE ticket SET change_time = current_timestamp, '
             . ' change_by = ?, accounted_time = ? WHERE id = ?',
-        Bind => [ \$Param{UserID}, \$AccountedTime, \$Param{TicketID} ],
+        Bind => [ \$Param{UserID}, \$Result, \$Param{TicketID} ],
     );
 
-    # clear ticket cache
     $Self->_TicketCacheClear(
         TicketID => $Param{TicketID}
     );
 
-    # add history
-    $Self->HistoryAdd(
-        TicketID     => $Param{TicketID},
-        ArticleID    => $Param{ArticleID},
-        CreateUserID => $Param{UserID},
-        HistoryType  => 'TimeAccounting',
-        Name         => "\%\%$Param{TimeUnit}\%\%$AccountedTime",
-    );
-
-    # trigger event
-    $Self->EventHandler(
-        Event => 'TicketAccountTime',
-        Data  => {
-            TicketID  => $Param{TicketID},
-            ArticleID => $Param{ArticleID},
-        },
-        UserID => $Param{UserID},
-    );
-
-    # push client callback event
-    $Kernel::OM->Get('ClientNotification')->NotifyClients(
-        Event     => 'UPDATE',
-        Namespace => 'Ticket',
-        ObjectID  => $Param{TicketID},
-    );
-
-    return 1;
+    return $Result;
 }
 
 =item TicketFlagSet()
@@ -6231,26 +6122,22 @@ sub ArticleMove {
     );
 
     # update time accounting data
-    return 'AccountFailed' if !$Kernel::OM->Get('DB')->Do(
-        SQL => 'UPDATE time_accounting SET ticket_id = ?, '
-            . "change_time = current_timestamp, change_by = ? WHERE article_id = ?",
-        Bind => [ \$Param{TicketID}, \$Param{UserID}, \$Param{ArticleID} ],
+    return 'AccountFailed' if !$Kernel::OM->Get('TimeAccounting')->TimeAccountingMoveTo(
+        ArticleID   => $Param{ArticleID},
+        NewTicketID => $Param{TicketID},
+        UserID      => $Param{UserID}
     );
 
     # update accounted time of old ticket
-    my $OldAccountedTime = $Self->TicketAccountedTimeGet( TicketID => $TicketID );
-    return if !$Kernel::OM->Get('DB')->Do(
-        SQL => 'UPDATE ticket SET change_time = current_timestamp, '
-            . ' change_by = ?, accounted_time = ? WHERE id = ?',
-        Bind => [ \$Param{UserID}, \$OldAccountedTime, \$TicketID ],
+    return if !$Self->TicketAccountedTimeSet(
+        TicketID => $TicketID,
+        UserID   => $Param{UserID}
     );
 
     # update accounted time of new ticket
-    my $NewAccountedTime = $Self->TicketAccountedTimeGet( TicketID => $Param{TicketID} );
-    return if !$Kernel::OM->Get('DB')->Do(
-        SQL => 'UPDATE ticket SET change_time = current_timestamp, '
-            . ' change_by = ?, accounted_time = ? WHERE id = ?',
-        Bind => [ \$Param{UserID}, \$NewAccountedTime, \$Param{TicketID} ],
+    return if !$Self->TicketAccountedTimeSet(
+        TicketID => $Param{TicketID},
+        UserID   => $Param{UserID}
     );
 
     # clear ticket cache
@@ -6534,46 +6421,6 @@ sub ArticleCreateDateUpdate {
         Namespace => 'Ticket.Article',
         ObjectID  => $Param{TicketID}.'::'.$Param{ArticleID},
     );
-
-    return 1;
-}
-
-=item TicketAccountedTimeDelete()
-
-deletes the accounted time of a ticket.
-
-    my $Success = $TicketObject->TicketAccountedTimeDelete(
-        TicketID    => 1234,
-        ArticleID   => 1234     # optional
-    );
-
-=cut
-
-sub TicketAccountedTimeDelete {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for my $Needed (qw(TicketID)) {
-        if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Log')
-                ->Log( Priority => 'error', Message => "Need $Needed!" );
-            return;
-        }
-    }
-
-    # db query
-    if ( $Param{ArticleID} ) {
-        return if !$Kernel::OM->Get('DB')->Prepare(
-            SQL => 'DELETE FROM time_accounting WHERE ticket_id = ? AND article_id = ?',
-            Bind => [ \$Param{TicketID}, \$Param{ArticleID} ],
-        );
-    }
-    else {
-        return if !$Kernel::OM->Get('DB')->Prepare(
-            SQL  => 'DELETE FROM time_accounting WHERE ticket_id = ?',
-            Bind => [ \$Param{TicketID} ],
-        );
-    }
 
     return 1;
 }

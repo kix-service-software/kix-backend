@@ -489,12 +489,16 @@ sub ArticleCreate {
     }
 
     # add accounted time if needed
+    my $TimeAccountingID;
     if ( $Param{TimeUnit} ) {
-        my $UpdateSuccess = $Self->TicketAccountTime(
-            TicketID  => $Param{TicketID},
-            ArticleID => $ArticleID,
-            TimeUnit  => $Param{TimeUnit},
-            UserID    => $Param{UserID},
+        $TimeAccountingID = $Kernel::OM->Get('TimeAccounting')->TimeAccountingCreate(
+            TicketID           => $Param{TicketID},
+            UserID             => $Param{UserID},
+            TimeUnit           => $Param{TimeUnit},
+            IsInvoiced         => 0,
+            StartTime          => $Kernel::OM->Get('Time')->CurrentTimestamp(),
+            ExecutingContactID => $Kernel::OM->Get('Contact')->ContactLookup( UserID => $Param{UserID} ),
+            ArticleID          => $ArticleID
         );
     }
 
@@ -516,9 +520,10 @@ sub ArticleCreate {
     $Self->EventHandler(
         Event => 'ArticleCreate',
         Data  => {
-            ArticleID     => $ArticleID,
-            TicketID      => $Param{TicketID},
-            OldTicketData => \%OldTicketData,
+            ArticleID        => $ArticleID,
+            TicketID         => $Param{TicketID},
+            OldTicketData    => \%OldTicketData,
+            TimeAccountingID => $TimeAccountingID
         },
         UserID => $Param{UserID},
     );
@@ -1934,7 +1939,7 @@ sub ArticleGet {
         }
 
         # add TimeUnit
-        $Part->{TimeUnit} = $Self->ArticleAccountedTimeGet(
+        $Part->{TimeUnit} = $Kernel::OM->Get('TimeAccounting')->TimeAccountingTotal(
             ArticleID => $Part->{ArticleID},
         );
     }
@@ -2863,46 +2868,6 @@ sub ArticleFlagsOfTicketGet {
     return %Flag;
 }
 
-=item ArticleAccountedTimeGet()
-
-returns the accounted time of a article.
-
-    my $AccountedTime = $TicketObject->ArticleAccountedTimeGet(
-        ArticleID => $ArticleID,
-    );
-
-=cut
-
-sub ArticleAccountedTimeGet {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    if ( !$Param{ArticleID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Need ArticleID!'
-        );
-        return;
-    }
-
-    # get database object
-    my $DBObject = $Kernel::OM->Get('DB');
-
-    # db query
-    return if !$DBObject->Prepare(
-        SQL  => 'SELECT time_unit FROM time_accounting WHERE article_id = ?',
-        Bind => [ \$Param{ArticleID} ],
-    );
-
-    my $AccountedTime = 0;
-    while ( my @Row = $DBObject->FetchrowArray() ) {
-        $Row[0] =~ s/,/./g;
-        $AccountedTime = $AccountedTime + $Row[0];
-    }
-
-    return $AccountedTime;
-}
-
 =item ArticleAccountedTimeDelete()
 
 delete accounted time of article
@@ -2929,23 +2894,16 @@ sub ArticleAccountedTimeDelete {
         }
     }
 
-    # db query
-    return if !$Kernel::OM->Get('DB')->Do(
-        SQL  => 'DELETE FROM time_accounting WHERE article_id = ?',
-        Bind => [ \$Param{ArticleID} ],
-    );
-
     # get ticket id of article
     my $TicketID = $Self->ArticleGetTicketID(
         ArticleID => $Param{ArticleID}
     );
 
-    # update ticket data
-    my $AccountedTime = $Self->TicketAccountedTimeGet( TicketID => $TicketID );
-    return if !$Kernel::OM->Get('DB')->Do(
-        SQL => 'UPDATE ticket SET change_time = current_timestamp, '
-            . ' change_by = ?, accounted_time = ? WHERE id = ?',
-        Bind => [ \$Param{UserID}, \$AccountedTime, \$TicketID ],
+    # db query
+    return if !$Kernel::OM->Get('TimeAccounting')->TimeAccountingDelete(
+        ArticleID => $Param{ArticleID},
+        TicketID  => $TicketID,
+        UserID    => $Param{UserID}
     );
 
     # push client callback event
