@@ -54,4 +54,24 @@ When qr/delete all this faq articles$/, sub {
 
 };
 
+#=========== delete all items ===================================================================
 
+When qr/delete all of "(.*?)" "(.*?)"$/, sub {
+    my $LC = lc($1.$2);
+    print STDERR "KLEIN:".Dumper($LC);
+    ( S->{Response}, S->{ResponseContent} ) = _Get(
+        Token => S->{Token},
+        URL   => S->{API_URL}.'/'.$LC
+    );
+    my $ARRAYAnzahl = @{S->{ResponseContent}->{FAQArticle}};
+    print STDERR "ARRAYAnzahl:".Dumper($ARRAYAnzahl);
+    #    if ( $ARRAYAnzahl > 0) {
+    foreach my $Row ( @{S->{ResponseContent}->{FAQArticle}} ) {
+        print STDERR "ROW:" . Dumper( $Row );
+        ( S->{Response}, S->{ResponseContent} ) = _Delete(
+            Token => S->{Token},
+            URL   => S->{API_URL} . '/' . lc( $1 ) . '/' . lc( $2 ) . '/' . $Row->{ID} || 1,
+        );
+    };
+    #    }
+};

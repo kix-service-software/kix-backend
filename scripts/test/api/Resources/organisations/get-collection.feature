@@ -6,6 +6,7 @@
     Given I am logged in as agent user "admin" with password "Passw0rd"
 
   Scenario: get the list of existing organisations
+    When delete all of "Organisation" in system
     Given 8 of organisations
     When I query the collection of organisations
     Then the response code is 200
@@ -15,6 +16,7 @@
     Then the response code is 204
 
   Scenario: get the list of existing organisations with filter
+    When delete all of "Organisation" in system
     Given 8 of organisations
     When I query the collection of organisations
     When I query the collection of organisation with filter of "K12345678_test_for_filter"
@@ -26,6 +28,7 @@
     Then the response code is 204
 
   Scenario: get the list of existing organisations with filter contain
+    When delete all of "Organisation" in system
     Given 8 of organisations
     When I query the collection of organisations
     When I query the collection of organisation with filter contains of "ambul"
@@ -37,6 +40,7 @@
     Then the response code is 204
 
   Scenario: get the list of existing organisations with limit
+    When delete all of "Organisation" in system
     Given 8 of organisations
     When I query the collection of organisations with limit 2
     Then the response code is 200
@@ -45,6 +49,7 @@
     Then the response code is 204
 
   Scenario: get the list of existing organisations with offset
+    When delete all of "Organisation" in system
     Given 8 of organisations
     When I query the collection of organisations with offset 2
     Then the response code is 200
@@ -53,6 +58,7 @@
     Then the response code is 204
 
   Scenario: get the list of existing organisations with limit and offset
+    When delete all of "Organisation" in system
     Given 8 of organisations
     When I query the collection of organisations with limit 2 and offset 1
     Then the response code is 200
@@ -61,6 +67,7 @@
     Then the response code is 204
 
   Scenario: get the list of existing organisations with sorted
+    When delete all of "Organisation" in system
     Given 7 of organisations
     When I query the collection of organisations with sorted by "Organisation.-Number:textual"
     Then the response code is 200
@@ -69,6 +76,7 @@
     Then the response code is 204
 
   Scenario: get the list of existing organisations with sorted, limit and offset
+    When delete all of "Organisation" in system
     Given 8 of organisations
     When I query the collection of organisations with sorted by "Organisation.-Number:textual" limit 2 and offset 1
     Then the response code is 200
