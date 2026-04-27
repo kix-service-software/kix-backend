@@ -377,8 +377,8 @@ sub _GetTicketData {
 
     # include AccountedTime if requested
     if ( $Param{Data}->{include}->{AccountedTime} && !defined $TicketData{AccountedTime} ) {
-        $TicketData{AccountedTime} = $TicketObject->TicketAccountedTimeGet(
-            TicketID => $TicketID,
+        $TicketData{AccountedTime} = $Kernel::OM->Get('TimeAccounting')->TimeAccountingTotal(
+            TicketID => $TicketID
         );
     }
 

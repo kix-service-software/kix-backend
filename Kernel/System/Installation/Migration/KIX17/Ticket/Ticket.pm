@@ -859,11 +859,18 @@ sub _MigrateTimeUnits {
         # insert row
         if ( !$ID ) {
             my %KIXTTAData;
-            foreach my $Key ( qw(description reference_1 reference_2 reference_3 reference_4 flag) ) {
+            foreach my $Key ( qw(reference_1 reference_2 reference_3 reference_4 flag) ) {
                 if ( $Item->{$Key} ) {
                     $KIXTTAData{$Key} = $Item->{$Key};
                 }
             }
+
+            # add new required columns (v38)
+            $Item->{'is_invoiced'}          = 0;
+            $Item->{'start_time'}           = $Item->{'create_time'};
+            $Item->{'executing_contact_id'} = $Kernel::OM->Get('Contact')->ContactLookup(
+                UserID => $Item->{'create_by'}
+            );
 
             $ID = $Self->Insert(
                 Table          => 'time_accounting',

@@ -997,6 +997,10 @@
     <Column Name="ticket_id" Required="true" Type="BIGINT"/>
     <Column Name="article_id" Required="false" Type="BIGINT"/>
     <Column Name="time_unit" Required="true" Size="10,2"  Type="DECIMAL"/>
+    <Column Name="executing_contact_id" Required="true"  Type="INTEGER"/>
+    <Column Name="description" Required="false" Size="1800000" Type="VARCHAR" />
+    <Column Name="start_time" Required="true" Type="DATE"/>
+    <Column Name="is_invoiced" Required="true" Type="SMALLINT" Default="0"/>
     <Column Name="create_time" Required="true" Type="DATE"/>
     <Column Name="create_by" Required="true" Type="INTEGER"/>
     <Column Name="change_time" Required="true" Type="DATE"/>
@@ -1012,6 +1016,9 @@
     </ForeignKey>
     <ForeignKey ForeignTable="article">
         <Reference Local="article_id" Foreign="id"/>
+    </ForeignKey>
+    <ForeignKey ForeignTable="contact">
+        <Reference Local="executing_contact_id" Foreign="id"/>
     </ForeignKey>
     <ForeignKey ForeignTable="users">
         <Reference Local="create_by" Foreign="id"/>
@@ -1157,7 +1164,7 @@
     <Column Name="create_time" Required="true" Type="DATE"/>
     <Column Name="create_by" Required="true" Type="INTEGER"/>
     <Column Name="change_time" Required="true" Type="DATE"/>
-    <Column Name="change_by" Required="true" Type="INTEGER"/>        
+    <Column Name="change_by" Required="true" Type="INTEGER"/>
     <Unique Name="organisation_number">
         <UniqueColumn Name="number"/>
     </Unique>

@@ -145,7 +145,10 @@ sub PostRun {
         }
     }
 
-    return $Kernel::OM->Get('PID')->PIDDelete( Name => $Self->Name() );
+    return $Kernel::OM->Get('PID')->PIDDelete(
+        Name  => $Self->Name(),
+        Force => $Self->GetOption('remove-pid') ? 1 : 0,
+    );
 }
 
 1;

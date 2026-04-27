@@ -452,7 +452,7 @@ sub HTMLDisplayValueRender {
     }
 
     $Output = <<"END";
-<table cellspacing="0" cellpadding="2" style="border:1px solid black; width: 100%">
+<table cellspacing="0" cellpadding="2" style="border:1px solid black; border-collapse: collapse; width: 100%">
     <thead>
         <tr>
 END

@@ -401,8 +401,9 @@ sub GetFulltextDef {
 
     # init def hash
     my %SQLDef = (
-        Columns => [],
-        Join    => []
+        Columns       => [],
+        StaticColumns => [],
+        Join          => []
     );
 
     # check required search parameter
@@ -500,6 +501,24 @@ sub GetFulltextDef {
                     @{ $SQLDef{Columns} },
                     $AttributeDef->{Column}
                 );
+            }
+
+            if (
+                IsHashRefWithData( $AttributeDef->{FulltextDef} )
+                && $AttributeDef->{FulltextDef}->{IsStaticSearch}
+            ) {
+                if ( IsArrayRef( $AttributeDef->{Column} ) ) {
+                    push(
+                        @{ $SQLDef{StaticColumns} },
+                        @{ $AttributeDef->{Column} }
+                    );
+                }
+                else {
+                    push(
+                        @{ $SQLDef{StaticColumns} },
+                        $AttributeDef->{Column}
+                    );
+                }
             }
         }
 

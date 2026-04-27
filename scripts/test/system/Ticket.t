@@ -1447,58 +1447,91 @@ $Self->Is(
     'MoveQueueList() (Junk)',
 );
 
-my $TicketAccountTime = $TicketObject->TicketAccountTime(
-    TicketID  => $TicketID,
-    ArticleID => $ArticleID,
-    TimeUnit  => '4.5',
-    UserID    => 1,
+my $TimeAccountingID1 = $Kernel::OM->Get('TimeAccounting')->TimeAccountingCreate(
+    TicketID           => $TicketID,
+    StartTime          => $Kernel::OM->Get('Time')->CurrentTimestamp(),
+    TimeUnit           => '4.5',
+    UserID             => 1,
+    IsInvoiced         => 0,
+    ExecutingContactID => $Kernel::OM->Get('Contact')->ContactLookup(
+        UserID => 1
+    )
 );
 
 $Self->True(
-    $TicketAccountTime,
-    'TicketAccountTime() 1',
+    $TimeAccountingID1,
+    'Set TimeUnit #1',
 );
 
-my $TicketAccountTime2 = $TicketObject->TicketAccountTime(
-    TicketID  => $TicketID,
-    ArticleID => $ArticleID,
-    TimeUnit  => '4123.53',
-    UserID    => 1,
-);
-
-$Self->True(
-    $TicketAccountTime2,
-    'TicketAccountTime() 2',
-);
-
-my $TicketAccountTime3 = $TicketObject->TicketAccountTime(
-    TicketID  => $TicketID,
-    ArticleID => $ArticleID,
-    TimeUnit  => '4,53',
-    UserID    => 1,
+my $TimeAccountingID2 = $Kernel::OM->Get('TimeAccounting')->TimeAccountingCreate(
+    TicketID           => $TicketID,
+    ArticleID          => $ArticleID,
+    StartTime          => $Kernel::OM->Get('Time')->CurrentTimestamp(),
+    TimeUnit           => '4123.53',
+    UserID             => 1,
+    IsInvoiced         => 0,
+    ExecutingContactID => $Kernel::OM->Get('Contact')->ContactLookup(
+        UserID => 1
+    )
 );
 
 $Self->True(
-    $TicketAccountTime3,
-    'TicketAccountTime() 3',
+    $TimeAccountingID2,
+    'Set TimeUnit #2',
 );
 
-my $AccountedTime = $TicketObject->TicketAccountedTimeGet( TicketID => $TicketID );
+my $TimeAccountingID3 = $Kernel::OM->Get('TimeAccounting')->TimeAccountingCreate(
+    TicketID           => $TicketID,
+    StartTime          => $Kernel::OM->Get('Time')->CurrentTimestamp(),
+    TimeUnit           => '4,53',
+    UserID             => 1,
+    IsInvoiced         => 0,
+    ExecutingContactID => $Kernel::OM->Get('Contact')->ContactLookup(
+        UserID => 1
+    )
+);
+
+$Self->True(
+    $TimeAccountingID3,
+    'Set TimeUnit #3',
+);
+
+my $TimeAccountingID4 = $Kernel::OM->Get('TimeAccounting')->TimeAccountingCreate(
+    TicketID           => $TicketID,
+    ArticleID          => $ArticleID,
+    StartTime          => $Kernel::OM->Get('Time')->CurrentTimestamp(),
+    TimeUnit           => '4,53',
+    UserID             => 1,
+    IsInvoiced         => 0,
+    ExecutingContactID => $Kernel::OM->Get('Contact')->ContactLookup(
+        UserID => 1
+    ),
+    Silent             => 1
+);
+
+$Self->False(
+    $TimeAccountingID4,
+    'Set TimeUnit #4 (dublicate)',
+);
+
+my $AccountedTime = $Kernel::OM->Get('TimeAccounting')->TimeAccountingTotal(
+    TicketID => $TicketID
+);
 
 $Self->Is(
     $AccountedTime,
-    4132,
-    'TicketAccountedTimeGet()',
+    4_132,
+    'Get Ticket Total Accounted Time',
 );
 
-my $AccountedTime2 = $TicketObject->ArticleAccountedTimeGet(
+my $AccountedTime2 = $Kernel::OM->Get('TimeAccounting')->TimeAccountingTotal(
     ArticleID => $ArticleID,
 );
 
 $Self->Is(
     $AccountedTime2,
-    4132.56,
-    'ArticleAccountedTimeGet()',
+    4_123.53,
+    'Get Article Total Accounted Time()',
 );
 
 my ( $Sec, $Min, $Hour, $Day, $Month, $Year ) = $TimeObject->SystemTime2Date(
@@ -2508,7 +2541,7 @@ for my $NewStateID (@NewStates) {
 
 my @TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
     ObjectType => 'Ticket',
-    Result       => 'LIST',
+    Result       => 'ARRAY',
     Limit        => 100,
     Search       => {
         AND => [
@@ -2529,7 +2562,7 @@ my @TicketIDs = $Kernel::OM->Get('ObjectSearch')->Search(
 );
 $Self->False(
     $TicketIDs[0],
-    'TicketSearch() (LIST:TicketNumber,StateType:new (no valid states of state type new)',
+    'TicketSearch() (ARRAY:TicketNumber,StateType:new (no valid states of state type new)',
 );
 
 # activate states again
