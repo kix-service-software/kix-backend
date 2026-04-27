@@ -259,6 +259,68 @@ sub RandomValueSet {
     };
 }
 
+sub ShortDisplayValueRender {
+    my ( $Self, %Param ) = @_;
+
+    my $Value = q{};
+
+    # check value
+    my @Values;
+    if ( ref $Param{Value} eq 'ARRAY' ) {
+        @Values = @{ $Param{Value} };
+    }
+    else {
+        @Values = ( $Param{Value} );
+    }
+
+    # convert date to localized string
+    my @LocalizedValues;
+    for my $Date ( @Values) {
+        next if !$Date;
+        if ( defined $Date ) {
+            my $LocalizedValue = $Param{LayoutObject}->{LanguageObject}->FormatTimeString(
+                $Date,
+                'DateFormatShort'
+            );
+            push(@LocalizedValues, $LocalizedValue);
+        }
+    }
+
+    # set new line separator
+    my $Separator = ', ';
+    if (
+        IsHashRefWithData($Param{DynamicFieldConfig}) &&
+        IsHashRefWithData($Param{DynamicFieldConfig}->{Config}) &&
+        defined $Param{DynamicFieldConfig}->{Config}->{ItemSeparator}
+    ) {
+        $Separator = $Param{DynamicFieldConfig}->{Config}->{ItemSeparator};
+
+        if ( $Param{HTMLOutput} ) {
+            $Separator = $Param{LayoutObject}->Ascii2Html(
+                Text => $Separator,
+            );
+        }
+    }
+
+    # Output transformations
+    $Value = join( $Separator, @LocalizedValues );
+    my $Title = $Value;
+
+    # set field link form config
+    my $Link        = $Param{DynamicFieldConfig}->{Config}->{Link}        || q{};
+    my $LinkPreview = $Param{DynamicFieldConfig}->{Config}->{LinkPreview} || q{};
+
+    my $Data = {
+        Value       => $Value,
+        Title       => $Title,
+        Link        => $Link,
+        LinkPreview => $LinkPreview,
+        NotTranslatedValue => join( $Separator, @Values )
+    };
+
+    return $Data;
+}
+
 1;
 
 =back
