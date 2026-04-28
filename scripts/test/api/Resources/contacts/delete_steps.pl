@@ -54,5 +54,43 @@ When qr/delete all this contacts$/, sub {
 
 };
 
+When qr/delete all of "(.*?)" and "(.*?)"$/, sub {
+    my $LCOrg = lc($2).'s';
+    my $LCCont = lc($1).'s';
 
+    ( S->{Response}, S->{ResponseContent} ) = _Get(
+        Token => S->{Token},
+        URL   => S->{API_URL}.'/'.$LCCont,
+    );
+    my $Anzahl = @{S->{ResponseContent}->{$1}};
+        print STDERR "ContactAnzahl:".Dumper($Anzahl);
+    if ( $Anzahl ) {
+        print STDERR "ContDRIN!!!!!!!!!!!:";
+            foreach my $Row ( @{S->{ResponseContent}->{$1}} ) {
+#                print STDERR "ContactRow:" . Dumper( $Row );
+                if ( $Row->{$1} != 1 ) {
+                    ( S->{Response}, S->{ResponseContent} ) = _Delete(
+                        Token => S->{Token},
+                        URL   => S->{API_URL} . '/' . $LCCont . '/' . $Row->{ID},
+                    );
+                }
+            }
+    }
+
+        ( S->{Response}, S->{ResponseContent} ) = _Get(
+            Token => S->{Token},
+            URL   => S->{API_URL} . '/' . $LCOrg,
+        );
+    my $OrgAnzahl = @{S->{ResponseContent}->{$2}};
+        print STDERR "OrgAnzahl:".Dumper($OrgAnzahl);
+    if ($OrgAnzahl ) {
+    print STDERR "OrgaDRIN!!!!!!!!!!!:";
+        foreach my $Row ( @{S->{ResponseContent}->{$2}} ) {
+            ( S->{Response}, S->{ResponseContent} ) = _Delete(
+                Token => S->{Token},
+                URL   => S->{API_URL} . '/' . $LCOrg . '/' . $Row->{ID},
+            );
+        }
+    }
+};
 	
