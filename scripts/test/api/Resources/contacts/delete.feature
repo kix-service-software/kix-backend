@@ -6,6 +6,7 @@ Feature: DELETE request /contacts/:ContactID resource
     Given I am logged in as agent user "admin" with password "Passw0rd"
 
   Scenario: delete this contact
+    When delete all of "Contact" and "Organisation"
     Given a organisation
     Given a contact
     When I delete this contact

@@ -61,12 +61,15 @@ When qr/delete all of "(.*?)" in system$/, sub {
         Token => S->{Token},
         URL   => S->{API_URL}.'/'.$LC,
     );
-
-    foreach my $Row ( @{ S->{ResponseContent}->{$1} } ) {
-        ( S->{Response}, S->{ResponseContent} ) = _Delete(
-            Token => S->{Token},
-            URL   => S->{API_URL} . '/'.$LC.'/'. $Row->{ID},
-        );
+    my $Anzahl = @{S->{ResponseContent}->{$1}};
+    print STDERR "Anzahl:".Dumper($Anzahl);
+    if ($Anzahl) {
+        foreach my $Row ( @{S->{ResponseContent}->{$1}} ) {
+            ( S->{Response}, S->{ResponseContent} ) = _Delete(
+                Token => S->{Token},
+                URL   => S->{API_URL} . '/' . $LC . '/' . $Row->{ID},
+            );
+        }
     }
 };
 	
