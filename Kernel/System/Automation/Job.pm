@@ -682,6 +682,9 @@ sub JobDelete {
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => 'ObjectSearch_Automation_JobRun',
+    );
 
     # event
     $Self->EventHandler(
@@ -1442,6 +1445,9 @@ sub _JobExecute {
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => 'ObjectSearch_Automation_JobRun',
+    );
 
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
@@ -1450,7 +1456,7 @@ sub _JobExecute {
         ObjectID  => $Param{ID}.'::'.$RunID,
     );
 
-    return 1;
+    return $RunID;
 }
 
 =item JobDump()
@@ -1563,7 +1569,7 @@ sub JobDump {
 returns a hash of all runs (ID + StateID) for a given job
 
     my %JobRunIDs = $AutomationObject->JobRunList(
-        JobID => 123
+        JobID     => 123
     );
 
 =cut
@@ -1592,9 +1598,12 @@ sub JobRunList {
     );
     return %{$Cache} if $Cache;
 
+    my $SQL  = 'SELECT id, state_id FROM job_run WHERE job_id = ?';
+    my @Bind = ( \$Param{JobID} );
+
     return if !$Kernel::OM->Get('DB')->Prepare(
-        SQL  => 'SELECT id, state_id FROM job_run WHERE job_id = ?',
-        Bind => [ \$Param{JobID} ]
+        SQL  => $SQL,
+        Bind => \@Bind
     );
 
     my %Result;
@@ -1704,6 +1713,73 @@ sub JobRunGet {
     );
 
     return %Result;
+}
+
+=item JobRunDelete()
+
+deletes a given job run
+
+    my $Success = $AutomationObject->JobRunDelete(
+        JobID  => 2,
+        RunID  => 2,
+        UserID => 1,
+    );
+
+=cut
+
+sub JobRunDelete {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(JobID RunID UserID)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!",
+                Silent   => $Param{Silent}
+            );
+            return;
+        }
+    }
+
+    # delete log entries for run
+    return if !$Self->LogDelete(
+        JobID => $Param{JobID},
+        RunID => $Param{RunID},
+    );
+
+    # remove from database
+    return if !$Kernel::OM->Get('DB')->Prepare(
+        SQL  => 'DELETE FROM job_run WHERE job_id = ? AND id = ?',
+        Bind => [ \$Param{JobID}, \$Param{RunID} ],
+    );
+
+    # delete cache
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => 'ObjectSearch_Automation_JobRun',
+    );
+
+    # event
+    $Self->EventHandler(
+        Event => 'JobRunDelete',
+        Data  => {
+            JobID => $Param{JobID},
+            RunID => $Param{RunID},
+        },
+        UserID => $Param{UserID},
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
+        Event     => 'DELETE',
+        Namespace => 'Job.Run',
+        ObjectID  => $Param{JobID}.'::'.$Param{RunID},
+    );
+
+    return 1;
 }
 
 =item JobRunLogList()
@@ -2003,6 +2079,11 @@ sub _JobRunAdd {
     while ( my @Row = $DBObject->FetchrowArray() ) {
         $ID = $Row[0];
     }
+
+    # delete cache for objectsearch
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => 'ObjectSearch_Automation_JobRun',
+    );
 
     return $ID;
 }

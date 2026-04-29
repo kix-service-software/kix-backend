@@ -21,6 +21,12 @@ my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 # begin transaction on database
 $Helper->BeginWork();
 
+# set fixed time to have predetermined verifiable results
+my $SystemTime = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
+    String => '2014-01-01 12:00:00',
+);
+$Helper->FixedTimeSet($SystemTime);
+
 my $NameRandom  = $Helper->GetRandomID();
 my %JobIDByJobName = (
     'test-job-' . $NameRandom . '-1' => undef,
@@ -453,6 +459,82 @@ $Self->IsDeeply(
         }
     ],
     'JobGet() for new job with filter list',
+);
+
+$Result = $AutomationObject->JobExecute(
+    ID     => $JobID,
+    UserID => 1
+);
+$Self->Is(
+    $Result,
+    1,
+    'JobExecute() successful',
+);
+
+my %JobRunIDs = $AutomationObject->JobRunList(
+    JobID => $JobID,
+);
+$Self->Is(
+    scalar( keys( %JobRunIDs ) ),
+    1,
+    'JobRunList() has one entry',
+);
+my $JobRunID = (keys(%JobRunIDs))[0];
+
+my %JobRunData = $AutomationObject->JobRunGet(
+    ID => $JobRunID,
+);
+$Self->IsDeeply(
+    \%JobRunData,
+    {
+        'ID'          => $JobRunID,
+        'JobID'       => $JobID,
+        'StateID'     => 3,
+        'Filter'      => [
+            {
+            'AND' => [
+                {
+                'Field' => 'Dummy',
+                'Operator' => 'EQ',
+                'Value' => 'this is a test'
+                }
+            ]
+            },
+            {
+            'AND' => [
+                {
+                'Field' => 'Dummy2',
+                'Operator' => 'EQ',
+                'Value' => 'this is a test 2'
+                }
+            ]
+            }
+        ],
+        'StartTime'   => '2014-01-01 12:00:00',
+        'EndTime'     => '2014-01-01 12:00:00',
+        'CreateBy'    => 1,
+    },
+    'JobRunGet() has correct data',
+);
+
+my $Success = $AutomationObject->JobRunDelete(
+    JobID  => $JobID,
+    RunID  => $JobRunID,
+    UserID => 1,
+);
+$Self->Is(
+    $Success,
+    1,
+    'JobRunDelete() is successful',
+);
+
+%JobRunIDs = $AutomationObject->JobRunList(
+    JobID => $JobID,
+);
+$Self->Is(
+    scalar( keys( %JobRunIDs ) ),
+    0,
+    'JobRunList() has no entry',
 );
 
 # rollback transaction on database
