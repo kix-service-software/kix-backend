@@ -68,7 +68,7 @@ When qr/delete all of "(.*?)" and "(.*?)"$/, sub {
         print STDERR "ContDRIN!!!!!!!!!!!:";
             foreach my $Row ( @{S->{ResponseContent}->{$1}} ) {
 #                print STDERR "ContactRow:" . Dumper( $Row );
-                if ( $Row->{$1} != 1 ) {
+                if ( $Row->{ID} != 1 ) {
                     ( S->{Response}, S->{ResponseContent} ) = _Delete(
                         Token => S->{Token},
                         URL   => S->{API_URL} . '/' . $LCCont . '/' . $Row->{ID},
