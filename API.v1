@@ -18,6 +18,7 @@
 /system/automation/jobs/:JobID/macroids                                                    | POST             | V1::Automation::JobMacroIDCreate                 |
 /system/automation/jobs/:JobID/macroids/:MacroID                                           | DELETE           | V1::Automation::JobMacroIDDelete                 |
 /system/automation/jobs/:JobID/runs                                                        | GET              | V1::Automation::JobRunSearch                     |
+/system/automation/jobs/:JobID/runs/:RunID                                                 | DELETE           | V1::Automation::JobRunDelete                     |
 /system/automation/jobs/:JobID/runs/:RunID                                                 | GET              | V1::Automation::JobRunGet                        |
 /system/automation/jobs/:JobID/runs/:RunID/logs                                            | GET              | V1::Automation::JobRunLogSearch                  |
 /system/automation/jobs/types                                                              | GET              | V1::Automation::JobTypeSearch                    |

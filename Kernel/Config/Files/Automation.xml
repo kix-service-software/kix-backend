@@ -197,7 +197,7 @@
             </Hash>
         </Setting>
     </ConfigItem>
-    
+
     <ConfigItem AccessLevel="internal" Name="Automation::MacroReferenceObject###Job" Required="0" Valid="1">
         <Description Translatable="1">Registration of a object (module) which uses macros.</Description>
         <Group>Automation</Group>
@@ -361,6 +361,30 @@
                     <Array>
                         <Item>--configuration-module</Item>
                         <Item>&lt;ModuleName&gt;</Item>
+                    </Array>
+                </Item>
+            </Hash>
+        </Setting>
+    </ConfigItem>
+
+    <ConfigItem AccessLevel="internal" Name="Daemon::SchedulerCronTaskManager::Task###AutomationJobRunCleanUp" Required="0" Valid="1" ConfigLevel="100">
+        <Description Translatable="1">Clears the runs of all jobs that have reached a certain age.</Description>
+        <Group>Automation</Group>
+        <SubGroup>Daemon::SchedulerCronTaskManager::Task</SubGroup>
+        <Setting>
+            <Hash>
+                <Item Key="TaskName">AutomationJobRunCleanUp</Item>
+                <Item Key="Schedule">0 1 1 * *</Item> <!-- Default once a month at 1 AM -->
+                <!-- Use a console command here as it does some PID handling -->
+                <Item Key="Module">Kernel::System::Console::Command::Maint::Automation::RunJob::Delete</Item>
+                <Item Key="Function">Execute</Item>
+                <Item Key="MaximumParallelInstances">1</Item>
+                <Item Key="Params">
+                    <Array>
+                        <Item>--all-jobs</Item>
+                        <Item>--older-than-days</Item>
+                        <Item>90</Item>
+                        <Item>--allow-root</Item>
                     </Array>
                 </Item>
             </Hash>
