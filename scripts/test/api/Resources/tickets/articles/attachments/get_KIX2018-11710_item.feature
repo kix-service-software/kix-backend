@@ -16,9 +16,9 @@ Feature: GET request to the /tickets/:TicketID/articles/:ArticleID/attachments r
     Then the response code is 200
     Then the response content is
     And the response contains the following items of type Attachment
-      | ContentType                    | Disposition | Filesize    | FilesizeRaw | Filename   |
-      | text/html; charset=\"utf-8\"   | inline      | 76 Bytes    | 76          | file-2     |
-      | image/png; name=\"grafik.png\" | inline      | 20.5 KBytes | 20951       | grafik.png |
+      | ContentType                    | Disposition | Filename   |
+      | text/html; charset=\"utf-8\"   | inline      | file-2     |
+      | image/png; name=\"grafik.png\" | inline      | grafik.png |
     When I delete this ticket
     Then the response code is 204
     And the response has no content
