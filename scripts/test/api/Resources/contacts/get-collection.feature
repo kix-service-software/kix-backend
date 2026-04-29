@@ -95,7 +95,7 @@
     When I query the collection of contacts
     When I query the collection of contacts with sorted by "Contact.-Firstname:textual"
     Then the response code is 200
-    And the response contains 8 items of type "Contact"
+    And the response contains 10 items of type "Contact"
     When delete all this contacts
     Then the response code is 204
     And the response has no content
