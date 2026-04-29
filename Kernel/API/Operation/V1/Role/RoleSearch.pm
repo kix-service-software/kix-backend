@@ -63,8 +63,7 @@ sub Run {
         Limit      => $Self->{SearchLimit}->{Role} || $Self->{SearchLimit}->{'__COMMON'},
         Sort       => $Self->{Sort}->{Role}        || $Self->{DefaultSort}->{Role},
         UserType   => $Self->{Authorization}->{UserType},
-        UserID     => $Self->{Authorization}->{UserID},
-        Debug      => $Param{Data}->{debug} || 0
+        UserID     => $Self->{Authorization}->{UserID}
     );
 
 	# get already prepared Role data from RoleGet operation
