@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
 "POT-Creation-Date: 2026-3-30 09:18+0000\n"
-"PO-Revision-Date: 2025-10-22 10:58+0000\n"
-"Last-Translator: DeepL <noreply-mt-deepl@weblate.org>\n"
+"PO-Revision-Date: 2026-05-04 11:16+0000\n"
+"Last-Translator: khuesig <Katja.Huesig@kixdesk.com>\n"
 "Language-Team: French <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/fr/>\n"
 "Language: fr\n"
@@ -11,7 +11,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: Weblate 5.6.2\n"
+"X-Generator: Weblate 5.16.2\n"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "1 very high"
@@ -131,7 +131,7 @@ msgstr "Base::Ticket"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Beamer"
-msgstr "Beamer"
+msgstr "Vidéoprojecteur"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Camera"
@@ -356,7 +356,7 @@ msgstr "MacroAction pour l'emploi \"Rapports périodiques\"."
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Maintenance"
-msgstr "Maintenance"
+msgstr "Entretien"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Middleware"
@@ -380,7 +380,7 @@ msgstr "Souris"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Multiselect"
-msgstr "Multiselect"
+msgstr "Sélection multiple"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "New ticket created by customer."
@@ -645,7 +645,7 @@ msgstr "Agent de billetterie"
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Ticket Agent (Servicedesk)"
-msgstr "Ticket Agent (Servicedesk)"
+msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Ticket Agent Base Permission"
@@ -1238,7 +1238,7 @@ msgstr "Boucle Variable"
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/Loop.pm
 msgid "Macro"
-msgstr "Macro"
+msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/Loop.pm
 msgid "The macro to execute for each value."
