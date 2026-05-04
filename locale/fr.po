@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
-"POT-Creation-Date: 2026-5-4 11:20+0000\n"
+"POT-Creation-Date: 2026-5-4 11:21+0000\n"
 "PO-Revision-Date: 2026-05-04 11:16+0000\n"
 "Last-Translator: khuesig <Katja.Huesig@kixdesk.com>\n"
 "Language-Team: French <http://weblate.vm.devel.cape-it.de/projects/kix18/"
