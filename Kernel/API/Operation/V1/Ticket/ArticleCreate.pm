@@ -307,7 +307,7 @@ sub _PrepareArticle {
         %Param
     );
 
-    $Article->{Attachments} = $Self->_PrepareAttachments(
+    $Article->{Attachment} = $Self->_PrepareAttachments(
         %Param
     );
 
@@ -461,18 +461,20 @@ sub _PrepareSubject {
 sub _PrepareAttachments {
     my ( $Self, %Param ) = @_;
 
-    my $Attachments = $Param{Article}->{Attachments};
+    my $Attachments = delete( $Param{Article}->{Attachments} );
 
     # prepare attachments
     if ( IsArrayRefWithData($Attachments) ) {
-
-        foreach my $Attachment ( @{$Attachments} ) {
+        for my $Attachment ( @{ $Attachments } ) {
             $Attachment->{Content} = MIME::Base64::decode_base64( $Attachment->{Content} );
             $Attachment->{Disposition} //= 'attachment';
         }
     }
+    else {
+        return [];
+    }
 
-    return $Attachments
+    return $Attachments;
 }
 
 1;
