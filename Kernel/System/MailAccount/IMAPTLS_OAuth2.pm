@@ -91,7 +91,7 @@ sub Connect {
     TRY:
     for my $Try ( 1 .. 2 ) {
         # auth via SASL XOAUTH2
-        my $SASLXOAUTH2 = encode_base64( 'user=' . $Param{Login} . "\x01auth=Bearer " . $AccessToken . "\x01\x01" );
+        my $SASLXOAUTH2 = encode_base64( 'user=' . $Param{Login} . "\x01auth=Bearer " . $AccessToken . "\x01\x01", '' );
         $IMAPObject->authenticate( 'XOAUTH2', sub { return $SASLXOAUTH2 } );
 
         last TRY if ( $IMAPObject->IsAuthenticated() );
