@@ -1749,7 +1749,7 @@ sub JobRunDelete {
     );
 
     # remove from database
-    return if !$Kernel::OM->Get('DB')->Prepare(
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL  => 'DELETE FROM job_run WHERE job_id = ? AND id = ?',
         Bind => [ \$Param{JobID}, \$Param{RunID} ],
     );
