@@ -531,6 +531,10 @@ my $ObjectSearch = $Kernel::OM->Get('ObjectSearch');
 # begin transaction on database
 $Helper->BeginWork();
 
+# clear job runs
+$Kernel::OM->Get('DB')->Do( SQL => 'DELETE FROM automation_log' );
+$Kernel::OM->Get('DB')->Do( SQL => 'DELETE FROM job_run' );
+
 ## prepare test jobs
 my $JobName1 = 'UnitTest1';
 my $JobID1   = $Kernel::OM->Get('Automation')->JobAdd(

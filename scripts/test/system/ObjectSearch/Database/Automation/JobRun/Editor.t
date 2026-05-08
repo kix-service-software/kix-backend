@@ -421,6 +421,10 @@ my $ObjectSearch = $Kernel::OM->Get('ObjectSearch');
 # begin transaction on database
 $Helper->BeginWork();
 
+# clear job runs
+$Kernel::OM->Get('DB')->Do( SQL => 'DELETE FROM automation_log' );
+$Kernel::OM->Get('DB')->Do( SQL => 'DELETE FROM job_run' );
+
 ## prepare user mapping
 my $RoleID = $Kernel::OM->Get('Role')->RoleLookup(
     Role => 'Customer Manager'
