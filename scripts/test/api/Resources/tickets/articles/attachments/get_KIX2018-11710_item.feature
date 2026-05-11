@@ -14,7 +14,6 @@ Feature: GET request to the /tickets/:TicketID/articles/:ArticleID/attachments r
     Then the response code is 200
     When I get the inline attachment item
     Then the response code is 200
-    Then the response content is
     And the response contains the following items of type Attachment
       | ContentType                  | Disposition | Filename |
       | text/html; charset=\"utf-8\" | inline      | file-2   |
