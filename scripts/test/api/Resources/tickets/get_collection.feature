@@ -49,7 +49,6 @@ Feature: GET request to the /tickets resource
     Given 8 of tickets
     When I query the collection of tickets with sorted by "Ticket.-Title:textual" 
     Then the response code is 200
-#    Then the response content is
     And the response contains 8 items of type "Ticket"
     When delete all this tickets
     Then the response code is 204

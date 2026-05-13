@@ -8,7 +8,6 @@
   Scenario: get an existing log
     When I query the collection of logs
     Then the response code is 200
-Then the response content is
     When I get the first log
     Then the response code is 200
     And the response object is LogFileResponse
