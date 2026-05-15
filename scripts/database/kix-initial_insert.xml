@@ -4313,7 +4313,7 @@
         <Data Key="name" Type="Quote">Salutation</Data>
         <Data Key="language" Type="Quote">en</Data>
         <Data Key="keywords" Type="Quote">introduction salutation</Data>
-        <Data Key="text" Type="Quote">Dear &lt;KIX_CONTACT_UserFirstname&gt; &lt;KIX_CONTACT_UserLastname&gt;,
+        <Data Key="text" Type="Quote">Dear &lt;KIX_CONTACT_Firstname&gt; &lt;KIX_CONTACT_Lastname&gt;,
 
 thank you for your message.
 </Data>
@@ -4329,7 +4329,7 @@ thank you for your message.
         <Data Key="name" Type="Quote">Anrede</Data>
         <Data Key="language" Type="Quote">de</Data>
         <Data Key="keywords" Type="Quote">Einstieg Anrede</Data>
-        <Data Key="text" Type="Quote">Sehr geehrte/r &lt;KIX_CONTACT_UserFirstname&gt; &lt;KIX_CONTACT_UserLastname&gt;,
+        <Data Key="text" Type="Quote">Sehr geehrte/r &lt;KIX_CONTACT_Firstname&gt; &lt;KIX_CONTACT_Lastname&gt;,
 
 vielen Dank für Ihre Nachricht.
 </Data>
