@@ -31,12 +31,12 @@
             "ID": 9,
             "Message": {
                 "de": {
-                    "Body": "Hallo <KIX_NOTIFICATION_RECIPIENT_UserFirstname> <KIX_NOTIFICATION_RECIPIENT_UserLastname>,\n\ndie Erinnerungszeit für das gesperrte Ticket [<KIX_CONFIG_Ticket::Hook><KIX_CONFIG_Ticket::HookDivider><KIX_TICKET_TicketNumber>] wurde erreicht.\n\n<KIX_CONFIG_HttpType>://<KIX_CONFIG_FQDN>/<KIX_CONFIG_ScriptAlias>index.pl?Action=AgentTicketZoom;TicketID=<KIX_TICKET_TicketID>\n\n-- <KIX_CONFIG_NotificationSenderName>",
+                    "Body": "Hallo <KIX_NOTIFICATION_RECIPIENT_Firstname> <KIX_NOTIFICATION_RECIPIENT_Lastname>,\n\ndie Erinnerungszeit für das gesperrte Ticket [<KIX_CONFIG_Ticket::Hook><KIX_CONFIG_Ticket::HookDivider><KIX_TICKET_TicketNumber>] wurde erreicht.\n\n<KIX_CONFIG_HttpType>://<KIX_CONFIG_FQDN>/<KIX_CONFIG_ScriptAlias>index.pl?Action=AgentTicketZoom;TicketID=<KIX_TICKET_TicketID>\n\n-- <KIX_CONFIG_NotificationSenderName>",
                     "ContentType": "text/plain",
                     "Subject": "Erinnerungszeit des gesperrten Tickets erreicht: <KIX_TICKET_Title>"
                 },
                 "en": {
-                    "Body": "Hi <KIX_NOTIFICATION_RECIPIENT_UserFirstname>,\n\nthe pending reminder time of the locked ticket [<KIX_CONFIG_Ticket::Hook><KIX_CONFIG_Ticket::HookDivider><KIX_TICKET_TicketNumber>] has been reached.\n\n<KIX_CONFIG_HttpType>://<KIX_CONFIG_FQDN>/<KIX_CONFIG_ScriptAlias>index.pl?Action=AgentTicketZoom;TicketID=<KIX_TICKET_TicketID>\n\n-- <KIX_CONFIG_NotificationSenderName>",
+                    "Body": "Hi <KIX_NOTIFICATION_RECIPIENT_Firstname>,\n\nthe pending reminder time of the locked ticket [<KIX_CONFIG_Ticket::Hook><KIX_CONFIG_Ticket::HookDivider><KIX_TICKET_TicketNumber>] has been reached.\n\n<KIX_CONFIG_HttpType>://<KIX_CONFIG_FQDN>/<KIX_CONFIG_ScriptAlias>index.pl?Action=AgentTicketZoom;TicketID=<KIX_TICKET_TicketID>\n\n-- <KIX_CONFIG_NotificationSenderName>",
                     "ContentType": "text/plain",
                     "Subject": "Locked Ticket Pending Reminder Time Reached: <KIX_TICKET_Title>"
                 }

@@ -24,6 +24,7 @@ our @ObjectDependencies = qw(
     Contact
     HTMLUtils
     Log
+    Organisation
     User
 );
 
@@ -141,11 +142,24 @@ sub _ReplaceUserPlaceholder {
 
     # FIXME: change/remove it (ID handling) with placeholder refactoring
     if (IsHashRefWithData(\%User)) {
-        $User{ID} = $User{UserID};
+        $User{ID}    = $User{UserID};
+        $User{Login} = $User{UserLogin};
     }
     if (IsHashRefWithData(\%ContactOfUser)) {
         $ContactOfUser{ContactID} = $ContactOfUser{ID};
         delete $ContactOfUser{ID};
+        $ContactOfUser{UserFirstname} = $ContactOfUser{Firstname};
+        $ContactOfUser{UserLastname}  = $ContactOfUser{Lastname};
+
+        if ($ContactOfUser{PrimaryOrganisationID}) {
+            my %Organisation = $Kernel::OM->Get('Organisation')->OrganisationGet(
+                ID => $ContactOfUser{PrimaryOrganisationID}
+            );
+            if (%Organisation) {
+                $ContactOfUser{PrimaryOrganisation} = $Organisation{Name};
+                $ContactOfUser{PrimaryOrganisationNumber} = $Organisation{Number};
+            }
+        }
     }
 
     # html quoting of content
