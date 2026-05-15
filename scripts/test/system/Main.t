@@ -711,7 +711,7 @@ my $Data = [
     {
         "ChangeBy" => 1,
         "ChangeTime" => "2025-06-16 14:31:26",
-        "Comment" => undef,
+        "Comment" => 'äöüß',
         "CreateBy" => 1,
         "CreateTime" => "2025-06-16 14:31:26",
         "ID" => 3,
@@ -899,7 +899,7 @@ my $Data = [
             {
                 "ChangeBy" => 1,
                 "ChangeTime" => "2025-06-16 14:31:26",
-                "Comment" => undef,
+                "Comment" => 'äöüß',
                 "CreateBy" => 1,
                 "CreateTime" => "2025-06-16 14:31:26",
                 "ID" => 3,
@@ -971,7 +971,7 @@ my $Data = [
             {
                 "ChangeBy" => 1,
                 "ChangeTime" => "2025-06-16 14:31:26",
-                "Comment" => undef,
+                "Comment" => 'äöüß',
                 "CreateBy" => 1,
                 "CreateTime" => "2025-06-16 14:31:26",
                 "ID" => 3,
@@ -1169,7 +1169,7 @@ my $Data = [
             {
                 "ChangeBy" => 1,
                 "ChangeTime" => "2025-06-16 14:31:26",
-                "Comment" => undef,
+                "Comment" => 'äöüß',
                 "CreateBy" => 1,
                 "CreateTime" => "2025-06-16 14:31:26",
                 "ID" => 3,
@@ -1219,7 +1219,7 @@ my $Data = [
             {
                 "ChangeBy" => 1,
                 "ChangeTime" => "2025-06-16 14:31:26",
-                "Comment" => undef,
+                "Comment" => 'äöüß',
                 "CreateBy" => 1,
                 "CreateTime" => "2025-06-16 14:31:26",
                 "ID" => 3,
@@ -1419,16 +1419,7 @@ my $Data = [
             },
         ]
     },
-
-
-
-
-
-
-
-
-
-
+    ### NOT FILTER TESTS ###
     {
         Name     => 'NOT EQ filter',
         Strict   => 0,
@@ -1469,7 +1460,7 @@ my $Data = [
             {
                 "ChangeBy" => 1,
                 "ChangeTime" => "2025-06-16 14:31:26",
-                "Comment" => undef,
+                "Comment" => 'äöüß',
                 "CreateBy" => 1,
                 "CreateTime" => "2025-06-16 14:31:26",
                 "ID" => 3,
@@ -1553,7 +1544,7 @@ my $Data = [
             {
                 "ChangeBy" => 1,
                 "ChangeTime" => "2025-06-16 14:31:26",
-                "Comment" => undef,
+                "Comment" => 'äöüß',
                 "CreateBy" => 1,
                 "CreateTime" => "2025-06-16 14:31:26",
                 "ID" => 3,
@@ -1615,7 +1606,7 @@ my $Data = [
             {
                 "ChangeBy" => 1,
                 "ChangeTime" => "2025-06-16 14:31:26",
-                "Comment" => undef,
+                "Comment" => 'äöüß',
                 "CreateBy" => 1,
                 "CreateTime" => "2025-06-16 14:31:26",
                 "ID" => 3,
@@ -1723,7 +1714,7 @@ my $Data = [
             {
                 "ChangeBy" => 1,
                 "ChangeTime" => "2025-06-16 14:31:26",
-                "Comment" => undef,
+                "Comment" => 'äöüß',
                 "CreateBy" => 1,
                 "CreateTime" => "2025-06-16 14:31:26",
                 "ID" => 3,
@@ -1784,7 +1775,7 @@ my $Data = [
             {
                 "ChangeBy" => 1,
                 "ChangeTime" => "2025-06-16 14:31:26",
-                "Comment" => undef,
+                "Comment" => 'äöüß',
                 "CreateBy" => 1,
                 "CreateTime" => "2025-06-16 14:31:26",
                 "ID" => 3,
@@ -1845,7 +1836,7 @@ my $Data = [
             {
                 "ChangeBy" => 1,
                 "ChangeTime" => "2025-06-16 14:31:26",
-                "Comment" => undef,
+                "Comment" => 'äöüß',
                 "CreateBy" => 1,
                 "CreateTime" => "2025-06-16 14:31:26",
                 "ID" => 3,
@@ -1884,7 +1875,7 @@ my $Data = [
             {
                 "ChangeBy" => 1,
                 "ChangeTime" => "2025-06-16 14:31:26",
-                "Comment" => undef,
+                "Comment" => 'äöüß',
                 "CreateBy" => 1,
                 "CreateTime" => "2025-06-16 14:31:26",
                 "ID" => 3,
@@ -1923,7 +1914,7 @@ my $Data = [
             {
                 "ChangeBy" => 1,
                 "ChangeTime" => "2025-06-16 14:31:26",
-                "Comment" => undef,
+                "Comment" => 'äöüß',
                 "CreateBy" => 1,
                 "CreateTime" => "2025-06-16 14:31:26",
                 "ID" => 3,
@@ -1985,6 +1976,359 @@ my $Data = [
             ],
         },
         Expected => undef
+    },
+    ### UMLAUT TEST (KIX2018-7119) ###
+    {
+        Name     => 'STARTSWITH filter - Umlaut value',
+        Strict   => 0,
+        Data     => $Data,
+        Filter   => {
+            AND => [
+                {
+                    Field    => 'Comment',
+                    Operator => 'STARTSWITH',
+                    Value    => 'ä',
+                }
+            ],
+        },
+        Expected => [
+            {
+                "ChangeBy"   => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment"    => 'äöüß',
+                "CreateBy"   => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID"         => 3,
+                "Name"       => "3 normal",
+                "ObjectIcon" => 23,
+                "ValidID"    => 1
+            }
+        ]
+    },
+    {
+        Name     => 'ENDSWITH filter - Umlaut value',
+        Strict   => 0,
+        Data     => $Data,
+        Filter   => {
+            AND => [
+                {
+                    Field    => 'Comment',
+                    Operator => 'ENDSWITH',
+                    Value    => 'ß',
+                }
+            ],
+        },
+        Expected => [
+            {
+                "ChangeBy"   => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment"    => 'äöüß',
+                "CreateBy"   => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID"         => 3,
+                "Name"       => "3 normal",
+                "ObjectIcon" => 23,
+                "ValidID"    => 1
+            }
+        ]
+    },
+    {
+        Name     => 'CONTAINS filter - Umlaut value',
+        Strict   => 0,
+        Data     => $Data,
+        Filter   => {
+            AND => [
+                {
+                    Field    => 'Comment',
+                    Operator => 'CONTAINS',
+                    Value    => 'ö',
+                }
+            ],
+        },
+        Expected => [
+            {
+                "ChangeBy"   => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment"    => 'äöüß',
+                "CreateBy"   => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID"         => 3,
+                "Name"       => "3 normal",
+                "ObjectIcon" => 23,
+                "ValidID"    => 1
+            }
+        ]
+    },
+    {
+        Name     => 'LIKE filter - Umlaut value',
+        Strict   => 0,
+        Data     => $Data,
+        Filter   => {
+            AND => [
+                {
+                    Field    => 'Comment',
+                    Operator => 'LIKE',
+                    Value    => '*ü*',
+                }
+            ],
+        },
+        Expected => [
+            {
+                "ChangeBy"   => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment"    => 'äöüß',
+                "CreateBy"   => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID"         => 3,
+                "Name"       => "3 normal",
+                "ObjectIcon" => 23,
+                "ValidID"    => 1
+            }
+        ]
+    },
+    {
+        Name     => 'NOT STARTSWITH filter - Umlaut value',
+        Strict   => 0,
+        Data     => $Data,
+        Filter   => {
+            AND => [
+                {
+                    Field    => 'Comment',
+                    Operator => 'STARTSWITH',
+                    Value    => 'ä',
+                    Not      => 1
+                }
+            ],
+        },
+        Expected => [
+            {
+                "ChangeBy"   => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment"    => undef,
+                "CreateBy"   => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID"         => 1,
+                "Name"       => "5 very low",
+                "ObjectIcon" => 25,
+                "ValidID"    => 1
+            },
+            {
+                "ChangeBy"   => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment"    => undef,
+                "CreateBy"   => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID"         => 2,
+                "Name"       => "4 low",
+                "ObjectIcon" => 24,
+                "ValidID"    => 1
+            },
+            {
+                "ChangeBy"   => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment"    => undef,
+                "CreateBy"   => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID"         => 4,
+                "Name"       => "2 high",
+                "ObjectIcon" => 22,
+                "ValidID"    => 1
+            },
+            {
+                "ChangeBy"   => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment"    => undef,
+                "CreateBy"   => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID"         => 5,
+                "Name"       => "1 very high",
+                "ObjectIcon" => 21,
+                "ValidID"    => 1
+            }
+        ]
+    },
+    {
+        Name     => 'NOT ENDSWITH filter - Umlaut value',
+        Strict   => 0,
+        Data     => $Data,
+        Filter   => {
+            AND => [
+                {
+                    Field    => 'Comment',
+                    Operator => 'ENDSWITH',
+                    Value    => 'ß',
+                    Not      => 1
+                }
+            ],
+        },
+        Expected => [
+            {
+                "ChangeBy"   => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment"    => undef,
+                "CreateBy"   => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID"         => 1,
+                "Name"       => "5 very low",
+                "ObjectIcon" => 25,
+                "ValidID"    => 1
+            },
+            {
+                "ChangeBy"   => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment"    => undef,
+                "CreateBy"   => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID"         => 2,
+                "Name"       => "4 low",
+                "ObjectIcon" => 24,
+                "ValidID"    => 1
+            },
+            {
+                "ChangeBy"   => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment"    => undef,
+                "CreateBy"   => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID"         => 4,
+                "Name"       => "2 high",
+                "ObjectIcon" => 22,
+                "ValidID"    => 1
+            },
+            {
+                "ChangeBy"   => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment"    => undef,
+                "CreateBy"   => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID"         => 5,
+                "Name"       => "1 very high",
+                "ObjectIcon" => 21,
+                "ValidID"    => 1
+            }
+        ]
+    },
+    {
+        Name     => 'NOT CONTAINS filter - Umlaut value',
+        Strict   => 0,
+        Data     => $Data,
+        Filter   => {
+            AND => [
+                {
+                    Field    => 'Comment',
+                    Operator => 'CONTAINS',
+                    Value    => 'ö',
+                    Not      => 1
+                }
+            ],
+        },
+        Expected => [
+            {
+                "ChangeBy"   => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment"    => undef,
+                "CreateBy"   => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID"         => 1,
+                "Name"       => "5 very low",
+                "ObjectIcon" => 25,
+                "ValidID"    => 1
+            },
+            {
+                "ChangeBy"   => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment"    => undef,
+                "CreateBy"   => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID"         => 2,
+                "Name"       => "4 low",
+                "ObjectIcon" => 24,
+                "ValidID"    => 1
+            },
+            {
+                "ChangeBy"   => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment"    => undef,
+                "CreateBy"   => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID"         => 4,
+                "Name"       => "2 high",
+                "ObjectIcon" => 22,
+                "ValidID"    => 1
+            },
+            {
+                "ChangeBy"   => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment"    => undef,
+                "CreateBy"   => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID"         => 5,
+                "Name"       => "1 very high",
+                "ObjectIcon" => 21,
+                "ValidID"    => 1
+            }
+        ]
+    },
+    {
+        Name     => 'NOT LIKE filter - Umlaut value',
+        Strict   => 0,
+        Data     => $Data,
+        Filter   => {
+            AND => [
+                {
+                    Field    => 'Comment',
+                    Operator => 'LIKE',
+                    Value    => '*ü*',
+                    Not      => 1
+                }
+            ],
+        },
+        Expected => [
+            {
+                "ChangeBy"   => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment"    => undef,
+                "CreateBy"   => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID"         => 1,
+                "Name"       => "5 very low",
+                "ObjectIcon" => 25,
+                "ValidID"    => 1
+            },
+            {
+                "ChangeBy"   => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment"    => undef,
+                "CreateBy"   => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID"         => 2,
+                "Name"       => "4 low",
+                "ObjectIcon" => 24,
+                "ValidID"    => 1
+            },
+            {
+                "ChangeBy"   => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment"    => undef,
+                "CreateBy"   => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID"         => 4,
+                "Name"       => "2 high",
+                "ObjectIcon" => 22,
+                "ValidID"    => 1
+            },
+            {
+                "ChangeBy"   => 1,
+                "ChangeTime" => "2025-06-16 14:31:26",
+                "Comment"    => undef,
+                "CreateBy"   => 1,
+                "CreateTime" => "2025-06-16 14:31:26",
+                "ID"         => 5,
+                "Name"       => "1 very high",
+                "ObjectIcon" => 21,
+                "ValidID"    => 1
+            }
+        ]
     },
 );
 
