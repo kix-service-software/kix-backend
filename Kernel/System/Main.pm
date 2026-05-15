@@ -1346,18 +1346,23 @@ sub FilterObjectList {
                             my $Type        = $FilterItem->{Type} || 'STRING';
 
                             # check if the value references a field in our hash and take its value in this case
-                            if ( $FilterValue && $FilterValue =~ /^\$(.*?)$/ ) {
+                            if (
+                                IsString( $FilterValue )
+                                && $FilterValue =~ /^\$(.*?)$/
+                            ) {
                                 $FilterValue = exists( $ObjectItem->{$1} ) ? $ObjectItem->{$1} : undef;
                             }
-                            elsif ($FilterValue) {
-                                if ( IsStringWithData($FilterValue) && $FilterItem->{Operator} eq 'LIKE' ) {
-                                    # make non word characters literal to prevent invalid regex (e.g. only opened brackets "[some*test" ==> "\[some*test")
-                                    $FilterValue =~ s/([^\w\s\*\\])/\\$1/g;
-                                    # remove possible unnecessary added backslash
-                                    $FilterValue =~ s/\\\\/\\/g;
-                                }
-                                # replace wildcards with valid RegEx in FilterValue
-                                $FilterValue =~ s/\*/.*?/g;
+                            elsif (
+                                $FilterItem->{Operator} eq 'IN'
+                                && IsArrayRefWithData( $FilterValue )
+                            ) {
+                                ## do nothing ##
+                            }
+                            elsif (
+                                $FilterItem->{Operator} ne 'IN'
+                                && IsString( $FilterValue )
+                            ) {
+                                ## do nothing ##
                             }
                             else {
                                 $FilterValue = undef;
@@ -1373,13 +1378,12 @@ sub FilterObjectList {
                             }
 
                             # handle multiple FieldValues (array)
+                            $FilterMatch = 0;
                             FIELDVALUE:
-                            foreach my $FieldValue (@FieldValues) {
-                                $FilterMatch = 1;
+                            for my $FieldValue (@FieldValues) {
 
                                 # prepare date compare
                                 if ( $Type eq 'DATE' ) {
-
                                     # convert values to unixtime
                                     my ( $DatePart, $TimePart ) = split( /\s+/, $FieldValue );
                                     $FieldValue = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
@@ -1396,7 +1400,6 @@ sub FilterObjectList {
 
                                 # prepare datetime compare
                                 elsif ( $Type eq 'DATETIME' ) {
-
                                     # convert values to unixtime
                                     $FieldValue = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
                                         String => $FieldValue,
@@ -1411,102 +1414,140 @@ sub FilterObjectList {
 
                                 # equal (=)
                                 if ( $FilterItem->{Operator} eq 'EQ' ) {
-                                    if ( !$FilterValue && $FieldValue ) {
-                                        $FilterMatch = 0
+                                    if ( $Type eq 'STRING' ) {
+                                        next FIELDVALUE if ( ( $FieldValue || '' ) ne ( $FilterValue || '' ) );
                                     }
-                                    elsif ( $Type eq 'STRING' && ( $FieldValue || '' ) ne ( $FilterValue || '' ) ) {
-                                        $FilterMatch = 0;
+                                    elsif ( $Type eq 'NUMERIC'  ) {
+                                        next FIELDVALUE if ( ( $FieldValue || 0 ) != ( $FilterValue || 0 ) );
                                     }
-                                    elsif ( $Type eq 'NUMERIC' && ( $FieldValue || 0 ) != ( $FilterValue || 0 ) ) {
-                                        $FilterMatch = 0;
+                                    else {
+                                        next FIELDVALUE;
                                     }
                                 }
 
                                 # not equal (!=)
                                 elsif ( $FilterItem->{Operator} eq 'NE' ) {
-                                    if ( !$FilterValue && !$FieldValue ) {
-                                        $FilterMatch = 0
+                                    if ( $Type eq 'STRING' ) {
+                                        next FIELDVALUE if ( ( $FieldValue || '' ) eq ( $FilterValue || '' ) );
                                     }
-                                    elsif ( $Type eq 'STRING' && ( $FieldValue || '' ) eq ( $FilterValue || '' ) ) {
-                                        $FilterMatch = 0;
+                                    elsif ( $Type eq 'NUMERIC'  ) {
+                                        next FIELDVALUE if ( ( $FieldValue || 0 ) == ( $FilterValue || 0 ) );
                                     }
-                                    elsif ( $Type eq 'NUMERIC' && ( $FieldValue || 0 ) == ( $FilterValue || 0 ) ) {
-                                        $FilterMatch = 0;
+                                    else {
+                                        next FIELDVALUE;
                                     }
                                 }
 
                                 # less than (<)
                                 elsif ( $FilterItem->{Operator} eq 'LT' ) {
-                                    if ( $Type eq 'NUMERIC' && ( $FieldValue || 0 ) >= ( $FilterValue || 0 ) ) {
-                                        $FilterMatch = 0;
+                                    if ( $Type eq 'NUMERIC' ) {
+                                        next FIELDVALUE if ( ( $FieldValue || 0 ) >= ( $FilterValue || 0 ) );
+                                    }
+                                    else {
+                                        next FIELDVALUE;
                                     }
                                 }
 
                                 # greater than (>)
                                 elsif ( $FilterItem->{Operator} eq 'GT' ) {
-                                    if ( $Type eq 'NUMERIC' && ( $FieldValue || 0 ) <= ( $FilterValue || 0 ) ) {
-                                        $FilterMatch = 0;
+                                    if ( $Type eq 'NUMERIC' ) {
+                                        next FIELDVALUE if ( ( $FieldValue || 0 ) <= ( $FilterValue || 0 ) );
+                                    }
+                                    else {
+                                        next FIELDVALUE;
                                     }
                                 }
 
                                 # less than or equal (<=)
                                 elsif ( $FilterItem->{Operator} eq 'LTE' ) {
-                                    if ( $Type eq 'NUMERIC' && ( $FieldValue || 0 ) > ( $FilterValue || 0 ) ) {
-                                        $FilterMatch = 0;
+                                    if ( $Type eq 'NUMERIC' ) {
+                                        next FIELDVALUE if ( ( $FieldValue || 0 ) > ( $FilterValue || 0 ) );
+                                    }
+                                    else {
+                                        next FIELDVALUE;
                                     }
                                 }
 
                                 # greater than or equal (>=)
                                 elsif ( $FilterItem->{Operator} eq 'GTE' ) {
-                                    if ( $Type eq 'NUMERIC' && ( $FieldValue || 0 ) < ( $FilterValue || 0 ) ) {
-                                        $FilterMatch = 0;
+                                    if ( $Type eq 'NUMERIC' ) {
+                                        next FIELDVALUE if ( ( $FieldValue || 0 ) < ( $FilterValue || 0 ) );
+                                    }
+                                    else {
+                                        next FIELDVALUE;
                                     }
                                 }
 
                                 # value is contained in an array or values
                                 elsif ( $FilterItem->{Operator} eq 'IN' ) {
-                                    $FilterMatch = 0;
-                                    foreach $FilterValue ( @{$FilterValue} ) {
-                                        if ( $Type eq 'NUMERIC' ) {
-                                            next if ( $FilterValue || 0 ) != ( $FieldValue || 0 );
+                                    next FIELDVALUE if ( !IsArrayRefWithData( $FilterValue ) );
+
+                                    FILTERVALUE:
+                                    for my $FilterValueEntry ( @{ $FilterValue } ) {
+                                        if ( $Type eq 'STRING' ) {
+                                            next FILTERVALUE if ( ( $FieldValue || '' ) ne ( $FilterValueEntry || '' ) );
                                         }
-                                        next if $FilterValue ne $FieldValue;
+                                        elsif ( $Type eq 'NUMERIC'  ) {
+                                            next FILTERVALUE if ( ( $FieldValue || 0 ) != ( $FilterValueEntry || 0 ) );
+                                        }
+                                        else {
+                                            next FILTERVALUE;
+                                        }
+
                                         $FilterMatch = 1;
+                                        last FIELDVALUE;
                                     }
+                                    next FIELDVALUE;
                                 }
 
                                 # the string contains a part
                                 elsif ( $FilterItem->{Operator} eq 'CONTAINS' ) {
-                                    my $FilterValueQuoted = quotemeta $FilterValue;
-                                    if ( $Type eq 'STRING' && $FieldValue !~ /$FilterValueQuoted/i ) {
-                                        $FilterMatch = 0;
+                                    my $FilterValueQuoted = quotemeta( $FilterValue );
+                                    if ( $Type eq 'STRING' ) {
+                                        next FIELDVALUE if ( $FieldValue !~ /$FilterValueQuoted/i );
+                                    }
+                                    else {
+                                        next FIELDVALUE;
                                     }
                                 }
 
                                 # the string starts with the part
                                 elsif ( $FilterItem->{Operator} eq 'STARTSWITH' ) {
-                                    my $FilterValueQuoted = quotemeta $FilterValue;
-                                    if ( $Type eq 'STRING' && $FieldValue !~ /^$FilterValueQuoted/i ) {
-                                        $FilterMatch = 0;
+                                    my $FilterValueQuoted = quotemeta( $FilterValue );
+                                    if ( $Type eq 'STRING' ) {
+                                        next FIELDVALUE if ( $FieldValue !~ /^$FilterValueQuoted/i );
+                                    }
+                                    else {
+                                        next FIELDVALUE;
                                     }
                                 }
 
                                 # the string ends with the part
                                 elsif ( $FilterItem->{Operator} eq 'ENDSWITH' ) {
-                                    my $FilterValueQuoted = quotemeta $FilterValue;
-                                    if ( $Type eq 'STRING' && $FieldValue !~ /$FilterValueQuoted$/i ) {
-                                        $FilterMatch = 0;
+                                    my $FilterValueQuoted = quotemeta( $FilterValue );
+                                    if ( $Type eq 'STRING' ) {
+                                        next FIELDVALUE if ( $FieldValue !~ /$FilterValueQuoted$/i );
+                                    }
+                                    else {
+                                        next FIELDVALUE;
                                     }
                                 }
 
                                 # the string matches the pattern
                                 elsif ( $FilterItem->{Operator} eq 'LIKE' ) {
-                                    if ( $Type eq 'STRING' && $FieldValue !~ /^$FilterValue$/im ) {
-                                        $FilterMatch = 0;
+                                    my $FilterValueQuoted = $FilterValue;
+                                    $FilterValueQuoted =~ s/([^\*]+)/quotemeta( $1 )/eg;
+                                    $FilterValueQuoted =~ s/\*/.*?/g;
+                                    if ( $Type eq 'STRING' ) {
+                                        next FIELDVALUE if ( $FieldValue !~ /^$FilterValueQuoted$/im );
+                                    }
+                                    else {
+                                        next FIELDVALUE;
                                     }
                                 }
 
-                                last FIELDVALUE if $FilterMatch;
+                                $FilterMatch = 1;
+                                last FIELDVALUE;
                             }
                         }
                     }
