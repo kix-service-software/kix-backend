@@ -13,6 +13,7 @@
                 <Item Key="CacheType">API_cmdb_classes</Item>
                 <Item Key="CacheTypeDependency">ITSMConfigurationManagement</Item>
                 <Item Key="RelevantObjectPermissions">CIClass-to-ConfigItem</Item>
+                <Item Key="RelevantBasePermissions">Base::Asset</Item>
             </Hash>
         </Setting>
     </ConfigItem>

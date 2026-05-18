@@ -1048,6 +1048,43 @@ sub _RestorePreviousValue {
     return 1;
 }
 
+=item _HandlePermissions()
+
+Handle the optional "Permissions" property
+
+    $CommonObject->_HandlePermissions(
+        ObjectID    => 123,
+        Object      => 'Queue',
+        Data        => {...},
+        Permissions => [],
+    );
+
+=cut
+
+sub _HandlePermissions {
+    my ( $Self, %Param ) = @_;
+
+    return $Self->SUPER::_HandlePermissions(        
+        %Param,
+        Object  => 'GeneralCatalog',
+    );
+}
+
+sub GetBasePermissionObjectIDs {
+    my ( $Self, %Param ) = @_;
+
+    # # we don't have to do the checks if we have been called by TicketSearch
+    # return 1 if ( $Self->{CallingOperationType} && $Self->{CallingOperationType} eq 'V1::Ticket::TicketSearch' );
+
+    my $ClassIDs = $Kernel::OM->Get('ITSMConfigItem')->BasePermissionRelevantObjectIDList(
+        %Param,
+    );
+    return if ( !defined( $ClassIDs ) );
+    return 1 if !IsArrayRef($ClassIDs);
+
+    return { Object => 'ConfigItem', Attribute => 'ClassID', ObjectIDs => $ClassIDs };
+}
+
 1;
 
 =end Internal:

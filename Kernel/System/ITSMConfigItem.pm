@@ -23,6 +23,7 @@ use Kernel::System::ITSMConfigItem::Permission;
 use Kernel::System::ITSMConfigItem::Version;
 use Kernel::System::ITSMConfigItem::XML;
 use Kernel::System::VariableCheck qw(:all);
+use Kernel::System::GeneralCatalog::BasePermission;
 
 use Storable;
 use Digest::MD5 qw(md5_hex);
@@ -90,6 +91,7 @@ sub new {
         Kernel::System::ITSMConfigItem::XML
         Kernel::System::EventHandler
         Kernel::System::PreEventHandler
+        Kernel::System::GeneralCatalog::BasePermission
     );
 
     # Dynamically find packages which are considered as super-classes for this
