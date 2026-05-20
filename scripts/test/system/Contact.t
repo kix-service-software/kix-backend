@@ -14,14 +14,6 @@ use vars (qw($Self));
 
 use Kernel::System::VariableCheck qw(:all);
 
-# get needed objects
-my $ConfigObject       = $Kernel::OM->Get('Config');
-my $CacheObject        = $Kernel::OM->Get('Cache');
-my $ContactObject      = $Kernel::OM->Get('Contact');
-my $OrganisationObject = $Kernel::OM->Get('Organisation');
-my $DBObject           = $Kernel::OM->Get('DB');
-my $UserObject         = $Kernel::OM->Get('User');
-
 # get helper object
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
@@ -29,14 +21,14 @@ my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 $Helper->BeginWork();
 
 # add three users
-$ConfigObject->Set(
+$Kernel::OM->Get('Config')->Set(
     Key   => 'CheckEmailAddresses',
     Value => 0,
 );
 
 # create organisation for tests
 my $OrgRand        = 'Example-Organisation-Company' . $Helper->GetRandomID();
-my $OrganisationID = $OrganisationObject->OrganisationAdd(
+my $OrganisationID = $Kernel::OM->Get('Organisation')->OrganisationAdd(
     Number  => $OrgRand,
     Name    => $OrgRand . ' Inc',
     Street  => 'Some Street',
@@ -48,7 +40,7 @@ my $OrganisationID = $OrganisationObject->OrganisationAdd(
     ValidID => 1,
     UserID  => 1,
 );
-my $OrganisationIDForUpdate = $OrganisationObject->OrganisationAdd(
+my $OrganisationIDForUpdate = $Kernel::OM->Get('Organisation')->OrganisationAdd(
     Number  => $OrgRand . '_ForUpdate',
     Name    => $OrgRand . ' Inc_ForUpdate',
     Street  => 'Some Street',
@@ -61,7 +53,7 @@ my $OrganisationIDForUpdate = $OrganisationObject->OrganisationAdd(
     UserID  => 1,
 );
 
-my $SubOrganisationID = $OrganisationObject->OrganisationAdd(
+my $SubOrganisationID = $Kernel::OM->Get('Organisation')->OrganisationAdd(
     ParentID => $OrganisationID,
     Number   => $OrgRand.'_sub',
     Name     => $OrgRand . '_sub Inc',
@@ -75,7 +67,7 @@ my $SubOrganisationID = $OrganisationObject->OrganisationAdd(
     UserID   => 1,
 );
 
-my $SubSubOrganisationID = $OrganisationObject->OrganisationAdd(
+my $SubSubOrganisationID = $Kernel::OM->Get('Organisation')->OrganisationAdd(
     ParentID => $SubOrganisationID,
     Number   => $OrgRand.'_sub_sub',
     Name     => $OrgRand . '_sub_sub Inc',
@@ -96,7 +88,7 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_' ) {
     my $ContactRandom = 'unittest-' . $Key . $Helper->GetRandomID();
 
     # add assigned user
-    my $UserID = $UserObject->UserAdd(
+    my $UserID = $Kernel::OM->Get('User')->UserAdd(
         UserLogin    => $ContactRandom,
         ValidID      => 1,
         ChangeUserID => 1,
@@ -107,7 +99,7 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_' ) {
         "assigned UserAdd() - $UserID",
     );
 
-    my $ContactID = $ContactObject->ContactAdd(
+    my $ContactID = $Kernel::OM->Get('Contact')->ContactAdd(
         AssignedUserID        => $UserID,
         Firstname             => 'Firstname Test' . $Key,
         Lastname              => 'Lastname Test' . $Key,
@@ -119,13 +111,12 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_' ) {
         ValidID  => 1,
         UserID   => 1,
     );
-
     $Self->True(
         $ContactID,
         "ContactAdd() - $ContactID",
     );
 
-    my %Contact = $ContactObject->ContactGet(
+    my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
         ID => $ContactID,
     );
 
@@ -177,7 +168,7 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_' ) {
         "Enable Organisation::VirtuallyAssignContactsToSubOrganisations",
     );
 
-    %Contact = $ContactObject->ContactGet(
+    %Contact = $Kernel::OM->Get('Contact')->ContactGet(
         ID => $ContactID,
     );
     $Self->Is(
@@ -205,7 +196,7 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_' ) {
         "Disable Organisation::VirtuallyAssignContactsToSubOrganisations",
     );
 
-    %Contact = $ContactObject->ContactGet(
+    %Contact = $Kernel::OM->Get('Contact')->ContactGet(
         ID => $ContactID,
     );
     $Self->Is(
@@ -221,7 +212,7 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_' ) {
         "ContactGet() re-test - OrganisationIDs",
     );
 
-    my $Update = $ContactObject->ContactUpdate(
+    my $Update = $Kernel::OM->Get('Contact')->ContactUpdate(
         ID                    => $ContactID,
         AssignedUserID        => $UserID,
         Firstname             => 'Firstname Test Update' . $Key,
@@ -239,7 +230,7 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_' ) {
         "ContactUpdate() - $ContactID",
     );
 
-    %Contact = $ContactObject->ContactGet(
+    %Contact = $Kernel::OM->Get('Contact')->ContactGet(
         ID => $ContactID,
     );
 
@@ -301,9 +292,8 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_' ) {
     );
 
     $Kernel::OM->ObjectsDiscard( Objects => ['Contact'] );
-    $ContactObject = $Kernel::OM->Get('Contact');
 
-    $CacheObject->CleanUp();
+    $Kernel::OM->Get('Cache')->CleanUp();
 
     # Customer Search
     %List = $Kernel::OM->Get('ObjectSearch')->Search(
@@ -597,7 +587,7 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_' ) {
     }
 
     #update customer user
-    $Update = $ContactObject->ContactUpdate(
+    $Update = $Kernel::OM->Get('Contact')->ContactUpdate(
         ID                    => $ContactID,
         AssignedUserID        => $UserID,
         Firstname             => 'Firstname Update' . $ContactID,
@@ -618,7 +608,7 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_' ) {
     if ( $Key eq '1' ) {
 
         # delete the first contact
-        my $Success = $ContactObject->ContactDelete(
+        my $Success = $Kernel::OM->Get('Contact')->ContactDelete(
             ID     => $ContactID,
             UserID => 1,
         );
@@ -628,6 +618,276 @@ for my $Key ( 1 .. 3, 'ä', 'カス', '_' ) {
             "ContactDelete() - $ContactID",
         );
     }
+}
+
+# set fixed time for test
+$Helper->FixedTimeSet(
+    $Kernel::OM->Get('Time')->TimeStamp2SystemTime(
+        String => '2014-01-01 14:00:00',
+    ),
+);
+
+my $DynamicFieldID1 = $Kernel::OM->Get('DynamicField')->DynamicFieldAdd(
+    Name            => 'UnitTest1',
+    Label           => 'UnitTest1',
+    FieldType       => 'Text',
+    ObjectType      => 'Contact',
+    Config          => {},
+    ValidID         => 1,
+    UserID          => 1
+);
+$Self->True(
+    $DynamicFieldID1,
+    'DynamicFieldAdd() - create first test dynamic field'
+);
+my $DynamicField1 = $Kernel::OM->Get('DynamicField')->DynamicFieldGet(
+    ID => $DynamicFieldID1,
+);
+
+my $DynamicFieldID2 = $Kernel::OM->Get('DynamicField')->DynamicFieldAdd(
+    Name            => 'UnitTest2',
+    Label           => 'UnitTest2',
+    FieldType       => 'Text',
+    ObjectType      => 'Contact',
+    Config          => {},
+    ValidID         => 1,
+    UserID          => 1
+);
+$Self->True(
+    $DynamicFieldID2,
+    'DynamicFieldAdd() - create second test dynamic field'
+);
+my $DynamicField2 = $Kernel::OM->Get('DynamicField')->DynamicFieldGet(
+    ID => $DynamicFieldID2,
+);
+
+my $ContactID1 = $Kernel::OM->Get('Contact')->ContactAdd(
+    Firstname => 'Unit',
+    Lastname  => 'Test',
+    Email     => 'unit.test@example.com',
+    ValidID   => 1,
+    UserID    => 1,
+);
+$Self->True(
+    $ContactID1,
+    "ContactAdd() - $ContactID1",
+);
+
+my $DynamicFieldValue1 = $Kernel::OM->Get('DynamicField::Backend')->ValueSet(
+    DynamicFieldConfig => $DynamicField1,
+    ObjectID           => $ContactID1,
+    Value              => 'UnitTest1',
+    UserID             => 1,
+);
+$Self->True(
+    $DynamicFieldValue1,
+    'ValueSet() - set first dynamic field value',
+);
+
+my $DynamicFieldValue2 = $Kernel::OM->Get('DynamicField::Backend')->ValueSet(
+    DynamicFieldConfig => $DynamicField2,
+    ObjectID           => $ContactID1,
+    Value              => 'UnitTest2',
+    UserID             => 1,
+);
+$Self->True(
+    $DynamicFieldValue2,
+    'ValueSet() - set second dynamic field value',
+);
+
+my @ContactGetTests = (
+    {
+        Name      => 'Parameter DynamicFields not given',
+        Parameter => {
+            ID => $ContactID1
+        },
+        Expected  => {
+            ID              => $ContactID1,
+            UserID          => $ContactID1,
+            Firstname       => 'Unit',
+            Lastname        => 'Test',
+            Email           => 'unit.test@example.com',
+            Title           => undef,
+            Phone           => undef,
+            Fax             => undef,
+            Mobile          => undef,
+            Street          => undef,
+            Zip             => undef,
+            City            => undef,
+            Country         => undef,
+            Comment         => '',
+            ValidID         => 1,
+            CreateTime      => '2014-01-01 14:00:00',
+            CreateBy        => 1,
+            ChangeTime      => '2014-01-01 14:00:00',
+            ChangeBy        => 1,
+            AssignedUserID  => undef,
+            Email1          => '',
+            Email2          => '',
+            Email3          => '',
+            Email4          => '',
+            Email5          => '',
+            OrganisationIDs => [],
+            Fullname        => 'Unit Test'
+        }
+    },
+    {
+        Name      => 'Parameter DynamicFields true value',
+        Parameter => {
+            ID            => $ContactID1,
+            DynamicFields => 1
+        },
+        Expected  => {
+            ID                     => $ContactID1,
+            UserID                 => $ContactID1,
+            Firstname              => 'Unit',
+            Lastname               => 'Test',
+            Email                  => 'unit.test@example.com',
+            Title                  => undef,
+            Phone                  => undef,
+            Fax                    => undef,
+            Mobile                 => undef,
+            Street                 => undef,
+            Zip                    => undef,
+            City                   => undef,
+            Country                => undef,
+            Comment                => '',
+            ValidID                => 1,
+            CreateTime             => '2014-01-01 14:00:00',
+            CreateBy               => 1,
+            ChangeTime             => '2014-01-01 14:00:00',
+            ChangeBy               => 1,
+            AssignedUserID         => undef,
+            Email1                 => '',
+            Email2                 => '',
+            Email3                 => '',
+            Email4                 => '',
+            Email5                 => '',
+            OrganisationIDs        => [],
+            Fullname               => 'Unit Test',
+            DynamicField_UnitTest1 => ['UnitTest1'],
+            DynamicField_UnitTest2 => ['UnitTest2']
+        }
+    },
+    {
+        Name      => 'Parameter DynamicFields empty array',
+        Parameter => {
+            ID            => $ContactID1,
+            DynamicFields => []
+        },
+        Expected  => {
+            ID              => $ContactID1,
+            UserID          => $ContactID1,
+            Firstname       => 'Unit',
+            Lastname        => 'Test',
+            Email           => 'unit.test@example.com',
+            Title           => undef,
+            Phone           => undef,
+            Fax             => undef,
+            Mobile          => undef,
+            Street          => undef,
+            Zip             => undef,
+            City            => undef,
+            Country         => undef,
+            Comment         => '',
+            ValidID         => 1,
+            CreateTime      => '2014-01-01 14:00:00',
+            CreateBy        => 1,
+            ChangeTime      => '2014-01-01 14:00:00',
+            ChangeBy        => 1,
+            AssignedUserID  => undef,
+            Email1          => '',
+            Email2          => '',
+            Email3          => '',
+            Email4          => '',
+            Email5          => '',
+            OrganisationIDs => [],
+            Fullname        => 'Unit Test'
+        }
+    },
+    {
+        Name      => 'Parameter DynamicFields array with existing field',
+        Parameter => {
+            ID            => $ContactID1,
+            DynamicFields => ['UnitTest1']
+        },
+        Expected  => {
+            ID                     => $ContactID1,
+            UserID                 => $ContactID1,
+            Firstname              => 'Unit',
+            Lastname               => 'Test',
+            Email                  => 'unit.test@example.com',
+            Title                  => undef,
+            Phone                  => undef,
+            Fax                    => undef,
+            Mobile                 => undef,
+            Street                 => undef,
+            Zip                    => undef,
+            City                   => undef,
+            Country                => undef,
+            Comment                => '',
+            ValidID                => 1,
+            CreateTime             => '2014-01-01 14:00:00',
+            CreateBy               => 1,
+            ChangeTime             => '2014-01-01 14:00:00',
+            ChangeBy               => 1,
+            AssignedUserID         => undef,
+            Email1                 => '',
+            Email2                 => '',
+            Email3                 => '',
+            Email4                 => '',
+            Email5                 => '',
+            OrganisationIDs        => [],
+            Fullname               => 'Unit Test',
+            DynamicField_UnitTest1 => ['UnitTest1']
+        }
+    },
+    {
+        Name      => 'Parameter DynamicFields array with not existing field',
+        Parameter => {
+            ID            => $ContactID1,
+            DynamicFields => ['UnitTest3']
+        },
+        Expected  => {
+            ID              => $ContactID1,
+            UserID          => $ContactID1,
+            Firstname       => 'Unit',
+            Lastname        => 'Test',
+            Email           => 'unit.test@example.com',
+            Title           => undef,
+            Phone           => undef,
+            Fax             => undef,
+            Mobile          => undef,
+            Street          => undef,
+            Zip             => undef,
+            City            => undef,
+            Country         => undef,
+            Comment         => '',
+            ValidID         => 1,
+            CreateTime      => '2014-01-01 14:00:00',
+            CreateBy        => 1,
+            ChangeTime      => '2014-01-01 14:00:00',
+            ChangeBy        => 1,
+            AssignedUserID  => undef,
+            Email1          => '',
+            Email2          => '',
+            Email3          => '',
+            Email4          => '',
+            Email5          => '',
+            OrganisationIDs => [],
+            Fullname        => 'Unit Test'
+        }
+    }
+);
+for my $Test ( @ContactGetTests ) {
+    my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
+        %{ $Test->{Parameter} }
+    );
+    $Self->IsDeeply(
+        \%Contact,
+        $Test->{Expected},
+        'ContactGet: ' . $Test->{Name} . ': Result',
+    );
 }
 
 # rollback transaction on database

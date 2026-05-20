@@ -17,10 +17,11 @@ use vars (qw($Self));
 use File::Path;
 use Unicode::Normalize;
 
-# get needed objects
-my $ConfigObject = $Kernel::OM->Get('Config');
-my $EncodeObject = $Kernel::OM->Get('Encode');
-my $MainObject   = $Kernel::OM->Get('Main');
+# get helper object
+my $Helper = $Kernel::OM->Get('UnitTest::Helper');
+
+# begin transaction on database
+$Helper->BeginWork();
 
 # FilenameCleanUp - tests
 my @Tests = (
@@ -89,7 +90,7 @@ my @Tests = (
 );
 
 for my $Test (@Tests) {
-    my $Filename = $MainObject->FilenameCleanUp(
+    my $Filename = $Kernel::OM->Get('Main')->FilenameCleanUp(
         Filename => $Test->{FilenameOrig},
         Type     => $Test->{Type},
     );
@@ -102,7 +103,7 @@ for my $Test (@Tests) {
 
 # md5sum tests
 my $String = 'abc1234567890';
-my $MD5Sum = $MainObject->MD5sum( String => \$String );
+my $MD5Sum = $Kernel::OM->Get('Main')->MD5sum( String => \$String );
 $Self->Is(
     $MD5Sum || '',
     '57041f8f7dff9b67e3f97d7facbaf8d3',
@@ -111,7 +112,7 @@ $Self->Is(
 
 # test charset specific situations
 $String = 'abc1234567890äöüß-カスタマ';
-$MD5Sum = $MainObject->MD5sum( String => \$String );
+$MD5Sum = $Kernel::OM->Get('Main')->MD5sum( String => \$String );
 
 $Self->Is(
     $MD5Sum || '',
@@ -127,10 +128,10 @@ my %MD5SumOf = (
     xls => '39fae660239f62bb0e4a29fe14ff5663',
 );
 
-my $Home = $ConfigObject->Get('Home');
+my $Home = $Kernel::OM->Get('Config')->Get('Home');
 
 for my $Extension (qw(doc pdf png txt xls)) {
-    my $MD5Sum = $MainObject->MD5sum(
+    my $MD5Sum = $Kernel::OM->Get('Main')->MD5sum(
         Filename => $Home . "/scripts/test/system/sample/Main/Main-Test1.$Extension",
     );
     $Self->Is(
@@ -140,14 +141,14 @@ for my $Extension (qw(doc pdf png txt xls)) {
     );
 }
 
-my $Path = $ConfigObject->Get('TempDir');
+my $Path = $Kernel::OM->Get('Config')->Get('TempDir');
 
 # write & read some files via Directory/Filename
 for my $Extension (qw(doc pdf png txt xls)) {
-    my $MD5Sum = $MainObject->MD5sum(
+    my $MD5Sum = $Kernel::OM->Get('Main')->MD5sum(
         Filename => $Home . "/scripts/test/system/sample/Main/Main-Test1.$Extension",
     );
-    my $Content = $MainObject->FileRead(
+    my $Content = $Kernel::OM->Get('Main')->FileRead(
         Directory => $Home . '/scripts/test/system/sample/Main/',
         Filename  => "Main-Test1.$Extension",
     );
@@ -155,7 +156,7 @@ for my $Extension (qw(doc pdf png txt xls)) {
         ${$Content} || '',
         "FileRead() - Main-Test1.$Extension",
     );
-    my $FileLocation = $MainObject->FileWrite(
+    my $FileLocation = $Kernel::OM->Get('Main')->FileWrite(
         Directory => $Path,
         Filename  => "me_öüto/al<>?Main-Test1.$Extension",
         Content   => $Content,
@@ -164,7 +165,7 @@ for my $Extension (qw(doc pdf png txt xls)) {
         $FileLocation || '',
         "FileWrite() - $FileLocation",
     );
-    my $MD5Sum2 = $MainObject->MD5sum(
+    my $MD5Sum2 = $Kernel::OM->Get('Main')->MD5sum(
         Filename => $Path . '/' . $FileLocation,
     );
     $Self->Is(
@@ -172,7 +173,7 @@ for my $Extension (qw(doc pdf png txt xls)) {
         $MD5Sum  || '',
         "MD5sum()>FileWrite()>MD5sum() - $FileLocation",
     );
-    my $Success = $MainObject->FileDelete(
+    my $Success = $Kernel::OM->Get('Main')->FileDelete(
         Directory => $Path,
         Filename  => $FileLocation,
     );
@@ -184,17 +185,17 @@ for my $Extension (qw(doc pdf png txt xls)) {
 
 # write & read some files via Location
 for my $Extension (qw(doc pdf png txt xls)) {
-    my $MD5Sum = $MainObject->MD5sum(
+    my $MD5Sum = $Kernel::OM->Get('Main')->MD5sum(
         Filename => $Home . "/scripts/test/system/sample/Main/Main-Test1.$Extension",
     );
-    my $Content = $MainObject->FileRead(
+    my $Content = $Kernel::OM->Get('Main')->FileRead(
         Location => $Home . '/scripts/test/system/sample/Main/' . "Main-Test1.$Extension",
     );
     $Self->True(
         ${$Content} || '',
         "FileRead() - Main-Test1.$Extension",
     );
-    my $FileLocation = $MainObject->FileWrite(
+    my $FileLocation = $Kernel::OM->Get('Main')->FileWrite(
         Location => $Path . "Main-Test1.$Extension",
         Content  => $Content,
     );
@@ -202,13 +203,13 @@ for my $Extension (qw(doc pdf png txt xls)) {
         $FileLocation || '',
         "FileWrite() - $FileLocation",
     );
-    my $MD5Sum2 = $MainObject->MD5sum( Filename => $FileLocation );
+    my $MD5Sum2 = $Kernel::OM->Get('Main')->MD5sum( Filename => $FileLocation );
     $Self->Is(
         $MD5Sum2 || '',
         $MD5Sum  || '',
         "MD5sum()>FileWrite()>MD5sum() - $FileLocation",
     );
-    my $Success = $MainObject->FileDelete( Location => $FileLocation );
+    my $Success = $Kernel::OM->Get('Main')->FileDelete( Location => $FileLocation );
     $Self->True(
         $Success || '',
         "FileDelete() - $FileLocation",
@@ -217,7 +218,7 @@ for my $Extension (qw(doc pdf png txt xls)) {
 
 # write / read ARRAYREF test
 my $Content      = "some\ntest\nöäüßカスタマ";
-my $FileLocation = $MainObject->FileWrite(
+my $FileLocation = $Kernel::OM->Get('Main')->FileWrite(
     Directory => $Path,
     Filename  => "some-test.txt",
     Mode      => 'utf8',
@@ -228,7 +229,7 @@ $Self->True(
     "FileWrite() - $FileLocation",
 );
 
-my $ContentARRAYRef = $MainObject->FileRead(
+my $ContentARRAYRef = $Kernel::OM->Get('Main')->FileRead(
     Directory => $Path,
     Filename  => $FileLocation,
     Mode      => 'utf8',
@@ -254,7 +255,7 @@ $Self->Is(
     "FileRead() [2] - $FileLocation",
 );
 
-my $Success = $MainObject->FileDelete(
+my $Success = $Kernel::OM->Get('Main')->FileDelete(
     Directory => $Path,
     Filename  => $FileLocation,
 );
@@ -264,7 +265,7 @@ $Self->True(
 );
 
 # check if the file have the correct charset
-my $ContentSCALARRef = $MainObject->FileRead(
+my $ContentSCALARRef = $Kernel::OM->Get('Main')->FileRead(
     Location => $Home . '/scripts/test/system/sample/Main/PDF-test2-utf-8.txt',
     Mode     => 'utf8',
     Result   => 'SCALAR',
@@ -282,7 +283,7 @@ $Self->True(
     "FileRead() - Check a utf8 file - is the utf8 content wellformed ( $Text )",
 );
 
-my $FileMTime = $MainObject->FileGetMTime(
+my $FileMTime = $Kernel::OM->Get('Main')->FileGetMTime(
     Location => $Home . '/Kernel/Config.pm',
 );
 
@@ -291,7 +292,7 @@ $Self->True(
     'FileGetMTime()',
 );
 
-my $FileMTimeNonexisting = $MainObject->FileGetMTime(
+my $FileMTimeNonexisting = $Kernel::OM->Get('Main')->FileGetMTime(
     Location        => $Home . '/Kernel/some.nonexisting.file',
     DisableWarnings => 1,
 );
@@ -326,7 +327,7 @@ for my $Directory ( $DirectoryWithFiles, $SubDirA, $SubDirB, ) {
         'Второй_файл',    # Unicode NFD
         )
     {
-        my $Success = $MainObject->FileWrite(
+        my $Success = $Kernel::OM->Get('Main')->FileWrite(
             Directory => $Directory,
             Filename  => "Example_File_$Suffix",
             Content   => \'',
@@ -530,14 +531,14 @@ for my $Test (@Tests) {
 
     my @UnicodeResults;
     for my $Result ( @{ $Test->{Results} } ) {
-        push @UnicodeResults, $EncodeObject->Convert2CharsetInternal(
+        push @UnicodeResults, $Kernel::OM->Get('Encode')->Convert2CharsetInternal(
             Text => $Result,
             From => 'utf-8',
         );
     }
     @UnicodeResults = sort @UnicodeResults;
 
-    my @Results = $MainObject->DirectoryRead(
+    my @Results = $Kernel::OM->Get('Main')->DirectoryRead(
         Directory => $Test->{Directory},
         Filter    => $Test->{Filter},
         Recursive => $Test->{Recursive},
@@ -605,12 +606,12 @@ for my $Directory ( $DirectoryWithFiles, $DirectoryWithoutFiles ) {
 
 for my $Test (@Tests) {
     $Self->Is(
-        $MainObject->Dump( $Test->{Source} ),
+        $Kernel::OM->Get('Main')->Dump( $Test->{Source} ),
         $Test->{ResultDumpBinary},
         "$Test->{Name} - Dump() result (binary)"
     );
     $Self->Is(
-        $MainObject->Dump( $Test->{Source}, 'ascii' ),
+        $Kernel::OM->Get('Main')->Dump( $Test->{Source}, 'ascii' ),
         $Test->{ResultDumpAscii},
         "$Test->{Name} - Dump() result (ascii)"
     );
@@ -618,7 +619,7 @@ for my $Test (@Tests) {
 
 # Generate Random string test
 
-my $Token  = $MainObject->GenerateRandomString();
+my $Token  = $Kernel::OM->Get('Main')->GenerateRandomString();
 my $Length = length($Token);
 
 $Self->True(
@@ -632,7 +633,7 @@ $Self->Is(
     "GenerateRandomString - standard size is 16",
 );
 
-$Token = $MainObject->GenerateRandomString(
+$Token = $Kernel::OM->Get('Main')->GenerateRandomString(
     Length => 8,
 );
 $Length = length($Token);
@@ -652,7 +653,7 @@ my %Values;
 my $Seen = 0;
 COUNTER:
 for my $Counter ( 1 .. 100_000 ) {
-    my $Random = $MainObject->GenerateRandomString( Length => 16 );
+    my $Random = $Kernel::OM->Get('Main')->GenerateRandomString( Length => 16 );
     if ( $Values{$Random}++ ) {
         $Seen = 1;
         last COUNTER;
@@ -669,7 +670,7 @@ $Self->Is(
 my $NoHexChar;
 COUNTER:
 for my $Counter ( 1 .. 1000 ) {
-    my $HexString = $MainObject->GenerateRandomString(
+    my $HexString = $Kernel::OM->Get('Main')->GenerateRandomString(
         Length     => 32,
         Dictionary => [ 0 .. 9, 'a' .. 'f' ],
     );
@@ -2336,7 +2337,7 @@ my $TestCount = 0;
 foreach my $Test ( @Tests ) {
     $TestCount++;
 
-    my $FilteredData = $MainObject->FilterObjectList(
+    my $FilteredData = $Kernel::OM->Get('Main')->FilterObjectList(
         %{$Test},
     );
 
@@ -2840,7 +2841,7 @@ foreach my $Test ( @Tests ) {
     my %Data      = %{$Test->{Data}};
     my %Variables = %{$Test->{Variables}};
 
-    $MainObject->ReplaceVariables(
+    $Kernel::OM->Get('Main')->ReplaceVariables(
         Data      => \%Data,
         Variables => \%Variables
     );
@@ -2852,10 +2853,235 @@ foreach my $Test ( @Tests ) {
     );
 }
 
+my @GetAssignedSearchAttributesTests = (
+    {
+        Name         => 'Missing parameter "AssignedObjectType"',
+        ConfigSet    => '',
+        Parameter    => {
+            ObjectType => 'Contact',
+            Silent     => 1
+        },
+        Expected     => undef,
+        InfoMessage  => undef,
+        ErrorMessage => 'Need AssignedObjectType!'
+    },
+    {
+        Name         => 'Missing parameter "ObjectType"',
+        ConfigSet    => '',
+        Parameter    => {
+            AssignedObjectType => 'Ticket',
+            Silent             => 1
+        },
+        Expected     => undef,
+        InfoMessage  => undef,
+        ErrorMessage => 'Need ObjectType!'
+    },
+    {
+        Name         => 'Unset SysConfig "AssignedObjectsMapping"',
+        ConfigSet    => '',
+        Parameter    => {
+            AssignedObjectType => 'Ticket',
+            ObjectType         => 'Contact',
+            Silent             => 1
+        },
+        Expected     => {},
+        InfoMessage  => 'SysConfig "AssignedObjectsMapping" not set',
+        ErrorMessage => undef
+    },
+    {
+        Name         => 'SysConfig "AssignedObjectsMapping" without matching ObjectType/AssignedObjectType',
+        ConfigSet    => '{"Ticket":{"Contact":{"OrganisationID":{"SearchAttributes":["RelevantOrganisationID"]},"ContactID":{"SearchAttributes":["ID"]}}}}',
+        Parameter    => {
+            AssignedObjectType => 'Ticket',
+            ObjectType         => 'Contact',
+            Silent             => 1
+        },
+        Expected     => {},
+        InfoMessage  => 'ObjectType "Contact" or AssignedObjectType "Ticket" not contained in SysConfig "AssignedObjectsMapping"',
+        ErrorMessage => undef
+    },
+    {
+        Name         => 'SysConfig "AssignedObjectsMapping" with matching ObjectType/AssignedObjectType',
+        ConfigSet    => '{"Contact":{"Ticket":{"OrganisationID":{"SearchAttributes":["RelevantOrganisationID"]},"ContactID":{"SearchAttributes":["ID"]}}}}',
+        Parameter    => {
+            AssignedObjectType => 'Ticket',
+            ObjectType         => 'Contact',
+            Silent             => 1
+        },
+        Expected     => {
+            ContactID => {
+                SearchAttributes => ['ID']
+            },
+            OrganisationID => {
+                SearchAttributes => ['RelevantOrganisationID']
+            }
+        },
+        InfoMessage  => undef,
+        ErrorMessage => undef
+    }
+);
+for my $Test ( @GetAssignedSearchAttributesTests ) {
+    $Helper->ConfigSettingChange(
+        Key   => 'AssignedObjectsMapping',
+        Value => $Test->{ConfigSet}
+    );
+
+    # clear logstack
+    $Kernel::OM->Get('Log')->{LogStack}->{4} = [];
+    $Kernel::OM->Get('Log')->{LogStack}->{16} = [];
+
+    my $SearchAttributes = $Kernel::OM->Get('Main')->GetAssignedSearchAttributes(
+        %{ $Test->{Parameter} }
+    );
+    $Self->IsDeeply(
+        $SearchAttributes,
+        $Test->{Expected},
+        'GetAssignedSearchAttributes: ' . $Test->{Name} . ': Result',
+    );
+
+    my $InfoMessage = $Kernel::OM->Get('Log')->GetLogEntry(
+        Type => 'info',
+        What => 'Message',
+    );
+    $Self->IsDeeply(
+        $InfoMessage,
+        $Test->{InfoMessage},
+        'GetAssignedSearchAttributes: ' . $Test->{Name} . ': InfoMessage'
+    );
+
+    my $ErrorMessage = $Kernel::OM->Get('Log')->GetLogEntry(
+        Type => 'error',
+        What => 'Message',
+    );
+    $Self->IsDeeply(
+        $ErrorMessage,
+        $Test->{ErrorMessage},
+        'GetAssignedSearchAttributes: ' . $Test->{Name} . ': ErrorMessage'
+    );
+}
+
+my @GetAssignedSearchParamsTests = (
+    {
+        Name         => 'Missing parameter "AssignedObjectType"',
+        ConfigSet    => '',
+        Parameter    => {
+            ObjectType => 'Contact',
+            Silent     => 1
+        },
+        Expected     => {},
+        InfoMessage  => undef,
+        ErrorMessage => 'Need AssignedObjectType!'
+    },
+    {
+        Name         => 'Missing parameter "ObjectType"',
+        ConfigSet    => '',
+        Parameter    => {
+            AssignedObjectType => 'Ticket',
+            Silent             => 1
+        },
+        Expected     => {},
+        InfoMessage  => undef,
+        ErrorMessage => 'Need ObjectType!'
+    },
+    {
+        Name         => 'Unset SysConfig "AssignedObjectsMapping"',
+        ConfigSet    => '',
+        Parameter    => {
+            AssignedObjectType => 'Ticket',
+            ObjectType         => 'Contact',
+            Silent             => 1
+        },
+        Expected     => {},
+        InfoMessage  => 'SysConfig "AssignedObjectsMapping" not set',
+        ErrorMessage => undef
+    },
+    {
+        Name         => 'SysConfig "AssignedObjectsMapping" without matching ObjectType/AssignedObjectType',
+        ConfigSet    => '{"Ticket":{"Contact":{"OrganisationID":{"SearchAttributes":["RelevantOrganisationID"]},"QueueID":{"SearchStatic":["1"]}}}}',
+        Parameter    => {
+            AssignedObjectType => 'Ticket',
+            ObjectType         => 'Contact',
+            Silent             => 1
+        },
+        Expected     => {},
+        InfoMessage  => 'ObjectType "Contact" or AssignedObjectType "Ticket" not contained in SysConfig "AssignedObjectsMapping"',
+        ErrorMessage => undef
+    },
+    {
+        Name         => 'SysConfig "AssignedObjectsMapping" with matching ObjectType/AssignedObjectType, without Object',
+        ConfigSet    => '{"Contact":{"Ticket":{"OrganisationID":{"SearchAttributes":["RelevantOrganisationID"]},"QueueID":{"SearchStatic":["1"]}}}}',
+        Parameter    => {
+            AssignedObjectType => 'Ticket',
+            ObjectType         => 'Contact'
+        },
+        Expected     => {
+            QueueID => [1]
+        },
+        InfoMessage  => undef,
+        ErrorMessage => undef
+    },
+    {
+        Name         => 'SysConfig "AssignedObjectsMapping" with matching ObjectType/AssignedObjectType, with Object',
+        ConfigSet    => '{"Contact":{"Ticket":{"OrganisationID":{"SearchAttributes":["RelevantOrganisationID"]},"QueueID":{"SearchStatic":["1"]}}}}',
+        Parameter    => {
+            AssignedObjectType => 'Ticket',
+            ObjectType         => 'Contact',
+            Object             => {
+                RelevantOrganisationID => 2
+            }
+        },
+        Expected     => {
+            QueueID        => [1],
+            OrganisationID => [2]
+        },
+        InfoMessage  => undef,
+        ErrorMessage => undef
+    }
+);
+for my $Test ( @GetAssignedSearchParamsTests ) {
+    $Helper->ConfigSettingChange(
+        Key   => 'AssignedObjectsMapping',
+        Value => $Test->{ConfigSet}
+    );
+
+    # clear logstack
+    $Kernel::OM->Get('Log')->{LogStack}->{4} = [];
+    $Kernel::OM->Get('Log')->{LogStack}->{16} = [];
+
+    my %SearchData = $Kernel::OM->Get('Main')->GetAssignedSearchParams(
+        %{ $Test->{Parameter} }
+    );
+    $Self->IsDeeply(
+        \%SearchData,
+        $Test->{Expected},
+        'GetAssignedSearchParams: ' . $Test->{Name} . ': Result',
+    );
+
+    my $InfoMessage = $Kernel::OM->Get('Log')->GetLogEntry(
+        Type => 'info',
+        What => 'Message',
+    );
+    $Self->IsDeeply(
+        $InfoMessage,
+        $Test->{InfoMessage},
+        'GetAssignedSearchParams: ' . $Test->{Name} . ': InfoMessage'
+    );
+
+    my $ErrorMessage = $Kernel::OM->Get('Log')->GetLogEntry(
+        Type => 'error',
+        What => 'Message',
+    );
+    $Self->IsDeeply(
+        $ErrorMessage,
+        $Test->{ErrorMessage},
+        'GetAssignedSearchParams: ' . $Test->{Name} . ': ErrorMessage'
+    );
+}
+
+# rollback transaction on database
+$Helper->Rollback();
 
 1;
-
-
 
 =back
 
