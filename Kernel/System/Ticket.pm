@@ -1377,7 +1377,7 @@ sub TicketGet {
 
     # prepare cache key
     my $CacheKey = 'TicketGet::' . $Param{Extended} . '::';
-    if ( IsArrayRefWithData($Param{DynamicFields}) ) {
+    if ( IsArrayRef($Param{DynamicFields}) ) {
         $CacheKey .= join('::', @{$Param{DynamicFields}});
     }
     else {
@@ -1452,7 +1452,7 @@ sub TicketGet {
         my $DynamicFieldBackendObject = $Kernel::OM->Get('DynamicField::Backend');
 
         my $FieldFilterRef = undef;
-        if ( IsArrayRefWithData($Param{DynamicFields}) ) {
+        if ( IsArrayRef($Param{DynamicFields}) ) {
             my %FieldFilter = map { $_ => 1 } @{$Param{DynamicFields}};
 
             $FieldFilterRef = \%FieldFilter;
