@@ -37,7 +37,6 @@
     Given 6 of faq articles
     When I query the collection of faq articles with sorted by "FAQArticle.-Title:textual"
     Then the response code is 200
-    Then the response content is
     And the response contains 6 items of type "FAQArticle"
     And the response contains the following items of type FAQArticle
       | Title                 |

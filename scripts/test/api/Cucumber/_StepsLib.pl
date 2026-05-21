@@ -129,7 +129,7 @@ Then qr/the attribute "(.*?)" is "(.*?)"$/, sub {
 Then qr/the response contains (\d+) items of type "(.*?)"$/, sub {
    is(@{S->{ResponseContent}->{$2}}, $1, 'Check response item count');
    my $Anzahl = @{S->{ResponseContent}->{$2}};
-    print STDERR "Anzahl:".Dumper($Anzahl);
+#    print STDERR "Anzahl:".Dumper($Anzahl);
 };
 
 Then qr/the (.*?) header is set/, sub {
