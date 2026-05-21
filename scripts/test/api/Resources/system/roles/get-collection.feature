@@ -33,7 +33,7 @@ Feature: GET request to the /system/roles resource
   Scenario: get the list of existing roles with offset
     When I query the collection of roles with offset 2
     Then the response code is 200
-    And the response contains 17 items of type "Role"
+    And the response contains 19 items of type "Role"
 
   Scenario: get the list of existing roles with limit and offset
     When I query the collection of roles with limit 2 and offset 4
@@ -43,28 +43,30 @@ Feature: GET request to the /system/roles resource
   Scenario: get the list of existing roles with sorted
     When I query the collection of roles with sorted by "Role.-Name:textual"
     Then the response code is 200
-    And the response contains 19 items of type "Role"
+    And the response contains 21 items of type "Role"
     And the response contains the following items of type Role
-      | Name                         |
-      | Webform Ticket Creator       |
-      | Ticket Reader                |
-      | Ticket Agent (Servicedesk)   |
-      | Ticket Agent Base Permission |
-      | Ticket Agent                 |
-      | Textmodule Admin             |
-      | System Admin                 |
-      | Superuser                    |
-      | Report User                  |
-      | Report Manager               |
-      | FAQ Reader                   |
-      | FAQ Editor                   |
-      | FAQ Admin                    |
-      | Customer Reader              |
-      | Customer Manager             |
-      | Customer                     |
-      | Asset Reader                 |
-      | Asset Maintainer             |
-      | Agent User                   |
+      | Name                             |
+      | Webform Ticket Creator           |
+      | Ticket Reader                    |
+      | Ticket Agent (Servicedesk)       |
+      | Ticket Agent Base Permission     |
+      | Ticket Agent                     |
+      | Textmodule Admin                 |
+      | System Admin                     |
+      | Superuser                        |
+      | Report User                      |
+      | Report Manager                   |
+      | FAQ Reader                       |
+      | FAQ Editor                       |
+      | FAQ Admin                        |
+      | Customer Reader                  |
+      | Customer Manager                 |
+      | Customer                         |
+      | Asset Reader Base Permission     |
+      | Asset Reader                     |
+      | Asset Maintainer Base Permission |
+      | Asset Maintainer                 |
+      | Agent User                       |
 
 
   Scenario: get the list of existing roles with sorted, limit and offset
