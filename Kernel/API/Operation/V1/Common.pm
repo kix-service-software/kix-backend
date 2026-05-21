@@ -4344,11 +4344,26 @@ sub _GetCustomerUserVisibleObjectIds {
         IsHashRefWithData($Self->{Authorization}) &&
         $Self->{Authorization}->{UserType} eq 'Customer'
     ) {
+        my $ContactSearchAttributes = $Kernel::OM->Get('Main')->GetAssignedSearchAttributes(
+            ObjectType         => 'Contact',
+            AssignedObjectType => $Param{ObjectType}
+        );
+        my $ContactDynamicFields = [];
+        if ( IsHashRefWithData( $ContactSearchAttributes ) ) {
+            for my $Attribute ( keys( %{ $ContactSearchAttributes } ) ) {
+                if ( $Attribute =~ m/^DynamicField_(.+)$/ ) {
+                    push( @{ $ContactDynamicFields }, $1 );
+                }
+            }
+        }
+        if ( !IsArrayRefWithData( $ContactDynamicFields ) ) {
+            $ContactDynamicFields = 0;
+        }
 
         # get contact data
         my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
             UserID        => $Self->{Authorization}->{UserID},
-            DynamicFields => 1
+            DynamicFields => $ContactDynamicFields
         );
 
         # get object relevant ids
