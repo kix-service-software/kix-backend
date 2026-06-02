@@ -239,6 +239,10 @@ sub TimeAccountingCreate {
     );
     return if !IsHashRefWithData($Data);
 
+    $Data->{TimeUnit} = $Self->_TimeUnitCalculate(
+        Value => $Data->{TimeUnit}
+    );
+
     my %Condition = $Self->_PrepareCondition(
         %{$Data},
         Type => 'Create'
@@ -312,6 +316,10 @@ sub TimeAccountingUpdate {
         Type => 'Update'
     );
     return if !IsHashRefWithData($Data);
+
+    $Data->{TimeUnit} = $Self->_TimeUnitCalculate(
+        Value => $Data->{TimeUnit}
+    );
 
     my %Condition = $Self->_PrepareCondition(
         %{$Data},
@@ -866,36 +874,44 @@ sub _CheckParams {
         return;
     }
 
-    if ( $Data->{TimeUnit} ) {
-        # check some wrong formats
-        $Data->{TimeUnit} =~ s/,/\./g;
-        $Data->{TimeUnit} =~ s/ //g;
-        $Data->{TimeUnit} =~ s/^(-?\d{1,10}\.\d\d).+?$/$1/g;
-        chomp $Data->{TimeUnit};
+    return if !$Self->_CheckTimeUnit(%Param);
 
-        if ( !IsNumber($Data->{TimeUnit}) ) {
+    return $Data;
+}
+
+sub _CheckTimeUnit {
+    my ( $Self, %Param ) = @_;
+
+    if ( $Param{TimeUnit} ) {
+        # check some wrong formats
+        $Param{TimeUnit} =~ s/,/\./g;
+        $Param{TimeUnit} =~ s/ //g;
+        $Param{TimeUnit} =~ s/^(-?\d{1,10}\.\d\d).+?$/$1/g;
+        chomp $Param{TimeUnit};
+
+        if ( !IsNumber($Param{TimeUnit}) ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "TimeUnit is not a number!",
-                Silent   => $Data->{Silent}
+                Silent   => $Param{Silent}
             );
             return;
         }
 
         if (
-            $Data->{TimeUnit} >= 86_400 ||
-            $Data->{TimeUnit} <= -86_400
+            $Param{TimeUnit} >= 86_400 ||
+            $Param{TimeUnit} <= -86_400
         ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "TimeUnit has to be between -86400 and 86400!",
-                Silent   => $Data->{Silent}
+                Silent   => $Param{Silent}
             );
             return;
         }
     }
 
-    return $Data;
+    return 1
 }
 
 =item _PrepareCondition()
@@ -974,7 +990,19 @@ sub _PrepareCondition {
     );
 }
 
-=item _PrepareCondition()
+=item _TimeUnitCalculate()
+
+calculate time unit
+
+=cut
+
+sub _TimeUnitCalculate {
+    my ( $Self, %Param ) = @_;
+    # do nothing, but some plugins require special preparation
+    return $Param{Value};
+}
+
+=item _GetLastInsertID()
 
 Returns the most recently created ID of the accounting time entry
 
