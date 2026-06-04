@@ -29,6 +29,16 @@ Kernel::API::Operation::Ticket::ArticleSearch - API Ticket Article Search Operat
 
 =cut
 
+sub Init {
+    my ( $Self, %Param ) = @_;
+
+    my $Result = $Self->SUPER::Init(%Param);
+
+    $Self->{HandleSortInCORE} = 1;
+
+    return $Result;
+}
+
 =item ParameterDefinition()
 
 define parameter preparation and check for this operation
