@@ -196,11 +196,7 @@ sub TableCreate {
     my @Return       = ();
     for my $Tag (@Param) {
 
-        if (
-            ( $Tag->{Tag} eq 'Table' || $Tag->{Tag} eq 'TableCreate' )
-            && $Tag->{TagType} eq 'Start'
-            )
-        {
+        if ( $Tag->{Tag} =~ /^Table(Create)?(IfNotExists)?$/ && $Tag->{TagType} eq 'Start' ) {
             if ( $ConfigObject->Get('Database::ShellOutput') ) {
                 $SQLStart .= $Self->{'DB::Comment'}
                     . "----------------------------------------------------------\n";
@@ -209,20 +205,16 @@ sub TableCreate {
                     . "----------------------------------------------------------\n";
             }
         }
-        if (
-            ( $Tag->{Tag} eq 'Table' || $Tag->{Tag} eq 'TableCreate' )
-            && $Tag->{TagType} eq 'Start'
-            )
-        {
-            $SQLStart .= "CREATE TABLE $Tag->{Name} (\n";
-            $TableName = $Tag->{Name};
-        }
-        if (
-            ( $Tag->{Tag} eq 'Table' || $Tag->{Tag} eq 'TableCreate' )
-            && $Tag->{TagType} eq 'End'
-            )
-        {
-            $SQLEnd .= ")";
+        if ( $Tag->{Tag} =~ /^Table(Create)?(IfNotExists)?$/ ) {
+            my $IfNotExists = $2;
+
+            if ( $Tag->{TagType} eq 'Start' ) {
+                $SQLStart .= "CREATE TABLE $Tag->{Name} (\n";
+                $TableName = $Tag->{Name};
+            }
+            elsif ( $Tag->{TagType} eq 'End' ) {
+                $SQLEnd .= ')';
+            }
         }
         elsif ( $Tag->{Tag} eq 'Column' && $Tag->{TagType} eq 'Start' ) {
             push @Column, $Tag;

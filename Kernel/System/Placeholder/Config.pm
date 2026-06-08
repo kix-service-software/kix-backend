@@ -88,19 +88,20 @@ sub _Replace {
                 )
             ) {
                 $Replace = $Self->_GetReplaceValue(
+                    %Param, 
                     Key             => $FullKey,
                     ReplaceNotFound => $Param{ReplaceNotFound}
                 );
             }
             else {
                 $Replace = $Param{UserID} == 1 ?
-                    $Replace = $Self->_GetReplaceValue(Key => $FullKey, ReplaceNotFound => $Param{ReplaceNotFound})
+                    $Replace = $Self->_GetReplaceValue(%Param, Key => $FullKey, ReplaceNotFound => $Param{ReplaceNotFound})
                     : $Param{ReplaceNotFound};
             }
         }
 
         if ( !$Exists && $Param{UserID} == 1 ) {
-            $Replace = $Self->_GetReplaceValue(Key => $FullKey, ReplaceNotFound => $Param{ReplaceNotFound});
+            $Replace = $Self->_GetReplaceValue(%Param, Key => $FullKey, ReplaceNotFound => $Param{ReplaceNotFound});
         }
 
         $Replace;
@@ -141,7 +142,7 @@ sub _GetReplaceValue {
         }
     }
     else {
-        return $ConfigObject->Get($Param{Key}) // $Param{ReplaceNotFound};
+        return $ConfigObject->Get($Param{Key}) // $Param{Data}->{$Param{Key}} // $Param{ReplaceNotFound};
         # TODO: handle ref values
         # if ( IsHashRefWithData($Replace) || IsArrayRefWithData($Replace) ) {
         #     $Replace = $Kernel::OM->Get('JSON')->Encode(
