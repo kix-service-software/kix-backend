@@ -109,7 +109,16 @@ sub Run {
     }
 
     # By default does not include HTML body as attachment (3) unless is explicitly requested (2).
-    my $StripPlainBodyAsAttachment = $Param{Data}->{HTMLBodyAsAttachment} ? 2 : 3;
+    my $StripPlainBodyAsAttachment;
+    if ( $Param{Data}->{HTMLBodyAsAttachment} ) {
+        $StripPlainBodyAsAttachment = 2;
+    }
+    elsif ( $Param{Data}->{NoInlineAttachments} ) {
+        $StripPlainBodyAsAttachment = 1;
+    }
+    else {
+        $StripPlainBodyAsAttachment = 3;
+    }
 
     my %AttachmentIndex = $TicketObject->ArticleAttachmentIndex(
         ContentPath                => $Article{ContentPath},
@@ -123,6 +132,7 @@ sub Run {
         # get already prepared Article data from ArticleGet operation
         my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::Ticket::ArticleAttachmentGet',
+            IgnoreParentPermissions  => 1,
             SuppressPermissionErrors => 1,
             Data                     => {
                 TicketID               => $Param{Data}->{TicketID},
