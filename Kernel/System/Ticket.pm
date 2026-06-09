@@ -1587,7 +1587,6 @@ sub _TicketCacheSet {
 
     # prepare cache type. Add TicketID when given
     my $CacheType = $Self->{CacheType};
-    my $Depends   = undef;
     if ( $Param{TicketID} ) {
         $CacheType .= $Param{TicketID};
     }
@@ -6262,6 +6261,11 @@ sub ArticleMove {
         TicketID => $Param{TicketID},
     );
 
+    # clear article cache
+    $Self->_ArticleCacheClear(
+        ArticleID => $Param{ArticleID}
+    );
+
     # event
     $Self->EventHandler(
         Event => 'ArticleMove',
@@ -6415,74 +6419,6 @@ sub ArticleCopy {
     );
 
     return $CopyArticleID;
-}
-
-=item ArticleFullDelete()
-
-Delete an article, its history, its plain message, and all attachments
-
-    my $Success = $TicketObject->ArticleFullDelete(
-        ArticleID => 123,
-        UserID    => 123,
-    );
-
-ATTENTION:
-    sub ArticleDelete is used in this sub, but this sub does not delete
-    article history
-
-Events:
-    ArticleFullDelete
-
-=cut
-
-sub ArticleFullDelete {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for my $Needed (qw(ArticleID UserID)) {
-        if ( !$Param{ $Needed } ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message => "ArticleFullDelete: Need $Needed!"
-            );
-            return;
-        }
-    }
-
-    # delete article history
-    return if !$Kernel::OM->Get('DB')->Do(
-        SQL  => 'DELETE FROM ticket_history WHERE article_id = ?',
-        Bind => [ \$Param{ArticleID} ],
-    );
-
-    # delete article, attachments and plain emails
-    return if !$Self->ArticleDelete(
-        ArticleID => $Param{ArticleID},
-        UserID    => $Param{UserID},
-    );
-
-    # get ticket id of article
-    my $TicketID = $Self->ArticleGetTicketID(
-        ArticleID => $Param{ArticleID},
-    );
-    return if !$TicketID;
-
-    # clear ticket cache
-    $Self->_TicketCacheClear(
-        TicketID => $TicketID,
-    );
-
-    # event
-    $Self->EventHandler(
-        Event => 'ArticleFullDelete',
-        Data  => {
-            TicketID  => $TicketID,
-            ArticleID => $Param{ArticleID},
-        },
-        UserID => $Param{UserID},
-    );
-
-    return 1;
 }
 
 =item ArticleCreateDateUpdate()
