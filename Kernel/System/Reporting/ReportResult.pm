@@ -280,7 +280,8 @@ sub ReportResultList {
 deletes a report result
 
     my $Success = $ReportingObject->ReportResultDelete(
-        ID => 123,
+        ID => 123,              # required
+        Silent => 0|1           # optional, default 0
     );
 
 =cut
@@ -304,10 +305,12 @@ sub ReportResultDelete {
         ID => $Param{ID},
     );
     if ( !%ReportResult ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "A report result with the ID $Param{ID} does not exist.",
-        );
+        if ( !$Param{Silent} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "A report result with the ID $Param{ID} does not exist.",
+            );
+        }
         return;
     }
 
