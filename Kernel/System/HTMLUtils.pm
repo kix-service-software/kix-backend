@@ -70,7 +70,7 @@ sub new {
 
 convert a html string to an ascii string
 
-    my $Ascii = $HTMLUtilsObject->ToAscii( 
+    my $Ascii = $HTMLUtilsObject->ToAscii(
         String       => $String,
         NoURLGlossar => 0|1,            # optional, default: 0 - don't add the URL list to the end of the document
         NoForcedLinebreak => 0|1,       # optional, default: 0
@@ -1276,7 +1276,6 @@ sub Safety {
     my $Packer = HTML::Packer->init();
     $Packer->minify(
         \$String, {
-            remove_comments => 1,
             remove_newlines => 1,
             do_javascript   => 'shrink',
             do_stylesheet   => 'minify',
@@ -1385,8 +1384,29 @@ sub _SafetyDeclarationHandler {
 sub _SafetyCommentHandler {
     my ( $Self, $Text ) = @_;
 
-    # remember replacement, conditional comments can contain unsecure code
-    $Self->{Safety}->{Replace} = 1;
+    # call safety function for comment content
+    if ( $Text =~ /^(<!--\[if\s[^\]]+\]>)(.*?)(<!\[endif\]-->)$/g ) {
+        my %Safety = $Kernel::OM->Get('HTMLUtils')->Safety(
+            %{ $Self->{Config} },
+            String => $2,
+        );
+
+        if ( $Safety{Replace} ) {
+            # remember replacement
+            $Self->{Safety}->{Replace} = 1;
+
+        }
+        # replace attribute value
+        $Self->{Safety}->{String} .= $1 . $Safety{String} . $3;
+    }
+    # keep conditional comments without content
+    elsif ( $Text =~ /^<!--(?:<!\[endif\]|\[if\s.*?\]>)/g ) {
+        $Self->{Safety}->{String} .= $Text;
+    }
+    # unhandle comments
+    else {
+        $Self->{Safety}->{Replace} = 1;
+    }
 
     return;
 }
