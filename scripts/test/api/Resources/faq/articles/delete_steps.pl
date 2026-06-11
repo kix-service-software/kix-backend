@@ -62,7 +62,7 @@ When qr/delete all of "(.*?)"$/, sub {
         Token => S->{Token},
         URL   => S->{API_URL}.'/faq/articles',#.$LC
     );
-    print STDERR "SHOW:".Dumper(S->{ResponseContent});
+
     my $ARRAYAnzahl = @{S->{ResponseContent}->{$1}};
     if ( $ARRAYAnzahl ) {
         foreach my $Row ( @{S->{ResponseContent}->{FAQArticle}} ) {
