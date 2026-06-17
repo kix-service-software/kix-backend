@@ -205,6 +205,7 @@ sub ValidateConfig {
         }
     }
 
+use Data::Dumper;
 
     # get SQL statement from config and prepare it for use
     my $SQL = $Self->_PrepareSQLStatement(
@@ -442,6 +443,7 @@ sub _PrepareSQLStatement {
     }
     if ( $SQL =~ /^base64\((.*?)\)\s*$/ ) {
         $SQL = MIME::Base64::decode_base64($1);
+        $Kernel::OM->Get('Encode')->EncodeOutput(\$SQL);
     }
 
     # quote parameters to prevent SQL injection

@@ -145,10 +145,18 @@ sub Array2CSV {
                 if ( !defined $ColumnLengths[$Col] || $ColumnLengths[$Col] < $CellLength ) {
                     $ColumnLengths[$Col] = $CellLength;
                 }
+
+                # we need to convert to iso to have correct umlauts
+                my $Value = $Kernel::OM->Get('Encode')->Convert(
+                    Text => $DataRaw->[$Col],
+                    From => 'utf-8',
+                    To   => 'iso-8859-1',
+                );
+
                 if ( $Row == 0 && @Head ) {
 
                     # Format header nicely if present.
-                    $Worksheet->write( $Row, $Col, "$DataRaw->[$Col]", $HeaderFormat );
+                    $Worksheet->write( $Row, $Col, "$Value", $HeaderFormat );
                 }
                 else {
                     # There are major problems with data recognition in Excel. KIX
@@ -156,7 +164,7 @@ sub Array2CSV {
                     #   Excel will (incorrectly) round them. Prevent this by using write_string()
                     #   to protect the data. This might trigger formatting notifications in Excel,
                     #   but these can be turned off.
-                    $Worksheet->write_string( $Row, $Col, "$DataRaw->[$Col]" );
+                    $Worksheet->write_string( $Row, $Col, "$Value" );
                 }
             }
             $Row++;
