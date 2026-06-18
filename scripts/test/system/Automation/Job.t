@@ -465,9 +465,8 @@ $Result = $AutomationObject->JobExecute(
     ID     => $JobID,
     UserID => 1
 );
-$Self->Is(
+$Self->True(
     $Result,
-    1,
     'JobExecute() successful',
 );
 

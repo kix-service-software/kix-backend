@@ -1520,7 +1520,7 @@ my $AccountedTime = $Kernel::OM->Get('TimeAccounting')->TimeAccountingTotal(
 
 $Self->Is(
     $AccountedTime,
-    4_132,
+    4_132.56,
     'Get Ticket Total Accounted Time',
 );
 
@@ -2592,7 +2592,7 @@ for my $SearchParam (qw(ArticleCreateTime CreateTime PendingTime)) {
                 ]
             },
             UserType   => 'Agent',
-            UserID     => 1,
+            UserID     => 1
         );
         my $ErrorMessage = $Kernel::OM->Get('Log')->GetLogEntry(
             Type => 'error',

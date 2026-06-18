@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/ 
+# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -126,9 +126,10 @@ $Self->False(
     'Validate() - invalid attribute',
 );
 
+# rollback transaction on database
+$Helper->Rollback();
+
 1;
-
-
 
 =back
 

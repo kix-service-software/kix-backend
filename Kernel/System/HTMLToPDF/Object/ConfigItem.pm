@@ -90,6 +90,7 @@ sub DataGet {
         if ( $Param{Number} ) {
             $ConfigItemID = $Kernel::OM->Get('ConfigItem')->ConfigItemLookup(
                 ConfigItemNumber => $Param{Number},
+                Silent           => $Param{Silent},
             );
 
             if ( !$ConfigItemID ) {
@@ -100,7 +101,8 @@ sub DataGet {
         }
 
         $ConfigItem = $Kernel::OM->Get('ConfigItem')->ConfigItemGet(
-            ConfigItemID => $ConfigItemID
+            ConfigItemID => $ConfigItemID,
+            Silent       => $Param{Silent}
         );
 
         if ( !IsHashRefWithData( $ConfigItem ) ) {
@@ -121,7 +123,8 @@ sub DataGet {
     for my $Key ( qw(CreateBy ChangeBy) ) {
         my $ID = $ConfigItem->{$Key};
         my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
-            UserID => $ID
+            UserID => $ID,
+            Silent => $Param{Silent}
         );
 
         if ( %Contact ) {
@@ -140,7 +143,8 @@ sub DataGet {
                 ObjectID => $ConfigItem->{ConfigItemID},
                 UserID   => $Param{UserID},
                 Data     => $ConfigItem,
-                Type     => 'Asset'
+                Type     => 'Asset',
+                Silent   => $Param{Silent}
             );
         }
     }
@@ -150,7 +154,8 @@ sub DataGet {
             Data   => {
                 %{$ConfigItem}
             },
-            Filter => \%Filters
+            Filter => \%Filters,
+            Silent => $Param{Silent}
         );
 
         return if !$Match;
@@ -179,7 +184,8 @@ sub _GetVersion {
 
     my $VersionRef = $Kernel::OM->Get('ConfigItem')->VersionGet(
         ConfigItemID => $Param{ObjectID},
-        XMLDataGet   => 0
+        XMLDataGet   => 0,
+        Silent       => $Param{Silent}
     );
 
     delete $VersionRef->{XMLDefinition};
@@ -192,7 +198,8 @@ sub _GetVersion {
     for my $Key ( qw(CreateBy) ) {
         next if !$VersionRef->{$Key};
         my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
-            UserID => $VersionRef->{$Key}
+            UserID => $VersionRef->{$Key},
+            Silent => $Param{Silent}
         );
 
         if ( %Contact ) {
@@ -213,7 +220,8 @@ sub _GetAttributes {
 
     my $VersionRef = $Kernel::OM->Get('ConfigItem')->VersionGet(
         ConfigItemID => $Param{ObjectID},
-        XMLDataGet   => 1
+        XMLDataGet   => 1,
+        Silent       => $Param{Silent}
     );
 
     my %XMLAttr;
@@ -222,7 +230,8 @@ sub _GetAttributes {
         XMLDefinition  => $VersionRef->{XMLDefinition},
         XMLData        => $VersionRef->{XMLData}->[1]->{Version}->[1],
         Result         => \%XMLAttr,
-        OnlyAttributes => 1
+        OnlyAttributes => 1,
+        Silent         => $Param{Silent}
     );
 
     $Param{Data}->{Expands}->{XMLAttributes} = \%XMLAttr;
@@ -238,7 +247,8 @@ sub _GetContents {
 
     my $VersionRef = $Kernel::OM->Get('ConfigItem')->VersionGet(
         ConfigItemID => $Param{ObjectID},
-        XMLDataGet   => 1
+        XMLDataGet   => 1,
+        Silent       => $Param{Silent}
     );
 
     my %XMLAttr;
@@ -247,7 +257,8 @@ sub _GetContents {
         XMLDefinition  => $VersionRef->{XMLDefinition},
         XMLData        => $VersionRef->{XMLData}->[1]->{Version}->[1],
         Result         => \%XMLAttr,
-        OnlyContents   => 1
+        OnlyContents   => 1,
+        Silent         => $Param{Silent}
     );
 
     $Param{Data}->{Expands}->{XMLContents} = \%XMLAttr;
@@ -263,7 +274,8 @@ sub _GetStructure {
 
     my $VersionRef = $Kernel::OM->Get('ConfigItem')->VersionGet(
         ConfigItemID => $Param{ObjectID},
-        XMLDataGet   => 1
+        XMLDataGet   => 1,
+        Silent       => $Param{Silent}
     );
 
     my @XMLStructure;
@@ -271,7 +283,8 @@ sub _GetStructure {
         XMLDefinition => $VersionRef->{XMLDefinition},
         XMLData       => $VersionRef->{XMLData}->[1]->{Version}->[1],
         Result        => \@XMLStructure,
-        OnlyStructure => 1
+        OnlyStructure => 1,
+        Silent        => $Param{Silent}
     );
 
     $Param{Data}->{Expands}->{XMLStructure} = \@XMLStructure;

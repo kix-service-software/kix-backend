@@ -356,14 +356,16 @@ sub MacroActionUpdate {
 
     # get current data
     my %Data = $Self->MacroActionGet(
-        ID => $Param{ID},
+        ID     => $Param{ID},
+        Silent => $Param{Silent}
     );
 
     # validate parameters if given
     if ( $Param{Parameters} ) {
         # get macro data
         my %Macro = $Self->MacroGet(
-            ID => $Param{MacroID} || $Data{MacroID}
+            ID     => $Param{MacroID} || $Data{MacroID},
+            Silent => $Param{Silent}
         );
         if ( !%Macro ) {
             if ( !$Param{Silent} ) {
@@ -744,7 +746,8 @@ sub MacroActionExecute {
         if ( !$Param{$Needed} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "Need $Needed!"
+                Message  => "Need $Needed!",
+                Silent   => $Param{Silent}
             );
             return;
         }
@@ -755,13 +758,15 @@ sub MacroActionExecute {
 
     # get MacroAction data
     my %MacroAction = $Self->MacroActionGet(
-        ID => $Param{ID}
+        ID     => $Param{ID},
+        Silent => $Param{Silent}
     );
 
     if ( !%MacroAction ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => "No such macro action with ID $Param{ID}!"
+            Message  => "No such macro action with ID $Param{ID}!",
+            Silent   => $Param{Silent}
         );
         return;
     }
@@ -864,15 +869,16 @@ sub MacroActionExecute {
             }
 
             $Parameters{ $Option->{Name} } = $Self->_ReplaceValuePlaceholder(
-                Value     => $Parameters{ $Option->{Name} },
-                ValueType => $Option->{Placeholder}->{ValueType} || '',
-                Richtext  => $Option->{Placeholder}->{Richtext},
-                Translate => $Option->{Placeholder}->{Translate},
-                MacroType => $Macro{Type},
-                ObjectID  => $ObjectID,
-                UserID    => $Param{UserID},
-                Data      => IsHashRefWithData( $Param{AdditionalData} ) ? $Param{AdditionalData} : {},
-                ReplaceNotFound => $Option->{Placeholder}->{ReplaceNotFound}
+                Value           => $Parameters{ $Option->{Name} },
+                ValueType       => $Option->{Placeholder}->{ValueType} || '',
+                Richtext        => $Option->{Placeholder}->{Richtext},
+                Translate       => $Option->{Placeholder}->{Translate},
+                MacroType       => $Macro{Type},
+                ObjectID        => $ObjectID,
+                UserID          => $Param{UserID},
+                Data            => IsHashRefWithData( $Param{AdditionalData} ) ? $Param{AdditionalData} : {},
+                ReplaceNotFound => $Option->{Placeholder}->{ReplaceNotFound},
+                Silent          => $Param{Silent}
             );
         }
 
@@ -916,6 +922,7 @@ sub MacroActionExecute {
             $Self->LogError(
                 Message  => "Macro action \"$MacroAction{Type}\" returned execution error.",
                 UserID   => $Param{UserID},
+                Silent   => $Param{Silent}
             );
         }
     } while ( $MacroActionRunSuccess && $BackendObject->RepeatExecution() );
@@ -1386,6 +1393,7 @@ sub _ReplacePlaceholderString {
         ReplaceNotFound => $Param{ReplaceNotFound},
         ObjectType      => $Param{MacroType},
         ObjectID        => $Param{ObjectID},
+        Silent          => $Param{Silent},
     );
 
     return $Param{Value};

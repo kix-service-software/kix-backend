@@ -35,7 +35,8 @@ sub Convert {
         if ( %Data ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'notice',
-                Message  => "Template '$Param{TemplateName}' doesn't exists, so the default will be used!"
+                Message  => "Template '$Param{TemplateName}' doesn't exists, so the default will be used!",
+                Silent   => $Param{Silent}
             );
         }
     }
@@ -43,7 +44,8 @@ sub Convert {
     if ( !%Data ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => 'No definition exists!'
+            Message  => 'No definition exists!',
+            Silent   => $Param{Silent}
         );
         return;
     }
@@ -57,13 +59,15 @@ sub Convert {
 
     my $Result = $Self->_CheckParams(
         Object => $Data{Object},
-        Data   => \%Param
+        Data   => \%Param,
+        Silent => $Param{Silent}
     );
 
     if ( IsHashRefWithData($Result) ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => $Result->{error}
+            Message  => $Result->{error},
+            Silent   => $Param{Silent}
         );
         return;
     }
@@ -81,6 +85,7 @@ sub Convert {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "HTMLToPDF: wkhtmltopdf binary doesn't exist!",
+            Silent   => $Param{Silent},
         );
         return;
     }
@@ -91,6 +96,7 @@ sub Convert {
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Can't create directory '$CheckDirectory': $!",
+                    Silent   => $Param{Silent},
                 );
                 return;
             }

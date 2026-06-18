@@ -998,7 +998,12 @@ calculate time unit
 
 sub _TimeUnitCalculate {
     my ( $Self, %Param ) = @_;
-    # do nothing, but some plugins require special preparation
+
+    $Param{Value} =~ s/,/\./g;
+    $Param{Value} =~ s/ //g;
+    $Param{Value} =~ s/^(-?\d{1,10}\.\d\d).+?$/$1/g;
+    chomp $Param{Value};
+
     return $Param{Value};
 }
 

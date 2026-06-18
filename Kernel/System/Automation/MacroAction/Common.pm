@@ -444,6 +444,7 @@ sub _CheckParams {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
+                Silent   => $Param{Silent},
             );
             return;
         }
@@ -453,6 +454,7 @@ sub _CheckParams {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "Config is no object!",
+            Silent   => $Param{Silent},
         );
         return;
     }
@@ -468,6 +470,7 @@ sub _CheckParams {
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Need $Option->{Name} in Config!",
+                    Silent   => $Param{Silent},
                 );
                 return;
             }
