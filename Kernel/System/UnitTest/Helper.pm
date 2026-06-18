@@ -535,7 +535,17 @@ sub Rollback {
         && $DatabaseHandle
     ) {
         $Self->{RollbackDB} = 0;
-        return $DatabaseHandle->rollback();
+        $DatabaseHandle->rollback();
+    }
+
+    # If tokens have been created, delete them here
+    if ( IsArrayRefWithData($Self->{Tokens}) ) {
+        for my $Token ( @{ $Self->{Tokens} } ) {
+            $Kernel::OM->Get('Token')->RemoveToken(
+                Silent => 1,
+                Token  => $Token
+            );
+        }
     }
     return 1;
 }
@@ -653,6 +663,41 @@ sub HTTPRequestOverwriteUnset {
     return;
 }
 
+sub CreateToken {
+    my ( $Self, %Param ) = @_;
+
+    my $DatabaseHandle;
+    # when Rollback is used, prevent early rollback
+    if ( $Self->{RollbackDB} ) {
+        # get current handle
+        $DatabaseHandle = $Kernel::OM->Get('DB')->{dbh};
+
+        # remove handle reference from current object
+        $Kernel::OM->Get('DB')->{dbh} = undef;
+    }
+
+    my $Token = $Kernel::OM->Get('Token')->CreateToken(
+        %Param
+    );
+
+    if ( $Token ) {
+        push( @{$Self->{Tokens}}, $Token );
+    }
+
+    # restore database handle
+    if ( $Self->{RollbackDB} ) {
+        $Kernel::OM->Get('DB')->{dbh} = $DatabaseHandle;
+
+        $Kernel::OM->Get('Cache')->CleanUp(
+            Type => $Kernel::OM->Get('SysConfig')->{CacheType},
+        );
+        $Kernel::OM->Get('Config')->{Config} = $Kernel::OM->Get('Config')->GetLocalConfig() || {};
+        $Kernel::OM->Get('Config')->LoadSysConfig();
+    }
+
+    return $Token;
+}
+
 sub ObjectsDiscard {
     my ( $Self, %Param ) = @_;
 
@@ -672,7 +717,7 @@ sub ObjectsDiscard {
     if ( $Self->{RollbackDB} ) {
         # get current handle
         $DatabaseHandle = $Kernel::OM->Get('DB')->{dbh};
-        
+
         # remove handle reference from current object
         $Kernel::OM->Get('DB')->{dbh} = undef;
     }
@@ -781,7 +826,7 @@ sub ConfigSettingChange {
     my $Value = $Valid ? $Param{Value} : undef;
 
     die "Need 'Key'" if !defined $Key;
-    
+
     my %OptionData = $Kernel::OM->Get('SysConfig')->OptionGet(
         Name => $Key,
     );

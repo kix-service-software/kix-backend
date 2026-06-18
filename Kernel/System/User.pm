@@ -966,12 +966,11 @@ sub SetPassword {
 
     # check needed stuff
     if ( !$Param{UserLogin} ) {
-        if ( !$Param{Silent} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => 'Need UserLogin!'
-            );
-        }
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => 'Need UserLogin!',
+            Silent   => $Param{Silent}
+        );
         return;
     }
 
@@ -980,12 +979,11 @@ sub SetPassword {
         User => $Param{UserLogin}
     );
     if ( !$User{UserLogin} ) {
-        if ( !$Param{Silent} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => 'No such User!',
-            );
-        }
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => 'No such User!',
+            Silent   => $Param{Silent},
+        );
         return;
     }
 

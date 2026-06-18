@@ -337,6 +337,7 @@ sub FileRead {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Need Filename and Directory or Location!',
+            Silent   => $Param{Silent}
         );
 
     }
@@ -346,7 +347,8 @@ sub FileRead {
         if ( !$Param{DisableWarnings} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "File '$Param{Location}' doesn't exist!"
+                Message  => "File '$Param{Location}' doesn't exist!",
+                Silent   => $Param{Silent}
             );
         }
         return;
@@ -364,6 +366,7 @@ sub FileRead {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Can't open '$Param{Location}': $!",
+                Silent   => $Param{Silent}
             );
         }
         return;
@@ -375,6 +378,7 @@ sub FileRead {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Can't lock '$Param{Location}': $!",
+                Silent   => $Param{Silent}
             );
         }
     }

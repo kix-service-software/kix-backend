@@ -152,6 +152,7 @@ sub Search {
         Language    => $Param{Language},
         UserType    => $Param{UserType},
         UserID      => $Param{UserID},
+        Silent      => $Param{Silent},
         PrepareType => 'Condition'
     );
     return if !IsHashRefWithData($Definition);

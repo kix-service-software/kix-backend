@@ -56,7 +56,8 @@ sub Render {
                 UserID  => $Param{UserID},
                 Expands => $Param{Expands},
                 Filters => $Param{Filters},
-                Count   => $Param{Count}
+                Count   => $Param{Count},
+                Silent  => $Param{Silent}
             );
 
             return if !$Self->{$Object . 'Data'};
