@@ -326,21 +326,20 @@ sub _Log {
     # check needed stuff
     for (qw(Message Priority UserID)) {
         if ( !$Param{$_} ) {
-            if ( !$Param{Silent} ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Need $_!",
-                );
-            }
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!",
+                Silent   => $Param{Silent}
+            );
             return;
         }
     }
 
     # check desired log level
-    my $LogObject = $Kernel::OM->Get('Log');
-    my $MinimumLogLevel = $Self->{MinimumLogLevel} || 'error';
+    my $LogObject          = $Kernel::OM->Get('Log');
+    my $MinimumLogLevel    = $Self->{MinimumLogLevel} || 'error';
     my $MinimumLogLevelNum = $LogObject->GetNumericLogLevel( Priority => $MinimumLogLevel);
-    my $PriorityNum = $LogObject->GetNumericLogLevel( Priority => $Param{Priority} );
+    my $PriorityNum        = $LogObject->GetNumericLogLevel( Priority => $Param{Priority} );
     return 1 if $PriorityNum < $MinimumLogLevelNum;
 
     my %LogData;

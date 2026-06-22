@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/ 
+# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -62,6 +62,7 @@ sub DataSourceList {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No datasource backend modules found!",
+            Silent   => $Param{Silent},
         );
         return;
     }
@@ -92,6 +93,7 @@ sub DataSourceGet {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => 'Got no Name!',
+            Silent   => $Param{Silent},
         );
         return;
     }
@@ -122,12 +124,11 @@ sub DataSourceValidateConfig {
     # check needed stuff
     for (qw(Source Config)) {
         if ( !$Param{$_} ) {
-            if ( !$Param{Silent} ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Need $_!"
-                );
-            }
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!",
+                Silent   => $Param{Silent}
+            );
             return;
         }
     }
@@ -165,12 +166,11 @@ sub DataSourceGetProperties {
     # check needed stuff
     for (qw(Source Config)) {
         if ( !$Param{$_} ) {
-            if ( !$Param{Silent} ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Need $_!"
-                );
-            }
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!",
+                Silent   => $Param{Silent}
+            );
             return;
         }
     }
@@ -217,7 +217,8 @@ sub DataSourceGetData {
         if ( !$Param{$_} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "Need $_!"
+                Message  => "Need $_!",
+                Silent   => $Param{Silent}
             );
             return;
         }
@@ -242,7 +243,8 @@ sub DataSourceGetData {
         # validate the given parameters
         my $IsValid =  $Backend->ValidateParameters(
             Config     => $Param{Config}->{DataSource},
-            Parameters => $Param{Parameters}
+            Parameters => $Param{Parameters},
+            Silent     => $Param{Silent}
         );
         return if !$IsValid;
     }
@@ -260,12 +262,11 @@ sub _LoadDataSourceBackend {
     # check needed stuff
     for (qw(Name)) {
         if ( !$Param{$_} ) {
-            if ( !$Param{Silent} ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Need $_!"
-                );
-            }
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!",
+                Silent   => $Param{Silent}
+            );
             return;
         }
     }
@@ -278,12 +279,11 @@ sub _LoadDataSourceBackend {
         my $Backends = $Kernel::OM->Get('Config')->Get('Reporting::DataSource');
 
         if ( !IsHashRefWithData($Backends) ) {
-            if ( !$Param{Silent} ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "No datasource backend modules found!",
-                );
-            }
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "No datasource backend modules found!",
+                Silent   => $Param{Silent},
+            );
             return;
         }
 
@@ -295,23 +295,21 @@ sub _LoadDataSourceBackend {
                 Silent => $Param{Silent},
             )
         ) {
-            if ( !$Param{Silent} ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Unable to require $Backend!"
-                );
-            }
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Unable to require $Backend!",
+                Silent   => $Param{Silent}
+            );
             return;
         }
 
         my $BackendObject = $Backend->new( %{$Self} );
         if ( !$BackendObject ) {
-            if ( !$Param{Silent} ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Unable to create instance of $Backend!"
-                );
-            }
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Unable to create instance of $Backend!",
+                Silent   => $Param{Silent}
+            );
             return;
         }
 

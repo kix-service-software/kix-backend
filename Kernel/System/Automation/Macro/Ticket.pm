@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/ 
+# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -62,6 +62,7 @@ sub Run {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $_!",
+                Silent   => $Param{Silent}
             );
             return;
         }
@@ -77,6 +78,7 @@ sub Run {
             ObjectID => $Param{ObjectID},              # give the anonymous ObjectID as well for "Common" macro actions
             TicketID => $Param{ObjectID},
             UserID   => $Param{UserID},
+            Silent   => $Param{Silent},
 
             # FIXME: add instance if job was triggerd by event (ExecuteJobsForEvent)
             AutomationInstance => $Param{AutomationInstance},

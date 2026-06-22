@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/ 
+# Modified version of the work: Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -36,9 +36,9 @@ my $SVGContent = <<END;
 
 <svg height="100" width="100" xmlns="http://www.w3.org/2000/svg">
   <circle r="45" cx="50" cy="50" fill="red" />
-  Sorry, your browser does not support inline SVG.  
-</svg> 
- 
+  Sorry, your browser does not support inline SVG.
+</svg>
+
 </body>
 </html>
 END
@@ -52,9 +52,9 @@ my $SVGContent_Update = <<END;
 
 <svg width="300" height="130" xmlns="http://www.w3.org/2000/svg">
   <rect width="200" height="100" x="10" y="10" rx="20" ry="20" fill="blue" />
-  Sorry, your browser does not support inline SVG.  
+  Sorry, your browser does not support inline SVG.
 </svg>
- 
+
 </body>
 </html>
 END
@@ -63,6 +63,7 @@ my @CreateTests = (
     {
         Name   => 'ObjectIconAdd(): invalid data - no data',
         Data   => {},
+        Silent => 1,
         Expect => undef,
     },
     {
@@ -73,6 +74,7 @@ my @CreateTests = (
             Content     => $SVGContent,
             UserID      => 1,
         },
+        Silent => 1,
         Expect => undef,
     },
     {
@@ -83,6 +85,7 @@ my @CreateTests = (
             Content     => $SVGContent,
             UserID      => 1,
         },
+        Silent => 1,
         Expect => undef,
     },
     {
@@ -93,6 +96,7 @@ my @CreateTests = (
             Content     => $SVGContent,
             UserID      => 1,
         },
+        Silent => 1,
         Expect => undef,
     },
     {
@@ -103,6 +107,7 @@ my @CreateTests = (
             ContentType => 'image/svg+xml',
             UserID      => 1,
         },
+        Silent => 1,
         Expect => undef,
     },
     {
@@ -113,6 +118,7 @@ my @CreateTests = (
             ContentType => 'image/svg+xml',
             Content     => $SVGContent,
         },
+        Silent => 1,
         Expect => undef,
     },
     {
@@ -171,6 +177,7 @@ TEST:
 foreach my $Test ( @CreateTests ) {
     my $ObjectIconID = $ObjectIconObject->ObjectIconAdd(
         %{$Test->{Data}},
+        Silent  => $Test->{Silent},
         Content => $Test->{Data}->{Content} ? MIME::Base64::encode_base64($Test->{Data}->{Content}) : undef
     );
 
@@ -222,6 +229,7 @@ my @UpdateTests = (
     {
         Name   => 'ObjectIconUpdate(): invalid data - no data',
         Data   => {},
+        Silent => 1,
         Expect => undef,
     },
     {
@@ -233,6 +241,7 @@ my @UpdateTests = (
             Content     => $SVGContent,
             UserID      => 1,
         },
+        Silent => 1,
         Expect => undef,
     },
     {
@@ -245,6 +254,7 @@ my @UpdateTests = (
             Content     => $SVGContent,
             UserID      => 1,
         },
+        Silent => 1,
         Expect => undef,
     },
     {
@@ -256,6 +266,7 @@ my @UpdateTests = (
             Content     => $SVGContent,
             UserID      => 1,
         },
+        Silent => 1,
         Expect => undef,
     },
     {
@@ -267,6 +278,7 @@ my @UpdateTests = (
             Content     => $SVGContent,
             UserID      => 1,
         },
+        Silent => 1,
         Expect => undef,
     },
     {
@@ -278,6 +290,7 @@ my @UpdateTests = (
             Content     => $SVGContent,
             UserID      => 1,
         },
+        Silent => 1,
         Expect => undef,
     },
     {
@@ -289,6 +302,7 @@ my @UpdateTests = (
             ContentType => 'image/svg+xml',
             UserID      => 1,
         },
+        Silent => 1,
         Expect => undef,
     },
     {
@@ -300,6 +314,7 @@ my @UpdateTests = (
             ContentType => 'image/svg+xml',
             Content     => $SVGContent,
         },
+        Silent => 1,
         Expect => undef,
     },
     {
@@ -395,12 +410,14 @@ foreach my $Test ( @UpdateTests ) {
     my %ObjectIconOld;
     if ( $Test->{Expect} ) {
         %ObjectIconOld = $ObjectIconObject->ObjectIconGet(
-            ID => $Test->{Data}->{ID},
+            Silent => $Test->{Silent},
+            ID     => $Test->{Data}->{ID},
         );
     }
 
     my $Success = $ObjectIconObject->ObjectIconUpdate(
         %{$Test->{Data}},
+        Silent  => $Test->{Silent},
         Content => $Test->{Data}->{Content} ? MIME::Base64::encode_base64($Test->{Data}->{Content}) : undef
     );
 
@@ -534,6 +551,7 @@ $Self->IsDeeply(
 my $Content = $Kernel::OM->Get('Main')->FileRead(
     Directory => $ObjectIconObject->{Config}->{Directory},
     Filename  => "object1_objectid2.svg",
+    Silent    => 1
 );
 $Self->False(
     $Content,
@@ -541,7 +559,8 @@ $Self->False(
 );
 
 $Success = $ObjectIconObject->ObjectIconDelete(
-    ID => $ObjectIconIDs{'object1-objectid1'},
+    ID     => $ObjectIconIDs{'object1-objectid1'},
+    Silent => 1
 );
 
 $Self->False(
@@ -550,13 +569,14 @@ $Self->False(
 );
 
 $Success = $ObjectIconObject->ObjectIconDelete(
-    ID     => 999999,
+    ID     => 999_999,
     UserID => 1,
+    Silent => 1
 );
 
 $Self->False(
     $Success,
-    'ObjectIconDelete() - non-existing ID',
+    'ObjectIconDelete() - non-existing 999999 ID',
 );
 
 # rollback transaction on database

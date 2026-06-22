@@ -118,6 +118,7 @@ sub Run {
             ID       => $Param{Config}->{MacroID},
             ObjectID => $Value,
             UserID   => $Param{UserID},
+            Silent   => $Param{Silent},
 
             # keep event data if given
             EventData => $Self->{EventData} || $Param{EventData},

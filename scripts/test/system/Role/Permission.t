@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/ 
+# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -146,16 +146,16 @@ my %PermissionTypeList = $RoleObject->PermissionTypeList();
 
 $Self->Is(
     scalar(keys %PermissionTypeList),
-    4,
-    "PermissionTypeList() - returns 3 permission types"
+    5,
+    "PermissionTypeList() - returns 5 permission types"
 );
 
 %PermissionTypeList = $RoleObject->PermissionTypeList( Valid => 1 );
 
 $Self->Is(
     scalar(keys %PermissionTypeList),
-    4,
-    "PermissionTypeList(valid) - returns 3 valid permission types"
+    5,
+    "PermissionTypeList(valid) - returns 5 valid permission types"
 );
 
 for my $PermissionTest (@PermissionTests) {

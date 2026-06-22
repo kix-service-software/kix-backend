@@ -932,7 +932,8 @@ sub DeleteLinkedMergeTickets {
         if ( !$Param{$Needed} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
-                Message  => "Need $Needed!"
+                Message  => "Need $Needed!",
+                Silent   => $Param{Silent}
             );
             return;
         }
@@ -1368,7 +1369,8 @@ sub TicketGet {
     if ( !$Param{TicketID} ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => 'Need TicketID!'
+            Message  => 'Need TicketID!',
+            Silent   => $Param{Silent}
         );
         return;
     }
@@ -1435,12 +1437,11 @@ sub TicketGet {
 
     # check ticket
     if ( !$Ticket{TicketID} ) {
-        if ( !$Param{Silent} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "No such TicketID ($Param{TicketID})!",
-            );
-        }
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "No such TicketID ($Param{TicketID})!",
+            Silent   => $Param{Silent}
+        );
         return;
     }
 
@@ -6129,13 +6130,13 @@ sub ArticleMove {
     );
 
     # update accounted time of old ticket
-    return if !$Self->TicketAccountedTimeSet(
+    return if !defined $Self->TicketAccountedTimeSet(
         TicketID => $TicketID,
         UserID   => $Param{UserID}
     );
 
     # update accounted time of new ticket
-    return if !$Self->TicketAccountedTimeSet(
+    return if !defined $Self->TicketAccountedTimeSet(
         TicketID => $Param{TicketID},
         UserID   => $Param{UserID}
     );
