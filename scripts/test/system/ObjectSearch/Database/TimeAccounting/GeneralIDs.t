@@ -36,6 +36,9 @@ for my $Method ( qw(GetSupportedAttributes AttributePrepare Select Search Sort) 
     );
 }
 
+# get handling of order by null
+my $OrderByNull = $Kernel::OM->Get('DB')->GetDatabaseFunction('OrderByNull') || '';
+
 # check GetSupportedAttributes
 my $AttributeList = $AttributeObject->GetSupportedAttributes();
 $Self->IsDeeply(
@@ -834,7 +837,7 @@ my @IntegrationSortTests = (
                 Field => 'ArticleID'
             }
         ],
-        Expected => [$TimeAccountingID1,$TimeAccountingID2,$TimeAccountingID3,$TimeAccountingID4]
+        Expected => $OrderByNull eq 'LAST' ? [$TimeAccountingID1,$TimeAccountingID2,$TimeAccountingID3,$TimeAccountingID4] : [$TimeAccountingID4,$TimeAccountingID1,$TimeAccountingID2,$TimeAccountingID3]
     },
     {
         Name     => 'Sort: Field ArticleID / Direction ascending',
@@ -844,7 +847,7 @@ my @IntegrationSortTests = (
                 Direction => 'ascending'
             }
         ],
-        Expected => [$TimeAccountingID1,$TimeAccountingID2,$TimeAccountingID3,$TimeAccountingID4]
+        Expected => $OrderByNull eq 'LAST' ? [$TimeAccountingID1,$TimeAccountingID2,$TimeAccountingID3,$TimeAccountingID4] : [$TimeAccountingID4,$TimeAccountingID1,$TimeAccountingID2,$TimeAccountingID3]
     },
     {
         Name     => 'Sort: Field ArticleID / Direction descending',
@@ -854,7 +857,7 @@ my @IntegrationSortTests = (
                 Direction => 'descending'
             }
         ],
-        Expected => [$TimeAccountingID4,$TimeAccountingID3,$TimeAccountingID2,$TimeAccountingID1]
+        Expected => $OrderByNull eq 'LAST' ? [$TimeAccountingID4,$TimeAccountingID3,$TimeAccountingID2,$TimeAccountingID1] : [$TimeAccountingID3,$TimeAccountingID2,$TimeAccountingID1,$TimeAccountingID4]
     }
 );
 for my $Test ( @IntegrationSortTests ) {
