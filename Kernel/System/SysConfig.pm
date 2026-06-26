@@ -398,7 +398,7 @@ sub OptionGetAll {
     return %{$Cache} if $Cache;
 
     return if !$Kernel::OM->Get('DB')->Prepare(
-        SQL   => "SELECT name, context, context_metadata, description, access_level, experience_level,
+        SQL   => "SELECT id, name, context, context_metadata, description, access_level, experience_level,
                   type, group_name, setting, is_required, is_modified, default_value, value, comments,
                   default_valid_id, valid_id, create_time, create_by, change_time, change_by
                   FROM sysconfig"
@@ -406,7 +406,7 @@ sub OptionGetAll {
 
     # fetch the result
     my $FetchResult = $Kernel::OM->Get('DB')->FetchAllArrayRef(
-        Columns => [ 'Name', 'Context', 'ContextMetadata', 'Description', 'AccessLevel', 'ExperienceLevel', 'Type', 'Group', 'Setting', 'IsRequired',
+        Columns => [ 'ID', 'Name', 'Context', 'ContextMetadata', 'Description', 'AccessLevel', 'ExperienceLevel', 'Type', 'Group', 'Setting', 'IsRequired',
                      'IsModified', 'Default', 'Value', 'Comment', 'DefaultValidID', 'ValidID', 'CreateTime', 'CreateBy', 'ChangeTime', 'ChangeBy']
     );
 
