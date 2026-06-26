@@ -1637,7 +1637,31 @@ sub ArticleGet {
     else {
         $CacheKey .= $Param{DynamicFields};
     }
-    if ( $Param{ArticleID} ) {
+    my $HasFilter = 0;
+    for my $Filter (
+        qw(
+            CustomerVisible Channel ChannelID
+            ArticleSenderType ArticleSenderTypeID
+            MessageID
+        )
+    ) {
+        if ( $Filter eq 'CustomerVisible' ) {
+            if ( $Param{ $Filter } ) {
+                $HasFilter = 1;
+                last;
+            }
+        }
+        else {
+            if ( IsArrayRefWithData( $Param{ $Filter } ) ) {
+                $HasFilter = 1;
+                last;
+            }
+        }
+    }
+    if (
+        !$HasFilter
+        && $Param{ArticleID}
+    ) {
         # check cache
         my $Cached = $Self->_ArticleCacheGet(
             ArticleID => $Param{ArticleID},
@@ -1651,7 +1675,7 @@ sub ArticleGet {
 
     # channel lookup
     my $ChannelSQL = '';
-    if ( $Param{Channel} && ref $Param{Channel} eq 'ARRAY' ) {
+    if ( IsArrayRefWithData( $Param{Channel} ) ) {
         for ( @{ $Param{Channel} } ) {
             if ( $Kernel::OM->Get('Channel')->ChannelLookup( Name => $_ ) ) {
                 if ($ChannelSQL) {
@@ -1685,7 +1709,7 @@ sub ArticleGet {
 
     # sender type lookup
     my $SenderTypeSQL = '';
-    if ( $Param{ArticleSenderType} && ref $Param{ArticleSenderType} eq 'ARRAY' ) {
+    if ( IsArrayRefWithData( $Param{ArticleSenderType} ) ) {
         for ( @{ $Param{ArticleSenderType} } ) {
             if ( $Self->ArticleSenderTypeLookup( SenderType => $_ ) ) {
                 if ($SenderTypeSQL) {
@@ -1790,6 +1814,17 @@ sub ArticleGet {
 
     my %Ticket;
     while ( my @Row = $DBObject->FetchrowArray() ) {
+        if (
+            $HasFilter
+            && $Param{ArticleID}
+        ) {
+            # check cache
+            my $Cached = $Self->_ArticleCacheGet(
+                ArticleID => $Param{ArticleID},
+                Key       => $CacheKey,
+            );
+            return %{$Cached} if ref $Cached eq 'HASH';
+        }
 
         my %Data;
         $Data{TicketID}         = $Row[0];
