@@ -223,6 +223,59 @@ for my $Encoding ( '', qw(base64 quoted-printable 8bit) ) {
     }
 }
 
+my @MessageIDTests = (
+    {
+        Name   => 'FQDN as string without port',
+        Config => 'localhost'
+    },
+    {
+        Name   => 'FQDN as string with port',
+        Config => 'www.example.com:8080'
+    },
+    {
+        Name   => 'FQDN as hash without port',
+        Config => {
+            Backend  => 'backend.example.com',
+            Frontend => 'frontend.example.com',
+            SSP      => 'ssp.example.com'
+        }
+    },
+    {
+        Name   => 'FQDN as hash with port',
+        Config => {
+            Backend  => 'kix.example.com:20000',
+            Frontend => 'kix.example.com:20001',
+            SSP      => 'kix.example.com:20002'
+        }
+    }
+);
+for my $Test ( @MessageIDTests ) {
+    # set fqdn for test
+    my $Success = $Helper->ConfigSettingChange(
+        Key   => 'FQDN',
+        Value => $Test->{Config},
+    );
+    $Self->True(
+        $Success,
+        "Set FQDN for test",
+    );
+
+    # generate MessageID
+    my $MessageID = $Kernel::OM->Get('Email')->GenerateMessageID();
+    my $Check = 0;
+    if (
+        $MessageID
+        && $MessageID =~ m/^<\d{10}\.\d{6}@[0-9A-Za-z\.]+>$/
+    ) {
+        $Check = 1;
+    }
+    $Self->Is(
+        $Check,
+        1,
+        'GenerateMessageID: ' . $Test->{Name}
+    );
+}
+
 # rollback transaction on database
 $Helper->Rollback();
 
