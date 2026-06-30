@@ -1627,14 +1627,55 @@ sub ArticleGet {
         return;
     }
 
-    my $FetchDynamicFields = $Param{DynamicFields} ? 1 : 0;
+    $Param{DynamicFields} //= 0;
+
+    # prepare cache key
+    my $CacheKey = 'ArticleGet::';
+    if ( IsArrayRefWithData($Param{DynamicFields}) ) {
+        $CacheKey .= join('::', @{$Param{DynamicFields}});
+    }
+    else {
+        $CacheKey .= $Param{DynamicFields};
+    }
+    my $HasFilter = 0;
+    for my $Filter (
+        qw(
+            CustomerVisible Channel ChannelID
+            ArticleSenderType ArticleSenderTypeID
+            MessageID
+        )
+    ) {
+        if ( $Filter eq 'CustomerVisible' ) {
+            if ( $Param{ $Filter } ) {
+                $HasFilter = 1;
+                last;
+            }
+        }
+        else {
+            if ( IsArrayRefWithData( $Param{ $Filter } ) ) {
+                $HasFilter = 1;
+                last;
+            }
+        }
+    }
+    if (
+        !$HasFilter
+        && $Param{ArticleID}
+    ) {
+        # check cache
+        my $Cached = $Self->_ArticleCacheGet(
+            ArticleID => $Param{ArticleID},
+            Key       => $CacheKey,
+        );
+        return %{$Cached} if ref $Cached eq 'HASH';
+    }
 
     # get database object
     my $DBObject = $Kernel::OM->Get('DB');
 
     # channel lookup
     my $ChannelSQL = '';
-    if ( $Param{Channel} && ref $Param{Channel} eq 'ARRAY' ) {
+    if ( IsArrayRefWithData( $Param{Channel} ) ) {
         for ( @{ $Param{Channel} } ) {
             if ( $Kernel::OM->Get('Channel')->ChannelLookup( Name => $_ ) ) {
                 if ($ChannelSQL) {
@@ -1668,7 +1709,7 @@ sub ArticleGet {
 
     # sender type lookup
     my $SenderTypeSQL = '';
-    if ( $Param{ArticleSenderType} && ref $Param{ArticleSenderType} eq 'ARRAY' ) {
+    if ( IsArrayRefWithData( $Param{ArticleSenderType} ) ) {
         for ( @{ $Param{ArticleSenderType} } ) {
             if ( $Self->ArticleSenderTypeLookup( SenderType => $_ ) ) {
                 if ($SenderTypeSQL) {
@@ -1773,6 +1814,17 @@ sub ArticleGet {
 
     my %Ticket;
     while ( my @Row = $DBObject->FetchrowArray() ) {
+        if (
+            $HasFilter
+            && $Param{ArticleID}
+        ) {
+            # check cache
+            my $Cached = $Self->_ArticleCacheGet(
+                ArticleID => $Param{ArticleID},
+                Key       => $CacheKey,
+            );
+            return %{$Cached} if ref $Cached eq 'HASH';
+        }
 
         my %Data;
         $Data{TicketID}         = $Row[0];
@@ -1831,14 +1883,23 @@ sub ArticleGet {
     }
 
     # check if need to return dynamic fields
-    if ($FetchDynamicFields) {
+    if ($Param{DynamicFields}) {
 
         # get dynamic field objects
         my $DynamicFieldObject        = $Kernel::OM->Get('DynamicField');
         my $DynamicFieldBackendObject = $Kernel::OM->Get('DynamicField::Backend');
 
+        my $FieldFilterRef = undef;
+        if ( IsArrayRefWithData($Param{DynamicFields}) ) {
+            my %FieldFilter = map { $_ => 1 } @{$Param{DynamicFields}};
+
+            $FieldFilterRef = \%FieldFilter;
+        }
+
+        # get all dynamic fields for the object type Ticket (with optional filter)
         my $DynamicFieldArticleList = $DynamicFieldObject->DynamicFieldListGet(
-            ObjectType => 'Article'
+            ObjectType => 'Article',
+            FieldFilter => $FieldFilterRef,
         );
 
         for my $Article (@Content) {
@@ -1940,6 +2001,13 @@ sub ArticleGet {
     }
 
     if ( $Param{ArticleID} ) {
+        # set cache
+        $Self->_ArticleCacheSet(
+            ArticleID => $Param{ArticleID},
+            Key       => $CacheKey,
+            Value     => $Content[0],
+        );
+
         return %{ $Content[0] };
     }
     return @Content;
@@ -2247,6 +2315,11 @@ sub ArticleUpdate {
     # clear ticket cache
     $Self->_TicketCacheClear(
         TicketID => $Article{TicketID},
+    );
+
+    # clear article cache
+    $Self->_ArticleCacheClear(
+        ArticleID => $Param{ArticleID}
     );
 
     # event
@@ -3139,7 +3212,7 @@ sub ArticleAttachmentIndex {
     my %Attachments = $Self->ArticleAttachmentIndexRaw(%Param);
 
     # stript plain attachments and e. g. html attachments
-    if ( $Param{StripPlainBodyAsAttachment} && $Param{Article} ) {
+    if ( $Param{StripPlainBodyAsAttachment} ) {
 
         # plain attachment mime type vs. html attachment mime type check
         # remove plain body, rename html attachment
@@ -3212,7 +3285,9 @@ sub ArticleAttachmentIndex {
             {
                 delete $Attachments{$AttachmentIDHTML};
             }
-            $Param{Article}->{AttachmentIDOfHTMLBody} = $AttachmentIDHTML;
+            if ( $Param{Article} ) {
+                $Param{Article}->{AttachmentIDOfHTMLBody} = $AttachmentIDHTML;
+            }
         }
 
         # plain body size vs. attched body size check
@@ -3237,17 +3312,22 @@ sub ArticleAttachmentIndex {
             }
 
             # plain attachment detected and remove it from attachment index
-            if (%AttachmentFilePlain) {
+            if ( %AttachmentFilePlain ) {
 
-                # check body size vs. attachment size to be sure
-                my $BodySize = bytes::length( $Param{Article}->{Body} );
+                if ( $Param{Article} ) {
+                    # check body size vs. attachment size to be sure
+                    my $BodySize = bytes::length( $Param{Article}->{Body} );
 
-                # check size by tolerance of 1.1 factor (because of charset difs)
-                if (
-                    $BodySize / 1.1 < $AttachmentFilePlain{FilesizeRaw}
-                    && $BodySize * 1.1 > $AttachmentFilePlain{FilesizeRaw}
-                    )
-                {
+                    # check size by tolerance of 1.1 factor (because of charset difs)
+                    if (
+                        $BodySize / 1.1 < $AttachmentFilePlain{FilesizeRaw}
+                        && $BodySize * 1.1 > $AttachmentFilePlain{FilesizeRaw}
+                        )
+                    {
+                        delete $Attachments{$AttachmentIDPlain};
+                    }
+                }
+                else {
                     delete $Attachments{$AttachmentIDPlain};
                 }
             }
@@ -3640,6 +3720,49 @@ sub _ConvertScalar2ArrayRef {
     }
 
     return \@Data;
+}
+
+sub _ArticleCacheGet {
+    my ( $Self, %Param ) = @_;
+
+    # prepare cache type
+    my $CacheType = $Self->{CacheType} . '_Article_' . $Param{ArticleID};
+
+    # get cache
+    return $Kernel::OM->Get('Cache')->Get(
+        %Param,
+        Type => $CacheType,
+    );
+}
+
+sub _ArticleCacheSet {
+    my ( $Self, %Param ) = @_;
+
+    return if $Param{OnlyUpdateMeta};
+
+    # prepare cache type
+    my $CacheType = $Self->{CacheType} . '_Article_' . $Param{ArticleID};
+
+    # set cache
+    return $Kernel::OM->Get('Cache')->Set(
+        %Param,
+        Type    => $CacheType,
+        TTL     => $Self->{CacheTTL},
+    );
+}
+
+sub _ArticleCacheClear {
+    my ( $Self, %Param ) = @_;
+
+    # prepare cache type
+    my $CacheType = $Self->{CacheType} . '_Article_' . $Param{ArticleID};
+
+    # clear cache
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $CacheType,
+    );
+
+    return 1;
 }
 
 1;

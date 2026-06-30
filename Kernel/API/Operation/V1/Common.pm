@@ -869,7 +869,7 @@ sub IncludeSubResourceIfProperty {
         }
         $Self->{IncludeSubResourceIfProperty}->{lc($SubResource)} = {
             Property             => $Param{Property},
-            AdditionalParameters => $Param{AdditionalParameters}
+            AdditionalParameters => $Param{AdditionalParameters},
         };
     }
 
@@ -2478,7 +2478,8 @@ sub _ApplyInclude {
                                 %{ $Self->{RequestData} },
                                 %{$Self->{IncludeSubResourceIfProperty}->{lc($Include)}->{AdditionalParameters} || {}},
                                 $Self->{OperationConfig}->{ObjectID} => $Item->{$Self->{OperationConfig}->{ObjectID}} || $Item->{ID},
-                                }
+                            },
+                            IgnoreParentPermissions => IsHashRefWithData($Self->{IncludeSubResourceIfProperty}->{lc($Include)}) ? 1 : 0,
                         );
                         if ( IsHashRefWithData($Result) && $Result->{Success} ) {
 
@@ -2504,7 +2505,8 @@ sub _ApplyInclude {
                             %{ $Self->{RequestData} },
                             %{$Self->{IncludeSubResourceIfProperty}->{lc($Include)}->{AdditionalParameters} || {}},
                             $Self->{OperationConfig}->{ObjectID} => $Param{Data}->{$Object}->{ $Self->{OperationConfig}->{ObjectID} } || $Param{Data}->{$Object}->{ID}
-                        }
+                        },
+                        IgnoreParentPermissions => IsHashRefWithData($Self->{IncludeSubResourceIfProperty}->{lc($Include)}) ? 1 : 0,
                     );
                     if ( IsHashRefWithData($Result) && $Result->{Success} ) {
 

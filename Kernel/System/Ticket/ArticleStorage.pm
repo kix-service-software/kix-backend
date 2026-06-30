@@ -148,6 +148,11 @@ sub ArticleDelete {
         TicketID => $Article{TicketID}
     );
 
+    # clear article cache
+    $Self->_ArticleCacheClear(
+        ArticleID => $Param{ArticleID}
+    );
+
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
@@ -263,6 +268,11 @@ sub ArticleDeleteAttachments {
         Bind => [ \$Param{ArticleID} ],
     );
 
+    # clear article cache
+    $Self->_ArticleCacheClear(
+        ArticleID => $Param{ArticleID}
+    );
+
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
@@ -336,6 +346,11 @@ sub ArticleDeleteAttachment {
             Bind => [ \$Param{ArticleID} ],
         );
     }
+
+    # clear article cache
+    $Self->_ArticleCacheClear(
+        ArticleID => $Param{ArticleID}
+    );
 
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
@@ -540,6 +555,11 @@ sub ArticleWriteAttachment {
         );
     }
 
+    # clear article cache
+    $Self->_ArticleCacheClear(
+        ArticleID => $Param{ArticleID}
+    );
+
     $Self->EventHandler(
         Event => 'ArticleAttachmentAdd',
         Data  => {
@@ -608,6 +628,15 @@ sub ArticleAttachmentIndexRaw {
         return;
     }
 
+    # prepare cache key
+    my $CacheKey = 'ArticleAttachmentIndexRaw';
+    # check cache
+    my $Cached = $Self->_ArticleCacheGet(
+        ArticleID => $Param{ArticleID},
+        Key       => $CacheKey,
+    );
+    return %{$Cached} if ref $Cached eq 'HASH';
+
     # make sure the attachment metadata is in the DB
     $Self->_CheckAndSwitchArticleAttachmentMeta(ArticleID => $Param{ArticleID});
 
@@ -672,6 +701,13 @@ sub ArticleAttachmentIndexRaw {
             Disposition        => $Disposition,
         };
     }
+
+    # set cache
+    $Self->_ArticleCacheSet(
+        ArticleID => $Param{ArticleID},
+        Key       => $CacheKey,
+        Value     => \%Index,
+    );
 
     return %Index;
 }
@@ -990,6 +1026,11 @@ sub _ArticleStorageSwitch {
         Bind => [
             \$AttachmentCount, \$Param{ArticleID},
         ],
+    );
+
+    # clear article cache
+    $Self->_ArticleCacheClear(
+        ArticleID => $Param{ArticleID}
     );
 
     $Self->{AttachmentCount}->{$Param{ArticleID}} = $AttachmentCount;

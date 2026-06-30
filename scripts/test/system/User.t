@@ -430,6 +430,598 @@ $Self->True(
     "SetPreferences with empty array - $UserID",
 );
 
+### KIX2018-16212 ###
+## Combined tests for UpdateUserCounterObject, PrepareUserCounters and GetObjectIDsForCounter ##
+# prepare user #
+$UserID = $Helper->TestUserCreate(
+    Result => 'ID',
+    Roles  => ['Ticket Agent Base Permission', 'Ticket Agent'],
+);
+$Self->True(
+    $UserID,
+    'Created user'
+);
+
+# prepare tickets #
+my $TicketID1 = $Kernel::OM->Get('Ticket')->TicketCreate(
+    Title          => $Helper->GetRandomID(),
+    QueueID        => 1,
+    Lock           => 'unlock',
+    PriorityID     => 1,
+    StateID        => 1,
+    TypeID         => 1,
+    OrganisationID => 1,
+    ContactID      => 1,
+    OwnerID        => 1,
+    ResponsibleID  => 1,
+    UserID         => 1
+);
+$Self->True(
+    $TicketID1,
+    'Created first ticket'
+);
+my $TicketID2 = $Kernel::OM->Get('Ticket')->TicketCreate(
+    Title          => $Helper->GetRandomID(),
+    QueueID        => 1,
+    Lock           => 'unlock',
+    PriorityID     => 1,
+    StateID        => 1,
+    TypeID         => 1,
+    OrganisationID => 1,
+    ContactID      => 1,
+    OwnerID        => 1,
+    ResponsibleID  => 1,
+    UserID         => 1
+);
+$Self->True(
+    $TicketID2,
+    'Created second ticket'
+);
+
+# prepare tests #
+my @Tests = (
+    {
+        Name        => 'Ticket ' . $TicketID1 . ' / Unseen / Closed / Not owned / Unlocked / Unwatched',
+        Parameter   => {
+            ObjectID => $TicketID1,
+        },
+        TicketState => {
+            Seen    => 0,
+            State   => 0,
+            Owner   => 0,
+            Locked  => 0,
+            Watched => 0,
+        },
+        Expected    => {
+            PrepareUserCounters => {
+                All      => {
+                    Ticket => {
+                        Owned                   => [],
+                        OwnedAndLocked          => [],
+                        OwnedAndUnseen          => [],
+                        OwnedAndLockedAndUnseen => [],
+                        Watched                 => [],
+                        WatchedAndUnseen        => [],
+                    }
+                },
+                ObjectID => {
+                    Ticket => {
+                        Owned                   => [],
+                        OwnedAndLocked          => [],
+                        OwnedAndUnseen          => [],
+                        OwnedAndLockedAndUnseen => [],
+                        Watched                 => [],
+                        WatchedAndUnseen        => [],
+                    }
+                }
+            },
+            GetObjectIDsForCounter => {
+                All      => {
+                    Ticket => {
+                        Owned                   => [],
+                        OwnedAndLocked          => [],
+                        OwnedAndUnseen          => [],
+                        OwnedAndLockedAndUnseen => [],
+                        Watched                 => [],
+                        WatchedAndUnseen        => [],
+                    }
+                },
+                ObjectID => {
+                    Ticket => {
+                        Owned                   => [],
+                        OwnedAndLocked          => [],
+                        OwnedAndUnseen          => [],
+                        OwnedAndLockedAndUnseen => [],
+                        Watched                 => [],
+                        WatchedAndUnseen        => [],
+                    }
+                }
+            }
+        }
+    },
+    {
+        Name        => 'Ticket ' . $TicketID1 . ' / Unseen / Open / Owned / Unlocked / Unwatched',
+        Parameter   => {
+            ObjectID => $TicketID1,
+        },
+        TicketState => {
+            Seen    => 0,
+            State   => 1,
+            Owner   => 1,
+            Locked  => 0,
+            Watched => 0,
+        },
+        Expected    => {
+            PrepareUserCounters => {
+                All      => {
+                    Ticket => {
+                        Owned                   => [$TicketID1],
+                        OwnedAndLocked          => [],
+                        OwnedAndUnseen          => [$TicketID1],
+                        OwnedAndLockedAndUnseen => [],
+                        Watched                 => [],
+                        WatchedAndUnseen        => [],
+                    }
+                },
+                ObjectID => {
+                    Ticket => {
+                        Owned                   => [$TicketID1],
+                        OwnedAndLocked          => [],
+                        OwnedAndUnseen          => [$TicketID1],
+                        OwnedAndLockedAndUnseen => [],
+                        Watched                 => [],
+                        WatchedAndUnseen        => [],
+                    }
+                }
+            },
+            GetObjectIDsForCounter => {
+                All      => {
+                    Ticket => {
+                        Owned                   => [$TicketID1],
+                        OwnedAndLocked          => [],
+                        OwnedAndUnseen          => [$TicketID1],
+                        OwnedAndLockedAndUnseen => [],
+                        Watched                 => [],
+                        WatchedAndUnseen        => [],
+                    }
+                },
+                ObjectID => {
+                    Ticket => {
+                        Owned                   => [$TicketID1],
+                        OwnedAndLocked          => [],
+                        OwnedAndUnseen          => [$TicketID1],
+                        OwnedAndLockedAndUnseen => [],
+                        Watched                 => [],
+                        WatchedAndUnseen        => [],
+                    }
+                }
+            }
+        }
+    },
+    {
+        Name        => 'Ticket ' . $TicketID2 . ' / Unseen / Closed / Not owned / Unlocked / Watched',
+        Parameter   => {
+            ObjectID => $TicketID2,
+        },
+        TicketState => {
+            Seen    => 0,
+            State   => 0,
+            Owner   => 0,
+            Locked  => 0,
+            Watched => 1,
+        },
+        Expected    => {
+            PrepareUserCounters => {
+                All      => {
+                    Ticket => {
+                        Owned                   => [$TicketID1],
+                        OwnedAndLocked          => [],
+                        OwnedAndUnseen          => [$TicketID1],
+                        OwnedAndLockedAndUnseen => [],
+                        Watched                 => [$TicketID2],
+                        WatchedAndUnseen        => [$TicketID2],
+                    }
+                },
+                ObjectID => {
+                    Ticket => {
+                        Owned                   => [],
+                        OwnedAndLocked          => [],
+                        OwnedAndUnseen          => [],
+                        OwnedAndLockedAndUnseen => [],
+                        Watched                 => [$TicketID2],
+                        WatchedAndUnseen        => [$TicketID2],
+                    }
+                }
+            },
+            GetObjectIDsForCounter => {
+                All      => {
+                    Ticket => {
+                        Owned                   => [$TicketID1],
+                        OwnedAndLocked          => [],
+                        OwnedAndUnseen          => [$TicketID1],
+                        OwnedAndLockedAndUnseen => [],
+                        Watched                 => [$TicketID2],
+                        WatchedAndUnseen        => [$TicketID2],
+                    }
+                },
+                ObjectID => {
+                    Ticket => {
+                        Owned                   => [],
+                        OwnedAndLocked          => [],
+                        OwnedAndUnseen          => [],
+                        OwnedAndLockedAndUnseen => [],
+                        Watched                 => [$TicketID2],
+                        WatchedAndUnseen        => [$TicketID2],
+                    }
+                }
+            }
+        }
+    },
+    {
+        Name        => 'Ticket ' . $TicketID1 . ' / Seen / Open / Owned / Locked / Unwatched',
+        Parameter   => {
+            ObjectID => $TicketID1,
+        },
+        TicketState => {
+            Seen    => 1,
+            State   => 1,
+            Owner   => 1,
+            Locked  => 1,
+            Watched => 0,
+        },
+        Expected    => {
+            PrepareUserCounters => {
+                All      => {
+                    Ticket => {
+                        Owned                   => [$TicketID1],
+                        OwnedAndLocked          => [$TicketID1],
+                        OwnedAndUnseen          => [],
+                        OwnedAndLockedAndUnseen => [],
+                        Watched                 => [$TicketID2],
+                        WatchedAndUnseen        => [$TicketID2],
+                    }
+                },
+                ObjectID => {
+                    Ticket => {
+                        Owned                   => [$TicketID1],
+                        OwnedAndLocked          => [$TicketID1],
+                        OwnedAndUnseen          => [],
+                        OwnedAndLockedAndUnseen => [],
+                        Watched                 => [],
+                        WatchedAndUnseen        => [],
+                    }
+                }
+            },
+            GetObjectIDsForCounter => {
+                All      => {
+                    Ticket => {
+                        Owned                   => [$TicketID1],
+                        OwnedAndLocked          => [$TicketID1],
+                        OwnedAndUnseen          => [],
+                        OwnedAndLockedAndUnseen => [],
+                        Watched                 => [$TicketID2],
+                        WatchedAndUnseen        => [$TicketID2],
+                    }
+                },
+                ObjectID => {
+                    Ticket => {
+                        Owned                   => [$TicketID1],
+                        OwnedAndLocked          => [$TicketID1],
+                        OwnedAndUnseen          => [],
+                        OwnedAndLockedAndUnseen => [],
+                        Watched                 => [],
+                        WatchedAndUnseen        => [],
+                    }
+                }
+            }
+        }
+    },
+    {
+        Name        => 'Ticket ' . $TicketID2 . ' / Seen / Open / Not owned / Unlocked / Watched',
+        Parameter   => {
+            ObjectID => $TicketID2,
+        },
+        TicketState => {
+            Seen    => 1,
+            State   => 1,
+            Owner   => 0,
+            Locked  => 0,
+            Watched => 1,
+        },
+        Expected    => {
+            PrepareUserCounters => {
+                All      => {
+                    Ticket => {
+                        Owned                   => [$TicketID1],
+                        OwnedAndLocked          => [$TicketID1],
+                        OwnedAndUnseen          => [],
+                        OwnedAndLockedAndUnseen => [],
+                        Watched                 => [$TicketID2],
+                        WatchedAndUnseen        => [],
+                    }
+                },
+                ObjectID => {
+                    Ticket => {
+                        Owned                   => [],
+                        OwnedAndLocked          => [],
+                        OwnedAndUnseen          => [],
+                        OwnedAndLockedAndUnseen => [],
+                        Watched                 => [$TicketID2],
+                        WatchedAndUnseen        => [],
+                    }
+                }
+            },
+            GetObjectIDsForCounter => {
+                All      => {
+                    Ticket => {
+                        Owned                   => [$TicketID1],
+                        OwnedAndLocked          => [$TicketID1],
+                        OwnedAndUnseen          => [],
+                        OwnedAndLockedAndUnseen => [],
+                        Watched                 => [$TicketID2],
+                        WatchedAndUnseen        => [],
+                    }
+                },
+                ObjectID => {
+                    Ticket => {
+                        Owned                   => [],
+                        OwnedAndLocked          => [],
+                        OwnedAndUnseen          => [],
+                        OwnedAndLockedAndUnseen => [],
+                        Watched                 => [$TicketID2],
+                        WatchedAndUnseen        => [],
+                    }
+                }
+            }
+        }
+    },
+    {
+        Name        => 'Ticket ' . $TicketID1 . ' / Unseen / Closed / Owned / Locked / Watched',
+        Parameter   => {
+            ObjectID => $TicketID1,
+        },
+        TicketState => {
+            Seen    => 0,
+            State   => 0,
+            Owner   => 1,
+            Locked  => 1,
+            Watched => 1,
+        },
+        Expected    => {
+            PrepareUserCounters => {
+                All      => {
+                    Ticket => {
+                        Owned                   => [],
+                        OwnedAndLocked          => [],
+                        OwnedAndUnseen          => [],
+                        OwnedAndLockedAndUnseen => [],
+                        Watched                 => [$TicketID1,$TicketID2],
+                        WatchedAndUnseen        => [$TicketID1],
+                    }
+                },
+                ObjectID => {
+                    Ticket => {
+                        Owned                   => [],
+                        OwnedAndLocked          => [],
+                        OwnedAndUnseen          => [],
+                        OwnedAndLockedAndUnseen => [],
+                        Watched                 => [$TicketID1],
+                        WatchedAndUnseen        => [$TicketID1],
+                    }
+                }
+            },
+            GetObjectIDsForCounter => {
+                All      => {
+                    Ticket => {
+                        Owned                   => [],
+                        OwnedAndLocked          => [],
+                        OwnedAndUnseen          => [],
+                        OwnedAndLockedAndUnseen => [],
+                        Watched                 => [$TicketID1,$TicketID2],
+                        WatchedAndUnseen        => [$TicketID1],
+                    }
+                },
+                ObjectID => {
+                    Ticket => {
+                        Owned                   => [],
+                        OwnedAndLocked          => [],
+                        OwnedAndUnseen          => [],
+                        OwnedAndLockedAndUnseen => [],
+                        Watched                 => [$TicketID1],
+                        WatchedAndUnseen        => [$TicketID1],
+                    }
+                }
+            }
+        }
+    },
+);
+
+# run tests #
+for my $Test ( @Tests ) {
+    # prepare ticket state
+    if ( $Test->{TicketState}->{Seen} ) {
+        my $Success = $Kernel::OM->Get('Ticket')->TicketFlagSet(
+            TicketID => $Test->{Parameter}->{ObjectID},
+            Key      => 'Seen',
+            Value    => 1,
+            UserID   => $UserID,
+        );
+        $Self->True(
+            $Success,
+            $Test->{Name} . ' - Set ticket seen'
+        );
+    }
+    else {
+        my $Success = $Kernel::OM->Get('Ticket')->TicketFlagDelete(
+            TicketID => $Test->{Parameter}->{ObjectID},
+            Key      => 'Seen',
+            UserID   => $UserID,
+        );
+        $Self->True(
+            $Success,
+            $Test->{Name} . ' - Set ticket unseen'
+        );
+    }
+
+    if ( $Test->{TicketState}->{State} ) {
+        my $Success = $Kernel::OM->Get('Ticket')->TicketStateSet(
+            TicketID => $Test->{Parameter}->{ObjectID},
+            State    => 'open',
+            UserID   => $UserID,
+        );
+        $Self->True(
+            $Success,
+            $Test->{Name} . ' - Set ticket open'
+        );
+    }
+    else {
+        my $Success = $Kernel::OM->Get('Ticket')->TicketStateSet(
+            TicketID => $Test->{Parameter}->{ObjectID},
+            State    => 'closed',
+            UserID   => $UserID,
+        );
+        $Self->True(
+            $Success,
+            $Test->{Name} . ' - Set ticket closed'
+        );
+    }
+
+    if ( $Test->{TicketState}->{Owner} ) {
+        my $Success = $Kernel::OM->Get('Ticket')->TicketOwnerSet(
+            TicketID  => $Test->{Parameter}->{ObjectID},
+            NewUserID => $UserID,
+            UserID    => $UserID,
+        );
+        $Self->True(
+            $Success,
+            $Test->{Name} . ' - Set ticket owner to self'
+        );
+    }
+    else {
+        my $Success = $Kernel::OM->Get('Ticket')->TicketOwnerSet(
+            TicketID  => $Test->{Parameter}->{ObjectID},
+            NewUserID => 1,
+            UserID    => $UserID,
+        );
+        $Self->True(
+            $Success,
+            $Test->{Name} . ' - Set ticket owner to someone else'
+        );
+    }
+
+    if ( $Test->{TicketState}->{Locked} ) {
+        my $Success = $Kernel::OM->Get('Ticket')->TicketLockSet(
+            TicketID => $Test->{Parameter}->{ObjectID},
+            Lock     => 'lock',
+            UserID   => $UserID,
+        );
+        $Self->True(
+            $Success,
+            $Test->{Name} . ' - Set ticket locked'
+        );
+    }
+    else {
+        my $Success = $Kernel::OM->Get('Ticket')->TicketLockSet(
+            TicketID => $Test->{Parameter}->{ObjectID},
+            Lock     => 'unlock',
+            UserID   => $UserID,
+        );
+        $Self->True(
+            $Success,
+            $Test->{Name} . ' - Set ticket unlocked'
+        );
+    }
+
+    if ( $Test->{TicketState}->{Watched} ) {
+        my $Success = $Kernel::OM->Get('Watcher')->WatcherAdd(
+            Object      => 'Ticket',
+            ObjectID    => $Test->{Parameter}->{ObjectID},
+            WatchUserID => $UserID,
+            UserID      => $UserID,
+        );
+        $Self->True(
+            $Success,
+            $Test->{Name} . ' - Set ticket watched'
+        );
+    }
+    else {
+        my $Success = $Kernel::OM->Get('Watcher')->WatcherDelete(
+            Object      => 'Ticket',
+            ObjectID    => $Test->{Parameter}->{ObjectID},
+            WatchUserID => $UserID,
+            UserID      => $UserID,
+        );
+        $Self->True(
+            $Success,
+            $Test->{Name} . ' - Set ticket unwatched'
+        );
+    }
+
+    # check PrepareUserCounters
+    my $UserCountersHashAll = $Kernel::OM->Get('User')->PrepareUserCounters(
+        UserID => $UserID,
+    );
+    $Self->IsDeeply(
+        $UserCountersHashAll,
+        $Test->{Expected}->{PrepareUserCounters}->{All},
+        $Test->{Name} . ' - PrepareUserCounters / All'
+    );
+    my $UserCountersHashObjectID = $Kernel::OM->Get('User')->PrepareUserCounters(
+        UserID   => $UserID,
+        Category => 'Ticket',
+        ObjectID => $Test->{Parameter}->{ObjectID},
+    );
+    $Self->IsDeeply(
+        $UserCountersHashObjectID,
+        $Test->{Expected}->{PrepareUserCounters}->{ObjectID},
+        $Test->{Name} . ' - PrepareUserCounters / ObjectID'
+    );
+
+    # run UpdateUserCounterObject
+    my $Success = $Kernel::OM->Get('User')->UpdateUserCounterObject(
+        Category      => 'Ticket',
+        ObjectID      => $Test->{Parameter}->{ObjectID},
+        CurrentUserID => $UserID
+    );
+    $Self->True(
+        $Success,
+        $Test->{Name} . ' - UpdateUserCounterObject'
+    );
+
+    # check GetObjectIDsForCounter
+    for my $Category ( keys( %{ $Test->{Expected}->{GetObjectIDsForCounter}->{All} } ) ) {
+        for my $Counter ( keys( %{ $Test->{Expected}->{GetObjectIDsForCounter}->{All}->{ $Category } } ) ) {
+            my @ObjectIDs = $Kernel::OM->Get('User')->GetObjectIDsForCounter(
+                UserID   => $UserID,
+                Category => $Category,
+                Counter  => $Counter,
+            );
+            $Self->IsDeeply(
+                \@ObjectIDs,
+                $Test->{Expected}->{GetObjectIDsForCounter}->{All}->{ $Category }->{ $Counter },
+                $Test->{Name} . ' - GetObjectIDsForCounter / All / ' . $Category . ' / ' . $Counter
+            );
+        }
+    }
+    if ( $Test->{Parameter}->{ObjectID} ) {
+        for my $Category ( keys( %{ $Test->{Expected}->{GetObjectIDsForCounter}->{ObjectID} } ) ) {
+            for my $Counter ( keys( %{ $Test->{Expected}->{GetObjectIDsForCounter}->{ObjectID}->{ $Category } } ) ) {
+                my @ObjectIDs = $Kernel::OM->Get('User')->GetObjectIDsForCounter(
+                    UserID   => $UserID,
+                    Category => $Category,
+                    Counter  => $Counter,
+                    ObjectID => $Test->{Parameter}->{ObjectID},
+                );
+                $Self->IsDeeply(
+                    \@ObjectIDs,
+                    $Test->{Expected}->{GetObjectIDsForCounter}->{ObjectID}->{ $Category }->{ $Counter },
+                    $Test->{Name} . ' - GetObjectIDsForCounter / ObjectID / ' . $Category . ' / ' . $Counter
+                );
+            }
+        }
+    }
+}
+
 # reset fixed time
 $Helper->FixedTimeUnset();
 

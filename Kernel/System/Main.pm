@@ -24,6 +24,7 @@ use Storable;
 use Fcntl qw(:flock);
 use Time::HiRes;
 use MIME::Base64;
+use Safe;
 
 use Kernel::System::VariableCheck qw(:all);
 
@@ -934,6 +935,54 @@ sub Unflatten {
             ArrayDelimiter => $Param{ArrayDelimiter} || ':'
         }
     );
+}
+
+=item SafeEval()
+
+execute eval in a safe compartment
+
+    my $EvanResult = $MainObject->SafeEval(
+        What   => '...',        # the per code to execute
+        Permit => [...]         # the opcodes / opcode groups to permit
+    );
+
+=cut
+
+sub SafeEval {
+    my ( $Self, %Param ) = @_;
+
+    # check needed params
+    for my $Needed (qw(What Permit)) {
+        if ( !$Param{$Needed} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Message  => "Needed $Needed: $!",
+                Priority => 'error',
+            );
+            return;
+        }
+    }
+
+    if ( !IsArrayRefWithData($Param{Permit}) ) {
+        $Kernel::OM->Get('Log')->Log(
+            Message  => "Parameter \"Permit\" is not an array ref!",
+            Priority => 'error',
+        );
+        return;
+    }
+
+    # make it safe :)
+    my $Compartment = new Safe;
+    $Compartment->permit_only(@{$Param{Permit}});
+
+    # evaluate expression - we use a simple Safe string reval atm - better than nothing
+    my $EvalResult = $Compartment->reval($Param{What}, 1);
+    my $EvalFault = $@ || '';
+
+    return (
+        $EvalResult,
+        $EvalFault
+    )
+
 }
 
 =item DirectoryRead()
