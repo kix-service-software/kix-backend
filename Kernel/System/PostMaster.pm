@@ -877,6 +877,9 @@ sub _HandlePossibleFollowUp {
                 LinkToTicketID   => $Param{TicketID},
             );
 
+            # remember followup to ticket
+            $Param{SkipTicketIDs}->{ $Param{TicketID} } = 1;
+
             if ( @Result ) {
                 return ( 3, $Result[1] );
             }
@@ -904,6 +907,9 @@ sub _HandlePossibleFollowUp {
             if ( !$Run ) {
                 return;
             }
+
+            # remember followup to ticket
+            $Param{SkipTicketIDs}->{ $Param{TicketID} } = 1;
 
             return ( 4, $Param{TicketID} );
         } else  {

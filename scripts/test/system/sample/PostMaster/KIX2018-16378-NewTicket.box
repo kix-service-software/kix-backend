@@ -1,0 +1,12 @@
+Message-ID: <1234567890.123456@kix.example.com>
+Date: Tue, 5 May 2026 00:25:03 +0200
+From: <customer@kix.example.com>
+To: kix@localhost
+Subject: Test for StrictFollowUp - Step 1
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Length: 8
+Lines: 2
+
+Testmail
