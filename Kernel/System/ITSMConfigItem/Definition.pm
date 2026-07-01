@@ -409,12 +409,19 @@ sub DefinitionCheck {
         $Definition = $Param{Definition};
     }
     else {
-        $Definition = eval $Param{Definition};    ## no critic
-        my $EvalFault = $@ || '';
-        if ( $EvalFault ) {
+        # make it safe :)
+        ($Definition, my $Error) = $Kernel::OM->Get('Main')->SafeEval(
+            What   => $Param{Definition},
+            Permit => [
+                ':base_core', 
+                ':base_orig', 
+                ':base_mem'
+            ]
+        );
+        if ( $Error ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => 'Invalid Definition! You have an syntax error in the definition (' . $EvalFault. ').',
+                Message  => 'Invalid Definition! You have an syntax error in the definition (' . $Error. ').',
             );
             return;
         }

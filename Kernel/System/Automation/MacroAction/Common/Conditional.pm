@@ -14,8 +14,6 @@ use strict;
 use warnings;
 use utf8;
 
-use Safe;
-
 use Kernel::System::VariableCheck qw(:all);
 
 use base qw(Kernel::System::Automation::MacroAction::Common);
@@ -98,15 +96,20 @@ sub Run {
     return if !$Self->_CheckParams(%Param);
 
     # make it safe :)
-    my $Compartment = new Safe;
-    $Compartment->permit_only(qw(:base_core :base_mem :base_loop :base_orig :base_math));
-
-    # evaluate expression - we use a simple Safe string reval atm - better than nothing
-    my $EvalResult = $Compartment->reval($Param{Config}->{If}, 1);
-    if ( $@ ) {
+    my ($EvalResult, $Error) = $Kernel::OM->Get('Main')->SafeEval(
+        What   => $Param{Config}->{If},
+        Permit => [
+            ':base_core', 
+            ':base_orig', 
+            ':base_mem',
+            ':base_loop',
+            ':base_math'
+        ]
+    );
+    if ( $Error ) {
         $Kernel::OM->Get('Automation')->LogError(
             Referrer => $Self,
-            Message  => "An error occured while evaluating the logical expression ($@)!",
+            Message  => "An error occured while evaluating the logical expression ($Error)!",
             UserID   => $Param{UserID}
         );
         return;

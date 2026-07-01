@@ -126,12 +126,16 @@ sub Run {
         # get already prepared Article data from ArticleGet operation
         my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::Ticket::ArticleGet',
+            IgnoreParentPermissions  => 1,
             SuppressPermissionErrors => 1,
             Data                     => {
-                TicketID               => $Param{Data}->{TicketID},
-                ArticleID              => join(',', @ArticleIndex),
-                include                => $Param{Data}->{include},
-                expand                 => $Param{Data}->{expand}
+                TicketID             => $Param{Data}->{TicketID},
+                ArticleID            => join(',', @ArticleIndex),
+                DynamicFieldFilter   => $Param{Data}->{DynamicFieldFilter},
+                HTMLBodyAsAttachment => $Param{Data}->{HTMLBodyAsAttachment},
+                NoInlineAttachments  => $Param{Data}->{NoInlineAttachments},
+                include              => $Param{Data}->{include},
+                expand               => $Param{Data}->{expand}
             }
         );
 
