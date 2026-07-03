@@ -318,10 +318,20 @@ sub _GetTicketData {
 
     my $TicketObject = $Kernel::OM->Get('Ticket');
 
+    my $DynamicFieldsParam = 0;
+    if ( $Param{Data}->{include}->{DynamicFields} ) {
+        if ( IsArrayRefWithData( $Param{Data}->{DynamicFieldFilter} ) ) {
+            $DynamicFieldsParam = $Param{Data}->{DynamicFieldFilter};
+        }
+        else {
+            $DynamicFieldsParam = 1;
+        }
+    }
+
     # get the Ticket
     my %TicketRaw = $TicketObject->TicketGet(
         TicketID      => $TicketID,
-        DynamicFields => $Param{Data}->{include}->{DynamicFields},
+        DynamicFields => $DynamicFieldsParam,
         Extended      => $Param{Data}->{extended},
         UserID        => $Self->{Authorization}->{UserID},
     );

@@ -881,11 +881,19 @@ sub _CheckDefinition {
         $Definition = $Param{Definition};
     }
     else {
-        $Definition = eval $Param{Definition};    ## no critic
-        if ( !$Definition ) {
+        # make it safe :)
+        ($Definition, my $Error) = $Kernel::OM->Get('Main')->SafeEval(
+            What   => $Param{Definition},
+            Permit => [
+                ':base_core', 
+                ':base_orig', 
+                ':base_mem'
+            ]
+        );
+        if ( $Error ) {
             return $Self->_Error(
                 Code    => 'BadRequest',
-                Message => "Syntax error in definition! ($@)",
+                Message => "Syntax error in definition! ($Error)",
             );
         }
     }

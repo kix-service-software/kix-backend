@@ -383,6 +383,16 @@ sub _Log {
 
     my $Type = $LogData{Job}->{Type} || $LogData{Macro}->{Type} || 'Default';
 
+    # sub-macros must use the parent type to make sure the logs are going to the correct destination
+    # but we should not override the job type
+    if ( IsArrayRefWithData($Self->{ParentMacroID}) && !$LogData{Job}->{Type} ) {
+        my $ParentMacroID = $Self->{ParentMacroID}->[0];
+        my %ParentMacro   = $Self->MacroGet(ID => $ParentMacroID);
+        if ( %ParentMacro && $ParentMacro{Type} ) {
+            $Type = $ParentMacro{Type};
+        }
+    }
+
     # execute logging handler
     my $LogHandler = $Self->{LogHandler}->{$Type} || $Self->{LogHandler}->{Default};
     my $Success = $LogHandler->Log(

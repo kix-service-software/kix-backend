@@ -2145,7 +2145,7 @@ sub DeleteCounters {
 
 prepare the counters for a given user
 
-    my $Success = $UserObject->PrepareUserCounters(
+    my $UserCountersHash = $UserObject->PrepareUserCounters(
         UserID   => 123,                # required
         Category => 'Ticket',           # optional
         ObjectID => 123,                # optional, requires Category
@@ -2505,8 +2505,9 @@ sub DeleteUserCounterObject {
 update a user counter entry
 
     my $Success = $UserObject->UpdateUserCounterObject(
-        Category => 'Ticket',
-        ObjectID => 123,
+        Category      => 'Ticket',      # required
+        ObjectID      => 123,           # required
+        CurrentUserID => 123,           # optional
     );
 
 =cut
@@ -2585,6 +2586,7 @@ sub _UpdateUserCounterObject {
                 UserID   => $Param{UserID},
                 Category => $Category,
                 Counter  => $Counter,
+                ObjectID => $Param{ObjectID},
             );
 
             # prepare objects to delete and add
@@ -2633,6 +2635,7 @@ get the list of ObjectIDs for a specific user counter
         UserID   => 123,                        # required
         Category => 'Ticket',                   # required
         Counter  => 'OwnedAndUnseen',           # required
+        ObjectID => 123,                        # optional
     );
 
 =cut
@@ -2653,12 +2656,21 @@ sub GetObjectIDsForCounter {
         }
     }
 
+    my $SQL = 'SELECT object_id FROM user_counter WHERE user_id = ? AND category = ? AND counter = ?';
+    my @Bind = (
+         \$Param{UserID}, \$Param{Category}, \$Param{Counter}
+    );
+    # add ObjectID to sql condition if given
+    if ( $Param{ObjectID} ) {
+        $SQL .= ' AND object_id = ?';
+        push( @Bind, \$Param{ObjectID} );
+    }
+    $SQL .= ' ORDER BY object_id';
+
     # ask database
     my $Success = $Kernel::OM->Get('DB')->Prepare(
-        SQL   => "SELECT object_id FROM user_counter WHERE user_id = ? AND category = ? AND counter = ?",
-        Bind  => [
-            \$Param{UserID}, \$Param{Category}, \$Param{Counter},
-        ],
+        SQL   => $SQL,
+        Bind  => \@Bind,
     );
     return if !$Success;
 

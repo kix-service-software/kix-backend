@@ -5,3 +5,11 @@ Thank you very much, KIX Service Software
 N: Marco Hald
 W: https://github.com/marcohald
 --
+--
+N: Pascal Uphaus
+D: Thanks for pointing out a security issue regarding the execution of Perl code while updating  asset class definitions. 
+--
+--
+N: Steffen Klemer
+D: Thanks for pointing out misc security issues and contributions of solution suggestions. 
+--
