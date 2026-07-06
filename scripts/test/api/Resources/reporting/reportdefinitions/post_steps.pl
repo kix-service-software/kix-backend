@@ -116,5 +116,10 @@ When qr/I create a reportdefinition$/, sub {
    );
 };
 
-
+When qr/I get the config with Option "(.*?)"\s*$/, sub {
+    ( S->{Response}, S->{ResponseContent} ) = _Get(
+        Token => S->{Token},
+        URL   => S->{API_URL}.'/system/config/'.$1,
+    );
+};
 
