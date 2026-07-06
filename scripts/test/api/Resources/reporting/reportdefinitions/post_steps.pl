@@ -36,6 +36,13 @@ require '_StepsLib.pl';
 # feature specific steps
 
 Given qr/a reportdefinition$/, sub {
+#    Abfrage welche DB noch einbauen !!!!
+#    if ( $Kernel::OM->Get('DB')->{'DB::Type'} ne 'mysql' ) {
+#        die "This script can only be run on mysql databases.\n";
+#    }
+#    elsif ( $Kernel::OM->Get('DB')->{'DB::Type'} ne 'postgresql' ) {
+#        die "This script can only be run on mysql databases.\n";
+#    }
     ( S->{Response}, S->{ResponseContent} ) = _Post(
         URL     => S->{API_URL}.'/reporting/reportdefinitions',
         Token   => S->{Token},
@@ -109,5 +116,10 @@ When qr/I create a reportdefinition$/, sub {
    );
 };
 
-
+When qr/I get the config with Option "(.*?)"\s*$/, sub {
+    ( S->{Response}, S->{ResponseContent} ) = _Get(
+        Token => S->{Token},
+        URL   => S->{API_URL}.'/system/config/'.$1,
+    );
+};
 
