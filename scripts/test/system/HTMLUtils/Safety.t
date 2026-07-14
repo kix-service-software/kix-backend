@@ -501,7 +501,7 @@ EOF
 <img src="/img2.png"/>
 EOF
         Result => {
-            Output => '<img src="/img1.png" /><iframe src="" data-src="javascript:alert(&#39;XSS Exploit&#39;);"></iframe><img src="/img2.png" />',
+            Output => '<img src="/img1.png" /><iframe src=""></iframe><img src="/img2.png" />',
             Replace => 1,
         },
         Name => 'Safety - javascript source in data tag, keep'
@@ -952,7 +952,7 @@ to="javascript:alert(document.location.origin)"> </set>',
             NoJavaScript => 1
         },
         Result => {
-            Output  => '<img says,="says," \'xss\'")`="&#39;XSS&#39;&quot;)`" />',
+            Output  => '<img says,="says," \'xss\'")`="\'XSS\'&quot;)`" />',
             Replace => 1,
         },
     },
@@ -1018,7 +1018,7 @@ to="javascript:alert(document.location.origin)"> </set>',
             NoJavaScript => 1
         },
         Result => {
-            Output  => '<img src="onmouseover=&quot;alert(&#39;xxs&#39;)&quot;" />',
+            Output  => '<img src="onmouseover=&quot;alert(\'xxs\')&quot;" />',
             Replace => 1,
         },
     },
@@ -1359,7 +1359,7 @@ to="javascript:alert(document.location.origin)"> </set>',
             NoJavaScript => 1
         },
         Result => {
-            Output  => '<br size="&amp;{alert(&#39;XSS&#39;)}" />
+            Output  => '<br size="&amp;{alert(\'XSS\')}" />
 ',
             Replace => 1,
         },

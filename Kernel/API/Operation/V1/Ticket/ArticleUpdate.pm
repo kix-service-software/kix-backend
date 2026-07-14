@@ -427,16 +427,6 @@ sub _ArticleUpdate {
                 $Attachment->{Content} = MIME::Base64::decode_base64($Attachment->{Content});
                 $Attachment->{Disposition} //= 'attachment';
             }
-            # extract embedded images from file-2
-            elsif (
-                $Attachment->{ContentType} eq "text/html; charset=\"$Article->{Charset}\""
-                && $Attachment->{Filename} eq 'file-2'
-            ) {
-                $Kernel::OM->Get('HTMLUtils')->EmbeddedImagesExtract(
-                    DocumentRef    => \$Attachment->{Content},
-                    AttachmentsRef => $Article->{Attachments},
-                );
-            }
 
             # write file to backend
             my $UpdateSuccessful = $Kernel::OM->Get('Ticket')->ArticleWriteAttachment(
