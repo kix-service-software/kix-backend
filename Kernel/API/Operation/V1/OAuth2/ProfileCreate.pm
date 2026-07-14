@@ -154,7 +154,7 @@ sub Run {
         );
         return $Self->_Error(
             Code    => 'Object.UnableToCreate',
-            Message => 'Could not create OAuth2 Profile (error: $LogMessage).',
+            Message => 'Could not create OAuth2 Profile (error: ' . $LogMessage . ').',
         );
     }
 
