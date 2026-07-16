@@ -677,7 +677,7 @@ sub Run {
     # write plain email to the storage
     $TicketObject->ArticleWritePlain(
         ArticleID => $ArticleID,
-        Email     => $Self->{ParserObject}->GetPlainEmail(),
+        Email     => $Self->{ParserObject}->GetOriginalPlainEmail(),
         UserID    => $Param{InmailUserID},
     );
 
