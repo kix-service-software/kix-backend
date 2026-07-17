@@ -436,9 +436,10 @@ sub ArticleWriteAttachment {
     ) {
         # encode content
         $Param{Content} = $Kernel::OM->Get('Encode')->Convert(
-            Text => $Param{Content},
-            From => $Param{Charset} || 'utf-8',
-            To   => 'utf-8',
+            Text  => $Param{Content},
+            From  => $Param{Charset} || 'utf-8',
+            To    => 'utf-8',
+            Check => 1,
         );
 
         # apply safety rules and format content
