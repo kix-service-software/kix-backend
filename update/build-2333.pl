@@ -35,7 +35,7 @@ sub _CleanUpClientRegistration {
     my $LogObject  = $Kernel::OM->Get('Log');
     my $ClientID = "kix-agent-portal-development-userid";
 
-    my %ClientRegistration = $Kernel::OM->Get('ClientRegistration')->ClientRegistrationList(
+    my %ClientRegistration = $Kernel::OM->Get('ClientRegistration')->ClientRegistrationGet(
         ClientID => $ClientID,
         Silent   => 1,
     );
