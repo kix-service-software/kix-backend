@@ -508,6 +508,9 @@ sub TableAlter {
             if ( $Tag->{Type} =~ m{ (int|number) }xmsi ) {
                 $Default = defined $Tag->{Default} ? $Tag->{Default} : 0;
             }
+            elsif ( $Tag->{Type} =~ /(date|time)/i ) {
+                $Default = defined $Tag->{Default} ? $Tag->{Default} : '1970-01-01 00:00:00';
+            }
             else {
                 $Default = defined $Tag->{Default} ? "'$Tag->{Default}'" : "''";
             }

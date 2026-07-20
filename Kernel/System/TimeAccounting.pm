@@ -596,7 +596,7 @@ sub TimeAccountingGet {
     if ( !$Param{TimeAccountingID} ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => 'Needed TimeAccountingID!',
+            Message  => 'Need TimeAccountingID!',
             Silent   => $Param{Silent}
         );
         return;
