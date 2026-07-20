@@ -40,16 +40,18 @@ sub _UpdateTimeAccounting {
     );
 
     if ( @TimeAccountingIDs ) {
-        for my $TimeAccouningID ( @TimeAccountingIDs ) {
-            my %TimeAccouning = $Kernel::OM->Get('TimeAccounting')->TimeAccouningGet(
-                TimeAccouningID => $TimeAccountingID
+        for my $TimeAccountingID ( @TimeAccountingIDs ) {
+            my %TimeAccounting = $Kernel::OM->Get('TimeAccounting')->TimeAccountingGet(
+                TimeAccountingID => $TimeAccountingID
             );
 
             $Kernel::OM->Get('TimeAccounting')->TimeAccountingUpdate(
-                %TimeAccouning,
-                ExecutingContactID => $Kernel::OM->Get('Contact')->ContactLookup( UserID => $TimeAccouning{CreateBy} ),
-                StartTime          => $TimeAccouning{CreateTime},
-                IsInvoiced         => 0
+                %TimeAccounting,
+                TimeAccountingID   => $TimeAccountingID,
+                ExecutingContactID => $Kernel::OM->Get('Contact')->ContactLookup( UserID => $TimeAccounting{CreateBy} ),
+                StartTime          => $TimeAccounting{CreateTime},
+                IsInvoiced         => 0,
+                UserID             => 1
             );
         }
     }

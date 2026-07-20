@@ -2,9 +2,9 @@
 <database Name="kix">
 
     <TableAlter Name="time_accounting">
-        <ColumnChange OldName="executing_contact_id" NewName="executing_contact_id" Required="true"  Type="INTEGER"/>
-        <ColumnChange OldName="start_time" NewName="start_time" Required="true" Type="DATE"/>
-        <ColumnChange OldName="is_invoiced" NewName="is_invoiced" Required="true" Type="SMALLINT" Default="0"/>
+        <ColumnChange NameOld="executing_contact_id" NameNew="executing_contact_id" Required="true"  Type="INTEGER"/>
+        <ColumnChange NameOld="start_time" NameNew="start_time" Required="true" Type="DATE"/>
+        <ColumnChange NameOld="is_invoiced" NameNew="is_invoiced" Required="true" Type="SMALLINT" Default="0"/>
     </TableAlter>
 
 </database>
