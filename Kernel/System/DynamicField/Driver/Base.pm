@@ -36,36 +36,46 @@ sub ValueIsDifferent {
     my ( $Self, %Param ) = @_;
 
     # special cases where the values are different but they should be reported as equals
-    if (
-        !defined $Param{Value1}
-        && (
-            (
-                ref $Param{Value2} eq 'ARRAY'
-                && !IsArrayRefWithData( $Param{Value2} )
-            )
-            || (
-                ref $Param{Value2} eq ''
-                && !IsStringWithData( $Param{Value2} )
-            )
-        )
-    ) {
-        return
+    if ( !defined( $Param{Value1} ) ) {
+        if ( IsArrayRef( $Param{Value2} ) ) {
+            my $HasValue = 0;
+            for my $Entry ( @{ $Param{Value2} } ) {
+                if ( IsStringWithData( $Entry ) ) {
+                    $HasValue = 1;
+                    last;
+                }
+            }
+            if ( !$HasValue ) {
+                return;
+            }
+        }
+        elsif (
+            ref( $Param{Value2} ) eq ''
+            && !IsStringWithData( $Param{Value2} )
+        ) {
+            return;
+        }
     }
 
-    if (
-        !defined $Param{Value2}
-        && (
-            (
-                ref $Param{Value1} eq 'ARRAY'
-                && !IsArrayRefWithData( $Param{Value1} )
-            )
-            || (
-                ref $Param{Value1} eq ''
-                && !IsStringWithData( $Param{Value1} )
-            )
-        )
-    ) {
-        return
+    if ( !defined( $Param{Value2} ) ) {
+        if ( IsArrayRef( $Param{Value1} ) ) {
+            my $HasValue = 0;
+            for my $Entry ( @{ $Param{Value1} } ) {
+                if ( IsStringWithData( $Entry ) ) {
+                    $HasValue = 1;
+                    last;
+                }
+            }
+            if ( !$HasValue ) {
+                return;
+            }
+        }
+        elsif (
+            ref( $Param{Value1} ) eq ''
+            && !IsStringWithData( $Param{Value1} )
+        ) {
+            return;
+        }
     }
 
     # compare the results
