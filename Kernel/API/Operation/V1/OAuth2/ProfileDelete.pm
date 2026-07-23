@@ -98,7 +98,7 @@ sub Run {
             );
             return $Self->_Error(
                 Code    => 'Object.UnableToDelete',
-                Message => 'Could not delete OAuth2 Profile (error: $LogMessage).',
+                Message => 'Could not delete OAuth2 Profile (error: ' . $LogMessage . ').',
             );
         }
     }
