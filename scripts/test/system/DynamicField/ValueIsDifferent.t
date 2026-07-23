@@ -174,11 +174,38 @@ my @Tests = (
         Success => 0,
     },
     {
+        Name   => 'Text: Value1 undef, Value2 empty array',
+        Config => {
+            DynamicFieldConfig => $DynamicFieldConfigs{Text},
+            Value1             => undef,
+            Value2             => [],
+        },
+        Success => 0,
+    },
+    {
         Name   => 'Text: Value1 undef, Value2 array with empty string',
         Config => {
             DynamicFieldConfig => $DynamicFieldConfigs{Text},
             Value1             => undef,
             Value2             => [''],
+        },
+        Success => 0,
+    },
+    {
+        Name   => 'Text: Value1 undef, Value2 array with two empty strings',
+        Config => {
+            DynamicFieldConfig => $DynamicFieldConfigs{Text},
+            Value1             => undef,
+            Value2             => ['',''],
+        },
+        Success => 0,
+    },
+    {
+        Name   => 'Text: Value1 undef, Value2 array with empty string and non empty string',
+        Config => {
+            DynamicFieldConfig => $DynamicFieldConfigs{Text},
+            Value1             => undef,
+            Value2             => ['','1'],
         },
         Success => 1,
     },
@@ -192,10 +219,37 @@ my @Tests = (
         Success => 0,
     },
     {
+        Name   => 'Text: Value1 empty array, Value2 undef',
+        Config => {
+            DynamicFieldConfig => $DynamicFieldConfigs{Text},
+            Value1             => [],
+            Value2             => undef,
+        },
+        Success => 0,
+    },
+    {
         Name   => 'Text: Value1 array with empty string, Value2 undef',
         Config => {
             DynamicFieldConfig => $DynamicFieldConfigs{Text},
             Value1             => [''],
+            Value2             => undef,
+        },
+        Success => 0,
+    },
+    {
+        Name   => 'Text: Value1 array with two empty strings, Value2 undef',
+        Config => {
+            DynamicFieldConfig => $DynamicFieldConfigs{Text},
+            Value1             => ['',''],
+            Value2             => undef,
+        },
+        Success => 0,
+    },
+    {
+        Name   => 'Text: Value1 array with empty string and non empty string, Value2 undef',
+        Config => {
+            DynamicFieldConfig => $DynamicFieldConfigs{Text},
+            Value1             => ['','1'],
             Value2             => undef,
         },
         Success => 1,
@@ -275,11 +329,38 @@ my @Tests = (
         Success => 0,
     },
     {
+        Name   => 'TextArea: Value1 undef, Value2 empty array',
+        Config => {
+            DynamicFieldConfig => $DynamicFieldConfigs{TextArea},
+            Value1             => undef,
+            Value2             => [],
+        },
+        Success => 0,
+    },
+    {
         Name   => 'TextArea: Value1 undef, Value2 array with empty string',
         Config => {
             DynamicFieldConfig => $DynamicFieldConfigs{TextArea},
             Value1             => undef,
             Value2             => [''],
+        },
+        Success => 0,
+    },
+    {
+        Name   => 'TextArea: Value1 undef, Value2 array with two empty strings',
+        Config => {
+            DynamicFieldConfig => $DynamicFieldConfigs{TextArea},
+            Value1             => undef,
+            Value2             => ['',''],
+        },
+        Success => 0,
+    },
+    {
+        Name   => 'TextArea: Value1 undef, Value2 array with empty string and non empty string',
+        Config => {
+            DynamicFieldConfig => $DynamicFieldConfigs{TextArea},
+            Value1             => undef,
+            Value2             => ['','1'],
         },
         Success => 1,
     },
@@ -293,10 +374,37 @@ my @Tests = (
         Success => 0,
     },
     {
+        Name   => 'TextArea: Value1 empty array, Value2 undef',
+        Config => {
+            DynamicFieldConfig => $DynamicFieldConfigs{TextArea},
+            Value1             => [],
+            Value2             => undef,
+        },
+        Success => 0,
+    },
+    {
         Name   => 'TextArea: Value1 array with empty string, Value2 undef',
         Config => {
             DynamicFieldConfig => $DynamicFieldConfigs{TextArea},
-            Value1             =>  [''],
+            Value1             => [''],
+            Value2             => undef,
+        },
+        Success => 0,
+    },
+    {
+        Name   => 'TextArea: Value1 array with two empty strings, Value2 undef',
+        Config => {
+            DynamicFieldConfig => $DynamicFieldConfigs{TextArea},
+            Value1             => ['',''],
+            Value2             => undef,
+        },
+        Success => 0,
+    },
+    {
+        Name   => 'TextArea: Value1 array with empty string and non empty string, Value2 undef',
+        Config => {
+            DynamicFieldConfig => $DynamicFieldConfigs{TextArea},
+            Value1             => ['','1'],
             Value2             => undef,
         },
         Success => 1,
@@ -394,6 +502,42 @@ my @Tests = (
         Success => 0,
     },
     {
+        Name   => 'Dropdown: Value1 undef, Value2 empty array',
+        Config => {
+            DynamicFieldConfig => $DynamicFieldConfigs{Dropdown},
+            Value1             => undef,
+            Value2             => [],
+        },
+        Success => 0,
+    },
+    {
+        Name   => 'Dropdown: Value1 undef, Value2 array with empty string',
+        Config => {
+            DynamicFieldConfig => $DynamicFieldConfigs{Dropdown},
+            Value1             => undef,
+            Value2             => [''],
+        },
+        Success => 0,
+    },
+    {
+        Name   => 'Dropdown: Value1 undef, Value2 array with two empty strings',
+        Config => {
+            DynamicFieldConfig => $DynamicFieldConfigs{Dropdown},
+            Value1             => undef,
+            Value2             => ['',''],
+        },
+        Success => 0,
+    },
+    {
+        Name   => 'Dropdown: Value1 undef, Value2 array with empty string and non empty string',
+        Config => {
+            DynamicFieldConfig => $DynamicFieldConfigs{Dropdown},
+            Value1             => undef,
+            Value2             => ['','1'],
+        },
+        Success => 1,
+    },
+    {
         Name   => 'Dropdown: Value1 empty, Value2 undef',
         Config => {
             DynamicFieldConfig => $DynamicFieldConfigs{Dropdown},
@@ -401,6 +545,42 @@ my @Tests = (
             Value2             => undef,
         },
         Success => 0,
+    },
+    {
+        Name   => 'Dropdown: Value1 empty array, Value2 undef',
+        Config => {
+            DynamicFieldConfig => $DynamicFieldConfigs{Dropdown},
+            Value1             => [],
+            Value2             => undef,
+        },
+        Success => 0,
+    },
+    {
+        Name   => 'Dropdown: Value1 array with empty string, Value2 undef',
+        Config => {
+            DynamicFieldConfig => $DynamicFieldConfigs{Dropdown},
+            Value1             => [''],
+            Value2             => undef,
+        },
+        Success => 0,
+    },
+    {
+        Name   => 'Dropdown: Value1 array with two empty strings, Value2 undef',
+        Config => {
+            DynamicFieldConfig => $DynamicFieldConfigs{Dropdown},
+            Value1             => ['',''],
+            Value2             => undef,
+        },
+        Success => 0,
+    },
+    {
+        Name   => 'Dropdown: Value1 array with empty string and non empty string, Value2 undef',
+        Config => {
+            DynamicFieldConfig => $DynamicFieldConfigs{Dropdown},
+            Value1             => ['','1'],
+            Value2             => undef,
+        },
+        Success => 1,
     },
     {
         Name   => 'Dropdown: Both undefs',
@@ -477,20 +657,47 @@ my @Tests = (
         Success => 0,
     },
     {
-        Name   => 'Multiselect: Value1 empty, Value2 undef',
-        Config => {
-            DynamicFieldConfig => $DynamicFieldConfigs{Multiselect},
-            Value1             => q{},
-            Value2             => undef,
-        },
-        Success => 0,
-    },
-    {
         Name   => 'Multiselect: Value1 undef, Value2 empty array',
         Config => {
             DynamicFieldConfig => $DynamicFieldConfigs{Multiselect},
             Value1             => undef,
             Value2             => [],
+        },
+        Success => 0,
+    },
+    {
+        Name   => 'Multiselect: Value1 undef, Value2 array with empty string',
+        Config => {
+            DynamicFieldConfig => $DynamicFieldConfigs{Multiselect},
+            Value1             => undef,
+            Value2             => [''],
+        },
+        Success => 0,
+    },
+    {
+        Name   => 'Multiselect: Value1 undef, Value2 array with two empty strings',
+        Config => {
+            DynamicFieldConfig => $DynamicFieldConfigs{Multiselect},
+            Value1             => undef,
+            Value2             => ['',''],
+        },
+        Success => 0,
+    },
+    {
+        Name   => 'Multiselect: Value1 undef, Value2 array with empty string and non empty string',
+        Config => {
+            DynamicFieldConfig => $DynamicFieldConfigs{Multiselect},
+            Value1             => undef,
+            Value2             => ['','1'],
+        },
+        Success => 1,
+    },
+    {
+        Name   => 'Multiselect: Value1 empty, Value2 undef',
+        Config => {
+            DynamicFieldConfig => $DynamicFieldConfigs{Multiselect},
+            Value1             => q{},
+            Value2             => undef,
         },
         Success => 0,
     },
@@ -502,6 +709,33 @@ my @Tests = (
             Value2             => undef,
         },
         Success => 0,
+    },
+    {
+        Name   => 'Multiselect: Value1 array with empty string, Value2 undef',
+        Config => {
+            DynamicFieldConfig => $DynamicFieldConfigs{Multiselect},
+            Value1             => [''],
+            Value2             => undef,
+        },
+        Success => 0,
+    },
+    {
+        Name   => 'Multiselect: Value1 array with two empty strings, Value2 undef',
+        Config => {
+            DynamicFieldConfig => $DynamicFieldConfigs{Multiselect},
+            Value1             => ['',''],
+            Value2             => undef,
+        },
+        Success => 0,
+    },
+    {
+        Name   => 'Multiselect: Value1 array with empty string and non empty string, Value2 undef',
+        Config => {
+            DynamicFieldConfig => $DynamicFieldConfigs{Multiselect},
+            Value1             => ['','1'],
+            Value2             => undef,
+        },
+        Success => 1,
     },
     {
         Name   => 'Multiselect: Both undefs',
@@ -650,6 +884,42 @@ my @Tests = (
         Success => 0,
     },
     {
+        Name   => 'DateTime: Value1 undef, Value2 empty array',
+        Config => {
+            DynamicFieldConfig => $DynamicFieldConfigs{DateTime},
+            Value1             => undef,
+            Value2             => [],
+        },
+        Success => 0,
+    },
+    {
+        Name   => 'DateTime: Value1 undef, Value2 array with empty string',
+        Config => {
+            DynamicFieldConfig => $DynamicFieldConfigs{DateTime},
+            Value1             => undef,
+            Value2             => [''],
+        },
+        Success => 0,
+    },
+    {
+        Name   => 'DateTime: Value1 undef, Value2 array with two empty strings',
+        Config => {
+            DynamicFieldConfig => $DynamicFieldConfigs{DateTime},
+            Value1             => undef,
+            Value2             => ['',''],
+        },
+        Success => 0,
+    },
+    {
+        Name   => 'DateTime: Value1 undef, Value2 array with empty string and non empty string',
+        Config => {
+            DynamicFieldConfig => $DynamicFieldConfigs{DateTime},
+            Value1             => undef,
+            Value2             => ['','1'],
+        },
+        Success => 1,
+    },
+    {
         Name   => 'DateTime: Value1 empty, Value2 undef',
         Config => {
             DynamicFieldConfig => $DynamicFieldConfigs{DateTime},
@@ -657,6 +927,42 @@ my @Tests = (
             Value2             => undef,
         },
         Success => 0,
+    },
+    {
+        Name   => 'DateTime: Value1 empty array, Value2 undef',
+        Config => {
+            DynamicFieldConfig => $DynamicFieldConfigs{DateTime},
+            Value1             => [],
+            Value2             => undef,
+        },
+        Success => 0,
+    },
+    {
+        Name   => 'DateTime: Value1 array with empty string, Value2 undef',
+        Config => {
+            DynamicFieldConfig => $DynamicFieldConfigs{DateTime},
+            Value1             => [''],
+            Value2             => undef,
+        },
+        Success => 0,
+    },
+    {
+        Name   => 'DateTime: Value1 array with two empty strings, Value2 undef',
+        Config => {
+            DynamicFieldConfig => $DynamicFieldConfigs{DateTime},
+            Value1             => ['',''],
+            Value2             => undef,
+        },
+        Success => 0,
+    },
+    {
+        Name   => 'DateTime: Value1 array with empty string and non empty string, Value2 undef',
+        Config => {
+            DynamicFieldConfig => $DynamicFieldConfigs{DateTime},
+            Value1             => ['','1'],
+            Value2             => undef,
+        },
+        Success => 1,
     },
     {
         Name   => 'DateTime: Both undefs',
@@ -707,6 +1013,42 @@ my @Tests = (
         Success => 0,
     },
     {
+        Name   => 'Date: Value1 undef, Value2 empty array',
+        Config => {
+            DynamicFieldConfig => $DynamicFieldConfigs{Date},
+            Value1             => undef,
+            Value2             => [],
+        },
+        Success => 0,
+    },
+    {
+        Name   => 'Date: Value1 undef, Value2 array with empty string',
+        Config => {
+            DynamicFieldConfig => $DynamicFieldConfigs{Date},
+            Value1             => undef,
+            Value2             => [''],
+        },
+        Success => 0,
+    },
+    {
+        Name   => 'Date: Value1 undef, Value2 array with two empty strings',
+        Config => {
+            DynamicFieldConfig => $DynamicFieldConfigs{Date},
+            Value1             => undef,
+            Value2             => ['',''],
+        },
+        Success => 0,
+    },
+    {
+        Name   => 'Date: Value1 undef, Value2 array with empty string and non empty string',
+        Config => {
+            DynamicFieldConfig => $DynamicFieldConfigs{Date},
+            Value1             => undef,
+            Value2             => ['','1'],
+        },
+        Success => 1,
+    },
+    {
         Name   => 'Date: Value1 empty, Value2 undef',
         Config => {
             DynamicFieldConfig => $DynamicFieldConfigs{Date},
@@ -714,6 +1056,42 @@ my @Tests = (
             Value2             => undef,
         },
         Success => 0,
+    },
+    {
+        Name   => 'Date: Value1 empty array, Value2 undef',
+        Config => {
+            DynamicFieldConfig => $DynamicFieldConfigs{Date},
+            Value1             => [],
+            Value2             => undef,
+        },
+        Success => 0,
+    },
+    {
+        Name   => 'Date: Value1 array with empty string, Value2 undef',
+        Config => {
+            DynamicFieldConfig => $DynamicFieldConfigs{Date},
+            Value1             => [''],
+            Value2             => undef,
+        },
+        Success => 0,
+    },
+    {
+        Name   => 'Date: Value1 array with two empty strings, Value2 undef',
+        Config => {
+            DynamicFieldConfig => $DynamicFieldConfigs{Date},
+            Value1             => ['',''],
+            Value2             => undef,
+        },
+        Success => 0,
+    },
+    {
+        Name   => 'Date: Value1 array with empty string and non empty string, Value2 undef',
+        Config => {
+            DynamicFieldConfig => $DynamicFieldConfigs{Date},
+            Value1             => ['','1'],
+            Value2             => undef,
+        },
+        Success => 1,
     },
     {
         Name   => 'Date: Both undefs',
