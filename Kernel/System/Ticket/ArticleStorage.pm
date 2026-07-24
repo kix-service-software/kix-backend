@@ -497,7 +497,18 @@ sub ArticleWriteAttachment {
     if ( $Param{Disposition} ) {
         ( $Disposition, $FilenamePart ) = split ';', $Param{Disposition};
     }
-    $Disposition //= '';
+    elsif (
+        (
+            $Param{ContentID}
+            && $Param{ContentType} =~ m/image/i
+        )
+        || $Param{Filename} =~ m/^file-(1|2|1\.html)$/
+    ) {
+        $Disposition = 'inline';
+    }
+    else {
+        $Disposition = 'attachment';
+    }
 
     # write attachment to db
     return if !$DBObject->Do(
