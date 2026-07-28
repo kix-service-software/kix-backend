@@ -499,7 +499,7 @@ sub TimeAccountingExists {
     if ( !$Param{UserID} ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => "Needed UserID",
+            Message  => "Need UserID",
             Silent   => $Param{Silent}
         );
         return;
@@ -678,7 +678,7 @@ sub TimeAccountingUpdatable {
         if ( !$Param{$Needed} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "Needed $Needed",
+                Message  => "Need $Needed",
                 Silent   => $Param{Silent}
             );
             return;
