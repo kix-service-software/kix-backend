@@ -36,13 +36,11 @@ require '_StepsLib.pl';
 # feature specific steps
 
 Given qr/a reportdefinition$/, sub {
-#    Abfrage welche DB noch einbauen !!!!
-#    if ( $Kernel::OM->Get('DB')->{'DB::Type'} ne 'mysql' ) {
-#        die "This script can only be run on mysql databases.\n";
-#    }
-#    elsif ( $Kernel::OM->Get('DB')->{'DB::Type'} ne 'postgresql' ) {
-#        die "This script can only be run on mysql databases.\n";
-#    }
+    my $MyDB;
+
+#   Abfrage welche DB ist vorhanden 
+    $MyDB = $Kernel::OM->Get('DB')->{'DB::Type'};
+
     ( S->{Response}, S->{ResponseContent} ) = _Post(
         URL     => S->{API_URL}.'/reporting/reportdefinitions',
         Token   => S->{Token},
@@ -53,7 +51,8 @@ Given qr/a reportdefinition$/, sub {
                 Config => {
                     DataSource => {
                         SQL => {
-                             postgresql => "SELECT id, name, create_by FROM valid WHERE name LIKE '${Parameters.TestParameter}%'"
+                           #  postgresql => "SELECT id, name, create_by FROM valid WHERE name LIKE '${Parameters.TestParameter}%'"
+                            $MyDB => "SELECT id, name, create_by FROM valid WHERE name LIKE '${Parameters.TestParameter}%'"
                         }
                     },
                     Parameters => [
