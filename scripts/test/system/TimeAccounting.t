@@ -271,7 +271,7 @@ my @TimeAccountingGetTests = (
             Silent => 1
         },
         Expected     => {},
-        ErrorMessage => 'Needed TimeAccountingID!'
+        ErrorMessage => 'Need TimeAccountingID!'
     },
     {
         Name          => 'TimeAccountingGet: Invalid TimeAccountingID',
@@ -596,7 +596,7 @@ my @TimeAccountingExistsTests = (
             Silent => 1
         },
         Expected     => undef,
-        ErrorMessage => 'Needed UserID'
+        ErrorMessage => 'Need UserID'
     },
     {
         Name         => 'TimeAccountingExists: Missing TimeAccountingID',
@@ -660,7 +660,7 @@ my @TimeAccountingUpdatableTests = (
             Silent => 1
         },
         Expected     => undef,
-        ErrorMessage => 'Needed TimeAccountingID'
+        ErrorMessage => 'Need TimeAccountingID'
     },
     {
         Name         => 'TimeAccountingUpdatable: Invalid TimeAccountingID',
