@@ -1232,14 +1232,15 @@ sub ResolveValueByKey {
         if ( !$Param{$_} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "Need $_!"
+                Message  => "Need $_!",
+                Silent   => $Param{Silent}
             );
             return;
         }
     }
 
     # return undef if we have no data to work through
-    return if !$Param{Data};
+    return if ( !IsHashRefWithData( $Param{Data} ) );
 
     my $Data = $Param{Data};
 
@@ -1293,8 +1294,11 @@ sub ResolveValueByKey {
         return;
     }
 
-    if ( defined $ArrayIndex && IsArrayRef($Data) ) {
+    if ( defined( $ArrayIndex ) && IsArrayRef($Data) ) {
         $Data = $Data->[$ArrayIndex];
+    }
+    elsif ( defined( $ArrayIndex ) ) {
+        return;
     }
 
     if ( @Parts ) {

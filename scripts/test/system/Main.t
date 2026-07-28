@@ -3078,6 +3078,191 @@ for my $Test ( @GetAssignedSearchParamsTests ) {
     );
 }
 
+# test ResolveValueByKey
+@Tests = (
+    {
+        Name      => 'Missing Key',
+        Parameter => {
+            Data     => {},
+            Key      => undef,
+            Resolver => undef,
+            Silent   => 1
+        },
+        Expected  => undef
+    },
+    {
+        Name      => 'Not existing Key',
+        Parameter => {
+            Data     => {},
+            Key      => 'String',
+            Resolver => undef
+        },
+        Expected  => undef
+    },
+    {
+        Name      => 'Existing Key',
+        Parameter => {
+            Data     => {
+                String => 'UnitTest'
+            },
+            Key      => 'String',
+            Resolver => undef
+        },
+        Expected  => 'UnitTest'
+    },
+    {
+        Name      => 'Not existing Key in hash',
+        Parameter => {
+            Data     => {
+                Hash => {
+                    String => 'UnitTest'
+                }
+            },
+            Key      => 'Hash.Undef',
+            Resolver => undef
+        },
+        Expected  => undef
+    },
+    {
+        Name      => 'Not existing parent Key of hash',
+        Parameter => {
+            Data     => {
+                Hash => {
+                    String => {}
+                }
+            },
+            Key      => 'Undef.String',
+            Resolver => undef
+        },
+        Expected  => undef
+    },
+    {
+        Name      => 'Hash Key on string',
+        Parameter => {
+            Data     => {
+                String => 'UnitTest'
+            },
+            Key      => 'String.String',
+            Resolver => undef
+        },
+        Expected  => undef
+    },
+    {
+        Name      => 'Hash Key for string',
+        Parameter => {
+            Data     => {
+                Hash => {
+                    String => 'UnitTest'
+                }
+            },
+            Key      => 'Hash.String',
+            Resolver => undef
+        },
+        Expected  => 'UnitTest'
+    },
+    {
+        Name      => 'Key for hash',
+        Parameter => {
+            Data     => {
+                Hash => {
+                    String => 'UnitTest'
+                }
+            },
+            Key      => 'Hash',
+            Resolver => undef
+        },
+        Expected  => {
+            String => 'UnitTest'
+        }
+    },
+    {
+        Name      => 'Key for array',
+        Parameter => {
+            Data     => {
+                Array => [ 'Entry1', 'Entry2' ]
+            },
+            Key      => 'Array',
+            Resolver => undef
+        },
+        Expected  => [ 'Entry1', 'Entry2' ]
+    },
+    {
+        Name      => 'Key for array index',
+        Parameter => {
+            Data     => {
+                Array => [ 'Entry1', 'Entry2' ]
+            },
+            Key      => 'Array:0',
+            Resolver => undef
+        },
+        Expected  => 'Entry1'
+    },
+    {
+        Name      => 'Key for undefined array index',
+        Parameter => {
+            Data     => {
+                Array => [ 'Entry1', 'Entry2' ]
+            },
+            Key      => 'Array:2',
+            Resolver => undef
+        },
+        Expected  => undef
+    },
+    {
+        Name      => 'Key for array index used on hash',
+        Parameter => {
+            Data     => {
+                Hash => {
+                    String => 'UnitTest'
+                }
+            },
+            Key      => 'Hash:0',
+            Resolver => undef
+        },
+        Expected  => undef
+    },
+    {
+        Name      => 'Key for array index used on string',
+        Parameter => {
+            Data     => {
+                String => 'UnitTest'
+            },
+            Key      => 'String:0',
+            Resolver => undef
+        },
+        Expected  => undef
+    },
+    {
+        Name      => 'Key by Resolver',
+        Parameter => {
+            Data     => {
+                StringID => '1'
+            },
+            Key      => 'String',
+            Resolver => {
+                Handler       => sub {
+                    my ( $Self, %Param ) = @_;
+
+                    return 'UnitTest' . $Param{Data};
+                },
+                HandlerObject => $Kernel::OM->Get('Main'),
+                Resolves      => 'StringID'
+            }
+        },
+        Expected  => 'UnitTest1'
+    },
+);
+for my $Test ( @Tests ) {
+    my $Result = $Kernel::OM->Get('Main')->ResolveValueByKey(
+        %{ $Test->{Parameter} }
+    );
+    $Self->IsDeeply(
+        $Result,
+        $Test->{Expected},
+        'ResolveValueByKey: ' . $Test->{Name} . ': ErrorMessage'
+    );
+}
+
 # rollback transaction on database
 $Helper->Rollback();
 
