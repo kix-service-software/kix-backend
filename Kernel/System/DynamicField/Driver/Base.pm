@@ -40,7 +40,10 @@ sub ValueIsDifferent {
         if ( IsArrayRef( $Param{Value2} ) ) {
             my $HasValue = 0;
             for my $Entry ( @{ $Param{Value2} } ) {
-                if ( IsStringWithData( $Entry ) ) {
+                if (
+                    IsStringWithData( $Entry )
+                    || IsHashRefWithData( $Entry )
+                ) {
                     $HasValue = 1;
                     last;
                 }
@@ -50,8 +53,8 @@ sub ValueIsDifferent {
             }
         }
         elsif (
-            ref( $Param{Value2} ) eq ''
-            && !IsStringWithData( $Param{Value2} )
+            !IsStringWithData( $Param{Value2} )
+            && !IsHashRefWithData( $Param{Value2} )
         ) {
             return;
         }
@@ -61,7 +64,10 @@ sub ValueIsDifferent {
         if ( IsArrayRef( $Param{Value1} ) ) {
             my $HasValue = 0;
             for my $Entry ( @{ $Param{Value1} } ) {
-                if ( IsStringWithData( $Entry ) ) {
+                if (
+                    IsStringWithData( $Entry )
+                    || IsHashRefWithData( $Entry )
+                ) {
                     $HasValue = 1;
                     last;
                 }
@@ -71,8 +77,8 @@ sub ValueIsDifferent {
             }
         }
         elsif (
-            ref( $Param{Value1} ) eq ''
-            && !IsStringWithData( $Param{Value1} )
+            !IsStringWithData( $Param{Value1} )
+            && !IsHashRefWithData( $Param{Value1} )
         ) {
             return;
         }
