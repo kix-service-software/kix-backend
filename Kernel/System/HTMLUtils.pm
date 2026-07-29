@@ -1532,6 +1532,7 @@ sub _SafetyTagStartHandler {
                 lc( $Attribute ) eq 'background'
                 || lc( $Attribute ) eq 'url'
                 || lc( $Attribute ) eq 'src'
+                || lc( $Attribute ) eq 'data-src'
                 || lc( $Attribute ) eq 'dynsrc'
                 || lc( $Attribute ) eq 'lowsrc'
                 || lc( $Attribute ) eq 'href'
@@ -1590,6 +1591,7 @@ sub _SafetyTagStartHandler {
             if (
                 lc( $Attribute ) eq 'poster'
                 || lc( $Attribute ) eq 'src'
+                || lc( $Attribute ) eq 'data-src'
             ) {
                 # remember replacement
                 $Self->{Safety}->{Replace} = 1;
@@ -1616,6 +1618,7 @@ sub _SafetyTagStartHandler {
                 (
                     lc( $Attribute ) eq 'poster'
                     || lc( $Attribute ) eq 'src'
+                    || lc( $Attribute ) eq 'data-src'
                 )
                 && $Attributes->{ $Attribute } =~ m/(?:http|ftp|https):\/\//i
             ) {
@@ -1646,7 +1649,7 @@ sub _SafetyTagStartHandler {
         }
 
         # prepare attribute value
-        my $AttributeValue = encode_entities( $Attributes->{ $Attribute } );
+        my $AttributeValue = encode_entities( $Attributes->{ $Attribute }, '<>&"' );
 
         # check for changes
         if ( $AttributeValue ne $Attributes->{ $Attribute } ) {

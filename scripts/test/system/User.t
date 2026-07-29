@@ -430,8 +430,9 @@ $Self->True(
     "SetPreferences with empty array - $UserID",
 );
 
-### KIX2018-16212 ###
-## Combined tests for UpdateUserCounterObject, PrepareUserCounters and GetObjectIDsForCounter ##
+### KIX2018-16212 and KIX2018-16652 ###
+## Combined tests for UpdateUserCounterObject, PrepareUserCounters,       ##
+## GetObjectIDsForCounter, PrepareUserCounters and GetObjectIDsForCounter ##
 # prepare user #
 $UserID = $Helper->TestUserCreate(
     Result => 'ID',
@@ -515,6 +516,16 @@ my @Tests = (
                     }
                 }
             },
+            PrepareObjectCounters => {
+                Ticket => {
+                    Owned                   => [],
+                    OwnedAndLocked          => [],
+                    OwnedAndUnseen          => [],
+                    OwnedAndLockedAndUnseen => [],
+                    Watched                 => [],
+                    WatchedAndUnseen        => [],
+                }
+            },
             GetObjectIDsForCounter => {
                 All      => {
                     Ticket => {
@@ -527,6 +538,28 @@ my @Tests = (
                     }
                 },
                 ObjectID => {
+                    Ticket => {
+                        Owned                   => [],
+                        OwnedAndLocked          => [],
+                        OwnedAndUnseen          => [],
+                        OwnedAndLockedAndUnseen => [],
+                        Watched                 => [],
+                        WatchedAndUnseen        => [],
+                    }
+                }
+            },
+            GetUserIDsForCounter => {
+                All      => {
+                    Ticket => {
+                        Owned                   => [],
+                        OwnedAndLocked          => [],
+                        OwnedAndUnseen          => [],
+                        OwnedAndLockedAndUnseen => [],
+                        Watched                 => [],
+                        WatchedAndUnseen        => [],
+                    }
+                },
+                UserID => {
                     Ticket => {
                         Owned                   => [],
                         OwnedAndLocked          => [],
@@ -574,6 +607,16 @@ my @Tests = (
                     }
                 }
             },
+            PrepareObjectCounters => {
+                Ticket => {
+                    Owned                   => [$UserID],
+                    OwnedAndLocked          => [],
+                    OwnedAndUnseen          => [$UserID],
+                    OwnedAndLockedAndUnseen => [],
+                    Watched                 => [],
+                    WatchedAndUnseen        => [],
+                }
+            },
             GetObjectIDsForCounter => {
                 All      => {
                     Ticket => {
@@ -590,6 +633,28 @@ my @Tests = (
                         Owned                   => [$TicketID1],
                         OwnedAndLocked          => [],
                         OwnedAndUnseen          => [$TicketID1],
+                        OwnedAndLockedAndUnseen => [],
+                        Watched                 => [],
+                        WatchedAndUnseen        => [],
+                    }
+                }
+            },
+            GetUserIDsForCounter => {
+                All      => {
+                    Ticket => {
+                        Owned                   => [$UserID],
+                        OwnedAndLocked          => [],
+                        OwnedAndUnseen          => [$UserID],
+                        OwnedAndLockedAndUnseen => [],
+                        Watched                 => [],
+                        WatchedAndUnseen        => [],
+                    }
+                },
+                UserID => {
+                    Ticket => {
+                        Owned                   => [$UserID],
+                        OwnedAndLocked          => [],
+                        OwnedAndUnseen          => [$UserID],
                         OwnedAndLockedAndUnseen => [],
                         Watched                 => [],
                         WatchedAndUnseen        => [],
@@ -633,6 +698,16 @@ my @Tests = (
                     }
                 }
             },
+            PrepareObjectCounters => {
+                Ticket => {
+                    Owned                   => [],
+                    OwnedAndLocked          => [],
+                    OwnedAndUnseen          => [],
+                    OwnedAndLockedAndUnseen => [],
+                    Watched                 => [$UserID],
+                    WatchedAndUnseen        => [$UserID],
+                }
+            },
             GetObjectIDsForCounter => {
                 All      => {
                     Ticket => {
@@ -652,6 +727,28 @@ my @Tests = (
                         OwnedAndLockedAndUnseen => [],
                         Watched                 => [$TicketID2],
                         WatchedAndUnseen        => [$TicketID2],
+                    }
+                }
+            },
+            GetUserIDsForCounter => {
+                All      => {
+                    Ticket => {
+                        Owned                   => [],
+                        OwnedAndLocked          => [],
+                        OwnedAndUnseen          => [],
+                        OwnedAndLockedAndUnseen => [],
+                        Watched                 => [$UserID],
+                        WatchedAndUnseen        => [$UserID],
+                    }
+                },
+                UserID => {
+                    Ticket => {
+                        Owned                   => [],
+                        OwnedAndLocked          => [],
+                        OwnedAndUnseen          => [],
+                        OwnedAndLockedAndUnseen => [],
+                        Watched                 => [$UserID],
+                        WatchedAndUnseen        => [$UserID],
                     }
                 }
             }
@@ -692,6 +789,16 @@ my @Tests = (
                     }
                 }
             },
+            PrepareObjectCounters => {
+                Ticket => {
+                    Owned                   => [$UserID],
+                    OwnedAndLocked          => [$UserID],
+                    OwnedAndUnseen          => [],
+                    OwnedAndLockedAndUnseen => [],
+                    Watched                 => [],
+                    WatchedAndUnseen        => [],
+                }
+            },
             GetObjectIDsForCounter => {
                 All      => {
                     Ticket => {
@@ -707,6 +814,28 @@ my @Tests = (
                     Ticket => {
                         Owned                   => [$TicketID1],
                         OwnedAndLocked          => [$TicketID1],
+                        OwnedAndUnseen          => [],
+                        OwnedAndLockedAndUnseen => [],
+                        Watched                 => [],
+                        WatchedAndUnseen        => [],
+                    }
+                }
+            },
+            GetUserIDsForCounter => {
+                All      => {
+                    Ticket => {
+                        Owned                   => [$UserID],
+                        OwnedAndLocked          => [$UserID],
+                        OwnedAndUnseen          => [],
+                        OwnedAndLockedAndUnseen => [],
+                        Watched                 => [],
+                        WatchedAndUnseen        => [],
+                    }
+                },
+                UserID => {
+                    Ticket => {
+                        Owned                   => [$UserID],
+                        OwnedAndLocked          => [$UserID],
                         OwnedAndUnseen          => [],
                         OwnedAndLockedAndUnseen => [],
                         Watched                 => [],
@@ -751,6 +880,16 @@ my @Tests = (
                     }
                 }
             },
+            PrepareObjectCounters => {
+                Ticket => {
+                    Owned                   => [1],
+                    OwnedAndLocked          => [],
+                    OwnedAndUnseen          => [1],
+                    OwnedAndLockedAndUnseen => [],
+                    Watched                 => [$UserID],
+                    WatchedAndUnseen        => [],
+                }
+            },
             GetObjectIDsForCounter => {
                 All      => {
                     Ticket => {
@@ -769,6 +908,28 @@ my @Tests = (
                         OwnedAndUnseen          => [],
                         OwnedAndLockedAndUnseen => [],
                         Watched                 => [$TicketID2],
+                        WatchedAndUnseen        => [],
+                    }
+                }
+            },
+            GetUserIDsForCounter => {
+                All      => {
+                    Ticket => {
+                        Owned                   => [1],
+                        OwnedAndLocked          => [],
+                        OwnedAndUnseen          => [1],
+                        OwnedAndLockedAndUnseen => [],
+                        Watched                 => [$UserID],
+                        WatchedAndUnseen        => [],
+                    }
+                },
+                UserID => {
+                    Ticket => {
+                        Owned                   => [],
+                        OwnedAndLocked          => [],
+                        OwnedAndUnseen          => [],
+                        OwnedAndLockedAndUnseen => [],
+                        Watched                 => [$UserID],
                         WatchedAndUnseen        => [],
                     }
                 }
@@ -810,6 +971,16 @@ my @Tests = (
                     }
                 }
             },
+            PrepareObjectCounters => {
+                Ticket => {
+                    Owned                   => [],
+                    OwnedAndLocked          => [],
+                    OwnedAndUnseen          => [],
+                    OwnedAndLockedAndUnseen => [],
+                    Watched                 => [$UserID],
+                    WatchedAndUnseen        => [$UserID],
+                }
+            },
             GetObjectIDsForCounter => {
                 All      => {
                     Ticket => {
@@ -831,9 +1002,31 @@ my @Tests = (
                         WatchedAndUnseen        => [$TicketID1],
                     }
                 }
+            },
+            GetUserIDsForCounter => {
+                All      => {
+                    Ticket => {
+                        Owned                   => [],
+                        OwnedAndLocked          => [],
+                        OwnedAndUnseen          => [],
+                        OwnedAndLockedAndUnseen => [],
+                        Watched                 => [$UserID],
+                        WatchedAndUnseen        => [$UserID],
+                    }
+                },
+                UserID => {
+                    Ticket => {
+                        Owned                   => [],
+                        OwnedAndLocked          => [],
+                        OwnedAndUnseen          => [],
+                        OwnedAndLockedAndUnseen => [],
+                        Watched                 => [$UserID],
+                        WatchedAndUnseen        => [$UserID],
+                    }
+                }
             }
         }
-    },
+    }
 );
 
 # run tests #
@@ -977,6 +1170,19 @@ for my $Test ( @Tests ) {
         $Test->{Name} . ' - PrepareUserCounters / ObjectID'
     );
 
+    # check PrepareObjectCounters
+    if ( $Test->{Parameter}->{ObjectID} ) {
+        my $ObjectCountersHash = $Kernel::OM->Get('User')->PrepareObjectCounters(
+            Category => 'Ticket',
+            ObjectID => $Test->{Parameter}->{ObjectID},
+        );
+        $Self->IsDeeply(
+            $ObjectCountersHash,
+            $Test->{Expected}->{PrepareObjectCounters},
+            $Test->{Name} . ' - PrepareObjectCounters'
+        );
+    }
+
     # run UpdateUserCounterObject
     my $Success = $Kernel::OM->Get('User')->UpdateUserCounterObject(
         Category      => 'Ticket',
@@ -1016,6 +1222,39 @@ for my $Test ( @Tests ) {
                     \@ObjectIDs,
                     $Test->{Expected}->{GetObjectIDsForCounter}->{ObjectID}->{ $Category }->{ $Counter },
                     $Test->{Name} . ' - GetObjectIDsForCounter / ObjectID / ' . $Category . ' / ' . $Counter
+                );
+            }
+        }
+    }
+
+    # check GetUserIDsForCounter
+    if ( $Test->{Parameter}->{ObjectID} ) {
+        for my $Category ( keys( %{ $Test->{Expected}->{GetUserIDsForCounter}->{All} } ) ) {
+            for my $Counter ( keys( %{ $Test->{Expected}->{GetUserIDsForCounter}->{All}->{ $Category } } ) ) {
+                my @UserIDs = $Kernel::OM->Get('User')->GetUserIDsForCounter(
+                    ObjectID => $Test->{Parameter}->{ObjectID},
+                    Category => $Category,
+                    Counter  => $Counter,
+                );
+                $Self->IsDeeply(
+                    \@UserIDs,
+                    $Test->{Expected}->{GetUserIDsForCounter}->{All}->{ $Category }->{ $Counter },
+                    $Test->{Name} . ' - GetUserIDsForCounter / All / ' . $Category . ' / ' . $Counter
+                );
+            }
+        }
+        for my $Category ( keys( %{ $Test->{Expected}->{GetUserIDsForCounter}->{UserID} } ) ) {
+            for my $Counter ( keys( %{ $Test->{Expected}->{GetUserIDsForCounter}->{UserID}->{ $Category } } ) ) {
+                my @UserIDs = $Kernel::OM->Get('User')->GetUserIDsForCounter(
+                    ObjectID => $Test->{Parameter}->{ObjectID},
+                    Category => $Category,
+                    Counter  => $Counter,
+                    UserID   => $UserID,
+                );
+                $Self->IsDeeply(
+                    \@UserIDs,
+                    $Test->{Expected}->{GetUserIDsForCounter}->{UserID}->{ $Category }->{ $Counter },
+                    $Test->{Name} . ' - GetUserIDsForCounter / UserID / ' . $Category . ' / ' . $Counter
                 );
             }
         }
