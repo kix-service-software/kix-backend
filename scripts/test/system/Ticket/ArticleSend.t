@@ -12,6 +12,8 @@ use strict;
 use warnings;
 use utf8;
 
+use Kernel::System::EmailParser;
+
 use vars (qw($Self));
 
 # get helper object
@@ -184,6 +186,17 @@ for my $Test (@ArticleTests) {
         $Email->{ToArray},
         $Test->{ExpectedToArray},
         $Test->{Name} . ' - EmailsGet() To',
+    );
+
+    # check attachments on send email
+    my $EmailParserObject = Kernel::System::EmailParser->new(
+        Email => ${$Email->{Header}} . "\n" . $${Email->{Body}},
+    );
+    my @Attachments = $EmailParserObject->GetAttachments();
+    $Self->Is(
+        scalar( @Attachments ),
+        $Test->{ExpectedAttachmentCount} + 2,           # plain text (file-1) and html text (file-2) are handled as attachments of the email
+        $Test->{Name} . ' - Email Attachment Count'
     );
 
     # check article count
