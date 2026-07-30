@@ -189,7 +189,7 @@ sub Describe {
         Placeholder => {
             ValueType => 'KeyValueListValues',
             Richtext  => 0,
-            Translate => 0,
+            Translate => 1,
         },
     );
 
