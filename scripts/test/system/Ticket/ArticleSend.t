@@ -190,7 +190,7 @@ for my $Test (@ArticleTests) {
 
     # check attachments on send email
     my $EmailParserObject = Kernel::System::EmailParser->new(
-        Email => ${$Email->{Header}} . "\n" . $${Email->{Body}},
+        Email => ${$Email->{Header}} . "\n" . ${$Email->{Body}},
     );
     my @Attachments = $EmailParserObject->GetAttachments();
     $Self->Is(
