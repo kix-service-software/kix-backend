@@ -277,6 +277,144 @@ sub SearchSQLSortFieldGet {
     };
 }
 
+sub _ExportConfigDataPrepare {
+    my ( $Self, %Param ) = @_;
+
+    return if !IsArrayRefWithData($Param{Source});
+    return if !$Param{Object};
+    return if !IsHashRefWithData($Param{List});
+
+    my @Source  = @{$Param{Source} || []};
+    my $Object  = $Param{Object};
+    my %List    = %{$Param{List}};
+    my %ListRev = reverse %List;
+    my @Result;
+
+    for my $DataID ( @Source ) {
+        if ( !defined $DataID ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "An ungefined $Object is given!",
+                Silent   => $Param{Silent}
+            );
+            return;
+        }
+        elsif ( $DataID !~ m/^\d+$/sxm ) {
+            if ( !$ListRev{$DataID} ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "$Object ($DataID) doesn't exists!",
+                    Silent   => $Param{Silent}
+                );
+                return;
+            }
+            push( @Result, $ListRev{$DataID});
+            next;
+        }
+        elsif ( !$List{$DataID} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "$Object ($DataID) doesn't exists!",
+                Silent   => $Param{Silent}
+            );
+            return;
+        }
+
+        push( @Result, $List{$DataID});
+    }
+
+    return \@Result;
+}
+
+sub _ImportConfigDataPrepare {
+    my ( $Self, %Param ) = @_;
+
+    return if !IsArrayRefWithData($Param{Source}) && !IsArrayRefWithData($Param{Target});
+    return if !$Param{Object};
+    return if !IsHashRefWithData($Param{List});
+
+    my @Source  = @{$Param{Source} || []};
+    my @Target  = @{$Param{Target} || []};
+    my $Object  = $Param{Object};
+    my %List    = %{$Param{List}};
+    my %ListRev = reverse %List;
+    my @Result;
+    my $Type;
+
+    if ( scalar( @Source ) ) {
+        $Type = 'Source';
+        for my $Data ( @Source ) {
+            if ( !defined $Data ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "An ungefined $Object is given!",
+                    Silent   => $Param{Silent}
+                );
+                return;
+            }
+            elsif ( $ListRev{$Data} ) {
+                push( @Result, $ListRev{$Data} );
+            }
+            else {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "$Object ($Data) doesn't exists!",
+                    Silent   => $Param{Silent}
+                );
+                return;
+            }
+        }
+    }
+    # fallback to old parameter
+    elsif ( scalar( @Target ) ) {
+        $Type = 'Target';
+        for my $Data ( @Target ) {
+            if ( !defined $Data ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "An ungefined $Object is given!",
+                    Silent   => $Param{Silent}
+                );
+                return;
+            }
+            elsif ( $Data =~ m/^\d+$/sxm ) {
+                # look first as ID
+                if ( $List{$Data} ) {
+                    push( @Result, $Data);
+                }
+                # look second as Name
+                elsif ( $ListRev{$Data} ) {
+                    push( @Result, $ListRev{$Data});
+                }
+                else {
+                    $Kernel::OM->Get('Log')->Log(
+                        Priority => 'error',
+                        Message  => "$Object ($Data) doesn't exists!",
+                        Silent   => $Param{Silent}
+                    );
+                    return;
+                }
+            }
+            elsif ( $ListRev{$Data} ) {
+                push( @Result, $ListRev{$Data});
+            }
+            else {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "$Object ($Data) doesn't exists!",
+                    Silent   => $Param{Silent}
+                );
+                return;
+            }
+        }
+    }
+
+    return {
+        Values => \@Result,
+        Type   => $Type
+    };
+}
+
 1;
 
 =back
