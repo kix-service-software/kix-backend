@@ -370,7 +370,7 @@ my @Tests = (
             Filesize           => '3 Bytes',
             FilesizeRaw        => 3,
             ContentID          => '',
-            ContentType        => 'text/html',
+            ContentType        => 'text/html; charset="utf-8"',
             Disposition        => 'inline',
             ContentAlternative => '',
         },
