@@ -20,10 +20,38 @@ my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 # begin transaction on database
 $Helper->BeginWork();
 
+# some preparations
+# create customer user
+my $ContactID = $Helper->TestContactCreate();
+$Self->True(
+    $ContactID,
+    'ContactCreate',
+);
+my %CustomerContact = $Kernel::OM->Get('Contact')->ContactGet(
+    ID => $ContactID,
+);
+
+# create ticket
+my $TicketID = $Kernel::OM->Get('Ticket')->TicketCreate(
+    Title          => 'ExtractText test ticket',
+    Queue          => 'Junk',
+    Lock           => 'unlock',
+    Priority       => '3 normal',
+    State          => 'closed',
+    OrganisationID => $CustomerContact{PrimaryOrganisationID},
+    ContactID      => $ContactID,
+    OwnerID        => 1,
+    UserID         => 1,
+);
+$Self->True(
+    $TicketID,
+    'TicketCreate',
+);
+
 # create macro
 my $MacroID = $Kernel::OM->Get('Automation')->MacroAdd(
     Name    => 'VariableSet - Macro',
-    Type    => 'Synchronisation',
+    Type    => 'Ticket',
     ValidID => 1,
     UserID  => 1,
 );
@@ -101,6 +129,20 @@ my @Tests = (
         },
         Result => [ 'Test' ],
     },
+    {
+        Name  => 'Parameter Value with not translated placeholder',
+        Input => {
+            Value => '<KIX_TICKET_Type!>',
+        },
+        Result => 'Unclassified',
+    },
+    {
+        Name  => 'Parameter Value with translated placeholder',
+        Input => {
+            Value => '<KIX_TICKET_Type>',
+        },
+        Result => 'Unklassifiziert',
+    },
 );
 
 for my $Test ( @Tests ) {
@@ -129,7 +171,7 @@ for my $Test ( @Tests ) {
     # check if placeholder is used
     $Success = $Kernel::OM->Get('Automation')->MacroExecute(
         ID       => $MacroID,
-        ObjectID => 1,
+        ObjectID => $TicketID,
         UserID   => 1,
     );
     $Self->True(

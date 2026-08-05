@@ -429,6 +429,50 @@ sub ArticleWriteAttachment {
         }
     }
 
+    # special handling for html body file
+    if (
+        $Param{Filename} =~ m/^file-(1|2|1\.html)$/
+        && $Param{ContentType} =~ m/^text\/html/
+    ) {
+        # encode content
+        $Param{Content} = $Kernel::OM->Get('Encode')->Convert(
+            Text  => $Param{Content},
+            From  => $Param{Charset} || 'utf-8',
+            To    => 'utf-8',
+            Check => 1,
+        );
+
+        # apply safety rules and format content
+        my %Safe = $Kernel::OM->Get('HTMLUtils')->Safety(
+            String       => $Param{Content},
+            NoApplet     => 1,
+            NoObject     => 1,
+            NoEmbed      => 1,
+            NoSVG        => 1,
+            NoImg        => 0,
+            NoIntSrcLoad => 0,
+            NoExtSrcLoad => 0,
+            NoJavaScript => 1,
+        );
+        $Param{Content} = $Safe{String};
+
+        # extract embedded images from html content
+        my @HTMLAttachments = ();
+        $Kernel::OM->Get('HTMLUtils')->EmbeddedImagesExtract(
+            DocumentRef    => \$Param{Content},
+            AttachmentsRef => \@HTMLAttachments,
+        );
+
+        # add html attachments
+        for my $Attachment ( @HTMLAttachments ) {
+            $Self->ArticleWriteAttachment(
+                %{ $Attachment },
+                ArticleID => $Param{ArticleID},
+                UserID    => $Param{UserID},
+            );
+        }
+    }
+
     # cleanup filename
     $Param{Filename} =~ s/ /_/g;
     $Param{Filename} =~ s/^\.//g;

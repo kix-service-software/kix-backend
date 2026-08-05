@@ -207,21 +207,18 @@ sub ArticleCreate {
         DynamicFields => 1,
     );
 
-    # get html utils object
-    my $HTMLUtilsObject = $Kernel::OM->Get('HTMLUtils');
-
     # add 'no body' if there is no body there!
-    my @AttachmentConvert;
     if ( !length $Param{Body} ) {    # allow '0' as body
         $Param{Body} = 'No body';
-    } else {
-
+    }
+    else {
         if (IsHashRefWithData($Param{OrigHeader}) && $Param{OrigHeader}->{Body}) {
             $Param{OrigHeader}->{Body} = $Param{Body};
         }
 
         # process html article
         if ( $Param{MimeType} =~ /text\/html/i ) {
+            # apply safety rules and format content
             my %Safe = $Kernel::OM->Get('HTMLUtils')->Safety(
                 String       => $Param{Body},
                 NoApplet     => 1,
@@ -234,13 +231,17 @@ sub ArticleCreate {
                 NoJavaScript => 1,
             );
 
+            if ( !IsArrayRef( $Param{Attachment} ) ) {
+                $Param{Attachment} = [];
+            }
+
             # add html article as attachment
-            my $Attach = {
+            my $HTMLAttachment = {
                 Content     => $Safe{String},
                 ContentType => "text/html; charset=\"$Param{Charset}\"",
                 Filename    => 'file-2',
             };
-            push @AttachmentConvert, $Attach;
+            push( @{ $Param{Attachment} }, $HTMLAttachment );
 
             # save HTML body for later use
             $Param{HTMLBody} = $Safe{String};
@@ -248,7 +249,7 @@ sub ArticleCreate {
             # get ascii body
             $Param{MimeType} = 'text/plain';
             $Param{ContentType} =~ s/html/plain/i;
-            $Param{Body} = $HTMLUtilsObject->ToAscii(
+            $Param{Body} = $Kernel::OM->Get('HTMLUtils')->ToAscii(
                 String            => $Safe{String},
                 NoForcedLinebreak => 1
             );
@@ -452,32 +453,8 @@ sub ArticleCreate {
         Bind => [ \$Param{UserID}, \$Param{TicketID} ],
     );
 
-    # check for base64 encoded images in html body and upload them
-    for my $Attachment (@AttachmentConvert) {
-
-        if (
-            $Attachment->{ContentType} eq "text/html; charset=\"$Param{Charset}\""
-            && $Attachment->{Filename} eq 'file-2'
-            )
-        {
-            $HTMLUtilsObject->EmbeddedImagesExtract(
-                DocumentRef    => \$Attachment->{Content},
-                AttachmentsRef => \@AttachmentConvert,
-            );
-        }
-    }
-
-    # add converted attachments
-    for my $Attachment (@AttachmentConvert) {
-        $Self->ArticleWriteAttachment(
-            %{$Attachment},
-            ArticleID => $ArticleID,
-            UserID    => $Param{UserID},
-        );
-    }
-
     # add attachments
-    if ( $Param{Attachment} ) {
+    if ( IsArrayRefWithData( $Param{Attachment} ) ) {
         for my $Attachment ( @{ $Param{Attachment} } ) {
             $Self->ArticleWriteAttachment(
                 %{$Attachment},
