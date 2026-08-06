@@ -116,7 +116,7 @@ When qr/I create a reportdefinition$/, sub {
                 }
             }
         }
-   );
+    );
 };
 
 When qr/I get the config with Option "(.*?)"\s*$/, sub {
