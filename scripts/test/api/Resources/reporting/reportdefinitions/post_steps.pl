@@ -78,6 +78,11 @@ Given qr/a reportdefinition$/, sub {
 };
 
 When qr/I create a reportdefinition$/, sub {
+    my $MyDB;
+
+    #   Abfrage welche DB ist vorhanden
+    $MyDB = $Kernel::OM->Get('DB')->{'DB::Type'};
+
     ( S->{Response}, S->{ResponseContent} ) = _Post(
         URL     => S->{API_URL}.'/reporting/reportdefinitions',
         Token   => S->{Token},
@@ -88,7 +93,7 @@ When qr/I create a reportdefinition$/, sub {
                 Config => {
                     DataSource => {
                         SQL => {
-                             postgresql => "SELECT id, name, create_by FROM valid WHERE name LIKE '${Parameters.TestParameter}%'"
+                            $MyDB => "SELECT id, name, create_by FROM valid WHERE name LIKE '${Parameters.TestParameter}%'"
                         }
                     },
                     Parameters => [
