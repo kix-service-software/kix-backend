@@ -51,7 +51,6 @@ Given qr/a reportdefinition$/, sub {
                 Config => {
                     DataSource => {
                         SQL => {
-                           #  postgresql => "SELECT id, name, create_by FROM valid WHERE name LIKE '${Parameters.TestParameter}%'"
                             $MyDB => "SELECT id, name, create_by FROM valid WHERE name LIKE '${Parameters.TestParameter}%'"
                         }
                     },
