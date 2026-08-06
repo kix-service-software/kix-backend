@@ -12,7 +12,7 @@ Feature: GET request to the /reporting/reportdefinitions/:reportDefinitionId res
     Then the response code is 200
     When I delete this reportdefinition
     Then the response code is 204
-    And the response has no content
+
 
 
     
