@@ -421,7 +421,7 @@ $Self->IsDeeply(
 # create a job with filter list
 $JobID = $AutomationObject->JobAdd(
     Name    => 'job-with-list filter-'.$NameRandom,
-    Type    => 'Ticket',
+    Type    => 'Synchronisation',
     Filter  => [
         {
             AND => [
@@ -534,6 +534,106 @@ $Self->Is(
     scalar( keys( %JobRunIDs ) ),
     0,
     'JobRunList() has no entry',
+);
+
+# create a job with not matching filter
+$JobID = $AutomationObject->JobAdd(
+    Name    => 'job-with-no match filter-'.$NameRandom,
+    Type    => 'Ticket',
+    Filter  => [
+        {
+            AND => [
+                { Field => 'TicketID', Operator => 'EQ', Value => '0' }
+            ]
+        }
+    ],
+    ValidID => 1,
+    UserID  => 1
+);
+$Self->True(
+    $JobID,
+    'JobAdd() for new job with not matching filter',
+);
+%Job = $AutomationObject->JobGet(
+    ID => $JobID
+);
+$Self->IsDeeply(
+    $Job{Filter},
+    [
+        {
+            AND => [
+                { Field => 'TicketID', Operator => 'EQ', Value => '0' }
+            ]
+        }
+    ],
+    'JobGet() - Filter: for new job with not matching filter',
+);
+$Self->Is(
+    $Job{LastExecutionTime},
+    undef,
+    'JobGet() - LastExecutionTime: for new job with not matching filter',
+);
+
+# add one minute
+$Helper->FixedTimeAddSeconds(60);
+
+$Result = $AutomationObject->JobExecute(
+    ID     => $JobID,
+    UserID => 1
+);
+$Self->True(
+    $Result,
+    'JobExecute() successful',
+);
+
+%JobRunIDs = $AutomationObject->JobRunList(
+    JobID => $JobID,
+);
+$Self->Is(
+    scalar( keys( %JobRunIDs ) ),
+    0,
+    'JobRunList() has no entry',
+);
+
+%Job = $AutomationObject->JobGet(
+    ID => $JobID
+);
+$Self->Is(
+    $Job{LastExecutionTime},
+    '2014-01-01 12:01:00',
+    'JobGet() - LastExecutionTime - after execution without event flag',
+);
+
+# add one minute
+$Helper->FixedTimeAddSeconds(60);
+
+$Result = $AutomationObject->JobExecute(
+    ID           => $JobID,
+    IsEventBased => 1,
+    UserID       => 1
+);
+$Self->Is(
+    $Result,
+    -1,
+    'JobExecute() successful',
+);
+
+%JobRunIDs = $AutomationObject->JobRunList(
+    JobID => $JobID,
+);
+$Self->Is(
+    scalar( keys( %JobRunIDs ) ),
+    0,
+    'JobRunList() has no entry',
+);
+
+%Job = $AutomationObject->JobGet(
+    ID => $JobID
+);
+$Self->Is(
+    $Job{LastExecutionTime},
+    '2014-01-01 12:01:00',
+    'JobGet() - LastExecutionTime - after execution with event flag',
 );
 
 # rollback transaction on database
