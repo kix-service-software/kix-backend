@@ -206,9 +206,10 @@ sub ExecuteJobsForEvent {
 
             $ExecutedJobCount++;
             my $Result = $AutomationObject->JobExecute(
-                ID => $JobID,
-                Async => $Job{IsAsynchronous},
                 %Param,
+                ID           => $JobID,
+                Async        => $Job{IsAsynchronous},
+                IsEventBased => 1,
             );
             if ( $Self->{Debug} ) {
                 $Self->_Debug(sprintf "  ExecuteJobsForEvent: executed job \"%s\" in %i ms", $Job{Name}, (time() - $JobStartTime) * 1000);
