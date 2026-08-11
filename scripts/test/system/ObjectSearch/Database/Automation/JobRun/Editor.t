@@ -519,7 +519,7 @@ $Self->True(
 
 my $JobID = $Kernel::OM->Get('Automation')->JobAdd(
     Name    => 'UnitTest',
-    Type    => 'Ticket',
+    Type    => 'Synchronisation',
     ValidID => 1,
     UserID  => 1,
     Silent  => 1,

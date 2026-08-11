@@ -68,7 +68,7 @@ $Helper->FixedTimeSet($SystemTime);
 my $JobName1 = 'UnitTest1';
 my $JobID1   = $Kernel::OM->Get('Automation')->JobAdd(
     Name    => $JobName1,
-    Type    => 'Ticket',
+    Type    => 'Synchronisation',
     ValidID => 1,
     UserID  => 1,
     Silent  => 1,
@@ -80,7 +80,7 @@ $Self->True(
 my $JobName2 = 'UnitTest2';
 my $JobID2   = $Kernel::OM->Get('Automation')->JobAdd(
     Name    => $JobName2,
-    Type    => 'Ticket',
+    Type    => 'Synchronisation',
     ValidID => 1,
     UserID  => 1,
     Silent  => 1,
