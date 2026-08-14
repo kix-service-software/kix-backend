@@ -539,7 +539,7 @@ $Self->Is(
 my $JobName2 = 'UnitTest2';
 my $JobID2   = $Kernel::OM->Get('Automation')->JobAdd(
     Name    => $JobName2,
-    Type    => 'Ticket',
+    Type    => 'Synchronisation',
     ValidID => 1,
     UserID  => 1,
     Silent  => 1,
@@ -571,7 +571,7 @@ $Self->Is(
 my $JobName3 = 'UnitTest3';
 my $JobID3   = $Kernel::OM->Get('Automation')->JobAdd(
     Name    => $JobName3,
-    Type    => 'Ticket',
+    Type    => 'Synchronisation',
     ValidID => 1,
     UserID  => 1,
     Silent  => 1,
