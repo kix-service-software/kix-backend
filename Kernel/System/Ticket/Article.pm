@@ -207,6 +207,11 @@ sub ArticleCreate {
         DynamicFields => 1,
     );
 
+    my @Attachments = ();
+    if ( IsArrayRefWithData( $Param{Attachment} ) ) {
+        push( @Attachments, @{ $Param{Attachment} } );
+    }
+
     # add 'no body' if there is no body there!
     if ( !length $Param{Body} ) {    # allow '0' as body
         $Param{Body} = 'No body';
@@ -231,17 +236,13 @@ sub ArticleCreate {
                 NoJavaScript => 1,
             );
 
-            if ( !IsArrayRef( $Param{Attachment} ) ) {
-                $Param{Attachment} = [];
-            }
-
             # add html article as attachment
             my $HTMLAttachment = {
                 Content     => $Safe{String},
                 ContentType => "text/html; charset=\"$Param{Charset}\"",
                 Filename    => 'file-2',
             };
-            push( @{ $Param{Attachment} }, $HTMLAttachment );
+            push( @Attachments, $HTMLAttachment );
 
             # save HTML body for later use
             $Param{HTMLBody} = $Safe{String};
@@ -272,6 +273,7 @@ sub ArticleCreate {
                 ContentType => $Param{ContentType},
                 Filename    => $FileName,
             };
+            # really handle it, like it was given as attachment by parameter
             push @{ $Param{Attachment} }, $Attach;
 
             # set ascii body
@@ -454,15 +456,13 @@ sub ArticleCreate {
     );
 
     # add attachments
-    if ( IsArrayRefWithData( $Param{Attachment} ) ) {
-        for my $Attachment ( @{ $Param{Attachment} } ) {
-            $Self->ArticleWriteAttachment(
-                %{$Attachment},
-                ContentType => $Attachment->{ContentType} || $Kernel::OM->Get('Config')->Get('Ticket::Article::Attachment::ContentType::Fallback'),
-                ArticleID   => $ArticleID,
-                UserID      => $Param{UserID},
-            );
-        }
+    for my $Attachment ( @Attachments ) {
+        $Self->ArticleWriteAttachment(
+            %{$Attachment},
+            ContentType => $Attachment->{ContentType} || $Kernel::OM->Get('Config')->Get('Ticket::Article::Attachment::ContentType::Fallback'),
+            ArticleID   => $ArticleID,
+            UserID      => $Param{UserID},
+        );
     }
 
     # add accounted time if needed

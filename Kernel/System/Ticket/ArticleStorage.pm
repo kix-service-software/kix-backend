@@ -17,6 +17,7 @@ use CGI::Carp qw(cluck);
 use File::Path;
 use File::Basename;
 
+use Kernel::System::EmailParser;
 use Kernel::System::VariableCheck qw(:all);
 
 our $ObjectManagerDisabled = 1;
@@ -434,10 +435,17 @@ sub ArticleWriteAttachment {
         $Param{Filename} =~ m/^file-(1|2|1\.html)$/
         && $Param{ContentType} =~ m/^text\/html/
     ) {
+        my $ParserObject = Kernel::System::EmailParser->new(
+            Mode => 'Standalone'
+        );
+        my %Data = $ParserObject->GetContentTypeParams(
+            ContentType => $Param{ContentType}
+        );
+
         # encode content
         $Param{Content} = $Kernel::OM->Get('Encode')->Convert(
             Text  => $Param{Content},
-            From  => $Param{Charset} || 'utf-8',
+            From  => $Data{Charset} || 'utf-8',
             To    => 'utf-8',
             Check => 1,
         );
@@ -455,6 +463,7 @@ sub ArticleWriteAttachment {
             NoJavaScript => 1,
         );
         $Param{Content} = $Safe{String};
+        $Param{ContentType} = 'text/html; charset="utf-8"';
 
         # extract embedded images from html content
         my @HTMLAttachments = ();

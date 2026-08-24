@@ -1,0 +1,28 @@
+Date: Tue, 5 May 2026 00:25:03 +0200
+From: <customer@kix.example.com>
+To: kix@localhost
+Subject: Test html content encoding
+Content-Type: multipart/related; boundary="_008_GV2PR05MB1251670810F4BC4E18840A10FE5CB2GV2PR05MB12516eu_"; type="multipart/alternative"
+MIME-Version: 1.0
+
+--_008_GV2PR05MB1251670810F4BC4E18840A10FE5CB2GV2PR05MB12516eu_
+Content-Type: multipart/alternative;
+	boundary="_000_GV2PR05MB1251670810F4BC4E18840A10FE5CB2GV2PR05MB12516eu_"
+
+--_000_GV2PR05MB1251670810F4BC4E18840A10FE5CB2GV2PR05MB12516eu_
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+Mit freundlichen Gr=FC=DFen
+
+--_000_GV2PR05MB1251670810F4BC4E18840A10FE5CB2GV2PR05MB12516eu_
+Content-Type: text/html; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+<html><head></head>
+<body>
+<p>Mit freundlichen Gr=FC=DFen</p>
+</body>
+</html>
+
+--_000_GV2PR05MB1251670810F4BC4E18840A10FE5CB2GV2PR05MB12516eu_--
