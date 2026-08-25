@@ -212,7 +212,24 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
                     'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'Date' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\')'
                 ],
                 'Where' => [
-                    'xst_left0.xml_content_value = \'2024-02-09 00:00:00\''
+                    'xst_left0.xml_content_value = \'2024-02-09\''
+                ]
+            }
+        },
+        {
+            Name         => "Search: valid search / Field CurrentVersion.Data.Date / Operator EQ / absolute value with time",
+            Search       => {
+                Field    => 'CurrentVersion.Data.Date',
+                Operator => 'EQ',
+                Value    => '2024-02-09 00:00:00'
+            },
+            Expected     => {
+                'IsRelative' => undef,
+                'Join' => [
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'Date' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\')'
+                ],
+                'Where' => [
+                    'xst_left0.xml_content_value = \'2024-02-09\''
                 ]
             }
         },
@@ -229,7 +246,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
                     'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'Date' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\')'
                 ],
                 'Where' => [
-                    'xst_left0.xml_content_value = \'2024-02-10 00:00:00\''
+                    'xst_left0.xml_content_value = \'2024-02-10\''
                 ]
             }
         },
@@ -246,7 +263,24 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
                     'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'Date' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\')'
                 ],
                 'Where' => [
-                    '(xst_left0.xml_content_value != \'2024-02-09 00:00:00\' OR xst_left0.xml_content_value IS NULL)'
+                    '(xst_left0.xml_content_value != \'2024-02-09\' OR xst_left0.xml_content_value IS NULL)'
+                ]
+            }
+        },
+        {
+            Name         => "Search: valid search / Field CurrentVersion.Data.Date / Operator NE / absolute value with time",
+            Search       => {
+                Field    => 'CurrentVersion.Data.Date',
+                Operator => 'NE',
+                Value    => '2024-02-09 00:00:00'
+            },
+            Expected     => {
+                'IsRelative' => undef,
+                'Join' => [
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'Date' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\')'
+                ],
+                'Where' => [
+                    '(xst_left0.xml_content_value != \'2024-02-09\' OR xst_left0.xml_content_value IS NULL)'
                 ]
             }
         },
@@ -263,7 +297,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
                     'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'Date' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\')'
                 ],
                 'Where' => [
-                    '(xst_left0.xml_content_value != \'2024-02-10 00:00:00\' OR xst_left0.xml_content_value IS NULL)'
+                    '(xst_left0.xml_content_value != \'2024-02-10\' OR xst_left0.xml_content_value IS NULL)'
                 ]
 
             }
@@ -281,7 +315,25 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
                     'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'Date' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\')'
                 ],
                 'Where' => [
-                    'xst_left0.xml_content_value < \'2024-02-09 00:00:00\''
+                    'xst_left0.xml_content_value < \'2024-02-09\''
+                ]
+
+            }
+        },
+        {
+            Name         => "Search: valid search / Field CurrentVersion.Data.Date / Operator LT / absolute value with time",
+            Search       => {
+                Field    => 'CurrentVersion.Data.Date',
+                Operator => 'LT',
+                Value    => '2024-02-09 00:00:00'
+            },
+            Expected     => {
+                'IsRelative' => undef,
+                'Join' => [
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'Date' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\')'
+                ],
+                'Where' => [
+                    'xst_left0.xml_content_value < \'2024-02-09\''
                 ]
 
             }
@@ -299,7 +351,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
                     'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'Date' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\')'
                 ],
                 'Where' => [
-                    'xst_left0.xml_content_value < \'2024-02-10 00:00:00\''
+                    'xst_left0.xml_content_value < \'2024-02-10\''
                 ]
             }
         },
@@ -316,7 +368,24 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
                     'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'Date' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\')'
                 ],
                 'Where' => [
-                    'xst_left0.xml_content_value <= \'2024-02-09 00:00:00\''
+                    'xst_left0.xml_content_value <= \'2024-02-09\''
+                ]
+            }
+        },
+        {
+            Name         => "Search: valid search / Field CurrentVersion.Data.Date / Operator LTE / absolute value with time",
+            Search       => {
+                Field    => 'CurrentVersion.Data.Date',
+                Operator => 'LTE',
+                Value    => '2024-02-09 00:00:00'
+            },
+            Expected     => {
+                'IsRelative' => undef,
+                'Join' => [
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'Date' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\')'
+                ],
+                'Where' => [
+                    'xst_left0.xml_content_value <= \'2024-02-09\''
                 ]
             }
         },
@@ -333,7 +402,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
                     'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'Date' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\')'
                 ],
                 'Where' => [
-                    'xst_left0.xml_content_value <= \'2024-02-10 00:00:00\''
+                    'xst_left0.xml_content_value <= \'2024-02-10\''
                 ]
             }
         },
@@ -350,7 +419,24 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
                     'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'Date' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\')'
                 ],
                 'Where' => [
-                    'xst_left0.xml_content_value > \'2024-02-09 00:00:00\''
+                    'xst_left0.xml_content_value > \'2024-02-09\''
+                ]
+            }
+        },
+        {
+            Name         => "Search: valid search / Field CurrentVersion.Data.Date / Operator GT / absolute value with time",
+            Search       => {
+                Field    => 'CurrentVersion.Data.Date',
+                Operator => 'GT',
+                Value    => '2024-02-09 00:00:00'
+            },
+            Expected     => {
+                'IsRelative' => undef,
+                'Join' => [
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'Date' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\')'
+                ],
+                'Where' => [
+                    'xst_left0.xml_content_value > \'2024-02-09\''
                 ]
             }
         },
@@ -367,7 +453,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
                     'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'Date' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\')'
                 ],
                 'Where' => [
-                    'xst_left0.xml_content_value > \'2024-02-10 00:00:00\''
+                    'xst_left0.xml_content_value > \'2024-02-10\''
                 ]
             }
         },
@@ -384,7 +470,24 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
                     'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'Date' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\')'
                 ],
                 'Where' => [
-                    'xst_left0.xml_content_value >= \'2024-02-09 00:00:00\''
+                    'xst_left0.xml_content_value >= \'2024-02-09\''
+                ]
+            }
+        },
+        {
+            Name         => "Search: valid search / Field CurrentVersion.Data.Date / Operator GTE / absolute value with time",
+            Search       => {
+                Field    => 'CurrentVersion.Data.Date',
+                Operator => 'GTE',
+                Value    => '2024-02-09 00:00:00'
+            },
+            Expected     => {
+                'IsRelative' => undef,
+                'Join' => [
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'Date' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\')'
+                ],
+                'Where' => [
+                    'xst_left0.xml_content_value >= \'2024-02-09\''
                 ]
             }
         },
@@ -401,7 +504,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
                     'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = ci.last_version_id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'Date' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\')'
                 ],
                 'Where' => [
-                    'xst_left0.xml_content_value >= \'2024-02-10 00:00:00\''
+                    'xst_left0.xml_content_value >= \'2024-02-10\''
                 ]
 
             }
@@ -457,7 +560,29 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
                     'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'Date' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\',\'ITSM::ConfigItem::Archiv::' . $ClassID . '\')'
                 ],
                 'Where' => [
-                    'xst_left0.xml_content_value = \'2024-02-09 00:00:00\''
+                    'xst_left0.xml_content_value = \'2024-02-09\''
+                ]
+
+            }
+        },
+        {
+            Name         => "Search: valid search / Field CurrentVersion.Data.Date / Operator EQ / PreviousVersionSearch / absolute value with time",
+            Search       => {
+                Field    => 'CurrentVersion.Data.Date',
+                Operator => 'EQ',
+                Value    => '2024-02-09 00:00:00'
+            },
+            Flags        => {
+                PreviousVersionSearch => 1
+            },
+            Expected     => {
+                'IsRelative' => undef,
+                'Join' => [
+                    'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'Date' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\',\'ITSM::ConfigItem::Archiv::' . $ClassID . '\')'
+                ],
+                'Where' => [
+                    'xst_left0.xml_content_value = \'2024-02-09\''
                 ]
 
             }
@@ -479,7 +604,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
                     'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'Date' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\',\'ITSM::ConfigItem::Archiv::' . $ClassID . '\')'
                 ],
                 'Where' => [
-                    'xst_left0.xml_content_value = \'2024-02-10 00:00:00\''
+                    'xst_left0.xml_content_value = \'2024-02-10\''
                 ]
             }
         },
@@ -500,7 +625,29 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
                     'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'Date' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\',\'ITSM::ConfigItem::Archiv::' . $ClassID . '\')'
                 ],
                 'Where' => [
-                    '(xst_left0.xml_content_value != \'2024-02-09 00:00:00\' OR xst_left0.xml_content_value IS NULL)'
+                    '(xst_left0.xml_content_value != \'2024-02-09\' OR xst_left0.xml_content_value IS NULL)'
+                ]
+
+            }
+        },
+        {
+            Name         => "Search: valid search / Field CurrentVersion.Data.Date / Operator NE / PreviousVersionSearch / absolute value with time",
+            Search       => {
+                Field    => 'CurrentVersion.Data.Date',
+                Operator => 'NE',
+                Value    => '2024-02-09 00:00:00'
+            },
+            Flags        => {
+                PreviousVersionSearch => 1
+            },
+            Expected     => {
+                'IsRelative' => undef,
+                'Join' => [
+                    'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'Date' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\',\'ITSM::ConfigItem::Archiv::' . $ClassID . '\')'
+                ],
+                'Where' => [
+                    '(xst_left0.xml_content_value != \'2024-02-09\' OR xst_left0.xml_content_value IS NULL)'
                 ]
 
             }
@@ -522,7 +669,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
                     'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'Date' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\',\'ITSM::ConfigItem::Archiv::' . $ClassID . '\')'
                 ],
                 'Where' => [
-                    '(xst_left0.xml_content_value != \'2024-02-10 00:00:00\' OR xst_left0.xml_content_value IS NULL)'
+                    '(xst_left0.xml_content_value != \'2024-02-10\' OR xst_left0.xml_content_value IS NULL)'
                 ]
             }
         },
@@ -543,7 +690,28 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
                     'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'Date' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\',\'ITSM::ConfigItem::Archiv::' . $ClassID . '\')'
                 ],
                 'Where' => [
-                    'xst_left0.xml_content_value < \'2024-02-09 00:00:00\''
+                    'xst_left0.xml_content_value < \'2024-02-09\''
+                ]
+            }
+        },
+        {
+            Name         => "Search: valid search / Field CurrentVersion.Data.Date / Operator LT / PreviousVersionSearch / absolute value with time",
+            Search       => {
+                Field    => 'CurrentVersion.Data.Date',
+                Operator => 'LT',
+                Value    => '2024-02-09 00:00:00'
+            },
+            Flags        => {
+                PreviousVersionSearch => 1
+            },
+            Expected     => {
+                'IsRelative' => undef,
+                'Join' => [
+                    'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'Date' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\',\'ITSM::ConfigItem::Archiv::' . $ClassID . '\')'
+                ],
+                'Where' => [
+                    'xst_left0.xml_content_value < \'2024-02-09\''
                 ]
             }
         },
@@ -564,7 +732,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
                     'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'Date' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\',\'ITSM::ConfigItem::Archiv::' . $ClassID . '\')'
                 ],
                 'Where' => [
-                    'xst_left0.xml_content_value < \'2024-02-10 00:00:00\''
+                    'xst_left0.xml_content_value < \'2024-02-10\''
                 ]
             }
         },
@@ -585,7 +753,28 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
                     'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'Date' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\',\'ITSM::ConfigItem::Archiv::' . $ClassID . '\')'
                 ],
                 'Where' => [
-                    'xst_left0.xml_content_value <= \'2024-02-09 00:00:00\''
+                    'xst_left0.xml_content_value <= \'2024-02-09\''
+                ]
+            }
+        },
+        {
+            Name         => "Search: valid search / Field CurrentVersion.Data.Date / Operator LTE / PreviousVersionSearch / absolute value with time",
+            Search       => {
+                Field    => 'CurrentVersion.Data.Date',
+                Operator => 'LTE',
+                Value    => '2024-02-09 00:00:00'
+            },
+            Flags        => {
+                PreviousVersionSearch => 1
+            },
+            Expected     => {
+                'IsRelative' => undef,
+                'Join' => [
+                    'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'Date' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\',\'ITSM::ConfigItem::Archiv::' . $ClassID . '\')'
+                ],
+                'Where' => [
+                    'xst_left0.xml_content_value <= \'2024-02-09\''
                 ]
             }
         },
@@ -606,7 +795,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
                     'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'Date' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\',\'ITSM::ConfigItem::Archiv::' . $ClassID . '\')'
                 ],
                 'Where' => [
-                    'xst_left0.xml_content_value <= \'2024-02-10 00:00:00\''
+                    'xst_left0.xml_content_value <= \'2024-02-10\''
                 ]
             }
         },
@@ -627,7 +816,29 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
                     'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'Date' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\',\'ITSM::ConfigItem::Archiv::' . $ClassID . '\')'
                 ],
                 'Where' => [
-                    'xst_left0.xml_content_value > \'2024-02-09 00:00:00\''
+                    'xst_left0.xml_content_value > \'2024-02-09\''
+                ]
+
+            }
+        },
+        {
+            Name         => "Search: valid search / Field CurrentVersion.Data.Date / Operator GT / PreviousVersionSearch / absolute value with time",
+            Search       => {
+                Field    => 'CurrentVersion.Data.Date',
+                Operator => 'GT',
+                Value    => '2024-02-09 00:00:00'
+            },
+            Flags        => {
+                PreviousVersionSearch => 1
+            },
+            Expected     => {
+                'IsRelative' => undef,
+                'Join' => [
+                    'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'Date' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\',\'ITSM::ConfigItem::Archiv::' . $ClassID . '\')'
+                ],
+                'Where' => [
+                    'xst_left0.xml_content_value > \'2024-02-09\''
                 ]
 
             }
@@ -649,7 +860,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
                     'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'Date' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\',\'ITSM::ConfigItem::Archiv::' . $ClassID . '\')'
                 ],
                 'Where' => [
-                    'xst_left0.xml_content_value > \'2024-02-10 00:00:00\''
+                    'xst_left0.xml_content_value > \'2024-02-10\''
                 ]
             }
         },
@@ -670,7 +881,28 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
                     'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'Date' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\',\'ITSM::ConfigItem::Archiv::' . $ClassID . '\')'
                 ],
                 'Where' => [
-                    'xst_left0.xml_content_value >= \'2024-02-09 00:00:00\''
+                    'xst_left0.xml_content_value >= \'2024-02-09\''
+                ]
+            }
+        },
+        {
+            Name         => "Search: valid search / Field CurrentVersion.Data.Date / Operator GTE / PreviousVersionSearch / absolute value with time",
+            Search       => {
+                Field    => 'CurrentVersion.Data.Date',
+                Operator => 'GTE',
+                Value    => '2024-02-09 00:00:00'
+            },
+            Flags        => {
+                PreviousVersionSearch => 1
+            },
+            Expected     => {
+                'IsRelative' => undef,
+                'Join' => [
+                    'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'Date' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\',\'ITSM::ConfigItem::Archiv::' . $ClassID . '\')'
+                ],
+                'Where' => [
+                    'xst_left0.xml_content_value >= \'2024-02-09\''
                 ]
             }
         },
@@ -691,7 +923,7 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
                     'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'Date' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\',\'ITSM::ConfigItem::Archiv::' . $ClassID . '\')'
                 ],
                 'Where' => [
-                    'xst_left0.xml_content_value >= \'2024-02-10 00:00:00\''
+                    'xst_left0.xml_content_value >= \'2024-02-10\''
                 ]
             }
         },
@@ -701,6 +933,27 @@ for my $DatabaseType ( qw( postgresql mysql ) ) {
                 Field    => 'CurrentVersion.Data.Date',
                 Operator => 'EMPTY',
                 Value    => '2024-02-09'
+            },
+            Flags        => {
+                PreviousVersionSearch => 1
+            },
+            Expected     => {
+                'IsRelative' => undef,
+                'Join' => [
+                    'LEFT OUTER JOIN configitem_version civ on civ.configitem_id = ci.id',
+                    'LEFT OUTER JOIN xml_storage xst_left0 ON xst_left0.xml_key = civ.id AND xst_left0.xml_content_key LIKE \'[1]{' . $QuoteSingle . '\'Version' . $QuoteSingle . '\'}[1]{' . $QuoteSingle . '\'Date' . $QuoteSingle . '\'}[%]{' . $QuoteSingle . '\'Content' . $QuoteSingle . '\'}\' AND xst_left0.xml_type IN (\'ITSM::ConfigItem::' . $ClassID . '\',\'ITSM::ConfigItem::Archiv::' . $ClassID . '\')'
+                ],
+                'Where' => [
+                    '(xst_left0.xml_content_value = \'\' OR xst_left0.xml_content_value IS NULL)'
+                ]
+            }
+        },
+        {
+            Name         => "Search: valid search / Field CurrentVersion.Data.Date / Operator EMPTY / PreviousVersionSearch / absolute value with time",
+            Search       => {
+                Field    => 'CurrentVersion.Data.Date',
+                Operator => 'EMPTY',
+                Value    => '2024-02-09 00:00:00'
             },
             Flags        => {
                 PreviousVersionSearch => 1
@@ -847,7 +1100,7 @@ my $VersionID1 = $Kernel::OM->Get('ITSMConfigItem')->VersionAdd(
                     Date => [
                         undef,
                         {
-                            Content => '2024-02-09 00:00:00'
+                            Content => '2024-02-09'
                         }
                     ]
                 }
@@ -884,7 +1137,7 @@ my $VersionID2_1 = $Kernel::OM->Get('ITSMConfigItem')->VersionAdd(
                     Date => [
                         undef,
                         {
-                            Content => '2024-02-23 00:00:00'
+                            Content => '2024-02-23'
                         }
                     ]
                 }
@@ -912,7 +1165,7 @@ my $VersionID2_2 = $Kernel::OM->Get('ITSMConfigItem')->VersionAdd(
                     Date => [
                         undef,
                         {
-                            Content => '2024-02-16 00:00:00'
+                            Content => '2024-02-16'
                         }
                     ]
                 }
@@ -949,7 +1202,7 @@ my $VersionID3 = $Kernel::OM->Get('ITSMConfigItem')->VersionAdd(
                     Date => [
                         undef,
                         {
-                            Content => '2024-02-16 00:00:00'
+                            Content => '2024-02-16'
                         }
                     ]
                 }
@@ -984,6 +1237,19 @@ my @IntegrationSearchTests = (
         Expected => [$ConfigItemID2,$ConfigItemID3]
     },
     {
+        Name     => "Search: Field CurrentVersion.Data.Date / Operator EQ / Value 2024-02-16 00:00:00",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'CurrentVersion.Data.Date',
+                    Operator => 'EQ',
+                    Value    => '2024-02-16 00:00:00'
+                }
+            ]
+        },
+        Expected => [$ConfigItemID2,$ConfigItemID3]
+    },
+    {
         Name     => "Search: Field CurrentVersion.Data.Date / Operator EQ / Value +7d",
         Search   => {
             'AND' => [
@@ -1004,6 +1270,19 @@ my @IntegrationSearchTests = (
                     Field    => 'CurrentVersion.Data.Date',
                     Operator => 'NE',
                     Value    => '2024-02-16'
+                }
+            ]
+        },
+        Expected => [$ConfigItemID1]
+    },
+    {
+        Name     => "Search: Field CurrentVersion.Data.Date / Operator NE / Value 2024-02-16 00:00:00",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'CurrentVersion.Data.Date',
+                    Operator => 'NE',
+                    Value    => '2024-02-16 00:00:00'
                 }
             ]
         },
@@ -1036,6 +1315,19 @@ my @IntegrationSearchTests = (
         Expected => [$ConfigItemID1]
     },
     {
+        Name     => "Search: Field CurrentVersion.Data.Date / Operator LT / Value 2024-02-16 00:00:00",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'CurrentVersion.Data.Date',
+                    Operator => 'LT',
+                    Value    => '2024-02-16 00:00:00'
+                }
+            ]
+        },
+        Expected => [$ConfigItemID1]
+    },
+    {
         Name     => "Search: Field CurrentVersion.Data.Date / Operator LT / Value +1w",
         Search   => {
             'AND' => [
@@ -1056,6 +1348,19 @@ my @IntegrationSearchTests = (
                     Field    => 'CurrentVersion.Data.Date',
                     Operator => 'LTE',
                     Value    => '2024-02-16'
+                }
+            ]
+        },
+        Expected => [$ConfigItemID1,$ConfigItemID2,$ConfigItemID3]
+    },
+    {
+        Name     => "Search: Field CurrentVersion.Data.Date / Operator LTE / Value 2024-02-16 00:00:00",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'CurrentVersion.Data.Date',
+                    Operator => 'LTE',
+                    Value    => '2024-02-16 00:00:00'
                 }
             ]
         },
@@ -1088,6 +1393,19 @@ my @IntegrationSearchTests = (
         Expected => [$ConfigItemID2,$ConfigItemID3]
     },
     {
+        Name     => "Search: Field CurrentVersion.Data.Date / Operator GT / Value 2024-02-10 00:00:00",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'CurrentVersion.Data.Date',
+                    Operator => 'GT',
+                    Value    => '2024-02-10 00:00:00'
+                }
+            ]
+        },
+        Expected => [$ConfigItemID2,$ConfigItemID3]
+    },
+    {
         Name     => "Search: Field CurrentVersion.Data.Date / Operator GT / Value +1d",
         Search   => {
             'AND' => [
@@ -1108,6 +1426,19 @@ my @IntegrationSearchTests = (
                     Field    => 'CurrentVersion.Data.Date',
                     Operator => 'GTE',
                     Value    => '2024-02-16'
+                }
+            ]
+        },
+        Expected => [$ConfigItemID2,$ConfigItemID3]
+    },
+    {
+        Name     => "Search: Field CurrentVersion.Data.Date / Operator GTE / Value 2024-02-16 00:00:00",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'CurrentVersion.Data.Date',
+                    Operator => 'GTE',
+                    Value    => '2024-02-16 00:00:00'
                 }
             ]
         },
@@ -1170,6 +1501,23 @@ my @IntegrationSearchTests = (
         Expected => [$ConfigItemID2]
     },
     {
+        Name     => "Search: Field CurrentVersion.Data.Date / Operator EQ / Value 2024-02-23 00:00:00 / PreviousVersionSearch",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'PreviousVersionSearch',
+                    Value    => 1
+                },
+                {
+                    Field    => 'CurrentVersion.Data.Date',
+                    Operator => 'EQ',
+                    Value    => '2024-02-23 00:00:00'
+                }
+            ]
+        },
+        Expected => [$ConfigItemID2]
+    },
+    {
         Name     => "Search: Field CurrentVersion.Data.Date / Operator EQ / Value +2w / PreviousVersionSearch",
         Search   => {
             'AND' => [
@@ -1198,6 +1546,23 @@ my @IntegrationSearchTests = (
                     Field    => 'CurrentVersion.Data.Date',
                     Operator => 'NE',
                     Value    => '2024-02-23'
+                }
+            ]
+        },
+        Expected => [$ConfigItemID1,$ConfigItemID2,$ConfigItemID3]
+    },
+    {
+        Name     => "Search: Field CurrentVersion.Data.Date / Operator NE / Value 2024-02-23 00:00:00 / PreviousVersionSearch",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'PreviousVersionSearch',
+                    Value    => 1
+                },
+                {
+                    Field    => 'CurrentVersion.Data.Date',
+                    Operator => 'NE',
+                    Value    => '2024-02-23 00:00:00'
                 }
             ]
         },
@@ -1238,6 +1603,23 @@ my @IntegrationSearchTests = (
         Expected => [$ConfigItemID1,$ConfigItemID2,$ConfigItemID3]
     },
     {
+        Name     => "Search: Field CurrentVersion.Data.Date / Operator LT / Value 2024-02-23 00:00:00 / PreviousVersionSearch",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'PreviousVersionSearch',
+                    Value    => 1
+                },
+                {
+                    Field    => 'CurrentVersion.Data.Date',
+                    Operator => 'LT',
+                    Value    => '2024-02-23 00:00:00'
+                }
+            ]
+        },
+        Expected => [$ConfigItemID1,$ConfigItemID2,$ConfigItemID3]
+    },
+    {
         Name     => "Search: Field CurrentVersion.Data.Date / Operator LT / Value +2w / PreviousVersionSearch",
         Search   => {
             'AND' => [
@@ -1266,6 +1648,23 @@ my @IntegrationSearchTests = (
                     Field    => 'CurrentVersion.Data.Date',
                     Operator => 'LTE',
                     Value    => '2024-02-23'
+                }
+            ]
+        },
+        Expected => [$ConfigItemID1,$ConfigItemID2,$ConfigItemID3]
+    },
+    {
+        Name     => "Search: Field CurrentVersion.Data.Date / Operator LTE / Value 2024-02-23 00:00:00 / PreviousVersionSearch",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'PreviousVersionSearch',
+                    Value    => 1
+                },
+                {
+                    Field    => 'CurrentVersion.Data.Date',
+                    Operator => 'LTE',
+                    Value    => '2024-02-23 00:00:00'
                 }
             ]
         },
@@ -1306,6 +1705,23 @@ my @IntegrationSearchTests = (
         Expected => [$ConfigItemID2,$ConfigItemID3]
     },
     {
+        Name     => "Search: Field CurrentVersion.Data.Date / Operator GT / Value 2024-02-09 00:00:00 / PreviousVersionSearch",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'PreviousVersionSearch',
+                    Value    => 1
+                },
+                {
+                    Field    => 'CurrentVersion.Data.Date',
+                    Operator => 'GT',
+                    Value    => '2024-02-09 00:00:00'
+                }
+            ]
+        },
+        Expected => [$ConfigItemID2,$ConfigItemID3]
+    },
+    {
         Name     => "Search: Field CurrentVersion.Data.Date / Operator GT / Value +1w / PreviousVersionSearch",
         Search   => {
             'AND' => [
@@ -1340,6 +1756,23 @@ my @IntegrationSearchTests = (
         Expected => [$ConfigItemID2]
     },
     {
+        Name     => "Search: Field CurrentVersion.Data.Date / Operator GTE / Value 2024-02-23 00:00:00 / PreviousVersionSearch",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'PreviousVersionSearch',
+                    Value    => 1
+                },
+                {
+                    Field    => 'CurrentVersion.Data.Date',
+                    Operator => 'GTE',
+                    Value    => '2024-02-23 00:00:00'
+                }
+            ]
+        },
+        Expected => [$ConfigItemID2]
+    },
+    {
         Name     => "Search: Field CurrentVersion.Data.Date / Operator GTE / Value +2w / PreviousVersionSearch",
         Search   => {
             'AND' => [
@@ -1368,6 +1801,23 @@ my @IntegrationSearchTests = (
                     Field    => 'CurrentVersion.Data.Date',
                     Operator => 'EMPTY',
                     Value    => '2024-02-23'
+                }
+            ]
+        },
+        Expected => []
+    },
+    {
+        Name     => "Search: Field CurrentVersion.Data.Date / Operator EMPTY / Value 2024-02-23 00:00:00 / PreviousVersionSearch",
+        Search   => {
+            'AND' => [
+                {
+                    Field    => 'PreviousVersionSearch',
+                    Value    => 1
+                },
+                {
+                    Field    => 'CurrentVersion.Data.Date',
+                    Operator => 'EMPTY',
+                    Value    => '2024-02-23 00:00:00'
                 }
             ]
         },
