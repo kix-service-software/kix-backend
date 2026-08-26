@@ -74,6 +74,9 @@ sub new {
     # load settings from Config.pm
     $Self->{Config} = $Self->LoadLocalConfig();
 
+    # init lookup for already replaced variables
+    $Self->{ConfigVariablesReplaced} = {};
+
     return $Self;
 }
 
@@ -264,10 +267,16 @@ sub Get {
         print STDERR "($$) Debug: Config.pm ->Get('$What') --> $Value\n";
     }
 
-    # replace config variables in value
-    $Self->{Config}->{$What} = $Self->_ReplaceConfigVariables(
-        Value => $Self->{Config}->{$What}
-    );
+    # check if variables need to be replaced
+    if ( !$Self->{ConfigVariablesReplaced}->{$What} ) {
+        # replace config variables in value
+        $Self->{Config}->{$What} = $Self->_ReplaceConfigVariables(
+            Value => $Self->{Config}->{$What}
+        );
+
+        # remember replacement of config variables
+        $Self->{ConfigVariablesReplaced}->{$What} = 1;
+    }
 
     return $Self->{Config}->{$What};
 }
@@ -294,6 +303,9 @@ sub Set {
         }
         else {
             $Self->{Config}->{$1}->{$2} = $Param{Value};
+
+            # handle replacement of config variables again
+            $Self->{ConfigVariablesReplaced}->{$1} = 0;
         }
     }
     else {
@@ -302,6 +314,9 @@ sub Set {
         }
         else {
             $Self->{Config}->{ $Param{Key} } = $Param{Value};
+
+            # handle replacement of config variables again
+            $Self->{ConfigVariablesReplaced}->{ $Param{Key} } = 0;
         }
     }
     return 1;
