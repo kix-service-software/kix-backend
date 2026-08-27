@@ -185,7 +185,7 @@ END
             %Param,
             BackendKey => $BackendKey,
         );
-        return if !$Content;
+        return if ( !defined( $Content ) );
     }
 
     return (
