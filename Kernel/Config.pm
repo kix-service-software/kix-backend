@@ -227,6 +227,9 @@ sub LoadSysConfig {
 
     $Self->{Config} = $Self->GetSysConfig();
 
+    # reset lookup for already replaced variables
+    $Self->{ConfigVariablesReplaced} = {};
+
     return 1;
 }
 
