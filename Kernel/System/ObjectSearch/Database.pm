@@ -418,7 +418,14 @@ sub _PrepareSQLDef {
 
         # add permission def to sql def
         for my $Key ( keys %{ $PermissionDef } ) {
-            push( @{ $SQLDef{ $Key } }, @{ $PermissionDef->{ $Key } } );
+            if ( $Key eq 'IsRelative' ) {
+                if ( $PermissionDef->{ $Key } ) {
+                    $SQLDef{ $Key } = $PermissionDef->{ $Key };
+                }
+            }
+            else {
+                push( @{ $SQLDef{ $Key } }, @{ $PermissionDef->{ $Key } } );
+            }
         }
     }
 
@@ -624,7 +631,14 @@ sub _ProcessExtractAttribute {
                 return;
             }
 
-            if ( defined( $Param{Extract}->{ $SearchItem->{Field} } ) ) {
+            if (
+                (
+                    !defined( $SearchItem->{Operator} )
+                    || $SearchItem->{Operator} eq 'EQ'
+                    || $SearchItem->{Operator} eq 'IN'
+                )
+                && defined( $Param{Extract}->{ $SearchItem->{Field} } )
+            ) {
                 $Param{Flags}->{ $SearchItem->{Field} } = $SearchItem->{Value};
 
                 if ( $Param{Extract}->{ $SearchItem->{Field} } ) {
