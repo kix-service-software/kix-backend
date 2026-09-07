@@ -56,6 +56,7 @@ $Self->IsDeeply(
         From    => ['ticket st'],
         OrderBy => ['st.id ASC'],
         Extract => {
+            TicketID  => 1,
             ArticleID => 1,
         }
     },
