@@ -1640,6 +1640,9 @@ sub ArticleGet {
             }
         }
     }
+
+    # check for cached data
+    my @Content;
     if (
         !$HasFilter
         && $Param{ArticleID}
@@ -1649,219 +1652,318 @@ sub ArticleGet {
             ArticleID => $Param{ArticleID},
             Key       => $CacheKey,
         );
-        return %{$Cached} if ref $Cached eq 'HASH';
-    }
+        return %{ $Cached } if ( ref( $Cached ) eq 'HASH' );
 
-    # get database object
-    my $DBObject = $Kernel::OM->Get('DB');
-
-    # channel lookup
-    my $ChannelSQL = '';
-    if ( IsArrayRefWithData( $Param{Channel} ) ) {
-        for ( @{ $Param{Channel} } ) {
-            if ( $Kernel::OM->Get('Channel')->ChannelLookup( Name => $_ ) ) {
-                if ($ChannelSQL) {
-                    $ChannelSQL .= ',';
-                }
-                $ChannelSQL .= $DBObject->Quote(
-                    $Kernel::OM->Get('Channel')->ChannelLookup( Name => $_ ),
-                    'Integer',
-                );
-            }
-        }
-        if ($ChannelSQL) {
-            $ChannelSQL = " AND sa.channel_id IN ($ChannelSQL)";
-        }
-    }
-    my $ChannelIDSQL = '';
-    if ( IsArrayRefWithData( $Param{ChannelID} ) ) {
-        my $QuotedIDs = join ', ',
-            map { $DBObject->Quote( $_, 'Integer' ) }
-            @{ $Param{ChannelID} };
-        $ChannelIDSQL = " AND sa.channel_id IN ($QuotedIDs)";
-    }
-
-    my $CustomerVisibleSQL = '';
-    if ( $Param{CustomerVisible} ) {
-        $CustomerVisibleSQL = " AND sa.customer_visible = 1";
-    }
-    elsif ( defined( $Param{CustomerVisible} ) ) {
-        $CustomerVisibleSQL = " AND sa.customer_visible = 0";
-    }
-
-    # sender type lookup
-    my $SenderTypeSQL = '';
-    if ( IsArrayRefWithData( $Param{ArticleSenderType} ) ) {
-        for ( @{ $Param{ArticleSenderType} } ) {
-            if ( $Self->ArticleSenderTypeLookup( SenderType => $_ ) ) {
-                if ($SenderTypeSQL) {
-                    $SenderTypeSQL .= ',';
-                }
-                $SenderTypeSQL .= $DBObject->Quote(
-                    $Self->ArticleSenderTypeLookup( SenderType => $_ ),
-                    'Integer',
-                );
-            }
-        }
-        if ($SenderTypeSQL) {
-            $SenderTypeSQL = " AND sa.article_sender_type_id IN ($SenderTypeSQL)";
-        }
-    }
-
-    my $SenderTypeIDSQL;
-    if ( IsArrayRefWithData( $Param{ArticleSenderTypeID} ) ) {
-        my $QuotedIDs = join ', ',
-            map { $DBObject->Quote( $_, 'Integer' ) }
-            @{ $Param{ArticleSenderTypeID} };
-        $SenderTypeIDSQL = " AND sa.article_sender_type_id IN ($QuotedIDs)";
-    }
-
-    # sql query
-    my @Content;
-    my @Bind;
-    my $SQL = '
-        SELECT sa.ticket_id, sa.a_from, sa.a_to, sa.a_cc, sa.a_bcc, sa.a_subject,
-            sa.a_reply_to, sa.a_message_id, sa.a_in_reply_to, sa.a_references, sa.a_body,
-            sa.create_time, sa.a_content_type, sa.create_by, article_sender_type_id,
-            sa.channel_id, sa.incoming_time, sa.id, sa.change_time, sa.change_by, sa.customer_visible, sa.attachment_count
-        FROM article sa
-        WHERE ';
-
-    if ( $Param{ArticleID} ) {
-        $SQL .= 'sa.id = ?';
-        push @Bind, \$Param{ArticleID};
-    }
-    else {
-        $SQL .= 'sa.ticket_id = ?';
-        push @Bind, \$Param{TicketID};
-    }
-
-    # add channels
-    if ($ChannelSQL) {
-        $SQL .= $ChannelSQL;
-    }
-    if ($ChannelIDSQL) {
-        $SQL .= $ChannelIDSQL;
-    }
-
-    # add customer visibility
-    if ($CustomerVisibleSQL) {
-        $SQL .= $CustomerVisibleSQL;
-    }
-
-    # add sender types
-    if ($SenderTypeSQL) {
-        $SQL .= $SenderTypeSQL;
-    }
-    if ($SenderTypeIDSQL) {
-        $SQL .= $SenderTypeIDSQL;
-    }
-
-    # add message id
-    my $MessageIDSQL;
-    if ( IsArrayRefWithData( $Param{MessageID} ) ) {
-        $SQL .= ' AND sa.a_message_id_md5 IN (' . join( ',', map {'?'} @{ $Param{MessageID} } ) . ')';
-
-        for my $MessageID ( @{ $Param{MessageID} } ) {
-            my $MD5 = $Kernel::OM->Get('Main')->MD5sum( String => $MessageID );
-            push( @Bind, \$MD5 );
-        }
-
-        $MessageIDSQL = 1;
-    }
-
-    # set order
-    if ( $Param{Order} && $Param{Order} eq 'DESC' ) {
-        $SQL .= ' ORDER BY sa.create_time DESC, sa.id DESC';
-    }
-    else {
-        $SQL .= ' ORDER BY sa.create_time, sa.id ASC';
-    }
-
-    my $Start;
-
-    if ( $Param{Page} ) {
-        $Start = $Param{Limit} * ( $Param{Page} - 1 );
-    }
-
-    # get time object
-    my $TimeObject = $Kernel::OM->Get('Time');
-
-    return if !$DBObject->Prepare(
-        SQL   => $SQL,
-        Bind  => \@Bind,
-        Limit => $Param{Limit},
-        Start => $Start,
-    );
-
-    my %Ticket;
-    while ( my @Row = $DBObject->FetchrowArray() ) {
-        if (
-            $HasFilter
-            && $Param{ArticleID}
-        ) {
+        # check for basic article data if not already checked
+        if ( $CacheKey ne 'ArticleGet::0' ) {
             # check cache
             my $Cached = $Self->_ArticleCacheGet(
                 ArticleID => $Param{ArticleID},
-                Key       => $CacheKey,
+                Key       => 'ArticleGet::0',
             );
-            return %{$Cached} if ref $Cached eq 'HASH';
+
+            if ( ref( $Cached ) eq 'HASH' ) {
+                @Content = ( \%{ $Cached } );
+            }
+        }
+    }
+
+    # only fetch basic data from database, when not cached
+    if ( !scalar( @Content ) ) {
+        # channel lookup
+        my $ChannelSQL = '';
+        if ( IsArrayRefWithData( $Param{Channel} ) ) {
+            for ( @{ $Param{Channel} } ) {
+                if ( $Kernel::OM->Get('Channel')->ChannelLookup( Name => $_ ) ) {
+                    if ($ChannelSQL) {
+                        $ChannelSQL .= ',';
+                    }
+                    $ChannelSQL .= $Kernel::OM->Get('DB')->Quote(
+                        $Kernel::OM->Get('Channel')->ChannelLookup( Name => $_ ),
+                        'Integer',
+                    );
+                }
+            }
+            if ($ChannelSQL) {
+                $ChannelSQL = " AND sa.channel_id IN ($ChannelSQL)";
+            }
+        }
+        my $ChannelIDSQL = '';
+        if ( IsArrayRefWithData( $Param{ChannelID} ) ) {
+            my $QuotedIDs = join ', ',
+                map { $Kernel::OM->Get('DB')->Quote( $_, 'Integer' ) }
+                @{ $Param{ChannelID} };
+            $ChannelIDSQL = " AND sa.channel_id IN ($QuotedIDs)";
         }
 
-        my %Data;
-        $Data{TicketID}         = $Row[0];
-        $Data{From}             = $Row[1];
-        $Data{To}               = $Row[2];
-        $Data{Cc}               = $Row[3];
-        $Data{Bcc}              = $Row[4];
-        $Data{Subject}          = $Row[5];
-        $Data{ReplyTo}          = $Row[6];
-        $Data{MessageID}        = $Row[7];
-        $Data{InReplyTo}        = $Row[8];
-        $Data{References}       = $Row[9];
-        $Data{Body}             = $Row[10];
-        $Data{CreateTime}       = $Row[11];
-        $Data{ContentType}      = $Row[12];
-        $Data{CreatedBy}        = $Row[13];
-        $Data{SenderTypeID}     = $Row[14];
-        $Data{ChannelID}        = $Row[15];
-        $Data{IncomingTime}     = $Row[16];
-        $Data{ArticleID}        = $Row[17];
-        $Data{ChangeTime}       = $Row[18];
-        $Data{ChangedBy}        = $Row[19];
-        $Data{CustomerVisible}  = $Row[20];
-        $Data{AttachmentCount}  = $Row[21];
+        my $CustomerVisibleSQL = '';
+        if ( $Param{CustomerVisible} ) {
+            $CustomerVisibleSQL = " AND sa.customer_visible = 1";
+        }
+        elsif ( defined( $Param{CustomerVisible} ) ) {
+            $CustomerVisibleSQL = " AND sa.customer_visible = 0";
+        }
 
-        if ( $Data{ContentType} && $Data{ContentType} =~ /charset=/i ) {
-            $Data{Charset} = $Data{ContentType};
-            $Data{Charset} =~ s/.+?charset=("|'|)(\w+)/$2/gi;
-            $Data{Charset} =~ s/"|'//g;
-            $Data{Charset} =~ s/(.+?);.*/$1/g;
+        # sender type lookup
+        my $SenderTypeSQL = '';
+        if ( IsArrayRefWithData( $Param{ArticleSenderType} ) ) {
+            for ( @{ $Param{ArticleSenderType} } ) {
+                if ( $Self->ArticleSenderTypeLookup( SenderType => $_ ) ) {
+                    if ($SenderTypeSQL) {
+                        $SenderTypeSQL .= ',';
+                    }
+                    $SenderTypeSQL .= $Kernel::OM->Get('DB')->Quote(
+                        $Self->ArticleSenderTypeLookup( SenderType => $_ ),
+                        'Integer',
+                    );
+                }
+            }
+            if ($SenderTypeSQL) {
+                $SenderTypeSQL = " AND sa.article_sender_type_id IN ($SenderTypeSQL)";
+            }
+        }
 
+        my $SenderTypeIDSQL;
+        if ( IsArrayRefWithData( $Param{ArticleSenderTypeID} ) ) {
+            my $QuotedIDs = join ', ',
+                map { $Kernel::OM->Get('DB')->Quote( $_, 'Integer' ) }
+                @{ $Param{ArticleSenderTypeID} };
+            $SenderTypeIDSQL = " AND sa.article_sender_type_id IN ($QuotedIDs)";
+        }
+
+        # sql query
+        my @Bind;
+        my $SQL = '
+            SELECT sa.ticket_id, sa.a_from, sa.a_to, sa.a_cc, sa.a_bcc, sa.a_subject,
+                sa.a_reply_to, sa.a_message_id, sa.a_in_reply_to, sa.a_references, sa.a_body,
+                sa.create_time, sa.a_content_type, sa.create_by, article_sender_type_id,
+                sa.channel_id, sa.incoming_time, sa.id, sa.change_time, sa.change_by, sa.customer_visible, sa.attachment_count
+            FROM article sa
+            WHERE ';
+
+        if ( $Param{ArticleID} ) {
+            $SQL .= 'sa.id = ?';
+            push @Bind, \$Param{ArticleID};
         }
         else {
-            $Data{Charset} = '';
+            $SQL .= 'sa.ticket_id = ?';
+            push @Bind, \$Param{TicketID};
         }
 
-        # compat.
-        $Data{ContentCharset} = $Data{Charset};
+        # add channels
+        if ($ChannelSQL) {
+            $SQL .= $ChannelSQL;
+        }
+        if ($ChannelIDSQL) {
+            $SQL .= $ChannelIDSQL;
+        }
 
-        if ( $Data{ContentType} && $Data{ContentType} =~ /^(\w+\/\w+)/i ) {
-            $Data{MimeType} = $1;
-            $Data{MimeType} =~ s/"|'//g;
+        # add customer visibility
+        if ($CustomerVisibleSQL) {
+            $SQL .= $CustomerVisibleSQL;
+        }
+
+        # add sender types
+        if ($SenderTypeSQL) {
+            $SQL .= $SenderTypeSQL;
+        }
+        if ($SenderTypeIDSQL) {
+            $SQL .= $SenderTypeIDSQL;
+        }
+
+        # add message id
+        my $MessageIDSQL;
+        if ( IsArrayRefWithData( $Param{MessageID} ) ) {
+            $SQL .= ' AND sa.a_message_id_md5 IN (' . join( ',', map {'?'} @{ $Param{MessageID} } ) . ')';
+
+            for my $MessageID ( @{ $Param{MessageID} } ) {
+                my $MD5 = $Kernel::OM->Get('Main')->MD5sum( String => $MessageID );
+                push( @Bind, \$MD5 );
+            }
+
+            $MessageIDSQL = 1;
+        }
+
+        # set order
+        if ( $Param{Order} && $Param{Order} eq 'DESC' ) {
+            $SQL .= ' ORDER BY sa.create_time DESC, sa.id DESC';
         }
         else {
-            $Data{MimeType} = '';
+            $SQL .= ' ORDER BY sa.create_time, sa.id ASC';
         }
 
-        # strip not wanted stuff
-        RECIPIENT:
-        for my $Key (qw(From To Cc Bcc Subject)) {
-            next RECIPIENT if !$Data{$Key};
-            $Data{$Key} =~ s/\n|\r//g;
+        my $Start;
+
+        if ( $Param{Page} ) {
+            $Start = $Param{Limit} * ( $Param{Page} - 1 );
         }
 
-        push @Content, { %Ticket, %Data };
+        return if !$Kernel::OM->Get('DB')->Prepare(
+            SQL   => $SQL,
+            Bind  => \@Bind,
+            Limit => $Param{Limit},
+            Start => $Start,
+        );
+
+        while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
+            if (
+                $HasFilter
+                && $Param{ArticleID}
+            ) {
+                # check cache
+                my $Cached = $Self->_ArticleCacheGet(
+                    ArticleID => $Param{ArticleID},
+                    Key       => $CacheKey,
+                );
+                return %{ $Cached } if ( ref( $Cached ) eq 'HASH' );
+            }
+
+            my %Data;
+            $Data{TicketID}         = $Row[0];
+            $Data{From}             = $Row[1];
+            $Data{To}               = $Row[2];
+            $Data{Cc}               = $Row[3];
+            $Data{Bcc}              = $Row[4];
+            $Data{Subject}          = $Row[5];
+            $Data{ReplyTo}          = $Row[6];
+            $Data{MessageID}        = $Row[7];
+            $Data{InReplyTo}        = $Row[8];
+            $Data{References}       = $Row[9];
+            $Data{Body}             = $Row[10];
+            $Data{CreateTime}       = $Row[11];
+            $Data{ContentType}      = $Row[12];
+            $Data{CreatedBy}        = $Row[13];
+            $Data{SenderTypeID}     = $Row[14];
+            $Data{ChannelID}        = $Row[15];
+            $Data{IncomingTime}     = $Row[16];
+            $Data{ArticleID}        = $Row[17];
+            $Data{ChangeTime}       = $Row[18];
+            $Data{ChangedBy}        = $Row[19];
+            $Data{CustomerVisible}  = $Row[20];
+            $Data{AttachmentCount}  = $Row[21];
+
+            if ( $Data{ContentType} && $Data{ContentType} =~ /charset=/i ) {
+                $Data{Charset} = $Data{ContentType};
+                $Data{Charset} =~ s/.+?charset=("|'|)(\w+)/$2/gi;
+                $Data{Charset} =~ s/"|'//g;
+                $Data{Charset} =~ s/(.+?);.*/$1/g;
+
+            }
+            else {
+                $Data{Charset} = '';
+            }
+
+            # compat.
+            $Data{ContentCharset} = $Data{Charset};
+
+            if ( $Data{ContentType} && $Data{ContentType} =~ /^(\w+\/\w+)/i ) {
+                $Data{MimeType} = $1;
+                $Data{MimeType} =~ s/"|'//g;
+            }
+            else {
+                $Data{MimeType} = '';
+            }
+
+            # strip not wanted stuff
+            RECIPIENT:
+            for my $Key (qw(From To Cc Bcc Subject)) {
+                next RECIPIENT if !$Data{$Key};
+                $Data{$Key} =~ s/\n|\r//g;
+            }
+
+            push @Content, { %Data };
+        }
+
+        # create email parser object
+        my $EmailParser = Kernel::System::EmailParser->new(
+            Mode => 'Standalone',
+        );
+
+        # article stuff
+        for my $Part (@Content) {
+
+            # get sender type
+            $Part->{SenderType} = $Self->ArticleSenderTypeLookup(
+                SenderTypeID => $Part->{SenderTypeID},
+            );
+
+            # get article type
+            $Part->{Channel} = $Kernel::OM->Get('Channel')->ChannelLookup(
+                ID => $Part->{ChannelID},
+            );
+
+            # add real name lines
+            RECIPIENT:
+            for my $Key (qw( From To Cc Bcc)) {
+                if (!$Part->{$Key}) {
+                    $Part->{ $Key . 'Realname' } = undef;
+                    next RECIPIENT;
+                }
+
+                # check if it's a queue
+                if ( $Part->{$Key} !~ /@/ ) {
+                    $Part->{ $Key . 'Realname' } = $Part->{$Key};
+                    next RECIPIENT;
+                }
+
+                # strip out real names
+                my $Realname = '';
+                EMAILADDRESS:
+                for my $EmailSplit ( $EmailParser->SplitAddressLine( Line => $Part->{$Key} ) ) {
+                    my $Name = $EmailParser->GetRealname( Email => $EmailSplit );
+                    if ( !$Name ) {
+                        $Name = $EmailParser->GetEmailAddress( Email => $EmailSplit );
+                    }
+                    next EMAILADDRESS if !$Name;
+                    if ($Realname) {
+                        $Realname .= ', ';
+                    }
+                    $Realname .= $Name;
+                }
+
+                $Part->{ $Key . 'Realname' } = $Realname;
+            }
+
+            # add TimeUnit
+            $Part->{TimeUnit} = $Kernel::OM->Get('TimeAccounting')->TimeAccountingTotal(
+                ArticleID => $Part->{ArticleID},
+            );
+        }
+
+        # return if content is empty
+        if ( !@Content ) {
+
+            # Log an error only if a specific article was requested and there is no filter active.
+            if (
+                $Param{ArticleID}
+                && !$ChannelSQL
+                && !$SenderTypeSQL
+                && !$CustomerVisibleSQL
+                && !$MessageIDSQL
+            ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "No such article for ArticleID ($Param{ArticleID})!",
+                    Silent   => $Param{Silent}
+                );
+            }
+
+            return;
+        }
+
+        # set cache for basic article data, if that is not the requested return data
+        if (
+            $Param{ArticleID}
+            && $CacheKey ne 'ArticleGet::0'
+        ) {
+            my %BasicArticle = %{ $Content[0] };
+
+            $Self->_ArticleCacheSet(
+                ArticleID => $Param{ArticleID},
+                Key       => 'ArticleGet::0',
+                Value     => \%BasicArticle,
+            );
+        }
     }
 
     # check if need to return dynamic fields
@@ -1903,83 +2005,6 @@ sub ArticleGet {
                 $Article->{ 'DynamicField_' . $DynamicFieldConfig->{Name} } = $Value;
             }
         }
-    }
-
-    # return if content is empty
-    if ( !@Content ) {
-
-        # Log an error only if a specific article was requested and there is no filter active.
-        if (
-            $Param{ArticleID}
-            && !$ChannelSQL
-            && !$SenderTypeSQL
-            && !$CustomerVisibleSQL
-            && !$MessageIDSQL
-        ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "No such article for ArticleID ($Param{ArticleID})!",
-                Silent   => $Param{Silent}
-            );
-        }
-
-        return;
-    }
-
-    # create email parser object
-    my $EmailParser = Kernel::System::EmailParser->new(
-        Mode => 'Standalone',
-    );
-
-    # article stuff
-    for my $Part (@Content) {
-
-        # get sender type
-        $Part->{SenderType} = $Self->ArticleSenderTypeLookup(
-            SenderTypeID => $Part->{SenderTypeID},
-        );
-
-        # get article type
-        $Part->{Channel} = $Kernel::OM->Get('Channel')->ChannelLookup(
-            ID => $Part->{ChannelID},
-        );
-
-        # add real name lines
-        RECIPIENT:
-        for my $Key (qw( From To Cc Bcc)) {
-            if (!$Part->{$Key}) {
-                $Part->{ $Key . 'Realname' } = undef;
-                next RECIPIENT;
-            }
-
-            # check if it's a queue
-            if ( $Part->{$Key} !~ /@/ ) {
-                $Part->{ $Key . 'Realname' } = $Part->{$Key};
-                next RECIPIENT;
-            }
-
-            # strip out real names
-            my $Realname = '';
-            EMAILADDRESS:
-            for my $EmailSplit ( $EmailParser->SplitAddressLine( Line => $Part->{$Key} ) ) {
-                my $Name = $EmailParser->GetRealname( Email => $EmailSplit );
-                if ( !$Name ) {
-                    $Name = $EmailParser->GetEmailAddress( Email => $EmailSplit );
-                }
-                next EMAILADDRESS if !$Name;
-                if ($Realname) {
-                    $Realname .= ', ';
-                }
-                $Realname .= $Name;
-            }
-
-            $Part->{ $Key . 'Realname' } = $Realname;
-        }
-
-        # add TimeUnit
-        $Part->{TimeUnit} = $Kernel::OM->Get('TimeAccounting')->TimeAccountingTotal(
-            ArticleID => $Part->{ArticleID},
-        );
     }
 
     if ( $Param{ArticleID} ) {

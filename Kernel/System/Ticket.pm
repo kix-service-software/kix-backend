@@ -1391,67 +1391,142 @@ sub TicketGet {
         TicketID => $Param{TicketID},
         Key      => $CacheKey,
     );
-    return %{$Cached} if ref $Cached eq 'HASH';
+    return %{ $Cached } if ( ref( $Cached ) eq 'HASH' );
 
     my %Ticket;
 
-    # get database object
-    my $DBObject = $Kernel::OM->Get('DB');
+    # check cache for basic ticket data if not already checked
+    if ( $CacheKey ne 'TicketGet::0::0' ) {
+        # check cache
+        my $Cached = $Self->_TicketCacheGet(
+            TicketID => $Param{TicketID},
+            Key      => 'TicketGet::0::0',
+        );
 
-    return if !$DBObject->Prepare(
-        SQL => '
-            SELECT st.id, st.queue_id, st.ticket_state_id, st.ticket_lock_id, st.ticket_priority_id,
-                st.create_time_unix, st.create_time, st.tn, st.organisation_id, st.contact_id,
-                st.user_id, st.responsible_user_id, st.until_time, st.change_time, st.title,
-                st.timeout, st.type_id, st.archive_flag,
-                st.create_by, st.change_by, accounted_time, attachment_count
-            FROM ticket st
-            WHERE st.id = ?',
-        Bind  => [ \$Param{TicketID} ],
-        Limit => 1,
-    );
-
-    while ( my @Row = $DBObject->FetchrowArray() ) {
-        $Ticket{TicketID}        = $Row[0];
-        $Ticket{QueueID}         = $Row[1];
-        $Ticket{StateID}         = $Row[2];
-        $Ticket{LockID}          = $Row[3];
-        $Ticket{PriorityID}      = $Row[4];
-        $Ticket{CreateTimeUnix}  = $Row[5];
-        $Ticket{TicketNumber}    = $Row[7];
-        $Ticket{OrganisationID}  = $Row[8];
-        $Ticket{ContactID}       = $Row[9];
-        $Ticket{OwnerID}         = $Row[10];
-        $Ticket{ResponsibleID}   = $Row[11] || 1;
-        $Ticket{PendingTimeUnix} = $Row[12];
-        $Ticket{Changed}         = $Row[13];
-        $Ticket{Title}           = $Row[14];
-        $Ticket{UnlockTimeout}   = $Row[15];
-        $Ticket{TypeID}          = $Row[16] || 1;
-        $Ticket{ArchiveFlag}     = $Row[17] ? 'y' : 'n';
-        $Ticket{CreateBy}        = $Row[18];
-        $Ticket{ChangeBy}        = $Row[19];
-        $Ticket{AccountedTime}   = $Row[20];
-        $Ticket{AttachmentCount} = $Row[21] || 0;
+        if ( ref( $Cached ) eq 'HASH' ) {
+            %Ticket = %{ $Cached };
+        }
     }
 
-    # check ticket
-    if ( !$Ticket{TicketID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "No such TicketID ($Param{TicketID})!",
-            Silent   => $Param{Silent}
+    # only fetch basic data from database, when not cached
+    if ( !%Ticket ) {
+        return if !$Kernel::OM->Get('DB')->Prepare(
+            SQL => '
+                SELECT st.id, st.queue_id, st.ticket_state_id, st.ticket_lock_id, st.ticket_priority_id,
+                    st.create_time_unix, st.create_time, st.tn, st.organisation_id, st.contact_id,
+                    st.user_id, st.responsible_user_id, st.until_time, st.change_time, st.title,
+                    st.timeout, st.type_id, st.archive_flag,
+                    st.create_by, st.change_by, accounted_time, attachment_count
+                FROM ticket st
+                WHERE st.id = ?',
+            Bind  => [ \$Param{TicketID} ],
+            Limit => 1,
         );
-        return;
+
+        while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
+            $Ticket{TicketID}        = $Row[0];
+            $Ticket{QueueID}         = $Row[1];
+            $Ticket{StateID}         = $Row[2];
+            $Ticket{LockID}          = $Row[3];
+            $Ticket{PriorityID}      = $Row[4];
+            $Ticket{CreateTimeUnix}  = $Row[5];
+            $Ticket{TicketNumber}    = $Row[7];
+            $Ticket{OrganisationID}  = $Row[8];
+            $Ticket{ContactID}       = $Row[9];
+            $Ticket{OwnerID}         = $Row[10];
+            $Ticket{ResponsibleID}   = $Row[11] || 1;
+            $Ticket{PendingTimeUnix} = $Row[12];
+            $Ticket{Changed}         = $Row[13];
+            $Ticket{Title}           = $Row[14];
+            $Ticket{UnlockTimeout}   = $Row[15];
+            $Ticket{TypeID}          = $Row[16] || 1;
+            $Ticket{ArchiveFlag}     = $Row[17] ? 'y' : 'n';
+            $Ticket{CreateBy}        = $Row[18];
+            $Ticket{ChangeBy}        = $Row[19];
+            $Ticket{AccountedTime}   = $Row[20];
+            $Ticket{AttachmentCount} = $Row[21] || 0;
+        }
+
+        # check ticket
+        if ( !$Ticket{TicketID} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "No such TicketID ($Param{TicketID})!",
+                Silent   => $Param{Silent}
+            );
+            return;
+        }
+
+        $Ticket{Created} = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
+            SystemTime => $Ticket{CreateTimeUnix},
+        );
+
+        if ($Ticket{PendingTimeUnix} > 0) {
+            $Ticket{PendingTime} = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
+                SystemTime => $Ticket{PendingTimeUnix},
+            );
+        }
+        else {
+            $Ticket{PendingTime} = '';
+        }
+
+        $Ticket{Queue} = $Kernel::OM->Get('Queue')->QueueLookup(
+            QueueID => $Ticket{QueueID},
+        );
+
+        # fillup runtime values
+        $Ticket{Age} = $Kernel::OM->Get('Time')->SystemTime() - $Ticket{CreateTimeUnix};
+
+        $Ticket{Priority} = $Kernel::OM->Get('Priority')->PriorityLookup(
+            PriorityID => $Ticket{PriorityID},
+        );
+
+        # get owner
+        $Ticket{Owner} = $Kernel::OM->Get('User')->UserLookup(
+            UserID => $Ticket{OwnerID},
+        );
+
+        # get responsible
+        $Ticket{Responsible} = $Kernel::OM->Get('User')->UserLookup(
+            UserID => $Ticket{ResponsibleID},
+        );
+
+        # get lock
+        $Ticket{Lock} = $Kernel::OM->Get('Lock')->LockLookup(
+            LockID => $Ticket{LockID},
+        );
+
+        # get type
+        $Ticket{Type} = $Kernel::OM->Get('Type')->TypeLookup( TypeID => $Ticket{TypeID} );
+
+        # get state info
+        my %StateData = $Kernel::OM->Get('State')->StateGet(
+            ID => $Ticket{StateID}
+        );
+        $Ticket{StateType} = $StateData{TypeName};
+        $Ticket{State}     = $StateData{Name};
+
+        if ( !$Ticket{PendingTimeUnix} || lc $StateData{TypeName} eq 'pending' ) {
+            $Ticket{UntilTime} = 0;
+        }
+        else {
+            $Ticket{UntilTime} = $Ticket{PendingTimeUnix} - $Kernel::OM->Get('Time')->SystemTime();
+        }
+
+        # set cache for basic ticket data, if that is not the requested return data
+        if ( $CacheKey ne 'TicketGet::0::0' ) {
+            my %BasicTicket = %Ticket;
+
+            $Self->_TicketCacheSet(
+                TicketID => $Param{TicketID},
+                Key      => 'TicketGet::0::0',
+                Value    => \%BasicTicket,
+            );
+        }
     }
 
     # check if need to return DynamicFields
-    if ($Param{DynamicFields}) {
-
-        # get dynamic field objects
-        my $DynamicFieldObject        = $Kernel::OM->Get('DynamicField');
-        my $DynamicFieldBackendObject = $Kernel::OM->Get('DynamicField::Backend');
-
+    if ( $Param{DynamicFields} ) {
         my $FieldFilterRef = undef;
         if ( IsArrayRef($Param{DynamicFields}) ) {
             my %FieldFilter = map { $_ => 1 } @{$Param{DynamicFields}};
@@ -1460,7 +1535,7 @@ sub TicketGet {
         }
 
         # get all dynamic fields for the object type Ticket (with optional filter)
-        my $DynamicFieldList = $DynamicFieldObject->DynamicFieldListGet(
+        my $DynamicFieldList = $Kernel::OM->Get('DynamicField')->DynamicFieldListGet(
             ObjectType => 'Ticket',
             FieldFilter => $FieldFilterRef,
         );
@@ -1474,7 +1549,7 @@ sub TicketGet {
             next DYNAMICFIELD if !$DynamicFieldConfig->{Name};
 
             # get the current value for each dynamic field
-            my $Value = $DynamicFieldBackendObject->ValueGet(
+            my $Value = $Kernel::OM->Get('DynamicField::Backend')->ValueGet(
                 DynamicFieldConfig => $DynamicFieldConfig,
                 ObjectID           => $Ticket{TicketID},
             );
@@ -1482,68 +1557,6 @@ sub TicketGet {
             # set the dynamic field name and value into the ticket hash
             $Ticket{ 'DynamicField_' . $DynamicFieldConfig->{Name} } = $Value;
         }
-    }
-
-    # get time object
-    my $TimeObject = $Kernel::OM->Get('Time');
-
-    $Ticket{Created} = $TimeObject->SystemTime2TimeStamp(
-        SystemTime => $Ticket{CreateTimeUnix},
-    );
-
-    if ($Ticket{PendingTimeUnix} > 0) {
-        $Ticket{PendingTime} = $TimeObject->SystemTime2TimeStamp(
-            SystemTime => $Ticket{PendingTimeUnix},
-        );
-    } else {
-        $Ticket{PendingTime} = '';
-    }
-
-    $Ticket{Queue} = $Kernel::OM->Get('Queue')->QueueLookup(
-        QueueID => $Ticket{QueueID},
-    );
-
-    # fillup runtime values
-    $Ticket{Age} = $TimeObject->SystemTime() - $Ticket{CreateTimeUnix};
-
-    $Ticket{Priority} = $Kernel::OM->Get('Priority')->PriorityLookup(
-        PriorityID => $Ticket{PriorityID},
-    );
-
-    # get user object
-    my $UserObject = $Kernel::OM->Get('User');
-
-    # get owner
-    $Ticket{Owner} = $UserObject->UserLookup(
-        UserID => $Ticket{OwnerID},
-    );
-
-    # get responsible
-    $Ticket{Responsible} = $UserObject->UserLookup(
-        UserID => $Ticket{ResponsibleID},
-    );
-
-    # get lock
-    $Ticket{Lock} = $Kernel::OM->Get('Lock')->LockLookup(
-        LockID => $Ticket{LockID},
-    );
-
-    # get type
-    $Ticket{Type} = $Kernel::OM->Get('Type')->TypeLookup( TypeID => $Ticket{TypeID} );
-
-    # get state info
-    my %StateData = $Kernel::OM->Get('State')->StateGet(
-        ID => $Ticket{StateID}
-    );
-
-    $Ticket{StateType} = $StateData{TypeName};
-    $Ticket{State}     = $StateData{Name};
-
-    if ( !$Ticket{PendingTimeUnix} || lc $StateData{TypeName} eq 'pending' ) {
-        $Ticket{UntilTime} = 0;
-    }
-    else {
-        $Ticket{UntilTime} = $Ticket{PendingTimeUnix} - $TimeObject->SystemTime();
     }
 
     # do extended lookups
