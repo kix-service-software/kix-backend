@@ -96,7 +96,7 @@ sub Run {
             my %AllowedQueueIDs = map { $_ => 1 } @{$Result};
             next TYPE if !$AllowedQueueIDs{$Ticket{QueueID}};
         }
-            
+
         $HasPermission{$Type} = 1;
     }
 

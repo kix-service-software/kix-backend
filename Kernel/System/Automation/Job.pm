@@ -1298,10 +1298,11 @@ sub _JobExecute {
 
     # execute backend object for given type to get the (real) list of objects (search or filter)
     @ObjectIDs = $BackendObject->Run(
-        Data      => $Param{Data},
-        Filter    => $Job{Filter},
-        SortOrder => $Job{SortOrder},
-        UserID    => $Param{UserID},
+        Data         => $Param{Data},
+        IsEventBased => $Param{IsEventBased},
+        Filter       => $Job{Filter},
+        SortOrder    => $Job{SortOrder},
+        UserID       => $Param{UserID},
     );
 
     if ( $Self->{Debug} ) {
