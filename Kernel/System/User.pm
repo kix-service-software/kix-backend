@@ -880,14 +880,34 @@ sub UserSearch {
 
         # safe our current bind data
         my @OrgBind = @Bind;
-        foreach my $PermissionValue ( @PermissionValues ) {
-            push @WherePart1, "EXISTS (SELECT rp1.id FROM roles r1, role_user ru1, role_permission rp1, permission_type pt1 WHERE r1.valid_id = 1 AND r1.id = ru1.role_id AND r1.usage_context IN (1,3) AND ru1.user_id = u.id AND ru1.role_id = rp1.role_id AND pt1.id = rp1.type_id AND pt1.name='Base::Ticket' AND rp1.target IN ('*', ?) AND (rp1.value & ?) = ? $ExcludedRoleConditionForSubSelects)";
-            push @WherePart1, "pt.name='Resource' AND rp.target IN ('/*', '/tickets') AND (rp.value & ?) = ?";
+        for my $PermissionValue ( @PermissionValues ) {
+            if (
+                $Param{HasPermission}->{Object}
+                && $Param{HasPermission}->{Object} eq 'Queue'
+            ) {
+                my $WherePartStatement = 'EXISTS (SELECT rp1.id FROM roles r1, role_user ru1, role_permission rp1, permission_type pt1 WHERE r1.valid_id = 1 AND r1.id = ru1.role_id AND r1.usage_context IN (1,3) AND ru1.user_id = u.id AND ru1.role_id = rp1.role_id AND pt1.id = rp1.type_id AND pt1.name=\'Base::Ticket\' AND (rp1.value & ?) = ? AND rp1.target IN (\'*\'';
+                push( @Bind, ( \$PermissionValue, \$PermissionValue ) );
 
-            push(@Bind, ( \$Param{HasPermission}->{ObjectID}, \$PermissionValue, \$PermissionValue, \$PermissionValue, \$PermissionValue ));
+                if ( IsArrayRef( $Param{HasPermission}->{ObjectID} ) ) {
+                    for my $ObjectID ( @{ $Param{HasPermission}->{ObjectID} } ) {
+                        $WherePartStatement .= ',?';
+                        push( @Bind, \$ObjectID );
+                    }
+                }
+                elsif ( IsStringWithData( $Param{HasPermission}->{ObjectID} ) ) {
+                    $WherePartStatement .= ',?';
+                    push( @Bind, \$Param{HasPermission}->{ObjectID} );
+                }
+
+                $WherePartStatement .= ') ' . $ExcludedRoleConditionForSubSelects . ')';
+                push( @WherePart1, $WherePartStatement );
+            }
+
+            push( @WherePart1, 'pt.name=\'Resource\' AND rp.target IN (\'/*\', \'/tickets\') AND (rp.value & ?) = ?' );
+            push( @Bind, ( \$PermissionValue, \$PermissionValue ) );
         }
 
-        push @UnionWhere, \@WherePart1;
+        push( @UnionWhere, \@WherePart1 );
 
         # part 2 - in case ticket base permissions do not exist for the relevant users
         my @WherePart2 = (
