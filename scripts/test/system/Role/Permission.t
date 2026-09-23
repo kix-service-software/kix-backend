@@ -13,7 +13,7 @@ use utf8;
 use vars (qw($Self));
 
 use Kernel::System::Role;
-use Kernel::System::Role::Permission qw(:all);
+use Kernel::System::Role::Permission;
 
 # get helper object
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');

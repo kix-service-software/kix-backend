@@ -604,6 +604,30 @@ sub PrepareData {
         }
     }
 
+    if ( defined( $Param{Data}->{DynamicFieldFilter} ) ) {
+        if ( IsStringWithData( $Param{Data}->{DynamicFieldFilter} ) ) {
+            my $Data = $Kernel::OM->Get('JSON')->Decode(
+                Data   => $Param{Data}->{DynamicFieldFilter},
+                Silent => 1
+            );
+
+            if ( !IsArrayRef( $Data ) ) {
+                return $Self->_Error(
+                    Code    => 'PrepareData.InvalidDynamicFieldFilter',
+                    Message => "DynamicFieldFilter is neither a JSON (type: array) nor array!",
+                );
+            }
+
+            $Param{Data}->{DynamicFieldFilter} = $Data;
+        }
+        elsif ( !IsArrayRef( $Param{Data}->{DynamicFieldFilter} ) ) {
+            return $Self->_Error(
+                Code    => 'PrepareData.InvalidDynamicFieldFilter',
+                Message => "DynamicFieldFilter is neither a JSON (type: array) nor array!",
+            );
+        }
+    }
+
     my %Data = %{ $Param{Data} };
 
     # store data for later use
