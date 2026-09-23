@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-5-5 08:17+0000\n"
+"POT-Creation-Date: 2026-9-23 09:11+0000\n"
 "PO-Revision-Date: 2024-12-03 08:51+0000\n"
 "Last-Translator: mbauer <Mario.Bauer@kixdesk.com>\n"
 "Language-Team: English <http://weblate.vm.devel.cape-it.de/projects/kix18/"
@@ -119,11 +119,23 @@ msgid "Asset Maintainer"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
+msgid "Asset Maintainer Base Permission"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
 msgid "Asset Reader"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
+msgid "Asset Reader Base Permission"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
 msgid "Backup Device"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Base::Asset"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
@@ -410,10 +422,6 @@ msgid "Owner Out Of Office - unlock ticket"
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
-msgid "Pattern"
-msgstr ""
-
-#. Database: scripts/database/kix-initial_insert.xml
 msgid "Per Node"
 msgstr ""
 
@@ -431,6 +439,10 @@ msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
 msgid "Periodic Reports"
+msgstr ""
+
+#. Database: scripts/database/kix-initial_insert.xml
+msgid "Permission type for core object dependency Class->Asset."
 msgstr ""
 
 #. Database: scripts/database/kix-initial_insert.xml
@@ -1069,6 +1081,49 @@ msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/Conditional.pm
 msgid "Then"
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/ContactSearch.pm
+msgid ""
+"(Optional) Determines whether only valid contacts should be searched for. "
+"With \"0\" all contacts are taken into account and with \"1\" only valid "
+"ones."
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/ContactSearch.pm
+msgid "Attribute"
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/ContactSearch.pm
+msgid ""
+"Determines in which attribute to search. \"Firstname\", \"Lastname\" and "
+"contact dynamic fields \"DynamicField_xyz\" are allowed."
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/ContactSearch.pm
+msgid "Pattern"
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/ContactSearch.pm
+msgid "Search for ContactID or UserID."
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/ContactSearch.pm
+msgid ""
+"Search pattern which is checked against the value of the selected attribute. "
+"Placeholders <KIX_TICKET_...>, <KIX_CONTACT_...> and <KIX...> are supported."
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/ContactSearch.pm
+msgid "The ID of the found contact."
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/ContactSearch.pm
+msgid "The assigned user ID of the found contact."
+msgstr ""
+
+#. Perl Module: Kernel/System/Automation/MacroAction/Common/ContactSearch.pm
+msgid "Valid"
 msgstr ""
 
 #. Perl Module: Kernel/System/Automation/MacroAction/Common/CreateReport.pm
@@ -2124,6 +2179,17 @@ msgstr ""
 msgid "Lists of tickets with their durations in specified states and teams."
 msgstr ""
 
+#. Perl Module: update/build-2314.pl
+msgid ""
+"allows to read asset information in asset class and allows to READ links"
+msgstr ""
+
+#. Perl Module: update/build-2314.pl
+msgid ""
+"same as Asset-Reader, but additionally allows to create new or update any "
+"existing asset entry and allows to CREATE, UPDATE, DELETE links"
+msgstr ""
+
 #. SysConfig: Kernel/Config/Files/API.xml
 msgid ""
 "API return code mapping configuration for specific transport. Key=ErrorCode, "
@@ -2322,7 +2388,15 @@ msgid "Assemble Object"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Automation.xml
+msgid "Clears the runs of all jobs that have reached a certain age."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Automation.xml
 msgid "Conditional"
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Automation.xml
+msgid "ContactSearch"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Automation.xml
@@ -4702,6 +4776,13 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/KIXMobileApp.xml
 msgid ""
+"Defines which ticket attributes are shown in the ticket detail view section "
+"for more information. The order in this configuration is shown top-down in "
+"the app."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/KIXMobileApp.xml
+msgid ""
 "Dis-/Enables time accounting in the connected KIX Field Agent app. Enable "
 "this configuration key and keep a value not equals 0 (nor empty), in order "
 "to disable time accounting within the KIX Field Agent app for any ticket."
@@ -4766,6 +4847,11 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/ObjectSearch.xml
 msgid "Defines the backend module that should be used to search for tickets."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/ObjectSearch.xml
+msgid ""
+"Defines the backend module that should be used to search for time accounting."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/ObjectSearch.xml
@@ -5775,6 +5861,14 @@ msgstr ""
 msgid ""
 "Workflowmodule which sets the ticket responsible based on ticket type if not "
 "given."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/TimeAccounting.xml
+msgid "List of all time accounting events to be displayed in the GUI."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/TimeAccounting.xml
+msgid "Updates the “Accounted Time” on the ticket."
 msgstr ""
 
 #. Template: Page
