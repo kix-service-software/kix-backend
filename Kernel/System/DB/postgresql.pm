@@ -196,11 +196,7 @@ sub TableCreate {
     my @Return       = ();
     for my $Tag (@Param) {
 
-        if (
-            ( $Tag->{Tag} eq 'Table' || $Tag->{Tag} eq 'TableCreate' )
-            && $Tag->{TagType} eq 'Start'
-            )
-        {
+        if ( $Tag->{Tag} =~ /^Table(Create)?(IfNotExists)?$/ && $Tag->{TagType} eq 'Start' ) {
             if ( $ConfigObject->Get('Database::ShellOutput') ) {
                 $SQLStart .= $Self->{'DB::Comment'}
                     . "----------------------------------------------------------\n";
@@ -209,20 +205,16 @@ sub TableCreate {
                     . "----------------------------------------------------------\n";
             }
         }
-        if (
-            ( $Tag->{Tag} eq 'Table' || $Tag->{Tag} eq 'TableCreate' )
-            && $Tag->{TagType} eq 'Start'
-            )
-        {
-            $SQLStart .= "CREATE TABLE $Tag->{Name} (\n";
-            $TableName = $Tag->{Name};
-        }
-        if (
-            ( $Tag->{Tag} eq 'Table' || $Tag->{Tag} eq 'TableCreate' )
-            && $Tag->{TagType} eq 'End'
-            )
-        {
-            $SQLEnd .= ")";
+        if ( $Tag->{Tag} =~ /^Table(Create)?(IfNotExists)?$/ ) {
+            my $IfNotExists = $2;
+
+            if ( $Tag->{TagType} eq 'Start' ) {
+                $SQLStart .= "CREATE TABLE $Tag->{Name} (\n";
+                $TableName = $Tag->{Name};
+            }
+            elsif ( $Tag->{TagType} eq 'End' ) {
+                $SQLEnd .= ')';
+            }
         }
         elsif ( $Tag->{Tag} eq 'Column' && $Tag->{TagType} eq 'Start' ) {
             push @Column, $Tag;
@@ -494,11 +486,13 @@ sub TableAlter {
 
             # set default as null
             push @SQL, "ALTER TABLE $Table ALTER $Tag->{NameNew} DROP NOT NULL";
-
             # investigate the default value
             my $Default = '';
             if ( $Tag->{Type} =~ /int/i ) {
                 $Default = defined $Tag->{Default} ? $Tag->{Default} : 0;
+            }
+            elsif ( $Tag->{Type} =~ /(date|time)/i ) {
+                $Default = defined $Tag->{Default} ? $Tag->{Default} : '1970-01-01 00:00:00';
             }
             else {
                 $Default = defined $Tag->{Default} ? "'$Tag->{Default}'" : "''";

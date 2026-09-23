@@ -90,6 +90,9 @@ sub Search {
     # check params
     return if ( !$Self->_CheckSearchParams( %Param ) );
 
+    # get SupportedAttributes
+    my $SupportedAttributes = $Self->GetSupportedAttributes();
+
     # check for needed joins
     my $TableAlias = 'xst_left' . ( $Param{Flags}->{JoinMap}->{ $Param{Search}->{Field} } // '' );
     my @SQLJoin = ();
@@ -129,8 +132,7 @@ sub Search {
             Value    => $JoinRestrictionValue
         );
 
-        my $SupportedAttributes = $Self->GetSupportedAttributes();
-        my @XMLType     = map{"ITSM::ConfigItem::$_"} @{$SupportedAttributes->{$Param{Search}->{Field}}->{ClassID}};
+        my @XMLType = map{"ITSM::ConfigItem::$_"} @{$SupportedAttributes->{$Param{Search}->{Field}}->{ClassID}};
 
         if ( $Param{Flags}->{PreviousVersionSearch} ) {
             my @XMLTypeArchiv = map{"ITSM::ConfigItem::Archiv::$_"} @{$SupportedAttributes->{$Param{Search}->{Field}}->{ClassID}};
@@ -150,6 +152,21 @@ sub Search {
         );
 
         $Param{Flags}->{JoinMap}->{ $Param{Search}->{Field} } = $Count;
+    }
+
+    # cut time from date values for search
+    if (
+        $SupportedAttributes->{ $Param{Search}->{Field} }->{ValueType}
+        && $SupportedAttributes->{ $Param{Search}->{Field} }->{ValueType} eq 'DATE'
+    ) {
+        if ( IsArrayRef( $Param{Search}->{Value} ) ) {
+            for my $Value ( @{ $Param{Search}->{Value} } ) {
+                $Value =~ s/\s.+$//;
+            }
+        }
+        else {
+            $Param{Search}->{Value} =~ s/\s.+$//;
+        }
     }
 
     # prepare condition

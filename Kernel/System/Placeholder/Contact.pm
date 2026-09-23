@@ -70,7 +70,9 @@ sub _Replace {
                 $Contact{Login} = $Contact{AssignedUserID} ? $Kernel::OM->Get('User')->UserLookup(
                     UserID => $Contact{AssignedUserID},
                 ) : '',
-                $Contact{UserLogin} = $Contact{Login};
+                $Contact{UserLogin}     = $Contact{Login};
+                $Contact{UserFirstname} = $Contact{Firstname};
+                $Contact{UserLastname}  = $Contact{Lastname};
             }
 
             # HTML quoting of content

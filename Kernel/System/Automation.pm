@@ -206,9 +206,10 @@ sub ExecuteJobsForEvent {
 
             $ExecutedJobCount++;
             my $Result = $AutomationObject->JobExecute(
-                ID => $JobID,
-                Async => $Job{IsAsynchronous},
                 %Param,
+                ID           => $JobID,
+                Async        => $Job{IsAsynchronous},
+                IsEventBased => 1,
             );
             if ( $Self->{Debug} ) {
                 $Self->_Debug(sprintf "  ExecuteJobsForEvent: executed job \"%s\" in %i ms", $Job{Name}, (time() - $JobStartTime) * 1000);
@@ -326,21 +327,20 @@ sub _Log {
     # check needed stuff
     for (qw(Message Priority UserID)) {
         if ( !$Param{$_} ) {
-            if ( !$Param{Silent} ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Need $_!",
-                );
-            }
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!",
+                Silent   => $Param{Silent}
+            );
             return;
         }
     }
 
     # check desired log level
-    my $LogObject = $Kernel::OM->Get('Log');
-    my $MinimumLogLevel = $Self->{MinimumLogLevel} || 'error';
+    my $LogObject          = $Kernel::OM->Get('Log');
+    my $MinimumLogLevel    = $Self->{MinimumLogLevel} || 'error';
     my $MinimumLogLevelNum = $LogObject->GetNumericLogLevel( Priority => $MinimumLogLevel);
-    my $PriorityNum = $LogObject->GetNumericLogLevel( Priority => $Param{Priority} );
+    my $PriorityNum        = $LogObject->GetNumericLogLevel( Priority => $Param{Priority} );
     return 1 if $PriorityNum < $MinimumLogLevelNum;
 
     my %LogData;
@@ -383,6 +383,16 @@ sub _Log {
     }
 
     my $Type = $LogData{Job}->{Type} || $LogData{Macro}->{Type} || 'Default';
+
+    # sub-macros must use the parent type to make sure the logs are going to the correct destination
+    # but we should not override the job type
+    if ( IsArrayRefWithData($Self->{ParentMacroID}) && !$LogData{Job}->{Type} ) {
+        my $ParentMacroID = $Self->{ParentMacroID}->[0];
+        my %ParentMacro   = $Self->MacroGet(ID => $ParentMacroID);
+        if ( %ParentMacro && $ParentMacro{Type} ) {
+            $Type = $ParentMacro{Type};
+        }
+    }
 
     # execute logging handler
     my $LogHandler = $Self->{LogHandler}->{$Type} || $Self->{LogHandler}->{Default};

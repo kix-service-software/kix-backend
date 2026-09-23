@@ -29,6 +29,16 @@ Kernel::API::Operation::Ticket::ArticleSearch - API Ticket Article Search Operat
 
 =cut
 
+sub Init {
+    my ( $Self, %Param ) = @_;
+
+    my $Result = $Self->SUPER::Init(%Param);
+
+    $Self->{HandleSortInCORE} = 1;
+
+    return $Result;
+}
+
 =item ParameterDefinition()
 
 define parameter preparation and check for this operation
@@ -116,12 +126,16 @@ sub Run {
         # get already prepared Article data from ArticleGet operation
         my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::Ticket::ArticleGet',
+            IgnoreParentPermissions  => 1,
             SuppressPermissionErrors => 1,
             Data                     => {
-                TicketID               => $Param{Data}->{TicketID},
-                ArticleID              => join(',', @ArticleIndex),
-                include                => $Param{Data}->{include},
-                expand                 => $Param{Data}->{expand}
+                TicketID             => $Param{Data}->{TicketID},
+                ArticleID            => join(',', @ArticleIndex),
+                DynamicFieldFilter   => $Param{Data}->{DynamicFieldFilter},
+                HTMLBodyAsAttachment => $Param{Data}->{HTMLBodyAsAttachment},
+                NoInlineAttachments  => $Param{Data}->{NoInlineAttachments},
+                include              => $Param{Data}->{include},
+                expand               => $Param{Data}->{expand}
             }
         );
 

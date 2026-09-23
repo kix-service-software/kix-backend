@@ -37,6 +37,8 @@ sub GetFilterHandler {
         'ToBase64'          => \&_ToBase64,
         'FromBase64'        => \&_FromBase64,
         'AsConditionString' => \&_AsConditionString,
+        'IfNull'            => \&_IfNull,
+        'TranslateTo'       => \&_TranslateTo,
     );
 
     return %Handler;
@@ -155,6 +157,59 @@ sub _AsConditionString {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "\"$Param{Filter}\" need string!"
+        );
+    }
+
+    return $Param{Value};
+}
+
+sub _IfNull {
+    my ( $Self, %Param ) = @_;
+
+    if ( IsStringWithData( $Param{Parameter} ) ) {
+        if ( !defined $Param{Value} ) {
+            $Param{Value} = $Param{Parameter};
+        }
+    }
+    else {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "\"$Param{Filter}\" has no parameter!"
+        );
+    }
+
+    return $Param{Value};
+}
+
+sub _TranslateTo {
+    my ( $Self, %Param ) = @_;
+
+    if ( IsStringWithData( $Param{Parameter} ) ) {
+        # check if language exists
+        my $LanguagesRef = $Kernel::OM->Get('Config')->Get('DefaultUsedLanguages');
+        if ( !$LanguagesRef->{ $Param{Parameter} } ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "\"$Param{Filter}\" uses non-existent target language!"
+            );
+            return $Param{Value};
+        }
+
+        if ( IsString( $Param{Value} ) ) {
+            my $LanguageObject = $Kernel::OM->CreateOnce('Language', { UserLanguage => $Param{Parameter} });
+            $Param{Value} = $LanguageObject->Translate($Param{Value})
+        }
+        else {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "\"$Param{Filter}\" need string!"
+            );
+        }
+    }
+    else {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "\"$Param{Filter}\" has no target language!"
         );
     }
 

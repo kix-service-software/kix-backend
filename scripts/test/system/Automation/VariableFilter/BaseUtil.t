@@ -63,6 +63,8 @@ else {
             'ToBase64',
             'FromBase64',
             'AsConditionString',
+            'IfNull',
+            'TranslateTo',
         ],
         'GetFilterHandler()',
         1
@@ -458,6 +460,97 @@ SU1FLU5hY2hyaWNodGVu',
         Value     => '$Test,%Test,@Test,\'Test\'',
         Parameter => undef,
         Expected  => "'\$Test,\%Test,\@Test,\\\'Test\\\''"
+    },
+    {
+        Name      => 'IfNull: undef value',
+        Handler   => 'IfNull',
+        Value     => undef,
+        Parameter => 'test',
+        Expected  => 'test'
+    },
+    {
+        Name      => 'IfNull: undef parameter',
+        Handler   => 'IfNull',
+        Value     => '',
+        Parameter => undef,
+        Expected  => ''
+    },
+    {
+        Name      => 'IfNull: value is HasRef',
+        Handler   => 'IfNull',
+        Value     => {},
+        Parameter => 'test',
+        Expected  => {}
+    },
+    {
+        Name      => 'IfNull: value is ArrayRef',
+        Handler   => 'IfNull',
+        Value     => [],
+        Parameter => 'test',
+        Expected  => []
+    },
+    {
+        Name      => 'IfNull: value is StringRef',
+        Handler   => 'IfNull',
+        Value     => \'',
+        Parameter => 'test',
+        Expected  => \''
+    },
+    {
+        Name      => 'TranslateTo: undef value',
+        Handler   => 'TranslateTo',
+        Value     => undef,
+        Parameter => 'de',
+        Expected  => undef
+    },
+    {
+        Name      => 'TranslateTo: empty value',
+        Handler   => 'TranslateTo',
+        Value     => '',
+        Parameter => 'de',
+        Expected  => ''
+    },
+    {
+        Name      => 'TranslateTo: missing target language',
+        Handler   => 'TranslateTo',
+        Value     => '1 very high',
+        Parameter => undef,
+        Expected  => '1 very high'
+    },
+    {
+        Name      => 'TranslateTo: non-existent target language',
+        Handler   => 'TranslateTo',
+        Value     => '1 very high',
+        Parameter => 'es',
+        Expected  => '1 very high'
+    },
+    {
+        Name      => 'TranslateTo: value is HashRef',
+        Handler   => 'TranslateTo',
+        Value     => {},
+        Parameter => undef,
+        Expected  => {}
+    },
+    {
+        Name      => 'TranslateTo: value is ArrayRef',
+        Handler   => 'TranslateTo',
+        Value     => [],
+        Parameter => undef,
+        Expected  => []
+    },
+    {
+        Name      => 'TranslateTo: value is StringRef',
+        Handler   => 'TranslateTo',
+        Value     => \'',
+        Parameter => undef,
+        Expected  => \''
+    },
+    {
+        Name      => 'TranslateTo: simple string',
+        Handler   => 'TranslateTo',
+        Value     => '1 very high',
+        Parameter => 'de',
+        Expected  => '1 sehr hoch'
     }
 );
 for my $Test ( @Tests ) {

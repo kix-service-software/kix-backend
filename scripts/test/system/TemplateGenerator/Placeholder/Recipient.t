@@ -18,7 +18,7 @@ my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 # begin transaction on database
 $Helper->BeginWork();
 
-my $TestUser    = $Helper->TestUserCreate(
+my $TestUser = $Helper->TestUserCreate(
     Roles => [
         'Ticket Agent'
     ]
@@ -58,10 +58,8 @@ for my $Prefix (
     }
 }
 
-my $TestContactID = $Helper->TestContactCreate();
-
 my %Contact = $Kernel::OM->Get('Contact')->ContactGet(
-    ID => $TestContactID
+    UserID => $User{UserID}
 );
 
 if ( IsHashRefWithData($Contact{Preferences}) ) {
@@ -99,6 +97,30 @@ for my $Prefix (
     }
 }
 
+my %Organisation = $Kernel::OM->Get('Organisation')->OrganisationGet(
+    ID => $Contact{PrimaryOrganisationID}
+);
+
+# try by ID and some additional contact placeholders
+my %Expections = (
+    Login => $User{UserLogin},
+    Firstname => $Contact{Firstname},
+    UserFirstname => $Contact{Firstname},
+    UserLastname => $Contact{Lastname},
+    PrimaryOrganisation => $Organisation{Name},
+    PrimaryOrganisationNumber => $Organisation{Number}
+);
+for my $Attribute ( keys %Expections ) {
+    push(
+        @UnitTests,
+        {
+            TestName    => "Placeholder (by ID check): <" . $Attribute . ">",
+            Test        => "<KIX_NOTIFICATIONRECIPIENT_" . $Attribute . ">",
+            Expection   => defined $Expections{$Attribute} ? $Expections{$Attribute} : q{-},
+        }
+    );
+}
+
 _TestRun(
     Tests => \@UnitTests
 );
@@ -109,7 +131,9 @@ sub _TestRun {
     for my $Test ( @{$Param{Tests}} ) {
         my $Result = $Kernel::OM->Get('TemplateGenerator')->ReplacePlaceHolder(
             RichText    => 1,
-            Data        => {},
+            Data        => {
+                RecipientID => $User{UserID}
+            },
             Text        => $Test->{Test},
             Recipient   => $Test->{Recipient},
             UserID      => 1

@@ -97,7 +97,7 @@ sub Read {
         # $Content = ...
     }
 
-    return if !$Content;
+    return if ( !defined( $Content ) );
     return $Content;
 }
 

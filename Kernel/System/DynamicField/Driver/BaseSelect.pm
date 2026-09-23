@@ -291,49 +291,6 @@ sub ValueValidate {
     return 1;
 }
 
-sub ValueIsDifferent {
-    my ( $Self, %Param ) = @_;
-
-    # special cases where the values are different but they should be reported as equals
-    if (
-        !defined $Param{Value1}
-        && (
-            (
-                ref $Param{Value2} eq 'ARRAY'
-                && !IsArrayRefWithData( $Param{Value2} )
-            )
-            || (
-                ref $Param{Value2} eq ''
-                && !IsStringWithData( $Param{Value2} )
-            )
-        )
-    ) {
-        return
-    }
-
-    if (
-        !defined $Param{Value2}
-        && (
-            (
-                ref $Param{Value1} eq 'ARRAY'
-                && !IsArrayRefWithData( $Param{Value1} )
-            )
-            || (
-                ref $Param{Value1} eq ''
-                && !IsStringWithData( $Param{Value1} )
-            )
-        )
-    ) {
-        return
-    }
-
-    # compare the results
-    return DataIsDifferent(
-        Data1 => \$Param{Value1},
-        Data2 => \$Param{Value2}
-    );
-}
-
 sub DisplayValueRender {
     my ( $Self, %Param ) = @_;
 

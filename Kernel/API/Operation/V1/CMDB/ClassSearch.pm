@@ -29,6 +29,16 @@ Kernel::API::Operation::CMDB::ClassSearch - API CMDB Search Operation backend
 
 =cut
 
+sub ParameterDefinition {
+    my ( $Self, %Param ) = @_;
+
+    return {
+        'requiredPermission' => {
+            Type     => 'HASH',
+        }
+    }
+}
+
 =item Run()
 
 perform ClassSearch Operation. This will return a class list.
@@ -86,6 +96,73 @@ sub Run {
         }
     }
 
+    # check for base permissions
+    if (
+        $ClassIDList
+        && IsHashRefWithData($Param{Data}->{requiredPermission})
+        && $Param{Data}->{requiredPermission}->{Permission}
+    ) {
+        my %BasePermissionClassIDs;
+
+        my $UserID = $Self->{Authorization}->{UserID};
+        if (
+            $Param{Data}->{requiredPermission}->{Object}
+            && $Param{Data}->{requiredPermission}->{Object} eq 'User'
+        ) {
+            # return empty list, when no user id is given for permission
+            if ( !$Param{Data}->{requiredPermission}->{ObjectID} ) {
+                return $Self->_Success(
+                    ConfigItemClass => [],
+                );
+            }
+            $UserID = $Param{Data}->{requiredPermission}->{ObjectID};
+        }
+
+        my $Result = $Kernel::OM->Get('ITSMConfigItem')->BasePermissionRelevantObjectIDList(
+            UserID       => $UserID,
+            UsageContext => $Self->{Authorization}->{UserType},
+            Permission   => $Param{Data}->{requiredPermission}->{Permission},
+        );
+
+        if ( IsArrayRefWithData($Result) ) {
+            # get intersection of avaiable ConfigItemClass list and base permission list
+            my @ClassIDs = split(',', $ClassIDList);
+
+            my @CombinedList = $Kernel::OM->Get('Main')->GetCombinedList(
+                ListA => $Result,
+                ListB => \@ClassIDs,
+                Union => 0,
+            );            
+
+            %BasePermissionClassIDs = (
+                %BasePermissionClassIDs,
+                map { $_ => 1 } @CombinedList,
+            );
+        }
+
+        if ( %BasePermissionClassIDs ) {
+            $ClassIDList = join(',', sort { $a <=> $b } keys %BasePermissionClassIDs);
+        } elsif ( $Result ne 1 ) {
+            $ClassIDList = '';
+        }
+        else {
+            my $HasPermission = $Kernel::OM->Get('User')->CheckResourcePermission(
+                UserID              => $UserID,
+                UsageContext        => $Self->{Authorization}->{UserType},
+                Target              => '/system/cmdb/classes',
+                RequestedPermission => $Param{Data}->{requiredPermission}->{Permission},
+            );
+
+            if ( !$HasPermission ) {
+                $ClassIDList = '';
+            }
+        }
+
+        $Self->AddCacheKeyExtension(
+            Extension => ['requiredPermission']
+        );
+    }
+
 	# get already prepared CI Class data from ClassGet operation
     if ( $ClassIDList ) {
         my $GetResult = $Self->ExecOperation(
@@ -109,6 +186,10 @@ sub Run {
                 ConfigItemClass => \@ResultList,
             )
         }
+
+        $Self->AddCacheKeyExtension(
+            Extension => ['requiredPermission']
+        );
     }
 
     # return result

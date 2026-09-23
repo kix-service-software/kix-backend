@@ -56,16 +56,20 @@ if ($RoleIDAdmin && $RoleIDTicket && $RoleIDQueue3) {
                     Name   => 'Only allowed roles + given user id exception',
                     UserID => $LoginUserIDMapping{UserSearchTestAdmin}
                 },
-                # FIXME: currently not usable - see KIX2018-11535
-                # {
-                #     Result      => ["UserSearchTestTicketQueue3"],
-                #     Name        => 'Only allowed roles + queue 3',
-                #     ObjectID    => 3
-                # },
+                {
+                    Result      => ["UserSearchTestAdminTicket", "UserSearchTestTicket", "UserSearchTestTicketQueue3"],
+                    Name        => 'Only allowed roles + queue 3',
+                    ObjectID    => 3
+                },
                 {
                     Result   => ["UserSearchTestAdminTicket", "UserSearchTestTicket"],
                     Name     => 'Only allowed roles + queue 8',
                     ObjectID => 8
+                },
+                {
+                    Result   => ["UserSearchTestAdminTicket", "UserSearchTestTicket", "UserSearchTestTicketQueue3"],
+                    Name     => 'Only allowed roles + queue [3,8]',
+                    ObjectID => [3,8]
                 },
             );
 
@@ -89,16 +93,20 @@ if ($RoleIDAdmin && $RoleIDTicket && $RoleIDQueue3) {
                     Name   => 'No roles forbidden + given user id exception',
                     UserID => $LoginUserIDMapping{UserSearchTestAdmin}
                 },
-                # FIXME: currently not usable - see KIX2018-11535
-                # {
-                #     Result      => ["UserSearchTestAdmin", "UserSearchTestAdminNobase", "UserSearchTestTicketQueue3", "UserSearchTestAdminTicketBaseNone"],
-                #     Name        => 'No roles forbidden + queue 3',
-                #     ObjectID    => 3
-                # },
+                {
+                    Result      => ["UserSearchTestAdmin", "UserSearchTestAdminNobase", "UserSearchTestTicketQueue3", "UserSearchTestAdminTicketBaseNone", "UserSearchTestTicket", "UserSearchTestAdminTicket"],
+                    Name        => 'No roles forbidden + queue 3',
+                    ObjectID    => 3
+                },
                 {
                     Result   => ["UserSearchTestAdmin", "UserSearchTestAdminNobase", "UserSearchTestTicket", "UserSearchTestAdminTicket", "UserSearchTestAdminTicketBaseNone"],
                     Name     => 'No roles forbidden + queue 8',
                     ObjectID => 8
+                },
+                {
+                    Result   => ["UserSearchTestAdmin", "UserSearchTestAdminNobase", "UserSearchTestTicket", "UserSearchTestAdminTicket", "UserSearchTestAdminTicketBaseNone", "UserSearchTestTicketQueue3"],
+                    Name     => 'No roles forbidden + queue [3,8]',
+                    ObjectID => [3,8]
                 },
             );
 
@@ -365,8 +373,8 @@ sub _DoTests {
             IsAgent         => 1,
             ValidID         => 1,
             HasPermission   => {
-                Object => 'Queue',
-                ObjectID => $Test->{ObjectID},
+                Object     => 'Queue',
+                ObjectID   => $Test->{ObjectID},
                 Permission => 'WRITE,READ'
             },
             ExcludeUsersByRoleIDsIgnoreUserIDs => $Test->{UserID} ? [$Test->{UserID}] : undef

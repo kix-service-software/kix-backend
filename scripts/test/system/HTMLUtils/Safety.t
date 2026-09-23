@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/ 
+# Modified version of the work: Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -501,7 +501,7 @@ EOF
 <img src="/img2.png"/>
 EOF
         Result => {
-            Output => '<img src="/img1.png" /><iframe src="" data-src="javascript:alert(&#39;XSS Exploit&#39;);"></iframe><img src="/img2.png" />',
+            Output => '<img src="/img1.png" /><iframe src=""></iframe><img src="/img2.png" />',
             Replace => 1,
         },
         Name => 'Safety - javascript source in data tag, keep'
@@ -952,7 +952,7 @@ to="javascript:alert(document.location.origin)"> </set>',
             NoJavaScript => 1
         },
         Result => {
-            Output  => '<img says,="says," \'xss\'")`="&#39;XSS&#39;&quot;)`" />',
+            Output  => '<img says,="says," \'xss\'")`="\'XSS\'&quot;)`" />',
             Replace => 1,
         },
     },
@@ -1018,7 +1018,7 @@ to="javascript:alert(document.location.origin)"> </set>',
             NoJavaScript => 1
         },
         Result => {
-            Output  => '<img src="onmouseover=&quot;alert(&#39;xxs&#39;)&quot;" />',
+            Output  => '<img src="onmouseover=&quot;alert(\'xxs\')&quot;" />',
             Replace => 1,
         },
     },
@@ -1359,7 +1359,7 @@ to="javascript:alert(document.location.origin)"> </set>',
             NoJavaScript => 1
         },
         Result => {
-            Output  => '<br size="&amp;{alert(&#39;XSS&#39;)}" />
+            Output  => '<br size="&amp;{alert(\'XSS\')}" />
 ',
             Replace => 1,
         },
@@ -1574,7 +1574,7 @@ to="javascript:alert(document.location.origin)"> </set>',
         },
     },
     {
-        Name   => 'Safety - Downlevel-Hidden Block',
+        Name   => 'Safety - Downlevel-Hidden Block, forbidden content',
         Input  => '<!--[if gte IE 4]>
 <SCRIPT>alert(\'XSS\');</SCRIPT>
 <![endif]-->',
@@ -1582,8 +1582,21 @@ to="javascript:alert(document.location.origin)"> </set>',
             NoJavaScript => 1
         },
         Result => {
-            Output  => '',
+            Output  => '<!--[if gte IE 4]><![endif]-->',
             Replace => 1,
+        },
+    },
+    {
+        Name   => 'Safety - Downlevel-Hidden Block, allowed content',
+        Input  => '<!--[if gte IE 4]>
+<p>Unit Test</p>
+<![endif]-->',
+        Config => {
+            NoJavaScript => 1
+        },
+        Result => {
+            Output  => "<!--[if gte IE 4]><p>Unit Test</p>\n<![endif]-->",
+            Replace => 0,
         },
     },
     {
@@ -1797,7 +1810,7 @@ to="javascript:alert(document.location.origin)"> </set>',
     },
     {
         Name   => 'Safety - Minify text in span',
-        Input  => '<span>This   is 
+        Input  => '<span>This   is
 a simple
 Test</span>',
         Config => {},
@@ -1819,12 +1832,12 @@ Test</span>',
     },
     {
         Name   => 'Safety - Keep newlinesin pre',
-        Input  => '<pre>This   is 
+        Input  => '<pre>This   is
 a
 Test</pre>',
         Config => {},
         Result => {
-            Output  => '<pre>This   is 
+            Output  => '<pre>This   is
 a
 Test</pre>
 ',

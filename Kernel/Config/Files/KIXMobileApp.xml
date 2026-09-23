@@ -103,4 +103,25 @@
         </Setting>
     </ConfigItem>
 
+    <ConfigItem AccessLevel="internal" Name="KIXMobileApp::TicketMoreInformation" Required="0" Valid="1">
+        <Description Translatable="1">Defines which ticket attributes are shown in the ticket detail view section for more information. The order in this configuration is shown top-down in the app.</Description>
+        <Group>KIXMobileApp</Group>
+        <SubGroup>Core::Ticket</SubGroup>
+        <Context>mobile-app</Context>
+        <Setting>
+            <Array>
+                <Item>TicketNumber</Item>
+                <Item>State</Item>
+                <Item>Queue</Item>
+                <Item>Owner</Item>
+                <Item>Responsible</Item>
+                <Item>Created</Item>
+                <Item>DynamicField_CloseCode</Item>
+                <Item>DynamicField_ChildTickets</Item>
+                <Item>DynamicField_ParentTickets</Item>
+                <Item>DynamicField_PlannedEffort</Item>
+            </Array>
+        </Setting>
+    </ConfigItem>
+
 </kix_config>

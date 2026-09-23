@@ -67,6 +67,7 @@ sub GetBaseDef {
         From    => ['ticket st'],
         OrderBy => ['st.id ASC'],
         Extract => {
+            TicketID  => 1,
             ArticleID => 1
         }
     };
@@ -89,6 +90,9 @@ sub GetPermissionDef {
 
     # init collection for permission search parts
     my @PermissionSearchParts = ();
+
+    # init flag for relative searches
+    my $IsRelative = 0;
 
     # get allowed queues by base permission
     my $QueueIDs = $Kernel::OM->Get('Ticket')->BasePermissionRelevantObjectIDList(
@@ -154,11 +158,16 @@ sub GetPermissionDef {
 
         my $Result = $BackendObject->Run(
             %Param,
+            TicketID               => $Param{Flags}->{TicketID},
             BasePermissionQueueIDs => $QueueIDs,
             UserID                 => $Param{UserID},
             ReturnType             => 'ObjectSearch',
         );
         next PERMISSION_MODULE if ( !IsHashRefWithData( $Result ) );
+
+        if ( $Result->{IsRelative} ) {
+            $IsRelative = delete( $Result->{IsRelative} );
+        }
 
         push( @PermissionSearchParts, $Result );
     }
@@ -166,9 +175,10 @@ sub GetPermissionDef {
     # get permission search def from backend
     return $Self->GetSearchDef(
         %Param,
-        Search => {
+        Search     => {
             OR => \@PermissionSearchParts
-        }
+        },
+        IsRelative => $IsRelative
     );
 }
 

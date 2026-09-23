@@ -172,12 +172,13 @@ sub GetSearchDef {
 
     # init sql def hash
     my %SQLDef = (
-        Select  => [],
-        From    => [],
-        Join    => [],
-        Where   => [],
-        Having  => [],
-        OrderBy => [],
+        Select     => [],
+        From       => [],
+        Join       => [],
+        Where      => [],
+        Having     => [],
+        OrderBy    => [],
+        IsRelative => 0
     );
 
     # generate SQL from attribute modules
@@ -357,6 +358,11 @@ sub GetSearchDef {
         }
     }
 
+    # set "IsRelative" when given by param
+    if ( $Param{IsRelative} ) {
+        $SQLDef{IsRelative} = $Param{IsRelative};
+    }
+
     # check requires
     for my $Require ( @Requires ) {
         if ( !$AttributesAND{ $Require } ) {
@@ -401,8 +407,9 @@ sub GetFulltextDef {
 
     # init def hash
     my %SQLDef = (
-        Columns => [],
-        Join    => []
+        Columns       => [],
+        StaticColumns => [],
+        Join          => []
     );
 
     # check required search parameter
@@ -500,6 +507,24 @@ sub GetFulltextDef {
                     @{ $SQLDef{Columns} },
                     $AttributeDef->{Column}
                 );
+            }
+
+            if (
+                IsHashRefWithData( $AttributeDef->{FulltextDef} )
+                && $AttributeDef->{FulltextDef}->{IsStaticSearch}
+            ) {
+                if ( IsArrayRef( $AttributeDef->{Column} ) ) {
+                    push(
+                        @{ $SQLDef{StaticColumns} },
+                        @{ $AttributeDef->{Column} }
+                    );
+                }
+                else {
+                    push(
+                        @{ $SQLDef{StaticColumns} },
+                        $AttributeDef->{Column}
+                    );
+                }
             }
         }
 

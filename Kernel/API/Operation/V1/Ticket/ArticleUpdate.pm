@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/ 
+# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -427,16 +427,6 @@ sub _ArticleUpdate {
                 $Attachment->{Content} = MIME::Base64::decode_base64($Attachment->{Content});
                 $Attachment->{Disposition} //= 'attachment';
             }
-            # extract embedded images from file-2
-            elsif (
-                $Attachment->{ContentType} eq "text/html; charset=\"$Article->{Charset}\""
-                && $Attachment->{Filename} eq 'file-2'
-            ) {
-                $Kernel::OM->Get('HTMLUtils')->EmbeddedImagesExtract(
-                    DocumentRef    => \$Attachment->{Content},
-                    AttachmentsRef => $Article->{Attachments},
-                );
-            }
 
             # write file to backend
             my $UpdateSuccessful = $Kernel::OM->Get('Ticket')->ArticleWriteAttachment(
@@ -470,29 +460,39 @@ sub _ArticleUpdate {
 
     # check if we have to update the TimeUnit
     if ( IsStringWithData($Article->{TimeUnit}) ) {
-        # delete old time account values
-        my $DeleteSuccess = $Kernel::OM->Get('Ticket')->TicketAccountedTimeDelete(
-            TicketID  => $Param{TicketID},
-            ArticleID => $Param{ArticleID},
+        my $Success;
+        my $TimeAccountingID = $Kernel::OM->Get('TimeAccounting')->TimeAccountingExists(
+            TicketID         => $Param{TicketID},
+            ArticleID        => $Param{ArticleID},
+            UserID           => $Param{UserID},
+            Silent           => 1
         );
-        if ( !$DeleteSuccess ) {
-            return $Self->_Error(
-                Code         => 'Object.UnableToUpdate',
-                Message      => "Unable to update article (delete current TimeUnit)",
+        # update time account value only if exists an entry
+        if ( $TimeAccountingID ) {
+            $Success = $Kernel::OM->Get('TimeAccounting')->TimeAccountingUpdate(
+                TimeAccountingID => $TimeAccountingID,
+                TimeUnit         => $Article->{TimeUnit},
+                UserID           => $Param{UserID},
             );
         }
-
-        # set new time account value
-        my $UpdateSuccess = $Kernel::OM->Get('Ticket')->TicketAccountTime(
-            TicketID  => $Param{TicketID},
-            ArticleID => $Param{ArticleID},
-            TimeUnit  => $Article->{TimeUnit},
-            UserID    => $Param{UserID},
-        );
-        if ( !$UpdateSuccess ) {
+        elsif ( $Article->{TimeUnit} ) {
+            $Success = $Kernel::OM->Get('TimeAccounting')->TimeAccountingCreate(
+                TimeUnit           => $Article->{TimeUnit},
+                UserID             => $Param{UserID},
+                ArticleID          => $Param{ArticleID},
+                TicketID           => $Param{TicketID},
+                IsInvoiced         => 0,
+                StartTime          => $Kernel::OM->Get('Time')->CurrentTimestamp(),
+                ExecutingContactID => $Kernel::OM->Get('Contact')->ContactLookup( UserID => $Param{UserID} )
+            );
+        }
+        else {
+            $Success = 1;
+        }
+        if ( !$Success ) {
             return $Self->_Error(
                 Code         => 'Object.UnableToUpdate',
-                Message      => "Unable to update article (set new TimeUnit)",
+                Message      => "Unable to update article (update TimeUnit)",
             );
         }
     }

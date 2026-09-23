@@ -7,7 +7,6 @@
 
   Scenario: get the list of existing console command
     When I query the collection of console
-#    Then the response content
     Then the response code is 200
 #    And the response object is ConsoleCommandCollectionResponse
 

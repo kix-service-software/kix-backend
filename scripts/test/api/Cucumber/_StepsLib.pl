@@ -199,6 +199,22 @@ Then qr/this attribute "(.*?)" of the "(.*?)" item (\d+) is "(.*?)"$/, sub {
     is(S->{ResponseContent}->{$2}->{$1}, $4, 'Check attribute value in response');
 };
 
+#=============diff for plugins attribute ===============================
+
+Then qr/the response contains the following object items "(.*?)"$/, sub {
+    my $Object = $1;
+    my $Index = 0;
+
+    foreach my $Row ( @{ C->data } ) {
+        my $Name = $Row->{Name};
+        foreach my $Attribute ( keys %{$Row}) {
+              my ($GHash) = grep { $_->{Name} eq $Name } @{ S->{ResponseContent}->{$Object} };
+              is($GHash->{$Attribute}, $Row->{$Attribute}, 'Check attribute value in response');
+        }
+        $Index++
+    }
+};
+
 #========================filter================================
 # compare filters
 #Then qr/the initial Filter "(.*?)" of the "(.*?)" item (\d+) is "(.*?)"$/, sub {

@@ -224,6 +224,11 @@ sub PostValueSet {
         TicketID => $Article{TicketID}
     );
 
+    # clear article cache
+    $TicketObject->_ArticleCacheClear(
+        ArticleID => $Param{ObjectID}
+    );
+
     # trigger event
     $TicketObject->EventHandler(
         Event => 'ArticleDynamicFieldUpdate_' . $Param{DynamicFieldConfig}->{Name},

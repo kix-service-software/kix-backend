@@ -13,7 +13,7 @@ package Kernel::System::Ticket::BasePermission;
 use strict;
 use warnings;
 
-use Kernel::System::Role::Permission qw(:all);
+use Kernel::System::Role::Permission;
 use Kernel::System::VariableCheck qw(:all);
 
 our $ObjectManagerDisabled = 1;

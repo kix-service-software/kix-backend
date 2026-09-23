@@ -150,10 +150,8 @@ perform ArticleCreate Operation. This will return the created ArticleID.
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my $TicketObject = $Kernel::OM->Get('Ticket');
-
     # get ticket data
-    my %Ticket = $TicketObject->TicketGet(
+    my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
         TicketID => $Param{Data}->{TicketID},
     );
 
@@ -201,6 +199,7 @@ sub Run {
         Ticket   => \%Ticket,
         Article  => $Article,
         UserID   => $Self->{Authorization}->{UserID},
+        UserType => $Self->{Authorization}->{UserType},
     );
 }
 
@@ -239,142 +238,17 @@ sub _ArticleCreate {
     my $Ticket  = $Param{Ticket};
     my $Article = $Param{Article};
 
-    # get ticket object
-    my $TicketObject = $Kernel::OM->Get('Ticket');
-
-    # set Article From
-    my $From;
-    if ( $Article->{From} ) {
-        $From = $Article->{From};
-    } else {
-        if (!$Article->{SenderType}) {
-            $Article->{SenderType} = $Kernel::OM->Get('Ticket')->ArticleSenderTypeLookup(
-                SenderTypeID => $Article->{SenderTypeID},
-            );
-        }
-
-        # set From by contact if "send" from contact else ArticleCreate in core will handle From
-        if ($Article->{SenderType} ne 'agent') {
-            # determin relevant contact
-            my $ContactID;
-            # check if request is from customer user
-            if ( $Self->{Authorization}->{UserType} eq 'Customer' ) {
-                $ContactID = $Kernel::OM->Get('Contact')->ContactLookup(
-                    UserID => $Self->{Authorization}->{UserID},
-                    Silent => 1,
-                );
-            }
-
-            # when request is not from an customer user, or the user has no contact assigned, fallback to ticket contact
-            if ( !$ContactID ) {
-                $ContactID = $Ticket->{ContactID};
-            }
-
-            # get customer information
-            # with information will be used to create the ticket if customer is not defined in the
-            # database, customer ticket information need to be empty strings
-            my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
-                ID     => $ContactID,
-                Silent => 1,
-            );
-
-            # use data from contact (if contact is in database)
-            if ( IsHashRefWithData( \%ContactData ) ) {
-                $From = '"' . $ContactData{Firstname} . ' ' . $ContactData{Lastname} . '"'
-                    . ' <' . $ContactData{Email} . '>';
-            }
-            # otherwise use customer user as sent from the request (it should be an email)
-            else {
-                $From = $Ticket->{ContactID};
-            }
-        }
-    }
-
-    # set Article To
-    my $To;
-    if ( $Article->{To} ) {
-        $To = $Article->{To}
-    }
-    else {
-        if ( $Ticket->{Queue} ) {
-            $To = $Ticket->{Queue};
-        }
-        else {
-            $To = $Kernel::OM->Get('Queue')->QueueLookup(
-                QueueID => $Ticket->{QueueID},
-            );
-        }
-    }
-
-    # prepare subject if necessary
-    if (
-        !$Article->{DoNotSendEmail}
-        && (
-            $Article->{ChannelID} == 2
-            || (
-                !$Article->{ChannelID}
-                && $Article->{Channel} eq 'email'
-            )
-        )
-    ) {
-        my $Re  = $Kernel::OM->Get('Config')->Get('Ticket::SubjectRe') || '(RE|AW)';
-        my $Fwd = $Kernel::OM->Get('Config')->Get('Ticket::SubjectFwd') || '(FW|FWD)';
-        my $IsReply   = $Article->{Subject} =~ m/^$Re:/i;
-        my $IsForward = $Article->{Subject} =~ m/^$Fwd:/i;
-        $Article->{Subject} = $TicketObject->TicketSubjectBuild(
-            TicketNumber => $Ticket->{TicketNumber},
-            Subject      => $Article->{Subject},
-            Action       => $IsForward ? 'Forward' : 'Reply',
-            Type         => (!$IsReply && !$IsForward) ? 'New' : undef
-        );
-    }
-
-    # prepare attachments
-    if ( IsArrayRefWithData($Article->{Attachments}) ) {
-
-        foreach my $Attachment ( @{$Article->{Attachments}} ) {
-            $Attachment->{Content} = MIME::Base64::decode_base64( $Attachment->{Content} );
-            $Attachment->{Disposition} //= 'attachment';
-        }
-    }
+    $Article = $Self->_PrepareArticle(
+        Article => $Article,
+        Ticket  => $Ticket
+    );
 
     # create article
-    my $ArticleID = $TicketObject->ArticleCreate(
-        NoAgentNotify    => $Article->{NoAgentNotify}  || 0,
-        TicketID         => $Ticket->{TicketID},
-        ChannelID        => $Article->{ChannelID}      || '',
-        Channel          => $Article->{Channel}        || '',
-        CustomerVisible  => $Article->{CustomerVisible}, # no fallback, core handles it
-        SenderTypeID     => $Article->{SenderTypeID}   || '',
-        SenderType       => $Article->{SenderType}     || '',
-        From             => $From,
-        To               => $To,
-        Cc               => $Article->{Cc}             || '',
-        Bcc              => $Article->{Bcc}            || '',
-        ReplyTo          => $Article->{ReplyTo}        || '',
-        MessageID        => $Article->{MessageID}      || '',
-        DoNotSendEmail   => $Article->{DoNotSendEmail} || 0,
-        PlainEmail       => $Article->{PlainEmail}     || '',
-        Subject          => $Article->{Subject},
-        Body             => $Article->{Body},
-        IncomingTime     => $Article->{IncomingTime}   || '',
-        MimeType         => $Article->{MimeType}       || '',
-        Charset          => $Article->{Charset}        || '',
-        ContentType      => $Article->{ContentType}    || '',
-        UserID           => $Param{UserID},
-        HistoryType      => $Article->{HistoryType},
-        HistoryComment   => $Article->{HistoryComment} || '%%',
-        OrigHeader       => {
-            From    => $From,
-            To      => $To,
-            Subject => $Article->{Subject},
-            Body    => $Article->{Body},
-        },
-        Attachment        => $Article->{Attachments},
-        TimeUnit          => $Article->{TimeUnit},
-        InReplyTo         => $Article->{InReplyTo} || '',
-        References        => $Article->{References} || '',
-        EncryptIfPossible => $Article->{EncryptIfPossible} || 0
+    my $ArticleID = $Kernel::OM->Get('Ticket')->ArticleCreate(
+        %{$Article},
+        TicketID => $Ticket->{TicketID},
+        UserID   => $Param{UserID},
+        UserType => $Param{UserType}
     );
 
     if ( !$ArticleID ) {
@@ -414,6 +288,193 @@ sub _ArticleCreate {
         Code         => 'Object.Created',
         ArticleID    => 0 + $ArticleID,
     );
+}
+
+sub _PrepareArticle {
+    my ( $Self, %Param ) = @_;
+
+    my $Article = $Param{Article};
+
+    $Article->{To} = $Self->_PrepareTo(
+        %Param
+    );
+
+    $Article->{From} = $Self->_PrepareFrom(
+        %Param
+    );
+
+    $Article->{Subject} = $Self->_PrepareSubject(
+        %Param
+    );
+
+    $Article->{Attachment} = $Self->_PrepareAttachments(
+        %Param
+    );
+
+    # set empty string fallback
+    for my $Key (
+        qw(
+            ChannelID Channel SenderTypeID SenderType
+            Cc Bcc ReplyTo MessageID PlainEmail
+            IncomingTime MimeType Charset ContentType
+            InReplyTo References
+        )
+    ) {
+        next if $Article->{$Key};
+        $Article->{$Key} = q{};
+
+    }
+
+    # set 0 fallback
+    for my $Key (
+        qw(
+            NoAgentNotify DoNotSendEmail EncryptIfPossible
+        )
+    ) {
+        next if $Article->{$Key};
+        $Article->{$Key} = 0;
+    }
+
+    # set %% fallback
+    if ( !$Article->{HistoryComment} ) {
+        $Article->{HistoryComment} = q{%%};
+    }
+
+    # set OrigHeader
+    $Article->{OrigHeader} = {
+        From    => $Article->{From},
+        To      => $Article->{To},
+        Subject => $Article->{Subject},
+        Body    => $Article->{Body}
+    };
+
+    return $Article;
+}
+
+sub _PrepareFrom {
+    my ( $Self, %Param ) = @_;
+
+    # set Article From
+    my $From;
+    if ( $Param{Article}->{From} ) {
+        $From = $Param{Article}->{From};
+    } else {
+        if (!$Param{Article}->{SenderType}) {
+            $Param{Article}->{SenderType} = $Kernel::OM->Get('Ticket')->ArticleSenderTypeLookup(
+                SenderTypeID => $Param{Article}->{SenderTypeID},
+            );
+        }
+
+        # set From by contact if "send" from contact else ArticleCreate in core will handle From
+        if ($Param{Article}->{SenderType} ne 'agent') {
+            # determin relevant contact
+            my $ContactID;
+            # check if request is from customer user
+            if ( $Self->{Authorization}->{UserType} eq 'Customer' ) {
+                $ContactID = $Kernel::OM->Get('Contact')->ContactLookup(
+                    UserID => $Self->{Authorization}->{UserID},
+                    Silent => 1,
+                );
+            }
+
+            # when request is not from an customer user, or the user has no contact assigned, fallback to ticket contact
+            if ( !$ContactID ) {
+                $ContactID = $Param{Ticket}->{ContactID};
+            }
+
+            # get customer information
+            # with information will be used to create the ticket if customer is not defined in the
+            # database, customer ticket information need to be empty strings
+            my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
+                ID     => $ContactID,
+                Silent => 1,
+            );
+
+            # use data from contact (if contact is in database)
+            if ( IsHashRefWithData( \%ContactData ) ) {
+                $From = '"' . $ContactData{Firstname} . ' ' . $ContactData{Lastname} . '"'
+                    . ' <' . $ContactData{Email} . '>';
+            }
+            # otherwise use customer user as sent from the request (it should be an email)
+            else {
+                $From = $Param{Ticket}->{ContactID};
+            }
+        }
+    }
+
+    return $From;
+}
+
+sub _PrepareTo {
+    my ( $Self, %Param ) = @_;
+
+    # set Article To
+    my $To;
+    if ( $Param{Article}->{To} ) {
+        $To = $Param{Article}->{To}
+    }
+    else {
+        if ( $Param{Ticket}->{Queue} ) {
+            $To = $Param{Ticket}->{Queue};
+        }
+        else {
+            $To = $Kernel::OM->Get('Queue')->QueueLookup(
+                QueueID => $Param{Ticket}->{QueueID},
+            );
+        }
+    }
+
+    return $To;
+}
+
+sub _PrepareSubject {
+    my ( $Self, %Param ) = @_;
+
+    my $Subject = $Param{Article}->{Subject};
+
+    # prepare subject if necessary
+    if (
+        !$Param{Article}->{DoNotSendEmail}
+        && (
+            $Param{Article}->{ChannelID} == 2
+            || (
+                !$Param{Article}->{ChannelID}
+                && $Param{Article}->{Channel} eq 'email'
+            )
+        )
+    ) {
+        my $Re  = $Kernel::OM->Get('Config')->Get('Ticket::SubjectRe') || '(RE|AW)';
+        my $Fwd = $Kernel::OM->Get('Config')->Get('Ticket::SubjectFwd') || '(FW|FWD)';
+        my $IsReply   = $Param{Article}->{Subject} =~ m/^$Re:/i;
+        my $IsForward = $Param{Article}->{Subject} =~ m/^$Fwd:/i;
+        $Subject = $Kernel::OM->Get('Ticket')->TicketSubjectBuild(
+            TicketNumber => $Param{Ticket}->{TicketNumber},
+            Subject      => $Param{Article}->{Subject},
+            Action       => $IsForward ? 'Forward' : 'Reply',
+            Type         => (!$IsReply && !$IsForward) ? 'New' : undef
+        );
+    }
+
+    return $Subject;
+}
+
+sub _PrepareAttachments {
+    my ( $Self, %Param ) = @_;
+
+    my $Attachments = delete( $Param{Article}->{Attachments} );
+
+    # prepare attachments
+    if ( IsArrayRefWithData($Attachments) ) {
+        for my $Attachment ( @{ $Attachments } ) {
+            $Attachment->{Content} = MIME::Base64::decode_base64( $Attachment->{Content} );
+            $Attachment->{Disposition} //= 'attachment';
+        }
+    }
+    else {
+        return [];
+    }
+
+    return $Attachments;
 }
 
 1;

@@ -133,7 +133,10 @@ sub AttributePrepare {
     my $HasArticleIDSearch = 0;
     if (
         defined $Param{PrepareType}
-        && $Param{PrepareType} eq 'Condition'
+        && (
+            $Param{PrepareType} eq 'Condition'
+            || $Param{PrepareType} eq 'Fulltext'
+        )
         && $Param{Flags}->{ArticleID}
     ) {
         $HasArticleIDSearch = 1;
@@ -143,7 +146,10 @@ sub AttributePrepare {
     my $IsStaticSearch = 0;
     if (
         defined $Param{PrepareType}
-        && $Param{PrepareType} eq 'Condition'
+        && (
+            $Param{PrepareType} eq 'Condition'
+            || $Param{PrepareType} eq 'Fulltext'
+        )
         && !$HasArticleIDSearch
     ) {
         my $SearchIndexModule = $Kernel::OM->Get('Config')->Get('Ticket::SearchIndexModule');
@@ -218,42 +224,48 @@ sub AttributePrepare {
             ConditionDef => {
                 ValueType => 'NUMERIC',
                 NULLValue => 1
-            }
+            },
+            FulltextDef  => {}
         },
         ChannelID         => {
             Column       => $TableAliasPrefix . 'ta.channel_id',
             ConditionDef => {
                 ValueType => 'NUMERIC',
                 NULLValue => 1
-            }
+            },
+            FulltextDef  => {}
         },
         Channel           => {
             Column       => $TableAliasPrefix . 'tac.name',
             ConditionDef => {
                 CaseInsensitive => 1,
                 NULLValue       => 1
-            }
+            },
+            FulltextDef  => {}
         },
         SenderTypeID      => {
             Column       => $TableAliasPrefix . 'ta.article_sender_type_id',
             ConditionDef => {
                 ValueType => 'NUMERIC',
                 NULLValue => 1
-            }
+            },
+            FulltextDef  => {}
         },
         SenderType        => {
             Column       => $TableAliasPrefix . 'tast.name',
             ConditionDef => {
                 CaseInsensitive => 1,
                 NULLValue       => 1
-            }
+            },
+            FulltextDef  => {}
         },
         CustomerVisible   => {
             Column       => $TableAliasPrefix . 'ta.customer_visible',
             ConditionDef => {
                 ValueType => 'NUMERIC',
                 NULLValue => 1
-            }
+            },
+            FulltextDef  => {}
         },
         From              => {
             Column       => $TableAliasPrefix . 'ta.a_from',
@@ -261,6 +273,9 @@ sub AttributePrepare {
                 CaseInsensitive => 1,
                 IsStaticSearch  => $IsStaticSearch,
                 NULLValue       => 1
+            },
+            FulltextDef  => {
+                IsStaticSearch => $IsStaticSearch
             }
         },
         To                => {
@@ -269,6 +284,9 @@ sub AttributePrepare {
                 CaseInsensitive => 1,
                 IsStaticSearch  => $IsStaticSearch,
                 NULLValue       => 1
+            },
+            FulltextDef  => {
+                IsStaticSearch => $IsStaticSearch
             }
         },
         Cc                => {
@@ -277,6 +295,9 @@ sub AttributePrepare {
                 CaseInsensitive => 1,
                 IsStaticSearch  => $IsStaticSearch,
                 NULLValue       => 1
+            },
+            FulltextDef  => {
+                IsStaticSearch => $IsStaticSearch
             }
         },
         Subject           => {
@@ -285,6 +306,9 @@ sub AttributePrepare {
                 CaseInsensitive => 1,
                 IsStaticSearch  => $IsStaticSearch,
                 NULLValue       => 1
+            },
+            FulltextDef  => {
+                IsStaticSearch => $IsStaticSearch
             }
         },
         Body              => {
@@ -293,6 +317,9 @@ sub AttributePrepare {
                 CaseInsensitive => 1,
                 IsStaticSearch  => $IsStaticSearch,
                 NULLValue       => 1
+            },
+            FulltextDef  => {
+                IsStaticSearch => $IsStaticSearch
             }
         },
         ArticleCreateTime => {
@@ -300,7 +327,8 @@ sub AttributePrepare {
             ConditionDef => {
                 ValueType => 'NUMERIC',
                 NULLValue => 1
-            }
+            },
+            FulltextDef  => {}
         }
     );
 
@@ -315,6 +343,12 @@ sub AttributePrepare {
         && $Param{PrepareType} eq 'Condition'
     ) {
         $Attribute{ConditionDef} = $AttributeDefinition{ $Param{Attribute} }->{ConditionDef};
+    }
+    if (
+        defined $Param{PrepareType}
+        && $Param{PrepareType} eq 'Fulltext'
+    ) {
+        $Attribute{FulltextDef} = $AttributeDefinition{ $Param{Attribute} }->{FulltextDef};
     }
 
     return \%Attribute;

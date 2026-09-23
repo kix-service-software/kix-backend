@@ -61,7 +61,7 @@ sub _Replace {
         $Param{Text} =~ s/$Self->{Start} KIX_TICKET_NUMBER $Self->{End}/$Param{Ticket}->{TicketNumber}/gixms;
 
         if ( !$Param{Ticket}->{AccountedTime} && $Param{Text} =~ m/AccountedTime/) {
-            $Param{Ticket}->{AccountedTime} = $Kernel::OM->Get('Ticket')->TicketAccountedTimeGet(
+            $Param{Ticket}->{AccountedTime} = $Kernel::OM->Get('TimeAccounting')->TimeAccountingTotal(
                 TicketID => $Param{TicketID},
             );
         }

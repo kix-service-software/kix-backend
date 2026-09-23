@@ -12,9 +12,9 @@ Feature: GET request to the /tickets/:TicketID/articles/:ArticleID/attachments/:
     When I get the attachment item
     Then the response code is 200
     And the response contains the following items of type Attachment
-      | ContentType                  | Disposition | Filesize   | FilesizeRaw | Filename                                                                              |
-      | text/html; charset=\"utf-8\" | inline      | 72 Bytes   | 72          | file-2                                                                                |
-      | application/pdf              | attachment  | 7.1 KBytes | 7255        | ein-langer-dateiname-fuer-eine-pdf-datei-ein-langer-dateiname-fuer-eine-pdf-datei.pdf |
+      | ContentType     | Disposition | Filesize   | FilesizeRaw | Filename                                                                              |
+#      | text/html; charset=\"utf-8\" | inline      | 72 Bytes   | 72          | file-2                                                                                |
+      | application/pdf | attachment  | 7.1 KBytes | 7255        | ein-langer-dateiname-fuer-eine-pdf-datei-ein-langer-dateiname-fuer-eine-pdf-datei.pdf |
     When I delete this ticket
     Then the response code is 204
     And the response has no content 

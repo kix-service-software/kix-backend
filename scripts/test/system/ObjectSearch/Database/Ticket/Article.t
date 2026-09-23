@@ -156,86 +156,217 @@ my $QuoteSemicolon = $Kernel::OM->Get('DB')->GetDatabaseFunction('QuoteSemicolon
 my $CaseSensitive = $Kernel::OM->Get('DB')->GetDatabaseFunction('CaseSensitive');
 
 # check AttributePrepare
-# run tests for SearchIndexModule 'RuntimeDB' and 'StaticDB'
-for my $SearchIndexModule ( qw(RuntimeDB StaticDB) ) {
-    $Kernel::OM->Get('Config')->Set(
-        Key   => 'Ticket::SearchIndexModule',
-        Value => 'Kernel::System::Ticket::ArticleSearchIndex::' . $SearchIndexModule
-    );
-
-    # run tests for UserType 'Agent' and 'Customer'
-    for my $UserType ( qw(Agent Customer) ) {
-
-        my @AttributePrepareTests = ();
-
-        for my $PrepareType ( qw( none Select Condition Sort Fulltext ) ) {
-
-            my $AliasPrefix = q{};
-            my $TableSuffix = q{};
-            # prepare suffix for static article
-            if (
-                $SearchIndexModule eq 'StaticDB'
-                && $PrepareType eq 'Condition'
-            ) {
-                $AliasPrefix = 's_';
-                $TableSuffix = '_search';
-            }
-
-            my $JoinArticleSuffix = q{};
-            # prepare suffix for article join
-            if ( $UserType eq 'Customer' ) {
-                $JoinArticleSuffix = ' AND ' . $AliasPrefix . 'ta.customer_visible = 1'
-            }
-
-            my %SpecExpected = ();
-            if ( $PrepareType eq 'Condition' ) {
-                %SpecExpected = (
-                    ConditionDef => {
-                        ValueType => 'NUMERIC',
-                        NULLValue => 1
-                    }
-                );
-            }
-
-            my $ArticleJoinString = 'LEFT OUTER JOIN article'
-                . $TableSuffix
-                . q{ }
-                . $AliasPrefix
-                . 'ta ON '
-                . $AliasPrefix
-                . 'ta.ticket_id = st.id'
-                . $JoinArticleSuffix;
-
-            push (
-                @AttributePrepareTests,
-                {
-                    Name      => 'AttributePrepare: SearchIndexModule "' . $SearchIndexModule . '" / UserType "' . $UserType . '" / PrepareType "' . $PrepareType . '" / Attribute "ArticleID"',
-                    Parameter => {
-                        Attribute   => 'ArticleID',
-                        UserType    => $UserType,
-                        PrepareType => $PrepareType
-                    },
-                    Expected  => {
-                        Column => $AliasPrefix . 'ta.id',
-                        SQLDef => {
-                            Join => [ $ArticleJoinString ]
-                        },
-                        %SpecExpected
-                    }
-                }
-            );
+my %AttributeMapping = (
+    ArticleID         => {
+        Column          => 'ta.id',
+        IsNumericColumn => 1,
+        IsStaticColumn  => 0
+    },
+    ChannelID         => {
+        Column          => 'ta.channel_id',
+        IsNumericColumn => 1,
+        IsStaticColumn  => 0
+    },
+    Channel           => {
+        Column          => 'tac.name',
+        IsNumericColumn => 0,
+        IsStaticColumn  => 0,
+        AdditionalJoin  => {
+            Table  => 'channel',
+            Alias  => 'tac',
+            Column => 'channel_id'
         }
+    },
+    SenderTypeID      => {
+        Column          => 'ta.article_sender_type_id',
+        IsNumericColumn => 1,
+        IsStaticColumn  => 0
+    },
+    SenderType        => {
+        Column          => 'tast.name',
+        IsNumericColumn => 0,
+        IsStaticColumn  => 0,
+        AdditionalJoin  => {
+            Table  => 'article_sender_type',
+            Alias  => 'tast',
+            Column => 'article_sender_type_id'
+        }
+    },
+    CustomerVisible   => {
+        Column          => 'ta.customer_visible',
+        IsNumericColumn => 1,
+        IsStaticColumn  => 0
+    },
+    From              => {
+        Column          => 'ta.a_from',
+        IsNumericColumn => 0,
+        IsStaticColumn  => 1
+    },
+    To                => {
+        Column          => 'ta.a_to',
+        IsNumericColumn => 0,
+        IsStaticColumn  => 1
+    },
+    Cc                => {
+        Column          => 'ta.a_cc',
+        IsNumericColumn => 0,
+        IsStaticColumn  => 1
+    },
+    Subject           => {
+        Column          => 'ta.a_subject',
+        IsNumericColumn => 0,
+        IsStaticColumn  => 1
+    },
+    Body              => {
+        Column          => 'ta.a_body',
+        IsNumericColumn => 0,
+        IsStaticColumn  => 1
+    },
+    ArticleCreateTime => {
+        Column          => 'ta.incoming_time',
+        IsNumericColumn => 1,
+        IsStaticColumn  => 0
+    }
+);
+# run tests for all attributes
+ATTRIBUTE:
+for my $Attribute ( sort( keys( %{ $AttributeList } ) ) ) {
+    # run tests without and with ArticleID flag
+    for my $ArticleIDFlag ( 0 .. 1 ) {
+        # run tests for SearchIndexModule 'RuntimeDB' and 'StaticDB'
+        for my $SearchIndexModule ( qw(RuntimeDB StaticDB) ) {
+            $Kernel::OM->Get('Config')->Set(
+                Key   => 'Ticket::SearchIndexModule',
+                Value => 'Kernel::System::Ticket::ArticleSearchIndex::' . $SearchIndexModule
+            );
 
-        for my $Test ( @AttributePrepareTests ) {
-            my $Result = $AttributeObject->AttributePrepare(
-                %{ $Test->{Parameter} },
-                Silent => defined( $Test->{Expected} ) ? 0 : 1
-            );
-            $Self->IsDeeply(
-                $Result,
-                $Test->{Expected},
-                $Test->{Name}
-            );
+            # run tests for UserType 'Agent' and 'Customer'
+            for my $UserType ( qw(Agent Customer) ) {
+
+                my @AttributePrepareTests = ();
+
+                for my $PrepareType ( qw( none Select Condition Sort Fulltext ) ) {
+
+                    my $AliasPrefix    = q{};
+                    my $TableSuffix    = q{};
+                    my $IsStaticSearch = 0;
+                    # prepare suffix for static article
+                    if (
+                        !$ArticleIDFlag
+                        && $SearchIndexModule eq 'StaticDB'
+                        && (
+                            $PrepareType eq 'Condition'
+                            || $PrepareType eq 'Fulltext'
+                        )
+                    ) {
+                        $AliasPrefix    = 's_';
+                        $TableSuffix    = '_search';
+                        $IsStaticSearch = 1;
+                    }
+
+                    my $JoinArticleSuffix = q{};
+                    # prepare suffix for article join
+                    if ( $UserType eq 'Customer' ) {
+                        $JoinArticleSuffix = ' AND ' . $AliasPrefix . 'ta.customer_visible = 1'
+                    }
+
+                    my %SpecExpected = ();
+                    if ( $PrepareType eq 'Condition' ) {
+                        if ( $AttributeMapping{ $Attribute }->{IsNumericColumn} ) {
+                            %SpecExpected = (
+                                ConditionDef => {
+                                    ValueType => 'NUMERIC',
+                                    NULLValue => 1
+                                }
+                            );
+                        }
+                        else {
+                            %SpecExpected = (
+                                ConditionDef => {
+                                    CaseInsensitive => 1,
+                                    NULLValue       => 1
+                                }
+                            );
+                            if ( $AttributeMapping{ $Attribute }->{IsStaticColumn} ) {
+                                $SpecExpected{ConditionDef}->{IsStaticSearch} = $IsStaticSearch;
+                            }
+                        }
+                    }
+                    elsif ( $PrepareType eq 'Fulltext' ) {
+                        if ( $AttributeMapping{ $Attribute }->{IsStaticColumn} ) {
+                            %SpecExpected = (
+                                FulltextDef => {
+                                    IsStaticSearch => $IsStaticSearch,
+                                }
+                            );
+                        }
+                        else {
+                            %SpecExpected = (
+                                FulltextDef => {}
+                            );
+                        }
+                    }
+
+                    my $ArticleJoinString = 'LEFT OUTER JOIN article'
+                        . $TableSuffix
+                        . q{ }
+                        . $AliasPrefix
+                        . 'ta ON '
+                        . $AliasPrefix
+                        . 'ta.ticket_id = st.id'
+                        . $JoinArticleSuffix;
+                    my @JoinArray = ( $ArticleJoinString );
+                    if ( IsHashRefWithData( $AttributeMapping{ $Attribute }->{AdditionalJoin} ) ) {
+                        my $AdditionalJoinString = 'LEFT OUTER JOIN '
+                            . $AttributeMapping{ $Attribute }->{AdditionalJoin}->{Table}
+                            . q{ }
+                            . $AliasPrefix
+                            . $AttributeMapping{ $Attribute }->{AdditionalJoin}->{Alias}
+                            . ' ON '
+                            . $AliasPrefix
+                            . $AttributeMapping{ $Attribute }->{AdditionalJoin}->{Alias}
+                            . '.id = '
+                            . $AliasPrefix
+                            . 'ta.'
+                            . $AttributeMapping{ $Attribute }->{AdditionalJoin}->{Column};
+                        push( @JoinArray, $AdditionalJoinString );
+                    }
+
+                    push (
+                        @AttributePrepareTests,
+                        {
+                            Name      => 'AttributePrepare: SearchIndexModule "' . $SearchIndexModule . '" / UserType "' . $UserType . '" / PrepareType "' . $PrepareType . '" / Attribute "' . $Attribute . '" / Flag ArticleID ' . ( $ArticleIDFlag ? 'set' : 'unset' ),
+                            Parameter => {
+                                Attribute   => $Attribute,
+                                UserType    => $UserType,
+                                PrepareType => $PrepareType,
+                                Flags       => $ArticleIDFlag ? {
+                                    ArticleID => 1
+                                } : {}
+                            },
+                            Expected  => {
+                                Column => $AliasPrefix . $AttributeMapping{ $Attribute }->{Column},
+                                SQLDef => {
+                                    Join => \@JoinArray
+                                },
+                                %SpecExpected
+                            }
+                        }
+                    );
+                }
+
+                for my $Test ( @AttributePrepareTests ) {
+                    my $Result = $AttributeObject->AttributePrepare(
+                        %{ $Test->{Parameter} },
+                        Silent => defined( $Test->{Expected} ) ? 0 : 1
+                    );
+                    $Self->IsDeeply(
+                        $Result,
+                        $Test->{Expected},
+                        $Test->{Name}
+                    );
+                }
+            }
         }
     }
 }

@@ -318,10 +318,20 @@ sub _GetTicketData {
 
     my $TicketObject = $Kernel::OM->Get('Ticket');
 
+    my $DynamicFieldsParam = 0;
+    if ( $Param{Data}->{include}->{DynamicFields} ) {
+        if ( IsArrayRefWithData( $Param{Data}->{DynamicFieldFilter} ) ) {
+            $DynamicFieldsParam = $Param{Data}->{DynamicFieldFilter};
+        }
+        else {
+            $DynamicFieldsParam = 1;
+        }
+    }
+
     # get the Ticket
     my %TicketRaw = $TicketObject->TicketGet(
         TicketID      => $TicketID,
-        DynamicFields => $Param{Data}->{include}->{DynamicFields},
+        DynamicFields => $DynamicFieldsParam,
         Extended      => $Param{Data}->{extended},
         UserID        => $Self->{Authorization}->{UserID},
     );
@@ -359,7 +369,6 @@ sub _GetTicketData {
                     if (IsHashRefWithData($PreparedValue)) {
                         push(@DynamicFields, $PreparedValue);
                     }
-
                 }
             }
             next ATTRIBUTE;
@@ -378,8 +387,8 @@ sub _GetTicketData {
 
     # include AccountedTime if requested
     if ( $Param{Data}->{include}->{AccountedTime} && !defined $TicketData{AccountedTime} ) {
-        $TicketData{AccountedTime} = $TicketObject->TicketAccountedTimeGet(
-            TicketID => $TicketID,
+        $TicketData{AccountedTime} = $Kernel::OM->Get('TimeAccounting')->TimeAccountingTotal(
+            TicketID => $TicketID
         );
     }
 

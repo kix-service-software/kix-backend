@@ -17,6 +17,7 @@ use CGI::Carp qw(cluck);
 use File::Path;
 use File::Basename;
 
+use Kernel::System::EmailParser;
 use Kernel::System::VariableCheck qw(:all);
 
 our $ObjectManagerDisabled = 1;
@@ -148,6 +149,11 @@ sub ArticleDelete {
         TicketID => $Article{TicketID}
     );
 
+    # clear article cache
+    $Self->_ArticleCacheClear(
+        ArticleID => $Param{ArticleID}
+    );
+
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
@@ -263,6 +269,11 @@ sub ArticleDeleteAttachments {
         Bind => [ \$Param{ArticleID} ],
     );
 
+    # clear article cache
+    $Self->_ArticleCacheClear(
+        ArticleID => $Param{ArticleID}
+    );
+
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
         Event     => 'DELETE',
@@ -336,6 +347,11 @@ sub ArticleDeleteAttachment {
             Bind => [ \$Param{ArticleID} ],
         );
     }
+
+    # clear article cache
+    $Self->_ArticleCacheClear(
+        ArticleID => $Param{ArticleID}
+    );
 
     # push client callback event
     $Kernel::OM->Get('ClientNotification')->NotifyClients(
@@ -414,6 +430,58 @@ sub ArticleWriteAttachment {
         }
     }
 
+    # special handling for html body file
+    if (
+        $Param{Filename} =~ m/^file-(1|2|1\.html)$/
+        && $Param{ContentType} =~ m/^text\/html/
+    ) {
+        my $ParserObject = Kernel::System::EmailParser->new(
+            Mode => 'Standalone'
+        );
+        my %Data = $ParserObject->GetContentTypeParams(
+            ContentType => $Param{ContentType}
+        );
+
+        # encode content
+        $Param{Content} = $Kernel::OM->Get('Encode')->Convert(
+            Text  => $Param{Content},
+            From  => $Data{Charset} || 'utf-8',
+            To    => 'utf-8',
+            Check => 1,
+        );
+
+        # apply safety rules and format content
+        my %Safe = $Kernel::OM->Get('HTMLUtils')->Safety(
+            String       => $Param{Content},
+            NoApplet     => 1,
+            NoObject     => 1,
+            NoEmbed      => 1,
+            NoSVG        => 1,
+            NoImg        => 0,
+            NoIntSrcLoad => 0,
+            NoExtSrcLoad => 0,
+            NoJavaScript => 1,
+        );
+        $Param{Content} = $Safe{String};
+        $Param{ContentType} = 'text/html; charset="utf-8"';
+
+        # extract embedded images from html content
+        my @HTMLAttachments = ();
+        $Kernel::OM->Get('HTMLUtils')->EmbeddedImagesExtract(
+            DocumentRef    => \$Param{Content},
+            AttachmentsRef => \@HTMLAttachments,
+        );
+
+        # add html attachments
+        for my $Attachment ( @HTMLAttachments ) {
+            $Self->ArticleWriteAttachment(
+                %{ $Attachment },
+                ArticleID => $Param{ArticleID},
+                UserID    => $Param{UserID},
+            );
+        }
+    }
+
     # cleanup filename
     $Param{Filename} =~ s/ /_/g;
     $Param{Filename} =~ s/^\.//g;
@@ -482,7 +550,18 @@ sub ArticleWriteAttachment {
     if ( $Param{Disposition} ) {
         ( $Disposition, $FilenamePart ) = split ';', $Param{Disposition};
     }
-    $Disposition //= '';
+    elsif (
+        (
+            $Param{ContentID}
+            && $Param{ContentType} =~ m/image/i
+        )
+        || $Param{Filename} =~ m/^file-(1|2|1\.html)$/
+    ) {
+        $Disposition = 'inline';
+    }
+    else {
+        $Disposition = 'attachment';
+    }
 
     # write attachment to db
     return if !$DBObject->Do(
@@ -539,6 +618,11 @@ sub ArticleWriteAttachment {
             Bind => [ \$Param{UserID}, \$Param{ArticleID} ],
         );
     }
+
+    # clear article cache
+    $Self->_ArticleCacheClear(
+        ArticleID => $Param{ArticleID}
+    );
 
     $Self->EventHandler(
         Event => 'ArticleAttachmentAdd',
@@ -608,6 +692,15 @@ sub ArticleAttachmentIndexRaw {
         return;
     }
 
+    # prepare cache key
+    my $CacheKey = 'ArticleAttachmentIndexRaw';
+    # check cache
+    my $Cached = $Self->_ArticleCacheGet(
+        ArticleID => $Param{ArticleID},
+        Key       => $CacheKey,
+    );
+    return %{$Cached} if ref $Cached eq 'HASH';
+
     # make sure the attachment metadata is in the DB
     $Self->_CheckAndSwitchArticleAttachmentMeta(ArticleID => $Param{ArticleID});
 
@@ -672,6 +765,13 @@ sub ArticleAttachmentIndexRaw {
             Disposition        => $Disposition,
         };
     }
+
+    # set cache
+    $Self->_ArticleCacheSet(
+        ArticleID => $Param{ArticleID},
+        Key       => $CacheKey,
+        Value     => \%Index,
+    );
 
     return %Index;
 }
@@ -990,6 +1090,11 @@ sub _ArticleStorageSwitch {
         Bind => [
             \$AttachmentCount, \$Param{ArticleID},
         ],
+    );
+
+    # clear article cache
+    $Self->_ArticleCacheClear(
+        ArticleID => $Param{ArticleID}
     );
 
     $Self->{AttachmentCount}->{$Param{ArticleID}} = $AttachmentCount;

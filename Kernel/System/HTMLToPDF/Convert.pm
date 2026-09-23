@@ -35,7 +35,8 @@ sub Convert {
         if ( %Data ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'notice',
-                Message  => "Template '$Param{TemplateName}' doesn't exists, so the default will be used!"
+                Message  => "Template '$Param{TemplateName}' doesn't exists, so the default will be used!",
+                Silent   => $Param{Silent}
             );
         }
     }
@@ -43,7 +44,8 @@ sub Convert {
     if ( !%Data ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => 'No definition exists!'
+            Message  => 'No definition exists!',
+            Silent   => $Param{Silent}
         );
         return;
     }
@@ -57,13 +59,15 @@ sub Convert {
 
     my $Result = $Self->_CheckParams(
         Object => $Data{Object},
-        Data   => \%Param
+        Data   => \%Param,
+        Silent => $Param{Silent}
     );
 
     if ( IsHashRefWithData($Result) ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => $Result->{error}
+            Message  => $Result->{error},
+            Silent   => $Param{Silent}
         );
         return;
     }
@@ -81,6 +85,7 @@ sub Convert {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "HTMLToPDF: wkhtmltopdf binary doesn't exist!",
+            Silent   => $Param{Silent},
         );
         return;
     }
@@ -91,6 +96,7 @@ sub Convert {
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Can't create directory '$CheckDirectory': $!",
+                    Silent   => $Param{Silent},
                 );
                 return;
             }
@@ -174,7 +180,7 @@ sub Convert {
 
     # prepare temp file names
     my $TempPDFFile  = $Filename . '-Temp.pdf';
-    $Self->_Call(
+    my $Success = $Self->_Call(
         Binary    => $Binary,
         Config    => $Config,
         Page      => $Data{Definition}->{Page},
@@ -182,31 +188,12 @@ sub Convert {
         Header    => $FileDatas{Header},
         Footer    => $FileDatas{Footer},
         Content   => $FileDatas{Content},
-        TmpPDF    => $TempPDFFile
+        TmpPDF    => $TempPDFFile,
+        Silent    => $Param{Silent}
     );
 
-    # read PDF result file
-    if ( open( my $FH, '<', ($Directory . q{/} . $TempPDFFile) ) ) {
-        local $/ = undef;
-        $Output = <$FH>;
-        close($FH);
-    }
-
-    my $FileStat = $Kernel::OM->Get('Main')->FileStat(
-        Location => $Directory . q{/} . $TempPDFFile
-    );
-
-    my @DeleteData = (
-        {
-            Directory => $Directory,
-            Filename  => $FileDatas{Content},
-        },
-        {
-            Directory => $Directory,
-            Filename  => $TempPDFFile,
-        }
-    );
-    for my $Key ( qw(Header Footer ) ) {
+    my @DeleteData;
+    for my $Key ( qw(Content Header Footer ) ) {
         next if !$FileDatas{$Key};
         push(
             @DeleteData, {
@@ -215,6 +202,40 @@ sub Convert {
             }
         );
     }
+
+    if ( !$Success ) {
+        $Self->_FileDelete(
+            Data => \@DeleteData
+        );
+        return;
+    }
+
+    # read PDF result file
+    if ( open( my $FH, '<', ($Directory . q{/} . $TempPDFFile) ) ) {
+        local $/ = undef;
+        $Output = <$FH>;
+        close($FH);
+    }
+    else {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Could not open converted PDF",
+            Silent   => $Param{Silent},
+        );
+        return;
+    }
+
+    my $FileStat = $Kernel::OM->Get('Main')->FileStat(
+        Location => $Directory . q{/} . $TempPDFFile
+    );
+
+    push(
+        @DeleteData,
+        {
+            Directory => $Directory,
+            Filename  => $TempPDFFile,
+        }
+    );
 
     $Self->_FileDelete(
         Data => \@DeleteData
@@ -305,9 +326,23 @@ sub _Call {
         );
     }
 
+    my $useProxy = 0;
     # add parameter of the system call from config
     if ( ref( $Config{Parameter} ) eq 'ARRAY' ) {
         push( @SystemCallArg, @{ $Config{Parameter} } );
+        $useProxy = grep( { /^(?:-p|--proxy)(?:\shttp.+?)?$/smx } @{ $Config{Parameter} } );
+    }
+
+    # sets the WebUserAgent proxy if no specific proxy is defined
+    if (
+        !$useProxy
+        && $Kernel::OM->Get('WebUserAgent')->{Proxy}
+    ) {
+        push(
+            @SystemCallArg,
+            '-p',
+            $Kernel::OM->Get('WebUserAgent')->{Proxy}
+        );
     }
 
     # add content parameter to system call
@@ -342,8 +377,48 @@ sub _Call {
     # add output to system call
     push( @SystemCallArg, $Directory . q{/} . $TmpPDF );
 
-    # process system call
-    system( @SystemCallArg );
+    # log stdout and stderr
+    push( @SystemCallArg, '2>&1');
+
+    # process backticks call
+    my $Call = join(' ', @SystemCallArg);
+    my @Result = `$Call`;
+
+    my $Error;
+    for my $Line ( @Result ) {
+
+        if ( $Line =~ /^(Warning|Error):\s+?(.*)/smg ) {
+            if ( $1 eq 'Error' ) {
+                $Error = $2;
+                last;
+            }
+
+            my $Notice = $2;
+            $Notice =~ s/^\s+//smx;
+            $Notice =~ s/\s+$//smx;
+
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'notice',
+                Message  => "PDFConvert: $Notice",
+                Silent   => $Param{Silent},
+            );
+        }
+        elsif ( $Line =~ /^Invalid.*/smg ) {
+            $Error = $Line;
+            last;
+        }
+    }
+
+    if ( $Error ) {
+        $Error =~ s/^\s+//smx;
+        $Error =~ s/\s+$//smx;
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "PDFConvert: $Error",
+            Silent   => $Param{Silent},
+        );
+        return;
+    }
 
     return 1;
 }

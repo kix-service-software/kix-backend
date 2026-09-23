@@ -161,7 +161,7 @@ sub Run {
         );
         return $Self->_Error(
             Code    => 'Object.UnableToUpdate',
-            Message => 'Could not update OAuth2 Profile (error: $LogMessage).',
+            Message => 'Could not update OAuth2 Profile (error: ' . $LogMessage . ').',
         );
     }
 

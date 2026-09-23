@@ -137,6 +137,7 @@ sub TaskAdd {
     my $TimeObject = $Kernel::OM->Get('Time');
 
     my $Identifier;
+    my $Success;
     TRY:
     for my $Try ( 1 .. 10 ) {
 
@@ -145,7 +146,7 @@ sub TaskAdd {
 
         # insert the task (initially locked with lock_key = 1 so it will not be taken by any worker
         #   at this moment)
-        last TRY if $DBObject->Do(
+        last TRY if $Success = $DBObject->Do(
             SQL => '
                 INSERT INTO scheduler_task
                     (ident, name, task_type, task_data, attempts, lock_key, create_time)
@@ -158,7 +159,17 @@ sub TaskAdd {
                 \$Data,
                 \$Param{Attempts},
             ],
+            Silent => 1
         );
+    }
+
+    if ( !$Success ) {
+        # error log
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => 'Could not add task to DB after 10 tries',
+        );
+        return;
     }
 
     # get task id

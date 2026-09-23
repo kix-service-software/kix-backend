@@ -36,6 +36,11 @@ require '_StepsLib.pl';
 # feature specific steps 
 
 When qr/I update this reportdefinition$/, sub {
+    my $MyDB;
+
+    #   Abfrage welche DB ist vorhanden
+    $MyDB = $Kernel::OM->Get('DB')->{'DB::Type'};
+
    ( S->{Response}, S->{ResponseContent} ) = _Patch(
        URL   => S->{API_URL}.'/reporting/reportdefinitions/'.S->{ResponseContent}->{ReportDefinitionID},
       Token   => S->{Token},
@@ -46,7 +51,7 @@ When qr/I update this reportdefinition$/, sub {
                Config => {
                    DataSource => {
                        SQL => {
-                           postgresql => "SELECT id, name, create_by FROM valid WHERE name LIKE '${Parameters.TestParameter}%'"
+                           $MyDB => "SELECT id, name, create_by FROM valid WHERE name LIKE '${Parameters.TestParameter}%'"
                        }
                    },
                    Parameters => [

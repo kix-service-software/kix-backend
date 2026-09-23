@@ -312,7 +312,7 @@ sub NotificationEvent {
         next ARTICLE if !$ArticleData->{ArticleID};
 
         # get accounted time
-        my $AccountedTime = $TicketObject->ArticleAccountedTimeGet(
+        my $AccountedTime = $Kernel::OM->Get('TimeAccounting')->TimeAccountingTotal(
             ArticleID => $ArticleData->{ArticleID},
         );
 
@@ -596,7 +596,8 @@ sub _Replace {
     if ( $Param{TicketID} ) {
         %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
             TicketID      => $Param{TicketID},
-            DynamicFields => 1,
+            DynamicFields => 1,,
+            Silent        => $Param{Silent}
         );
         $Param{ObjectType} = 'Ticket';
         $Param{ObjectID}   = $Param{TicketID};

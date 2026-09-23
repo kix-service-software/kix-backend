@@ -63,10 +63,14 @@ sub _ReplaceParametersInString {
             Silent    => $Param{Silent},
         );
 
-        if ( !$ParameterValue ) {
+        if ( !$ParameterValue) {
             # try to use a configured fallback
-            if ( $String =~ /\$\{Parameters\.$Parameter->{Name}\?(.*?)\}/gmx ) {
+            if ( !defined $ParameterValue && $String =~ /\$\{Parameters\.$Parameter->{Name}\?(.*?)\}/gmx ) {
                 $String =~ s/\$\{Parameters\.$Parameter->{Name}\?(.*?)\}/$1/gmx ;
+                next;
+            }
+            if ( !$ParameterValue && $String =~ /\$\{Parameters\.$Parameter->{Name}\!(.*?)\}/gmx ) {
+                $String =~ s/\$\{Parameters\.$Parameter->{Name}\!(.*?)\}/$1/gmx ;
                 next;
             }
 
@@ -75,7 +79,7 @@ sub _ReplaceParametersInString {
                 && $Parameter->{DataType}
             ) {
                 $ParameterValue = $EmptyValuesForDataType{uc($Parameter->{DataType})};
-                $String =~ s/\$\{Parameters\.$Parameter->{Name}\??.*?\}/$ParameterValue/gmx ;
+                $String =~ s/\$\{Parameters\.$Parameter->{Name}(\?|\!)?.*?\}/$ParameterValue/gmx ;
             }
             next;
         }
@@ -83,7 +87,7 @@ sub _ReplaceParametersInString {
         if ( IsArrayRefWithData($ParameterValue) ) {
             $ParameterValue = uc($Parameter->{DataType}) eq 'STRING' ? join(',', (map { "'".$_."'"} @{$ParameterValue})) : join(',', @{$ParameterValue});
         }        
-        $String =~ s/\$\{Parameters\.$Parameter->{Name}\??.*?\}/$ParameterValue/gmx;        
+        $String =~ s/\$\{Parameters\.$Parameter->{Name}(\?|\!)?.*?\}/$ParameterValue/gmx;
     }
 
     return $String;

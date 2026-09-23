@@ -29,6 +29,8 @@ my @Tests = (
         Name        => '.txt',
         Location    => 'scripts/test/system/sample/VirtualFS/VirtualFS-Test1.txt',
         Filename    => 'TEST/File.txt',
+        Content     => 'some utf8 data äöüß
+',
         Mode        => 'utf8',
         MD5         => '26ea4a608d77c62ed0e4b0f8952c9df2',
         Find        => '*txt',
@@ -36,6 +38,11 @@ my @Tests = (
         Preferences => {
             ContentType => 'text/plain',
             ContentID   => '<some_id_xls@example.com>',
+            ArrayKey    => [
+                'Value1',
+                'Value2',
+                'Value3'
+            ]
         },
         FindPreferences => {
             ContentType => 'text/plain',
@@ -107,6 +114,30 @@ my @Tests = (
             },
         },
     },
+    {
+        Name        => 'empty content',
+        Location    => 'scripts/test/system/sample/VirtualFS/VirtualFS-Test4.txt',
+        Filename    => 'TEST/empty.txt',
+        Content     => '',
+        Mode        => 'utf8',
+        Find        => '*txt',
+        FindNot     => '*.txt_*',
+        Preferences => {
+            ContentType => 'text/plain',
+        },
+        FindPreferences => {
+            ContentType => 'text/plain',
+        },
+        FindNotPreferences => {
+            ContentType => 'text/xml',
+        },
+        FindFilenameAndPreferences => {
+            Filename    => 'TEST/empty.txt',
+            Preferences => {
+                ContentType => 'text/plain',
+            },
+        },
+    },
 );
 
 for my $Backend (qw( FS DB )) {
@@ -128,13 +159,14 @@ for my $Backend (qw( FS DB )) {
             Mode     => $Test->{Mode},
         );
 
-        my $MD5Sum = $MainObject->MD5sum( String => ${$Content} );
-
-        $Self->Is(
-            $MD5Sum || '',
-            $Test->{MD5},
-            "$Backend MD5sum() - pre - $Test->{Name}",
-        );
+        if ( $Test->{MD5} ) {
+            my $MD5Sum = $MainObject->MD5sum( String => ${$Content} );
+            $Self->Is(
+                $MD5Sum || '',
+                $Test->{MD5},
+                "$Backend MD5sum() - pre - $Test->{Name}",
+            );
+        }
 
         # write
         my %Preferences = %{ $Test->{Preferences} };
@@ -159,20 +191,40 @@ for my $Backend (qw( FS DB )) {
             "$Backend Read() - $Test->{Name}",
         );
 
-        $MD5Sum = $MainObject->MD5sum( String => $File{Content} );
-        $Self->Is(
-            $MD5Sum || '',
-            $Test->{MD5},
-            "$Backend MD5sum() - post - $Test->{Name}",
-        );
+        if ( defined( $Test->{Content} ) ) {
+            $Self->Is(
+                ${ $File{Content} },
+                $Test->{Content},
+                "$Backend Content - $Test->{Name}",
+            );
+        }
+
+        if ( $Test->{MD5} ) {
+            my $MD5Sum = $MainObject->MD5sum( String => $File{Content} );
+            $Self->Is(
+                $MD5Sum || '',
+                $Test->{MD5},
+                "$Backend MD5sum() - post - $Test->{Name}",
+            );
+        }
 
         # preferences
         for my $Key ( sort keys %{ $Test->{Preferences} } ) {
-            $Self->Is(
-                $File{Preferences}->{$Key},
-                $Test->{Preferences}->{$Key},
-                "$Backend Read() - preferences - $Key - $Test->{Name}",
-            );
+            if ( ref($Test->{Preferences}->{$Key} ) eq 'ARRAY' ) {
+                $Self->IsDeeply(
+                    $File{Preferences}->{$Key},
+                    $Test->{Preferences}->{$Key},
+                    "$Backend Read() - preferences - $Key - $Test->{Name}",
+                    1
+                );
+            }
+            else {
+                $Self->Is(
+                    $File{Preferences}->{$Key},
+                    $Test->{Preferences}->{$Key},
+                    "$Backend Read() - preferences - $Key - $Test->{Name}",
+                );
+            }
         }
 
         # find

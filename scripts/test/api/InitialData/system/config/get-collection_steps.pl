@@ -40,7 +40,6 @@ When qr/I query the collection of config "(.*?)"$/, sub {
         Token  => S->{Token},
         URL    => S->{API_URL} . '/system/config/'.$1,
         Limit  => 0,
-#        Filter => '{"SysConfigOption":{"AND":[{"Field":"Name","Operator":"LIKE","Value":"' . $1 . '"}]}}',
    );
 };
 
@@ -49,7 +48,6 @@ When qr/I get the attribute in config "(.*?)"$/, sub {
        Token  => S->{Token},
        URL    => S->{API_URL} . '/system/config/'.$1,
        Limit  => 0,
-#       Filter => '{"SysConfigOption":{"AND":[{"Field":"Name","Operator":"LIKE","Value":"' . $1 . '"}]}}',
    );
 };
 
