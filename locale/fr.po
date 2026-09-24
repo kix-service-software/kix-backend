@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
 "POT-Creation-Date: 2026-9-24 10:21+0000\n"
-"PO-Revision-Date: 2026-09-24 10:21+0000\n"
+"PO-Revision-Date: 2026-09-24 12:21+0000\n"
 "Last-Translator: fjacquemin <Frank.Jacquemin@kixdesk.com>\n"
 "Language-Team: French <http://weblate.vm.devel.cape-it.de/projects/kix18/"
 "backend-app/fr/>\n"
@@ -3788,7 +3788,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Defines which state will unlock the ticket."
-msgstr "Définit l'état dans lequel le billet sera déverrouillé."
+msgstr "Définit l'état dans lequel le ticket sera déverrouillé."
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Delete expired cache from core modules."
@@ -4769,7 +4769,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Sort order for the age of the follow up tickets."
-msgstr "Ordre de tri pour l'âge des billets de suivi."
+msgstr "Ordre de tri pour l'âge des tickets de suivi."
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
@@ -4859,7 +4859,7 @@ msgid ""
 "State types of follow up tickets which will be considered. If viewable "
 "tickets was selected and no one was found all tickets will be considered."
 msgstr ""
-"Indiquer les types de billets de suivi qui seront pris en considération. Si "
+"Indiquer les types de tickets de suivi qui seront pris en considération. Si "
 "l'option \"tickets consultables\" a été sélectionnée et qu'aucune personne "
 "n'a été trouvée, tous les tickets seront pris en considération."
 
@@ -5053,7 +5053,7 @@ msgstr "TicketStateCount"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "TicketStateDuration"
-msgstr "Durée de l'état du billet"
+msgstr "TicketStateDuration"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "TicketTeamCount"
@@ -6220,7 +6220,7 @@ msgstr "Supprimer les pièces jointes des articles"
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Delete Ticket"
-msgstr "Supprimer le billet"
+msgstr "Supprimer le ticket"
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Deleted link to ticket \"%s\"."
@@ -6272,7 +6272,7 @@ msgid ""
 "Enables the minimal ticket counter size (if \"Date\" or \"DateChecksum\" was "
 "selected as TicketNumberGenerator)."
 msgstr ""
-"Active la taille minimale du compteur de billets (si \"Date\" ou "
+"Active la taille minimale du compteur de tickets (si \"Date\" ou "
 "\"DateChecksum\" a été sélectionné comme TicketNumberGenerator)."
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
@@ -6296,8 +6296,8 @@ msgid ""
 "dynamic fields need the same event."
 msgstr ""
 "Enregistrement du module d'événement. Pour plus de performance, vous pouvez "
-"définir un événement déclencheur (par exemple, Event =&gt ; TicketCreate). "
-"Cela n'est possible que si tous les champs dynamiques du billet ont besoin "
+"définir un événement déclencheur (par exemple, Event =&gt ; TicketCreate). "
+"Cela n'est possible que si tous les champs dynamiques du ticket ont besoin "
 "du même événement."
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
@@ -6481,12 +6481,11 @@ msgstr ""
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "List of all ticket events to be displayed in the GUI."
 msgstr ""
-"Liste de tous les événements de billetterie à afficher dans l'interface "
-"graphique."
+"Liste de tous les événements de ticket à afficher dans l'interface graphique."
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Locked ticket."
-msgstr "Billet verrouillé."
+msgstr "Ticket verrouillé."
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Log file for the ticket counter."
@@ -6540,7 +6539,7 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Module registration for ticket attribute placeholders."
-msgstr "Module d'enregistrement pour les attributs de billets."
+msgstr "Module d'enregistrement pour les attributs de tickets."
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid ""
@@ -6880,7 +6879,7 @@ msgstr "Demande du système (%s)."
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "The divider between TicketHook and ticket number. E.g ': '."
 msgstr ""
-"Le séparateur entre TicketHook et le numéro de billet. Par exemple ' : '."
+"Le séparateur entre TicketHook et le numéro de ticket. Par exemple ' : '."
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid ""
@@ -6903,7 +6902,7 @@ msgid ""
 "The identifier for a ticket, e.g. Ticket#, Call#, MyTicket#. The default is "
 "Ticket#."
 msgstr ""
-"L'identifiant d'un billet, par exemple Ticket#, Call#, MyTicket#. La valeur "
+"L'identifiant d'un ticket, par exemple Ticket#, Call#, MyTicket#. La valeur "
 "par défaut est Ticket#."
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
@@ -6959,7 +6958,7 @@ msgstr "Titre mis à jour : Ancien : \"%s\", Nouveau : \"%s\""
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid "Unlocked ticket."
-msgstr "Billet déverrouillé."
+msgstr "Ticket déverrouillé."
 
 #. SysConfig: Kernel/Config/Files/Ticket.xml
 msgid ""
@@ -7057,7 +7056,7 @@ msgstr "Type de permission correspondant à une ressource élémentaire."
 
 #. Update: update/build-807_pre.xml
 msgid "Queue->Ticket"
-msgstr "File d'attente->Billet"
+msgstr "File d'attente->ticket"
 
 #. manual entry from templates.pot.manual
 msgid "Address Information"
@@ -7305,7 +7304,7 @@ msgstr "Modèle"
 
 #. manual entry from templates.pot.manual
 msgid "My Tickets"
-msgstr "Mes billets"
+msgstr "Mes tickets"
 
 #. manual entry from templates.pot.manual
 msgid "Network"
@@ -7457,7 +7456,7 @@ msgstr ""
 
 #. manual entry from templates.pot.manual
 msgid "Tickets by others"
-msgstr "Billets d'autres personnes"
+msgstr "Tickets d'autres personnes"
 
 #. manual entry from templates.pot.manual
 msgid "Type"
