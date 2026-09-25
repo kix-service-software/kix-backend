@@ -156,12 +156,13 @@ my @GetPermissionDefTests = (
             UserType => 'Agent'
         },
         Expected  => {
-            From    => [],
-            Having  => [],
-            Join    => [],
-            OrderBy => [],
-            Select  => [],
-            Where   => [ '(1=0)' ]
+            From       => [],
+            Having     => [],
+            IsRelative => 0,
+            Join       => [],
+            OrderBy    => [],
+            Select     => [],
+            Where      => [ '(1=0)' ]
         }
     },
     {
@@ -171,12 +172,13 @@ my @GetPermissionDefTests = (
             UserType => 'Agent'
         },
         Expected  => {
-            From    => [],
-            Having  => [],
-            Join    => [],
-            OrderBy => [],
-            Select  => [],
-            Where   => [ '(st.queue_id IN (1))' ]
+            From       => [],
+            Having     => [],
+            IsRelative => 0,
+            Join       => [],
+            OrderBy    => [],
+            Select     => [],
+            Where      => [ '(st.queue_id IN (1))' ]
         }
     }
 );
