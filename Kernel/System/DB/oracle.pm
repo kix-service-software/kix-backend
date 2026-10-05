@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/ 
+# Modified version of the work: Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -509,7 +509,7 @@ sub TableAlter {
                 $Default = defined $Tag->{Default} ? $Tag->{Default} : 0;
             }
             elsif ( $Tag->{Type} =~ /(date|time)/i ) {
-                $Default = defined $Tag->{Default} ? $Tag->{Default} : '1970-01-01 00:00:00';
+                $Default = defined $Tag->{Default} ? "'$Tag->{Default}'" : "'1970-01-01 00:00:00'";
             }
             else {
                 $Default = defined $Tag->{Default} ? "'$Tag->{Default}'" : "''";
