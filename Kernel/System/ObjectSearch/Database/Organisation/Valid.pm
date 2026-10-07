@@ -113,7 +113,7 @@ sub Sort {
             $TableAliasTLP .= $Count;
             $TableAliasTL  .= $Count;
 
-            push( @SQLJoin, "LEFT OUTER JOIN translation_pattern $TableAliasTLP ON $TableAliasTLP.value = ov.name" );
+            push( @SQLJoin, "LEFT OUTER JOIN translation_pattern $TableAliasTLP ON $TableAliasTLP.value_md5 = MD5(ov.name)" );
             push( @SQLJoin, "LEFT OUTER JOIN translation_language $TableAliasTL ON $TableAliasTL.pattern_id = $TableAliasTLP.id AND $TableAliasTL.language = '$Param{Language}'" );
 
             $Param{Flags}->{JoinMap}->{TranslationOrganisationValid} = $Count;
