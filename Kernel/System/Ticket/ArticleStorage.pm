@@ -821,8 +821,8 @@ sub ArticleAttachment {
         SQL => '
             SELECT id, filename, content_type, content_size, content_id, content_alternative, disposition
             FROM article_attachment
-            WHERE id = ?',
-        Bind => [ \$Param{AttachmentID} ],
+            WHERE id = ? AND article_id = ?',
+        Bind => [ \$Param{AttachmentID}, \$Param{ArticleID} ],
     );
 
     my %Data;
@@ -872,6 +872,8 @@ sub ArticleAttachment {
             Disposition        => $Disposition,
         );
     }
+
+    return if ( !%Data );
 
     return %Data if ( $Param{NoContent} );
 
