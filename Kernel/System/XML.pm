@@ -812,9 +812,11 @@ sub XMLParse {
             $Self->{XMLQuote} = 0;
         }
         else {
+            my $Error = $@;
+
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "C-Parser: $@!$Sourcename"
+                Message  => "C-Parser: $Error!$Sourcename"
             );
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',

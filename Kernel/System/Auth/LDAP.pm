@@ -150,11 +150,14 @@ sub Auth {
     # ldap connect and bind (maybe with SearchUserDN and SearchUserPw)
     my $LDAP = Net::LDAP->new( $Self->{Host}, %{ $Self->{Params} } );
     if ( !$LDAP ) {
+        my $Error = $@;
+
         $Kernel::OM->Get('Log')->Log(
            Priority => 'error',
-           Message  => "[Auth::LDAP] Can't connect to '$Self->{Host}': '$@'! "
+           Message  => "[Auth::LDAP] Can't connect to '$Self->{Host}': '$Error'! "
                 . "(REMOTE_ADDR: '$RemoteAddr', Backend: '$Self->{Config}->{Name}')",
         );
+
         return;
     }
     my $Result = '';

@@ -120,13 +120,12 @@ sub Require {
     if ($@) {
         my $ErrorMessage = $@;
 
-        if ( !$Param{Silent} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Caller   => 1,
-                Priority => 'error',
-                Message  => $ErrorMessage,
-            );
-        }
+        $Kernel::OM->Get('Log')->Log(
+            Caller   => 1,
+            Priority => 'error',
+            Message  => $ErrorMessage,
+            Silent   => $Param{Silent}
+        );
 
         return;
     }

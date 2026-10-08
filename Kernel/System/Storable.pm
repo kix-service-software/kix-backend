@@ -95,12 +95,14 @@ sub Serialize {
 
     # error handling
     if ($@) {
-        if ( !$Param{Silent} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Error serializing data: $@",
-            );
-        }
+        my $Error = $@;
+
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Error serializing data: $Error",
+            Silent   => $Param{Silent}
+        );
+
         return;
     }
 
@@ -131,12 +133,14 @@ sub Deserialize {
 
     # error handling
     if ($@) {
-        if ( !$Param{Silent} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Error deserializing data: $@",
-            );
-        }
+        my $Error = $@;
+
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Error deserializing data: $Error",
+            Silent   => $Param{Silent}
+        );
+
         return;
     }
 
@@ -184,12 +188,14 @@ sub Clone {
 
     # error handling
     if ($@) {
-        if ( !$Param{Silent} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Error cloning data: $@",
-            );
-        }
+        my $Error = $@;
+
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Error cloning data: $Error",
+            Silent   => $Param{Silent}
+        );
+
         return;
     }
 

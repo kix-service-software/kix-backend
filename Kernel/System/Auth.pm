@@ -113,9 +113,11 @@ sub new {
 
             # require module
             if ( !$Kernel::OM->Get('Main')->Require( $Module ) ) {
+                my $Error = $@;
+
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
-                    Message  => 'Can not require auth backend module "' . $Config->{Module} . '": ' . $@
+                    Message  => 'Can not require auth backend module "' . $Config->{Module} . '": ' . $Error
                 );
 
                 next CONFIG;
@@ -184,9 +186,11 @@ sub new {
 
                     # require module
                     if ( !$Kernel::OM->Get('Main')->Require( $SyncModule ) ) {
+                        my $Error = $@;
+
                         $Kernel::OM->Get('Log')->Log(
                             Priority => 'error',
-                            Message  => 'Can not require auth sync backend module "' . $SyncConfig->{Module} . '": ' . $@
+                            Message  => 'Can not require auth sync backend module "' . $SyncConfig->{Module} . '": ' . $Error
                         );
 
                         next SYNCCONFIG;
@@ -279,9 +283,11 @@ sub new {
 
                 # require module
                 if ( !$Kernel::OM->Get('Main')->Require( $MFAModule ) ) {
+                    my $Error = $@;
+
                     $Kernel::OM->Get('Log')->Log(
                         Priority => 'error',
-                        Message  => 'Can not require multi factor auth backend module "' . $MFAConfig->{Module} . '": ' . $@
+                        Message  => 'Can not require multi factor auth backend module "' . $MFAConfig->{Module} . '": ' . $Error
                     );
 
                     next MFACONFIG;
