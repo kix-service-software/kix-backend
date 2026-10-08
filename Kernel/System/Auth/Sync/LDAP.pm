@@ -93,10 +93,13 @@ sub Sync {
     # ldap connect and bind (maybe with SearchUserDN and SearchUserPw)
     my $LDAP = Net::LDAP->new( $Self->{Host}, %{ $Self->{Params} } );
     if ( !$LDAP ) {
+        my $Error = $@;
+
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => "Can't connect to $Self->{Host}: $@",
+            Message  => "Can't connect to $Self->{Host}: $Error",
         );
+
         return;
     }
     my $Result;

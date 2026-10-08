@@ -321,13 +321,15 @@ sub _Init {
     };
 
     # error handling
-    if ($@) {
-        if ( !$Param{Silent} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Schedule: $Param{Schedule} is invalid:",
-            );
-        }
+    if ( $@ ) {
+        my $Error = $@;
+
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Schedule: $Param{Schedule} is invalid: $Error",
+            Silent   => $Param{Silent}
+        );
+
         return;
     }
 

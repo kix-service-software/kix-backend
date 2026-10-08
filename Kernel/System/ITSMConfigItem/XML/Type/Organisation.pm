@@ -69,7 +69,10 @@ get the xml data of a version
 sub ValueLookup {
     my ( $Self, %Param ) = @_;
 
-    return q{} if !$Param{Value};
+    return q{} if (
+        !$Param{Value}
+        || $Param{Value} !~ m/^\d+$/
+    );
 
     my %OrganisationSearchList = $Self->{OrganisationObject}->OrganisationGet(
         ID => $Param{Value},

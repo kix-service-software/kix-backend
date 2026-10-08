@@ -103,10 +103,12 @@ sub new {
         for my $CustModKey ( sort( keys(%CustomModules) ) ) {
             next if ( !$CustomModules{$CustModKey} );
             if ( !$Kernel::OM->Get('Main')->Require( $CustomModules{$CustModKey} ) ) {
+                my $Error = $@;
+
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Can't load ITSMConfigItem custom module "
-                        . $CustomModules{$CustModKey} . " ($@)!",
+                        . $CustomModules{$CustModKey} . " ($Error)!",
                 );
             }
             else {
@@ -1413,6 +1415,10 @@ sub RecalculateCurrentIncidentState {
             Priority => 'error',
             Message  => 'Need ConfigItemID!',
         );
+        return;
+    }
+    # ignore invalid id values
+    if ( $Param{ConfigItemID} !~ m/^\d+$/ ) {
         return;
     }
 
@@ -2797,7 +2803,10 @@ sub _FindInciConfigItems {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    return if !$Param{ConfigItemID};
+    return if (
+        !$Param{ConfigItemID}
+        || $Param{ConfigItemID} !~ m/^\d+$/
+    );
 
     # if maxlevel is reached
     $Param{_Level}   //= 0;
@@ -2902,7 +2911,10 @@ sub _FindWarnConfigItems {
     my ( $Self, %Param ) = @_;
 
     # check needed stuff
-    return if !$Param{ConfigItemID};
+    return if (
+        !$Param{ConfigItemID}
+        || $Param{ConfigItemID} !~ m/^\d+$/
+    );
 
     # if maxlevel is reached
     $Param{_Level}   //= 0;
