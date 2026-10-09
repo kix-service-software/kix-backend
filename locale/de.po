@@ -2953,10 +2953,10 @@ msgstr "Checkliste"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
-"Checks if the headers \"In-Reply-To\" or \"References\" of a follow-up "
-"message contain a Message-ID of an article visible in the self service "
-"portal on this ticket. If so, the email is visible in the self service "
-"portal."
+"Checks whether the most recent article referenced by the Message-IDs in the "
+"\"In-Reply-To\" or \"References\" headers of a follow-up message is visible in "
+"the Self Service Portal for this ticket. If so, the email is visible in the "
+"Self Service Portal."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml

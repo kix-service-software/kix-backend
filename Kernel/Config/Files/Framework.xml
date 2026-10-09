@@ -1085,7 +1085,7 @@
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="PostMaster::FollowUp::CheckReferences" Required="0" Valid="1">
-        <Description Translatable="1">Checks if the headers "In-Reply-To" or "References" of a follow-up message contain a Message-ID of an article visible in the self service portal on this ticket. If so, the email is visible in the self service portal.</Description>
+        <Description Translatable="1">Checks whether the most recent article referenced by the Message-IDs in the "In-Reply-To" or "References" headers of a follow-up message is visible in the Self Service Portal for this ticket. If so, the email is visible in the Self Service Portal.</Description>
         <Group>Framework</Group>
         <SubGroup>Core::PostMaster</SubGroup>
         <Setting>
