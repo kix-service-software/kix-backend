@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
-"POT-Creation-Date: 2026-10-8 08:52+0000\n"
+"POT-Creation-Date: 2026-10-9 09:22+0000\n"
 "PO-Revision-Date: 2026-09-24 12:21+0000\n"
 "Last-Translator: fjacquemin <Frank.Jacquemin@kixdesk.com>\n"
 "Language-Team: French <http://weblate.vm.devel.cape-it.de/projects/kix18/"
@@ -3055,18 +3055,6 @@ msgstr "Liste de contrôle"
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid ""
-"Checks whether the most recent article referenced by the Message-IDs in the "
-"\"In-Reply-To\" or \"References\" headers of a follow-up message is visible in "
-"the Self Service Portal for this ticket. If so, the email is visible in the "
-"Self Service Portal."
-msgstr ""
-"Vérifie si l'article le plus récent référencé par les identifiants de message "
-"figurant dans les en-têtes \"In-Reply-To\" ou \"References\" d'un message de "
-"réponse est visible dans le portail en libre-service pour ce ticket. Si tel est "
-"le cas, l'e-mail est visible dans le portail en libre-service."
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
-msgid ""
 "Checks if the sender of a follow-up message is contained in agent database, "
 "and if so sets sender type \"agent\"."
 msgstr ""
@@ -3090,6 +3078,19 @@ msgid ""
 msgstr ""
 "Vérifie si le délai d'expiration fixé par l'utilisateur a expiré et le "
 "réinitialise."
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid ""
+"Checks whether the most recent article referenced by the Message-IDs in the "
+"\"In-Reply-To\" or \"References\" headers of a follow-up message is visible "
+"in the Self Service Portal for this ticket. If so, the email is visible in "
+"the Self Service Portal."
+msgstr ""
+"Vérifie si l'article le plus récent référencé par les identifiants de "
+"message figurant dans les en-têtes \"In-Reply-To\" ou \"References\" d'un "
+"message de réponse est visible dans le portail en libre-service pour ce "
+"ticket. Si tel est le cas, l'e-mail est visible dans le portail en libre-"
+"service."
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Child"
