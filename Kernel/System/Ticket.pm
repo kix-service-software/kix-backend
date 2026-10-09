@@ -3320,18 +3320,18 @@ sub TicketArchiveFlagSet {
 
 to set a ticket state
 
-    my $Success = $TicketObject->TicketStateSet(
+    my $NewStateID = $TicketObject->TicketStateSet(
         State     => 'open',
         TicketID  => 123,
         ArticleID => 123, #optional, for history
         UserID    => 123,
     );
 
-    my $Success = $TicketObject->TicketStateSet(
+    my $NewStateID = $TicketObject->TicketStateSet(
         StateID  => 3,
         TicketID => 123,
         UserID   => 123,
-    );
+    ); 
 
 Optional attribute:
 SendNoNotification, disable or enable agent and customer notification for this
@@ -3348,9 +3348,6 @@ Events:
 
 sub TicketStateSet {
     my ( $Self, %Param ) = @_;
-
-    my %State;
-    my $ArticleID = $Param{ArticleID} || '';
 
     # check needed stuff
     for my $Needed (qw(TicketID UserID)) {
@@ -3370,83 +3367,73 @@ sub TicketStateSet {
         return;
     }
 
-    # get state object
-    my $StateObject = $Kernel::OM->Get('State');
-
-    # KIX4OTRS-capeIT
-    # get previous state if state placeholder is used
-    if ( $Param{State} && $Param{State} eq '_PREVIOUS_' ) {
-        $Param{State} = $Self->GetPreviousTicketState(
-            TicketID => $Param{TicketID},
-        );
-    }
-
     my %Ticket = $Self->TicketGet(
         TicketID      => $Param{TicketID},
         DynamicFields => 0,
     );
 
-    # use fallback if previous state could not be replaced
-    if ( defined( $Param{State} ) && ( $Param{State} eq '0' || $Param{State} eq '_PREVIOUS_' ) )
-    {
-        my $FallbackStates =
-            $Kernel::OM->Get('Config')->Get('TicketStateWorkflow::FallbackForPreviousState')
-            || 0;
-        my $FallbackStatesExtended
-            = $Kernel::OM->Get('Config')->Get('TicketStateWorkflowExtension::FallbackForPreviousState');
-        if ( defined $FallbackStatesExtended && ref $FallbackStatesExtended eq 'HASH' ) {
-            for my $Extension ( sort keys %{$FallbackStatesExtended} ) {
-                for my $Type ( keys %{ $FallbackStatesExtended->{$Extension} } ) {
-                    $FallbackStates->{$Type} = $FallbackStatesExtended->{$Extension}->{$Type};
-                }
+    # get previous state if state placeholder is used
+    if (
+        !$Param{StateID}
+        && $Param{State}
+        && $Param{State} eq '_PREVIOUS_'
+    ) {
+        $Param{State} = $Self->GetPreviousTicketState(
+            TicketID => $Param{TicketID},
+        ) || undef;
+
+        # use fallback if previous state could not be replaced
+        if ( !defined( $Param{State} ) ) {
+            my $FallbackStates = $Kernel::OM->Get('Config')->Get('TicketStateWorkflow::FallbackForPreviousState') || {};
+            if ( IsHashRef( $FallbackStates ) ) {
+                $Param{State} = $FallbackStates->{ $Ticket{Type} . ':::' . $Ticket{State} }
+                    || $FallbackStates->{ $Ticket{Type} }
+                    || undef;
+            }
+
+            if ( !defined( $Param{State} ) ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => 'Missing fallback for previous state!'
+                );
+                return;
             }
         }
-
-        if ( $FallbackStates && ref($FallbackStates) eq 'HASH' ) {
-            $Param{State} =
-                $FallbackStates->{ $Ticket{Type} . ':::' . $Ticket{State} }
-                || $FallbackStates->{ $Ticket{Type} }
-                || '_PREVIOUS_';
-        }
-    }
-
-    # EO KIX4OTRS-capeIT
-
-    # state id lookup
-    if ( !$Param{StateID} ) {
-        %State = $StateObject->StateGet( Name => $Param{State} );
     }
 
     # state lookup
-    if ( !$Param{State} ) {
-        %State = $StateObject->StateGet( ID => $Param{StateID} );
+    my %State;
+    # by id
+    if ( $Param{StateID} ) {
+        %State = $Kernel::OM->Get('State')->StateGet(
+            ID => $Param{StateID}
+        );
+    }
+    # by name
+    elsif ( $Param{State} ) {
+        %State = $Kernel::OM->Get('State')->StateGet(
+            Name => $Param{State}
+        );
     }
     if ( !%State ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => 'Need StateID or State!'
+            Message  => 'Need valid StateID or State!'
         );
         return;
     }
 
     # check if update is needed
-    # KIX4OTRS-capeIT
-    # moved content upwards
-    # my %Ticket = $Self->TicketGet( TicketID => $Param{TicketID} );
-    # EO KIX4OTRS-capeIT
-
-    if ( $State{Name} eq $Ticket{State} ) {
-
+    if ( $State{ID} eq $Ticket{StateID} ) {
         # update is not needed
-        # KIX4OTRS-capeIT
-        # return 1;
         return $State{ID};
-
-        # EO KIX4OTRS-capeIT
     }
 
     # permission check
-    my %StateList = $Self->TicketStateList(%Param);
+    my %StateList = $Self->TicketStateList(
+        TicketID => $Param{TicketID},
+        UserID   => $Param{UserID}
+    );
     if ( !$StateList{ $State{ID} } ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
@@ -3466,6 +3453,9 @@ sub TicketStateSet {
     $Self->_TicketCacheClear(
         TicketID => $Param{TicketID}
     );
+
+    # prepare ArticleID
+    my $ArticleID = $Param{ArticleID} || '';
 
     # add history
     $Self->HistoryAdd(
@@ -3495,11 +3485,7 @@ sub TicketStateSet {
         ObjectID  => $Param{TicketID}.'::'.$Ticket{StateID}.'::'.$State{ID},
     );
 
-    # KIX4OTRS-capeIT
-    # return 1;
     return $State{ID};
-
-    # EO KIX4OTRS-capeIT
 }
 
 =item TicketStateList()
@@ -3508,22 +3494,6 @@ to get the state list for a ticket (depends on workflow, if configured)
 
     my %States = $TicketObject->TicketStateList(
         TicketID => 123,
-        UserID   => 123,
-    );
-
-    my %States = $TicketObject->TicketStateList(
-        TicketID       => 123,
-        ContactID => 'customer_user_id_123',
-    );
-
-    my %States = $TicketObject->TicketStateList(
-        QueueID => 123,
-        UserID  => 123,
-    );
-
-    my %States = $TicketObject->TicketStateList(
-        TicketID => 123,
-        Type     => 'open',
         UserID   => 123,
     );
 
@@ -3540,63 +3510,27 @@ Returns:
 sub TicketStateList {
     my ( $Self, %Param ) = @_;
 
+
+    # check needed stuff
+    if ( !$Param{UserID} ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => 'Need UserID!'
+        );
+        return;
+    }
+
     my %States;
-
-    # check needed stuff
-    if ( !$Param{UserID} && !$Param{ContactID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Need UserID or ContactID!'
-        );
-        return;
-    }
-
-    # check needed stuff
-    if ( !$Param{QueueID} && !$Param{TicketID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Need QueueID, TicketID!'
-        );
-        return;
-    }
-
-    # get config object
-    my $ConfigObject = $Kernel::OM->Get('Config');
-
-    # get state object
-    my $StateObject = $Kernel::OM->Get('State');
-
     # get states by type
     if ( $Param{Type} ) {
-        %States = $StateObject->StateGetStatesByType(
+        %States = $Kernel::OM->Get('State')->StateGetStatesByType(
             Type   => $Param{Type},
             Result => 'HASH',
         );
     }
-    elsif ( $Param{Action} ) {
-
-        if (
-            ref $ConfigObject->Get("Ticket::Frontend::$Param{Action}")->{StateType} ne
-            'ARRAY'
-            )
-        {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need config for Ticket::Frontend::$Param{Action}->StateType!"
-            );
-            return;
-        }
-
-        my @StateType = @{ $ConfigObject->Get("Ticket::Frontend::$Param{Action}")->{StateType} };
-        %States = $StateObject->StateGetStatesByType(
-            StateType => \@StateType,
-            Result    => 'HASH',
-        );
-    }
-
     # get whole states list
     else {
-        %States = $StateObject->StateList(
+        %States = $Kernel::OM->Get('State')->StateList(
             UserID => $Param{UserID},
         );
     }
@@ -5764,7 +5698,7 @@ sub TSWFCommonNextStates {
 
         my %States = $Kernel::OM->Get('Ticket')->TicketStateList(
             TicketID => $CurrTID,
-            UserID => $Param{UserID} || 1,
+            UserID   => $Param{UserID} || 1,
         );
 
         my @CurrNextStatesArr;

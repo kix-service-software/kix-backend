@@ -79,7 +79,6 @@ sub Run {
 
         TICKETID:
         for my $TicketID (@TicketIDs) {
-
             # get ticket data
             my %Ticket = $Kernel::OM->Get('Ticket')->TicketGet(
                 TicketID      => $TicketID,
@@ -88,33 +87,32 @@ sub Run {
             );
 
             my $NewState;
-
             if ( $States->{"$Ticket{Type}:::$Ticket{State}" } || $States->{$Ticket{State}} ) {
                 $NewState = $States->{"$Ticket{Type}:::$Ticket{State}"} || $States->{$Ticket{State}};
             }
 
-            next TICKETID if !$NewState;
+            next TICKETID if ( !$NewState );
 
             $Self->Print(
                 " Update ticket state for ticket $Ticket{TicketNumber} ($TicketID) to '$NewState'..."
             );
 
             # set new state
-            my $Success = $Kernel::OM->Get('Ticket')->TicketStateSet(
+            my $NewStateID = $Kernel::OM->Get('Ticket')->TicketStateSet(
                 TicketID => $TicketID,
                 State    => $NewState,
                 UserID   => 1,
             );
 
             # error handling
-            if ( !$Success ) {
+            if ( !$NewStateID ) {
                 $Self->Print(" failed.\n");
                 next TICKETID;
             }
 
             # get state type for new state
             my %State = $Kernel::OM->Get('State')->StateGet(
-                Name => $States->{$Ticket{State}},
+                ID => $NewStateID,
             );
             if ( $State{TypeName} eq 'closed' ) {
 
