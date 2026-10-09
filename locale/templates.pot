@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: KIX\n"
-"POT-Creation-Date: 2026-10-8 08:52+0000\n"
+"POT-Creation-Date: 2026-10-9 09:22+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2491,13 +2491,6 @@ msgid "Checklist"
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
-"Checks whether the most recent article referenced by the Message-IDs in the "
-"\"In-Reply-To\" or \"References\" headers of a follow-up message is visible in "
-"the Self Service Portal for this ticket. If so, the email is visible in the "
-"Self Service Portal."
-msgstr ""
-
-#. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Checks if the sender of a follow-up message is contained in agent database, and if so sets sender type \"agent\"."
 msgstr ""
 
@@ -2507,6 +2500,10 @@ msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
 msgid "Checks whether the OutOfOffice set by the user has expired and resets it."
+msgstr ""
+
+#. SysConfig: Kernel/Config/Files/Framework.xml
+msgid "Checks whether the most recent article referenced by the Message-IDs in the \"In-Reply-To\" or \"References\" headers of a follow-up message is visible in the Self Service Portal for this ticket. If so, the email is visible in the Self Service Portal."
 msgstr ""
 
 #. SysConfig: Kernel/Config/Files/Framework.xml
