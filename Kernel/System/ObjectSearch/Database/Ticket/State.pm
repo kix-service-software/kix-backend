@@ -112,7 +112,7 @@ sub AttributePrepare {
                 $TableAliasTLP .= $Count;
                 $TableAliasTL  .= $Count;
 
-                push( @SQLJoin, "LEFT OUTER JOIN translation_pattern $TableAliasTLP ON $TableAliasTLP.value = ts.name" );
+                push( @SQLJoin, "LEFT OUTER JOIN translation_pattern $TableAliasTLP ON $TableAliasTLP.value_md5 = MD5(ts.name)" );
                 push( @SQLJoin, "LEFT OUTER JOIN translation_language $TableAliasTL ON $TableAliasTL.pattern_id = $TableAliasTLP.id AND $TableAliasTL.language = '$Param{Language}'" );
 
                 $Param{Flags}->{JoinMap}->{TranslationTicketState} = $Count;

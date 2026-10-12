@@ -349,10 +349,56 @@ foreach my $What ( qw(role_permission role_user roles) ) {
 # cleanup whole cache
 $Kernel::OM->Get('Cache')->CleanUp();
 
+# load translations for given language
+my @Translations = $Kernel::OM->Get('Translation')->TranslationList();
+my %TranslationsDE;
+for my $Translation ( @Translations ) {
+    $TranslationsDE{ $Translation->{Pattern} } = $Translation->{Languages}->{'de'};
+}
+
 ## prepare test valid ##
 my $ValidID1 = 1;
 my $ValidID2 = 2;
 my $ValidID3 = 3;
+my $ValidName1 = $Kernel::OM->Get('Valid')->ValidLookup(
+    ValidID => $ValidID1
+);
+$Self->Is(
+    $ValidName1,
+    'valid',
+    'ValidID 1 has expected name'
+);
+$Self->Is(
+    $TranslationsDE{ $ValidName1 },
+    'gültig',
+    'ValidID 1 has expected translation (de)'
+);
+my $ValidName2 = $Kernel::OM->Get('Valid')->ValidLookup(
+    ValidID => $ValidID2
+);
+$Self->Is(
+    $ValidName2,
+    'invalid',
+    'ValidID 2 has expected name'
+);
+$Self->Is(
+    $TranslationsDE{ $ValidName2 },
+    'ungültig',
+    'ValidID 2 has expected translation (de)'
+);
+my $ValidName3 = $Kernel::OM->Get('Valid')->ValidLookup(
+    ValidID => $ValidID3
+);
+$Self->Is(
+    $ValidName3,
+    'invalid-temporarily',
+    'ValidID 3 has expected name'
+);
+$Self->Is(
+    $TranslationsDE{ $ValidName3 },
+    'temporär ungültig',
+    'ValidID 3 has expected translation (de)'
+);
 
 ## prepare test roles ##
 # first role
@@ -489,6 +535,67 @@ my @IntegrationSortTests = (
             }
         ],
         Expected => [$RoleID3, $RoleID2, $RoleID1]
+    },
+    {
+        Name     => 'Sort: Field Valid',
+        Sort     => [
+            {
+                Field => 'Valid'
+            }
+        ],
+        Expected => [$RoleID2,$RoleID3,$RoleID1]
+    },
+    {
+        Name     => 'Sort: Field Valid / Direction ascending',
+        Sort     => [
+            {
+                Field     => 'Valid',
+                Direction => 'ascending'
+            }
+        ],
+        Expected => [$RoleID2,$RoleID3,$RoleID1]
+    },
+    {
+        Name     => 'Sort: Field Valid / Direction descending',
+        Sort     => [
+            {
+                Field     => 'Valid',
+                Direction => 'descending'
+            }
+        ],
+        Expected => [$RoleID1,$RoleID3,$RoleID2]
+    },
+    {
+        Name     => 'Sort: Field Valid / Language de',
+        Sort     => [
+            {
+                Field => 'Valid'
+            }
+        ],
+        Language => 'de',
+        Expected => [$RoleID1,$RoleID3,$RoleID2]
+    },
+    {
+        Name     => 'Sort: Field Valid / Direction ascending / Language de',
+        Sort     => [
+            {
+                Field     => 'Valid',
+                Direction => 'ascending'
+            }
+        ],
+        Language => 'de',
+        Expected => [$RoleID1,$RoleID3,$RoleID2]
+    },
+    {
+        Name     => 'Sort: Field Valid / Direction descending / Language de',
+        Sort     => [
+            {
+                Field     => 'Valid',
+                Direction => 'descending'
+            }
+        ],
+        Language => 'de',
+        Expected => [$RoleID2,$RoleID3,$RoleID1]
     }
 );
 for my $Test ( @IntegrationSortTests ) {
@@ -496,6 +603,7 @@ for my $Test ( @IntegrationSortTests ) {
         ObjectType => 'Role',
         Result     => 'ARRAY',
         Sort       => $Test->{Sort},
+        Language   => $Test->{Language},
         UserType   => 'Agent',
         UserID     => 1,
     );
