@@ -758,6 +758,10 @@ sub GenerateMessageID {
     if ( IsHashRefWithData($FQDN) ) {
         $FQDN = $FQDN->{Backend}
     }
+
+    # cleanup port from fqdn
+    $FQDN =~ s/:.+$//;
+
     my $NewMessageID = '<' . $Time . '.' . $Random . '@' . $FQDN . '>';
 
     return $NewMessageID;

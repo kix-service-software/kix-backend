@@ -369,7 +369,6 @@ sub _GetTicketData {
                     if (IsHashRefWithData($PreparedValue)) {
                         push(@DynamicFields, $PreparedValue);
                     }
-
                 }
             }
             next ATTRIBUTE;
@@ -388,8 +387,8 @@ sub _GetTicketData {
 
     # include AccountedTime if requested
     if ( $Param{Data}->{include}->{AccountedTime} && !defined $TicketData{AccountedTime} ) {
-        $TicketData{AccountedTime} = $TicketObject->TicketAccountedTimeGet(
-            TicketID => $TicketID,
+        $TicketData{AccountedTime} = $Kernel::OM->Get('TimeAccounting')->TimeAccountingTotal(
+            TicketID => $TicketID
         );
     }
 

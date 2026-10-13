@@ -20,8 +20,10 @@ use Kernel::System::VariableCheck qw(:all);
 use base qw(Kernel::System::Placeholder::Base);
 
 our @ObjectDependencies = (
+    'Contact',
     'HTMLUtils',
     'Log',
+    'Organisation',
     'User'
 );
 
@@ -62,10 +64,9 @@ sub _Replace {
     # get user object
     my $UserObject = $Kernel::OM->Get('User');
 
-    if ( !%Recipient && $Param{RecipientID} ) {
-
+    if ( !%Recipient && ($Param{RecipientID} || (IsHashRefWithData($Param{Data}) && $Param{Data}->{RecipientID} )) ) {
         %Recipient = $UserObject->GetUserData(
-            UserID => $Param{RecipientID},
+            UserID => $Param{RecipientID} || $Param{Data}->{RecipientID},
         );
     }
 
@@ -73,16 +74,29 @@ sub _Replace {
 
         # get contact of user if possible
         my %ContactOfUser;
-        if ($Recipient{UserID} && $Recipient{Type} eq 'Agent') {
+        if ($Recipient{UserID} && (!$Recipient{Type} || $Recipient{Type} eq 'Agent')) {
             %ContactOfUser = $Kernel::OM->Get('Contact')->ContactGet(
                 UserID => $Recipient{UserID},
             );
 
             # FIXME: change/remove it (ID handling) with placeholder refactoring
-            $Recipient{ID} = $Recipient{UserID};
+            $Recipient{ID}    = $Recipient{UserID};
+            $Recipient{Login} = $Recipient{UserLogin};
             if (IsHashRefWithData(\%ContactOfUser)) {
                 $ContactOfUser{ContactID} = $ContactOfUser{ID};
                 delete $ContactOfUser{ID};
+                $ContactOfUser{UserFirstname} = $ContactOfUser{Firstname};
+                $ContactOfUser{UserLastname}  = $ContactOfUser{Lastname};
+
+                if ($ContactOfUser{PrimaryOrganisationID}) {
+                    my %Organisation = $Kernel::OM->Get('Organisation')->OrganisationGet(
+                        ID => $ContactOfUser{PrimaryOrganisationID}
+                    );
+                    if (%Organisation) {
+                        $ContactOfUser{PrimaryOrganisation} = $Organisation{Name};
+                        $ContactOfUser{PrimaryOrganisationNumber} = $Organisation{Number};
+                    }
+                }
 
                 # HTML quoting of content
                 if ( $Param{RichText} ) {

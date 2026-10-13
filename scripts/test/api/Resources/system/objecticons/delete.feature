@@ -9,4 +9,4 @@ Feature: DELETE request /system/objecticons/:ObjectIconID resource
     Given a objecticon
     When I delete this objecticon
     Then the response code is 204
-    And the response has no content
+

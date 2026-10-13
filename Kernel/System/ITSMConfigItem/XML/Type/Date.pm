@@ -186,6 +186,10 @@ sub ValidateValue {
     if ( $Value =~ m{\A (\d{4} - \d{2} - \d{2} \z) }xms ) {
         $Value = $1 . ' 00:00:00';
     }
+    # cut time from param value
+    else {
+        $Param{Value} =~ s/\s.+$//;
+    }
 
     # convert the raw data to a system time format
     my $SystemTime = $Kernel::OM->Get('Time')->TimeStamp2SystemTime(

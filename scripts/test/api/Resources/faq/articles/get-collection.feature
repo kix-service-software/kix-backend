@@ -11,6 +11,7 @@
     Then the response object is FAQArticleCollectionResponse
 
   Scenario: get the list of existing faq articles filtered
+    When delete all of "FAQArticles"
     Given 8 of faq articles
     When I query the collection of faq articles with filter of "General"
     Then the response code is 200
@@ -22,6 +23,7 @@
     And the response has no content
 
   Scenario: get the list of initial faq articles with limit
+    When delete all of "FAQArticle"
     Given 8 of faq articles
     When I query the collection of faq articles with limit 4
     Then the response code is 200
@@ -31,10 +33,11 @@
     And the response has no content
 
   Scenario: get the list of initial faq articles with sorted
-    Given 8 of faq articles
+    When delete all of "FAQArticle"
+    Given 6 of faq articles
     When I query the collection of faq articles with sorted by "FAQArticle.-Title:textual"
     Then the response code is 200
-    And the response contains 8 items of type "FAQArticle"
+    And the response contains 6 items of type "FAQArticle"
     And the response contains the following items of type FAQArticle
       | Title                 |
       | Title for FAQ Article |
@@ -43,6 +46,7 @@
     And the response has no content
 
   Scenario: get the list of initial faq articles with offset
+    When delete all of "FAQArticle"
     Given 8 of faq articles
     When I query the collection of faq articles with offset 6
     Then the response code is 200
@@ -52,6 +56,7 @@
     And the response has no content
 
   Scenario: get the list of initial faq articles with limit and offset
+    When delete all of "FAQArticle"
     Given 8 of faq articles
     When I query the collection of faq articles with limit 2 and offset 1
     Then the response code is 200
@@ -61,6 +66,7 @@
     And the response has no content
 
   Scenario: get the list of initial faq articles with sorted, limit and offset
+    When delete all of "FAQArticle"
     Given 8 of faq articles
     When I query the collection of faq articles with sorted by "FAQArticle.-Title:textual" limit 4 and offset 1
     Then the response code is 200

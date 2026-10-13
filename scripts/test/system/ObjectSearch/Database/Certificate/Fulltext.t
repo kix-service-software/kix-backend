@@ -304,7 +304,7 @@ my $CertID4 = $List[3]->{FileID};
 my $CertID5 = $List[4]->{FileID};
 
 my $SearchValue1 = $List[0]->{Subject};
-my $SearchValue2 = $List[2]->{Email};
+my $SearchValue2 = $List[2]->{Email}->[0];
 my $SearchValue3 = $List[3]->{Subject};
 
 # discard contact object to process events

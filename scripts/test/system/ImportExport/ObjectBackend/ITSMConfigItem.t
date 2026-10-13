@@ -397,7 +397,7 @@ my @ConfigItems = (
                                 Date1 => [
                                     undef,
                                     {
-                                        Content => '2008-02-01 00:00:00',
+                                        Content => '2008-02-01',
                                     },
                                 ],
                                 DateTime1 => [
@@ -468,7 +468,7 @@ my @ConfigItems = (
                                 Date1 => [
                                     undef,
                                     {
-                                        Content => '2008-02-01 00:00:00',
+                                        Content => '2008-02-01',
                                     },
                                 ],
                                 DateTime1 => [
@@ -527,7 +527,7 @@ my @ConfigItems = (
                                 Date1 => [
                                     undef,
                                     {
-                                        Content => '2008-02-02 00:00:00',
+                                        Content => '2008-02-02',
                                     },
                                 ],
                                 DateTime1 => [
@@ -1344,7 +1344,7 @@ my @ExportDataTests = (
                 'Production',
                 'Operational',
                 $TestContact{Email},
-                '2008-02-01 00:00:00',
+                '2008-02-01',
                 '2008-02-01 03:59:00',
                 undef,
                 'Test1',
@@ -1456,8 +1456,8 @@ my @ExportDataTests = (
                 'Operational',
                 $TestContact{Email},
                 $TestContact{Email},
-                '2008-02-01 00:00:00',
-                '2008-02-01 00:00:00',
+                '2008-02-01',
+                '2008-02-01',
                 '2008-02-01 03:59:00',
                 '2008-02-01 03:59:00',
                 undef,

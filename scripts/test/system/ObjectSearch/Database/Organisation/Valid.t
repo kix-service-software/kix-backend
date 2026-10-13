@@ -284,7 +284,7 @@ my @SortTests = (
         Expected  => {
             'Join'    => [
                 'INNER JOIN valid ov ON ov.id = o.valid_id',
-                'LEFT OUTER JOIN translation_pattern tlp0 ON tlp0.value = ov.name',
+                'LEFT OUTER JOIN translation_pattern tlp0 ON tlp0.value_md5 = MD5(ov.name)',
                 'LEFT OUTER JOIN translation_language tl0 ON tl0.pattern_id = tlp0.id AND tl0.language = \'en\''
             ],
             'OrderBy' => [

@@ -133,7 +133,8 @@ sub Run {
                 TicketID                    => join(',', @{$PagedResult{Ticket}}),
                 include                     => $Param{Data}->{include},
                 expand                      => $Param{Data}->{expand},
-                NoDynamicFieldDisplayValues => $Param{Data}->{NoDynamicFieldDisplayValues}
+                NoDynamicFieldDisplayValues => $Param{Data}->{NoDynamicFieldDisplayValues},
+                DynamicFieldFilter          => $Param{Data}->{DynamicFieldFilter}
             }
         );
         if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {

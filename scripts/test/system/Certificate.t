@@ -40,6 +40,7 @@ for my $Method (
 $Helper->BeginWork();
 
 my $HomeDir = $Kernel::OM->Get('Config')->Get('Home');
+_GenerateCertByConf();
 my @Certificates = _ReadCertificates();
 my @Emails       = _ReadEmails();
 
@@ -225,7 +226,7 @@ my @TestsCGE = (
         Expected => {
             'CType'       => 'SMIME',
             'ContentType' => 'application/x-x509-ca-cert',
-            'Email'       => 'example@unittest.org',
+            'Email'       => ['example@unittest.org'],
             'EndDate'     => '2034-04-23 08:40:48',
             'FileID'      => '###ID###',
             'Filename'    => 'KIX_Cert_###ID###',
@@ -251,7 +252,7 @@ my @TestsCGE = (
         Expected => {
             'CType'       => 'SMIME',
             'ContentType' => 'application/x-x509-ca-cert',
-            'Email'       => 'example@unittest.org',
+            'Email'       => ['example@unittest.org'],
             'EndDate'     => '2034-04-23 08:40:48',
             'FileID'      => '###ID###',
             'Filename'    => 'KIX_Cert_###ID###',
@@ -328,7 +329,7 @@ END
         Expected => {
             'CType'       => 'SMIME',
             'ContentType' => 'application/x-x509-ca-cert',
-            'Email'       => 'example@unittest.org',
+            'Email'       => ['example@unittest.org'],
             'EndDate'     => '2034-04-23 08:40:48',
             'FileID'      => '###ID###',
             'Filename'    => 'KIX_Private_###ID###',
@@ -354,7 +355,7 @@ END
         Expected => {
             'CType'       => 'SMIME',
             'ContentType' => 'application/x-x509-ca-cert',
-            'Email'       => 'example@unittest.org',
+            'Email'       => ['example@unittest.org'],
             'EndDate'     => '2034-04-23 08:40:48',
             'FileID'      => '###ID###',
             'Filename'    => 'KIX_Private_###ID###',
@@ -447,7 +448,7 @@ END
         Expected => {
             'CType'       => 'SMIME',
             'ContentType' => 'application/pkix-cert',
-            'Email'       => 'example@unittest.org',
+            'Email'       => ['example@unittest.org'],
             'EndDate'     => '2029-04-24 08:44:04',
             'FileID'      => '###ID###',
             'Filename'    => 'KIX_Cert_###ID###',
@@ -473,7 +474,7 @@ END
         Expected => {
             'CType'       => 'SMIME',
             'ContentType' => 'application/pkix-cert',
-            'Email'       => 'example@unittest.org',
+            'Email'       => ['example@unittest.org'],
             'EndDate'     => '2029-04-24 08:44:04',
             'FileID'      => '###ID###',
             'Filename'    => 'KIX_Cert_###ID###',
@@ -631,7 +632,7 @@ END
             'CType'       => 'SMIME',
             'ContentType' => 'application/x-iwork-keynote-sffkey',
             'EndDate'     => '2029-04-24 08:44:04',
-            'Email'       => 'example@unittest.org',
+            'Email'       => ['example@unittest.org'],
             'FileID'      => '###ID###',
             'Filename'    => 'KIX_Private_###ID###',
             'Filepath'    => $Kernel::OM->Get('Config')->Get('Home') . '/var/ssl/private/KIX_Private_###ID###',
@@ -658,7 +659,7 @@ END
             'CType'       => 'SMIME',
             'ContentType' => 'application/x-iwork-keynote-sffkey',
             'EndDate'     => '2029-04-24 08:44:04',
-            'Email'       => 'example@unittest.org',
+            'Email'       => ['example@unittest.org'],
             'FileID'      => '###ID###',
             'Filename'    => 'KIX_Private_###ID###',
             'Filepath'    => $Kernel::OM->Get('Config')->Get('Home') . '/var/ssl/private/KIX_Private_###ID###',
@@ -731,6 +732,121 @@ END
         Expected => 1,
         Name     => 'Certificate: Exists / Type .KEY | application/x-iwork-keynote-sffkey / Private Key'
     },
+    {
+        Function => 'CertificateCreate',
+        Data     => {
+            File   => $Certificates[5],
+            Type   => 'Cert',
+            CType  => 'SMIME',
+            UserID => 1
+        },
+        Expected => 1,
+        Name     => 'Certificate: Create / Type .CRT | application/x-x509-ca-cert / Certificate'
+    },
+    {
+        Function => 'CertificateGet',
+        Data     => {
+            ID => '###ID###'
+        },
+        Index    => 5,
+        Expected => {
+            'CType'       => 'SMIME',
+            'ContentType' => 'application/x-x509-ca-cert',
+            'Email'       => [
+                'test2@example.com',
+                'test@example.com',
+                'test3@example.com'
+            ],
+            'EndDate'     => '###EndDate###',
+            'FileID'      => '###ID###',
+            'Filename'    => 'KIX_Cert_###ID###',
+            'Filepath'    => $Kernel::OM->Get('Config')->Get('Home') . '/var/ssl/certs/KIX_Cert_###ID###',
+            'Fingerprint' => '###Fingerprint###',
+            'Hash'        => '###Hash###',
+            'Issuer'      => '###Issuer###',
+            'Modulus'     => '###Modulus###',
+            'Serial'      => '###Serial###',
+            'StartDate'   => '###StartDate###',
+            'Subject'     => 'C =  DE, ST =  Sachsen, L =  Chemnitz, O =  TestOrg, OU =  IT, CN =  test@example.com',
+            'Type'        => 'Cert'
+        },
+        Name     => 'Certificate: Get / Type .CRT | application/x-x509-ca-cert / Certificate'
+    },
+    {
+        Function => 'CertificateExists',
+        Data     => {
+            Filename => 'Certificate/SMIME/Cert/###Fingerprint###',
+            Silent   => 1
+        },
+        Index    => 5,
+        Expected => 1,
+        Name     => 'Certificate: Exists / Type .CRT | application/x-x509-ca-cert / Certificate'
+    },
+    {
+        Function => 'CertificateCreate',
+        Data     => {
+            File       => $Certificates[6],
+            Type       => 'Private',
+            Passphrase => 'start123',
+            CType      => 'SMIME',
+            UserID     => 1
+        },
+        Expected => 1,
+        Name     => 'Certificate: Create / Type .KEY | application/x-iwork-keynote-sffkey / Private Key '
+    },
+    {
+        Function => 'CertificateGet',
+        Data     => {
+            ID => '###ID###'
+        },
+
+        Index    => 6,
+        Expected => {
+            'CType'       => 'SMIME',
+            'ContentType' => 'application/x-iwork-keynote-sffkey',
+            'Email'       => [
+                'test2@example.com',
+                'test@example.com',
+                'test3@example.com'
+            ],
+            'EndDate'     => '###EndDate###',
+            'FileID'      => '###ID###',
+            'Filename'    => 'KIX_Private_###ID###',
+            'Filepath'    => $Kernel::OM->Get('Config')->Get('Home') . '/var/ssl/private/KIX_Private_###ID###',
+            'Fingerprint' => '###Fingerprint###',
+            'Hash'        => '###Hash###',
+            'Issuer'      => '###Issuer###',
+            'Modulus'     => '###Modulus###',
+            'Serial'      => '###Serial###',
+            'StartDate'   => '###StartDate###',
+            'Subject'     => 'C =  DE, ST =  Sachsen, L =  Chemnitz, O =  TestOrg, OU =  IT, CN =  test@example.com',
+            'Type'        => 'Private'
+        },
+        Name     => 'Certificate: Get / Type .KEY | application/x-iwork-keynote-sffkey / Private Key'
+    },
+    {
+        Function => 'CertificateExists',
+        Data     => {
+            Modulus         => '###Modulus###',
+            Type            => 'Private',
+            HasCertificate  => 1,
+            CType           => 'SMIME',
+            Silent          => 1
+        },
+        Index    => 6,
+        Expected => 1,
+        Name     => 'Certificate: Exists / Type .KEY | application/x-iwork-keynote-sffkey / Private Key / Exists Certificate'
+    },
+    {
+        Function => 'CertificateExists',
+        Data     => {
+            Filename => 'Certificate/SMIME/Private/###Fingerprint###',
+            Silent   => 1
+        },
+        Index    => 6,
+        Expected => 1,
+        Name     => 'Certificate: Exists / Type .KEY | application/x-iwork-keynote-sffkey / Private Key'
+    }
 );
 
 for my $Test ( @TestsCGE ) {
@@ -764,6 +880,31 @@ for my $Test ( @TestsCGE ) {
         %{$Data->{Data}}
     );
 
+    if (
+        $Function eq 'CertificateGet'
+        && $Result
+    ) {
+        %{$CertificateIDs[$Data->{Index}]} = (
+            %{$CertificateIDs[$Data->{Index}]},
+            %{$Result}
+        );
+        if ( defined $Test->{Index} ) {
+            my $Tmp = $Kernel::OM->Get('JSON')->Encode(
+                Data => $Data
+            );
+            for my $Key ( keys %{$CertificateIDs[$Test->{Index}]} ) {
+                my $Pattern = "###$Key###";
+                my $Replace = $CertificateIDs[$Test->{Index}]->{$Key};
+
+                $Tmp =~ s/$Pattern/$Replace/g;
+            }
+
+            $Data = $Kernel::OM->Get('JSON')->Decode(
+                Data => $Tmp
+            );
+        }
+    }
+
     if ( $Function eq 'CertificateGet' ) {
         $Self->IsDeeply(
             $Result,
@@ -795,16 +936,6 @@ for my $Test ( @TestsCGE ) {
             {
                 ID => $Result
             }
-        );
-    }
-
-    if (
-        $Function eq 'CertificateGet'
-        && $Result
-    ) {
-        %{$CertificateIDs[$Data->{Index}]} = (
-            %{$CertificateIDs[$Data->{Index}]},
-            %{$Result}
         );
     }
 
@@ -1261,6 +1392,46 @@ my @TestsVD = (
             "Certificate: Decrypt + Verify / $Emails[1]->{Filename} / decryption / decrypted",
             "Certificate: Decrypt + Verify / $Emails[1]->{Filename} / verification / verified"
         ]
+    },
+    {
+        Functions => [ 'Verify' ],
+        Data      => {
+            %{$Emails[2]},
+            Type   => 'Email'
+        },
+        Expected => [
+            [
+                {
+                    'Value' => 1,
+                    'Key'   => 'SMIMESigned'
+                },
+                {
+                    'Key'   => 'SMIMESignedError',
+                    'Value' => "OpenSSL: Verification failure\n".'; self-signed certificate'
+                }
+            ]
+        ],
+        Name     => [ "Certificate: Verify / $Emails[2]->{Filename} / verified" ]
+    },
+    {
+        Functions => [ 'Verify' ],
+        Data      => {
+            %{$Emails[3]},
+            Type   => 'Email'
+        },
+        Expected => [
+            [
+                {
+                    'Value' => 1,
+                    'Key'   => 'SMIMESigned'
+                },
+                {
+                    'Key'   => 'SMIMESignedError',
+                    'Value' => "OpenSSL: Verification failure\n".'; self-signed certificate'
+                }
+            ]
+        ],
+        Name     => [ "Certificate: Verify / $Emails[3]->{Filename} / verified" ]
     }
 );
 
@@ -1453,10 +1624,10 @@ sub _ExistsFilesInFS {
     $Self->IsDeeply(
         \%Counts,
         {
-            Cert    => 3,
-            Private => 2
+            Cert    => 4,
+            Private => 3
         },
-        'Certificate: Export / Check / Count: Certificates 3 | Private Key 2'
+        'Certificate: Export / Check / Count: Certificates 4 | Private Key 3'
     );
 
     return 1;
@@ -1494,6 +1665,16 @@ sub _ReadCertificates {
         {
             Filename    => 'Example.key',
             Filesize    => 1_751,
+            ContentType => 'application/x-iwork-keynote-sffkey',
+            Name        => 'Certificate: Read / Type .KEY | application/x-iwork-keynote-sffkey / Private Key'
+        },
+        {
+            Filename    => 'smime.crt',
+            ContentType => 'application/x-x509-ca-cert',
+            Name        => 'Certificate: Read / Type .CRT | application/x-x509-ca-cert / Certificate'
+        },
+        {
+            Filename    => 'smime.key',
             ContentType => 'application/x-iwork-keynote-sffkey',
             Name        => 'Certificate: Read / Type .KEY | application/x-iwork-keynote-sffkey / Private Key'
         }
@@ -1541,6 +1722,16 @@ sub _ReadEmails {
             Filesize    => 6_778,
             ContentType => 'application/vnd.previewsystems.box',
             Name        => 'Certificate: Read / UnitTest_Encrypted_Signed.box / Email'
+        },
+        {
+            Filename    => 'UnitTest_Signed_Test.box',
+            ContentType => 'application/vnd.previewsystems.box',
+            Name        => 'Certificate: Read / UnitTest_Encrypted_Signed_Test.box / Email'
+        },
+        {
+            Filename    => 'UnitTest_Signed_Test2.box',
+            ContentType => 'application/vnd.previewsystems.box',
+            Name        => 'Certificate: Read / UnitTest_Encrypted_Signed_Test2.box / Email'
         }
     );
 
@@ -1573,6 +1764,22 @@ sub _ReadEmails {
     }
 
     return @List;
+}
+
+# Test for KIX2018-15214
+sub _GenerateCertByConf {
+    my ( %Param ) = @_;
+
+    my $Cmd = $Kernel::OM->Get('Certificate')->{Cmd};
+
+    # create private key
+    my $Options = "genrsa -out $HomeDir/scripts/test/system/sample/Certificate/Certificates/smime.key 4096";
+    my $LogMessage = qx{$Cmd $Options 2>&1};
+
+    $Options = "req -x509 -new -nodes -key $HomeDir/scripts/test/system/sample/Certificate/Certificates/smime.key -sha256 -days 365 -out $HomeDir/scripts/test/system/sample/Certificate/Certificates/smime.crt -config $HomeDir/scripts/test/system/sample/Certificate/Certificates/smime.cnf";
+    $LogMessage = qx{$Cmd $Options 2>&1};
+
+    return;
 }
 
 # rollback transaction on database

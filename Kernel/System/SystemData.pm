@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/ 
+# Modified version of the work: Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -157,7 +157,8 @@ sub SystemDataGet {
     if ( !$Param{Key} ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => "Need Key!"
+            Message  => "Need Key!",
+            Silent   => $Param{Silent}
         );
         return;
     }
@@ -224,7 +225,8 @@ sub SystemDataDelete {
         if ( !$Param{$_} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "Need $_!"
+                Message  => "Need $_!",
+                Silent   => $Param{Silent}
             );
             return;
         }
@@ -278,7 +280,8 @@ sub _SystemDataCacheKeyDelete {
     if ( !$Param{Key} ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => "_SystemDataCacheKeyDelete: need 'Key'!"
+            Message  => "_SystemDataCacheKeyDelete: need 'Key'!",
+            Silent   => $Param{Silent}
         );
         return;
     }

@@ -471,7 +471,8 @@ sub ReportDelete {
     );
     foreach my $ResultID ( @ReportResultList ) {
         my $Success = $Self->ReportResultDelete(
-            ID => $ResultID
+            ID     => $ResultID,
+            Silent => $Param{Silent}
         );
         if ( !$Success ) {
             $Kernel::OM->Get('Log')->Log(

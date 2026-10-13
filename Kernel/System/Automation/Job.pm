@@ -682,6 +682,9 @@ sub JobDelete {
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
     );
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => 'ObjectSearch_Automation_JobRun',
+    );
 
     # event
     $Self->EventHandler(
@@ -1203,10 +1206,12 @@ sub JobIsExecutable {
 executes a job
 
     my $Success = $AutomationObject->JobExecute(
-        ID        => 123,       # the ID of the job
-        Data      => {},        # optional, contains the relevant data given by an event or otherwise
-        Async     => 0|1,       # optional, default 0
-        UserID    => 1
+        ID           => 123,       # the ID of the job
+        Data         => {},        # optional, contains the relevant data given by an event or otherwise
+        Async        => 0|1,       # optional, default 0
+        IsEventBased => 1,         # optional, set when job is execcuted for an event,
+                                   # so last execution time is only updated when related object matches the filter
+        UserID       => 1
     );
 
 =cut
@@ -1260,25 +1265,15 @@ sub _JobExecute {
         }
     }
 
-    # add JobID for log reference
-    $Self->{JobID} = $Param{ID};
-
     my $StartTime;
     if ( $Self->{Debug} ) {
         $StartTime = time();
     }
 
-    # update execution time of job
-    my $Success = $Self->_JobLastExecutionTimeSet(
-        ID         => $Param{ID},
-        UserID     => $Param{UserID},
-    );
-
     # get Job data
     my %Job = $Self->JobGet(
         ID => $Param{ID}
     );
-
     if ( !%Job ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
@@ -1287,12 +1282,60 @@ sub _JobExecute {
         return;
     }
 
+    # load type backend module
+    my $BackendObject = $Self->_LoadJobTypeBackend(
+        Name => $Job{Type},
+    );
+
+    my @ObjectIDs;
+    if (!$BackendObject) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "No backend object found for job type \"$Job{Type}\"."
+        );
+        return;
+    }
+
+    # execute backend object for given type to get the (real) list of objects (search or filter)
+    @ObjectIDs = $BackendObject->Run(
+        Data         => $Param{Data},
+        IsEventBased => $Param{IsEventBased},
+        Filter       => $Job{Filter},
+        SortOrder    => $Job{SortOrder},
+        UserID       => $Param{UserID},
+    );
+
+    if ( $Self->{Debug} ) {
+        $Self->_Debug(sprintf "    _JobExecute: checking backend and fetching relevant objects took %i ms", (time() - $StartTime) * 1000);
+    }
+
+    if ( !@ObjectIDs ) {
+        if ( !$Param{IsEventBased} ) {
+            # update execution time of job
+            my $Success = $Self->_JobLastExecutionTimeSet(
+                ID     => $Param{ID},
+                UserID => $Param{UserID},
+            );
+        }
+
+        return -1;
+    }
+
+    if ( $Self->{Debug} ) {
+        $StartTime = time();
+    }
+
+    # update execution time of job
+    my $Success = $Self->_JobLastExecutionTimeSet(
+        ID     => $Param{ID},
+        UserID => $Param{UserID},
+    );
+
     # create job run
     my $RunID = $Self->_JobRunAdd(
         %Param,
         JobID => $Param{ID},
     );
-
     if ( !$RunID ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
@@ -1305,7 +1348,8 @@ sub _JobExecute {
         $Self->_Debug(sprintf "    _JobExecute: preparations and creating job run took %i ms", (time() - $StartTime) * 1000);
     }
 
-    # add RunID for log reference
+    # add JobID and RunID for log reference
+    $Self->{JobID} = $Param{ID};
     $Self->{RunID} = $RunID;
 
     if ( $Self->{Debug} ) {
@@ -1325,101 +1369,70 @@ sub _JobExecute {
     my $Warning = 0;
     if ( !IsArrayRefWithData(\@MacroIDs) ) {
         $Self->LogInfo(
-            Message  => "Job \"$Job{Name}\" has no macros to execute.",
-            UserID   => $Param{UserID},
+            Message => "Job \"$Job{Name}\" has no macros to execute.",
+            UserID  => $Param{UserID},
         );
         $Warning = 1;
     } else {
-
         if ( $Self->{Debug} ) {
             $StartTime = time();
         }
 
         # check the macro if they are executable, return success if not
-        my $ExecutableMacroCount = 0;
-        foreach my $MacroID ( @MacroIDs ) {
-            $ExecutableMacroCount++ if $Self->MacroIsExecutable(
+        my @ExecutableMacroIDs = ();
+        for my $MacroID ( @MacroIDs ) {
+            my $MacroIsExecutable = $Self->MacroIsExecutable(
                 ID     => $MacroID,
                 UserID => $Param{UserID},
             );
+            if ( $MacroIsExecutable ) {
+                push(@ExecutableMacroIDs, $MacroID);
+            }
         }
 
-        if ( !$ExecutableMacroCount ) {
+        if ( !@ExecutableMacroIDs ) {
             $Self->LogInfo(
-                Message  => "Job \"$Job{Name}\" has assigned macros but none of them is executable. Aborting job execution.",
-                UserID   => $Param{UserID},
+                Message => "Job \"$Job{Name}\" has assigned macros but none of them is executable. Aborting job execution.",
+                UserID  => $Param{UserID},
             );
             $Warning = 1;
         } else {
-
-            # load type backend module
-            my $BackendObject = $Self->_LoadJobTypeBackend(
-                Name => $Job{Type},
+            $Self->LogInfo(
+                Message => "executing job \"$Job{Name}\" with " . scalar(@ExecutableMacroIDs) . " macros on " . scalar(@ObjectIDs) . " objects.",
+                UserID  => $Param{UserID},
             );
 
-            my @ObjectIDs;
-            if (!$BackendObject) {
-                $Self->LogInfo(
-                    Message  => "No backend object found for job type \"$Job{Type}\".",
-                    UserID   => $Param{UserID},
-                );
-                $Warning = 1;
-            } else {
-
-                # execute backend object for given type to get the (real) list of objects (search or filter)
-                @ObjectIDs = $BackendObject->Run(
-                    Data      => $Param{Data},
-                    Filter    => $Job{Filter},
-                    SortOrder => $Job{SortOrder},
-                    UserID    => $Param{UserID},
-                );
-
-                if ( !@ObjectIDs ) {
-                    $Self->LogInfo(
-                        Message  => "No relevant objects. Aborting job execution.",
-                        UserID   => $Param{UserID},
+            # execute every executable macro with the list of objects
+            for my $MacroID ( @ExecutableMacroIDs ) {
+                for my $ObjectID ( @ObjectIDs ) {
+                    my $Result = $Self->MacroExecute(
+                        ID        => $MacroID,
+                        ObjectID  => $ObjectID,
+                        EventData => $Param{Data},
+                        UserID    => $Param{UserID},
                     );
+
+                    if ( !$Result ) {
+                        my %Macro = $Self->MacroGet(
+                            ID     => $MacroID,
+                            UserID => $Param{UserID},
+                        );
+
+                        $Self->LogError(
+                            Message => "Macro $Macro{Name} returned execution error for ObjectID $ObjectID.",
+                            UserID  => $Param{UserID},
+                        );
+                        $Warning = 1;
+                    }
                 }
             }
 
-            if (@ObjectIDs) {
-                $Self->LogInfo(
-                    Message  => "executing job \"$Job{Name}\" with $ExecutableMacroCount macros on ".(scalar(@ObjectIDs))." objects.",
-                    UserID   => $Param{UserID},
-                );
-
-                # execute any macro with the list of objects
-                foreach my $MacroID ( sort @MacroIDs ) {
-                    foreach my $ObjectID ( @ObjectIDs ) {
-                        my $Result = $Self->MacroExecute(
-                            ID        => $MacroID,
-                            ObjectID  => $ObjectID,
-                            EventData => $Param{Data},
-                            UserID    => $Param{UserID},
-                        );
-
-                        if ( !$Result ) {
-                            my %Macro = $Self->MacroGet(
-                                ID        => $MacroID,
-                                UserID    => $Param{UserID},
-                            );
-
-                            $Self->LogError(
-                                Message  => "Macro $Macro{Name} returned execution error for ObjectID $ObjectID.",
-                                UserID   => $Param{UserID},
-                            );
-                            $Warning = 1;
-                        }
-                    }
-                }
-
-                $Self->LogInfo(
-                    Message  => "job execution finished successfully.",
-                    UserID   => $Param{UserID},
-                );
-                if ( $Self->{Debug} ) {
-                    $Self->_Debug(sprintf "    _JobExecute: executing %i macros took %i ms", scalar @MacroIDs, (time() - $StartTime) * 1000);
-                }
+            $Self->LogInfo(
+                Message  => "job execution finished successfully.",
+                UserID   => $Param{UserID},
+            );
+            if ( $Self->{Debug} ) {
+                $Self->_Debug(sprintf "    _JobExecute: executing %i macros took %i ms", scalar @MacroIDs, (time() - $StartTime) * 1000);
             }
         }
     }
@@ -1435,12 +1448,15 @@ sub _JobExecute {
     );
 
     # remove JobID and RunID from log reference
-    delete $Self->{JobID};
-    delete $Self->{RunID};
+    delete( $Self->{JobID} );
+    delete( $Self->{RunID} );
 
     # delete cache
     $Kernel::OM->Get('Cache')->CleanUp(
         Type => $Self->{CacheType},
+    );
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => 'ObjectSearch_Automation_JobRun',
     );
 
     # push client callback event
@@ -1450,7 +1466,7 @@ sub _JobExecute {
         ObjectID  => $Param{ID}.'::'.$RunID,
     );
 
-    return 1;
+    return $RunID;
 }
 
 =item JobDump()
@@ -1563,7 +1579,7 @@ sub JobDump {
 returns a hash of all runs (ID + StateID) for a given job
 
     my %JobRunIDs = $AutomationObject->JobRunList(
-        JobID => 123
+        JobID     => 123
     );
 
 =cut
@@ -1592,9 +1608,12 @@ sub JobRunList {
     );
     return %{$Cache} if $Cache;
 
+    my $SQL  = 'SELECT id, state_id FROM job_run WHERE job_id = ?';
+    my @Bind = ( \$Param{JobID} );
+
     return if !$Kernel::OM->Get('DB')->Prepare(
-        SQL  => 'SELECT id, state_id FROM job_run WHERE job_id = ?',
-        Bind => [ \$Param{JobID} ]
+        SQL  => $SQL,
+        Bind => \@Bind
     );
 
     my %Result;
@@ -1704,6 +1723,73 @@ sub JobRunGet {
     );
 
     return %Result;
+}
+
+=item JobRunDelete()
+
+deletes a given job run
+
+    my $Success = $AutomationObject->JobRunDelete(
+        JobID  => 2,
+        RunID  => 2,
+        UserID => 1,
+    );
+
+=cut
+
+sub JobRunDelete {
+    my ( $Self, %Param ) = @_;
+
+    # check needed stuff
+    for (qw(JobID RunID UserID)) {
+        if ( !$Param{$_} ) {
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!",
+                Silent   => $Param{Silent}
+            );
+            return;
+        }
+    }
+
+    # delete log entries for run
+    return if !$Self->LogDelete(
+        JobID => $Param{JobID},
+        RunID => $Param{RunID},
+    );
+
+    # remove from database
+    return if !$Kernel::OM->Get('DB')->Do(
+        SQL  => 'DELETE FROM job_run WHERE job_id = ? AND id = ?',
+        Bind => [ \$Param{JobID}, \$Param{RunID} ],
+    );
+
+    # delete cache
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => $Self->{CacheType},
+    );
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => 'ObjectSearch_Automation_JobRun',
+    );
+
+    # event
+    $Self->EventHandler(
+        Event => 'JobRunDelete',
+        Data  => {
+            JobID => $Param{JobID},
+            RunID => $Param{RunID},
+        },
+        UserID => $Param{UserID},
+    );
+
+    # push client callback event
+    $Kernel::OM->Get('ClientNotification')->NotifyClients(
+        Event     => 'DELETE',
+        Namespace => 'Job.Run',
+        ObjectID  => $Param{JobID}.'::'.$Param{RunID},
+    );
+
+    return 1;
 }
 
 =item JobRunLogList()
@@ -2003,6 +2089,11 @@ sub _JobRunAdd {
     while ( my @Row = $DBObject->FetchrowArray() ) {
         $ID = $Row[0];
     }
+
+    # delete cache for objectsearch
+    $Kernel::OM->Get('Cache')->CleanUp(
+        Type => 'ObjectSearch_Automation_JobRun',
+    );
 
     return $ID;
 }

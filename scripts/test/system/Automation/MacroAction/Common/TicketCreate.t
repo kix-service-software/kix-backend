@@ -269,12 +269,12 @@ if ($Success) {
                             Priority               => '<KIX_TICKET_Priority>',
                             State                  => '<KIX_TICKET_State>',
                             PendingTimeDiff        => "<KIX_TICKET_DynamicField_$Data{DFTextName}_ObjectValue_0>",
-                            Title                  => '<KIX_TICKET_Title> clone',
+                            Title                  => '<KIX_TICKET_Title> <KIX_TICKET_Type>',
                             Team                   => '<KIX_TICKET_Queue>',
                             Type                   => '<KIX_TICKET_Type>',
                             DynamicFieldList       => [
                                 [$Data{DFSelectionName},"<KIX_TICKET_DynamicField_$Data{DFSelectionName}_ObjectValue>"],
-                                [$Data{DFTextName},"<KIX_TICKET_DynamicField_$Data{DFSelectionName}_Key>"]
+                                [$Data{DFTextName},"<KIX_TICKET_DynamicField_$Data{DFSelectionName}_Key> <KIX_TICKET_Type>"]
                             ],
                             Body => 'some body for TicketCreate test'
                         }
@@ -317,7 +317,7 @@ if ($Success) {
                         if (IsHashRefWithData(\%CloneTicket)) {
                             $Self->Is(
                                 $CloneTicket{Title},
-                                $Data{Title} . " clone",
+                                $Data{Title} . " Unklassifiziert",
                                 'Check title (clone ticket)'
                             );
                             $Self->Is(
@@ -392,7 +392,7 @@ if ($Success) {
                                 );
                                 $Self->Is(
                                     $TextValue->[0],
-                                    join('#', @{ $Data{DFSelectionValue} }),
+                                    join('#', @{ $Data{DFSelectionValue} }) . ' Unklassifiziert',
                                     'Check text DF (clone ticket)'
                                 );
                             }

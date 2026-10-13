@@ -17,8 +17,11 @@
       "readOnly": true
     },
     "Email": {
-      "type": "string",
-      "readOnly": true
+      "type" : "array",
+      "items" : {
+        "type" : "string",
+        "readOnly" : true
+      }
     },
     "Hash": {
       "type": "string",

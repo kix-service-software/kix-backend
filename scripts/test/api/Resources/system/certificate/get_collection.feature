@@ -8,6 +8,6 @@ Feature: GET request to the /system/certificates resource
   Scenario: get the list of existing certificates
     When I query collection of certificates
     Then the response code is 200
-#    Then the response content is
+
 
 

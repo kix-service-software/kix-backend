@@ -386,21 +386,11 @@ sub ContactGet {
     my @BindVars;
     my $CacheKey;
 
-    # check cache
-    my $FetchDynamicFields = $Param{DynamicFields} ? 1 : 0;
-
     if ($Param{ID}) {
         # ignore non-numeric IDs
         return if $Param{ID} !~ /^\d+$/;
 
-        # check cache
-        $CacheKey = "ContactGet::ContactID::$Param{ID}::".$FetchDynamicFields."::".$WithSubOrgs;
-        my $Data = $Kernel::OM->Get('Cache')->Get(
-            Type => $Self->{CacheType},
-            Key  => $CacheKey,
-        );
-
-        return %{$Data} if ref $Data eq 'HASH';
+        $CacheKey = "ContactGet::ContactID::$Param{ID}::".$WithSubOrgs;
 
         $SQLWhere .= ' id = ?';
         push(@BindVars,\$Param{ID});
@@ -409,17 +399,25 @@ sub ContactGet {
     elsif ($Param{UserID}) {
         return if $Param{UserID} !~ /^\d+$/;
 
-        $CacheKey = "ContactGet::UserID::$Param{UserID}::".$FetchDynamicFields."::".$WithSubOrgs;
-        my $Data = $Kernel::OM->Get('Cache')->Get(
-            Type => $Self->{CacheType},
-            Key  => $CacheKey,
-        );
-
-        return %{$Data} if ref $Data eq 'HASH';
+        $CacheKey = "ContactGet::UserID::$Param{UserID}::".$WithSubOrgs;
 
         $SQLWhere .= 'user_id IS NOT NULL AND user_id = ?';
         push(@BindVars,\$Param{UserID});
     }
+
+    $Param{DynamicFields} //= 0;
+    if ( IsArrayRef($Param{DynamicFields}) ) {
+        $CacheKey .= join('::', @{$Param{DynamicFields}});
+    }
+    else {
+        $CacheKey .= $Param{DynamicFields};
+    }
+
+    my $Data = $Kernel::OM->Get('Cache')->Get(
+        Type => $Self->{CacheType},
+        Key  => $CacheKey,
+    );
+    return %{$Data} if ref $Data eq 'HASH';
 
     # ask database
     $Kernel::OM->Get('DB')->Prepare(
@@ -432,7 +430,6 @@ sub ContactGet {
     # fetch the result
     my %Contact;
     while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
-
         $Contact{ID}                    = $Row[0];
         $Contact{UserID}                = $Row[0]; # for backward compatibility (e.g. NotifcationEvent)
         $Contact{Firstname}             = $Row[1];
@@ -516,20 +513,28 @@ sub ContactGet {
     );
 
     # check if need to return DynamicFields
-    if ($FetchDynamicFields) {
+    if ($Param{DynamicFields}) {
+        my $FieldFilterRef = undef;
+        if ( IsArrayRef($Param{DynamicFields}) ) {
+            my %FieldFilter = map { $_ => 1 } @{$Param{DynamicFields}};
 
-        # get all dynamic fields for the object type Ticket
+            $FieldFilterRef = \%FieldFilter;
+        }
+
+        # get all dynamic fields for the object type Contact (with optional filter)
         my $DynamicFieldList = $Kernel::OM->Get('DynamicField')->DynamicFieldListGet(
-            ObjectType => 'Contact'
+            ObjectType  => 'Contact',
+            FieldFilter => $FieldFilterRef,
         );
 
         DYNAMICFIELD:
         for my $DynamicFieldConfig ( @{$DynamicFieldList} ) {
-
             # validate each dynamic field
-            next DYNAMICFIELD if !$DynamicFieldConfig;
-            next DYNAMICFIELD if !IsHashRefWithData($DynamicFieldConfig);
-            next DYNAMICFIELD if !$DynamicFieldConfig->{Name};
+            next DYNAMICFIELD if (
+                !$DynamicFieldConfig
+                || !IsHashRefWithData( $DynamicFieldConfig )
+                || !$DynamicFieldConfig->{Name}
+            );
 
             # get the current value for each dynamic field
             my $Value = $Kernel::OM->Get('DynamicField::Backend')->ValueGet(
@@ -537,7 +542,7 @@ sub ContactGet {
                 ObjectID           => $Contact{ID},
             );
 
-            # set the dynamic field name and value into the ticket hash
+            # set the dynamic field name and value into the contact hash
             $Contact{ 'DynamicField_' . $DynamicFieldConfig->{Name} } = $Value;
         }
     }

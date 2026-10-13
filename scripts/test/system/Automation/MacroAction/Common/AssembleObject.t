@@ -114,9 +114,9 @@ my @Tests = (
     "TicketID": "<KIX_TICKET_TicketID>",
     "Title": "<KIX_TICKET_Title>",
     "Ticket": {
-        "Queue": "<KIX_TICKET_Queue>",
-        "Priority": "<KIX_TICKET_Priority>",
-        "State": "<KIX_TICKET_State>"
+        "Queue": "<KIX_TICKET_Queue!>",
+        "Priority": "<KIX_TICKET_Priority!>",
+        "State": "<KIX_TICKET_State!>"
     },
     "Customer": {
         "CustomerUser": "<KIX_CONTACT_Firstname> <KIX_CONTACT_Lastname>"
@@ -147,7 +147,8 @@ Title: "<KIX_TICKET_Title>"
 Ticket:
     Queue: "<KIX_TICKET_Queue>"
     Priority: "<KIX_TICKET_Priority>"
-    State: "<KIX_TICKET_State>"
+    State: "<KIX_TICKET_State!>"
+    Type: "<KIX_TICKET_Type>"
 Customer:
     CustomerUser: "<KIX_CONTACT_Firstname> <KIX_CONTACT_Lastname>"
 END
@@ -159,6 +160,7 @@ END
                 Queue    => 'Junk',
                 Priority => '3 normal',
                 State    => 'closed',
+                Type     => 'Unklassifiziert'
             },
             Customer => {
                 CustomerUser => $CustomerContact{Firstname} . ' ' . $CustomerContact{Lastname},

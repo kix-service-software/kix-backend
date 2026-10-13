@@ -88,7 +88,7 @@ sub Connect {
     TRY:
     for my $Try ( 1 .. 2 ) {
         # auth via SASL XOAUTH2
-        my $SASLXOAUTH2 = encode_base64( 'user=' . $Param{Login} . "\x01auth=Bearer " . $AccessToken . "\x01\x01" );
+        my $SASLXOAUTH2 = encode_base64( 'user=' . $Param{Login} . "\x01auth=Bearer " . $AccessToken . "\x01\x01", '' );
         $PopObject->command( 'AUTH', 'XOAUTH2' )->response();
         $NOM = $PopObject->command($SASLXOAUTH2)->response();
 

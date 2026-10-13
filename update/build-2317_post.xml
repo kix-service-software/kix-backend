@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<database Name="kix">
+
+    <TableAlter Name="time_accounting">
+        <ColumnChange NameOld="executing_contact_id" NameNew="executing_contact_id" Required="true"  Type="INTEGER"/>
+        <ColumnChange NameOld="start_time" NameNew="start_time" Required="true" Type="DATE"/>
+        <ColumnChange NameOld="is_invoiced" NameNew="is_invoiced" Required="true" Type="SMALLINT" Default="0"/>
+    </TableAlter>
+
+</database>

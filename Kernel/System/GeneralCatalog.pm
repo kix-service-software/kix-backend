@@ -13,7 +13,12 @@ package Kernel::System::GeneralCatalog;
 use strict;
 use warnings;
 
-use base qw(Kernel::System::EventHandler);
+use Kernel::System::GeneralCatalog::BasePermission;
+
+use base qw(
+    Kernel::System::EventHandler
+    Kernel::System::BasePermissionHandler
+);
 
 use Kernel::System::VariableCheck qw(:all);
 
@@ -73,6 +78,11 @@ sub new {
     # init of event handler
     $Self->EventHandlerInit(
         Config => 'GeneralCatalog::EventModulePost',
+    );
+
+    # init of base permission handler
+    $Self->BasePermissionHandlerInit(
+        Type => 'Base::Asset',
     );
 
     return $Self;

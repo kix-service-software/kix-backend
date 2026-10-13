@@ -72,7 +72,7 @@ sub _CreateReports {
                     "OutputHandler" => [
                         {
                             "States" => [
-                                "new ",
+                                "new",
                                 "open",
                                 "pending reminder"
                             ],

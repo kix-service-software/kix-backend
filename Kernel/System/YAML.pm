@@ -112,16 +112,18 @@ sub Load {
     my $YAMLImplementation = YAML::Any->implementation();
 
     if ( !eval { $Result = YAML::Any::Load( $Param{Data} ) } ) {
-        if ( !$Param{Silent} ) {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => 'Loading the YAML string failed: ' . $@,
-            );
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => 'YAML data was: "' . $Param{Data} . '"',
-            );
-        }
+        my $Error = $@;
+
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => 'Loading the YAML string failed: ' . $Error,
+            Silent   => $Param{Silent}
+        );
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => 'YAML data was: "' . $Param{Data} . '"',
+            Silent   => $Param{Silent}
+        );
         # if used implementation is pure perl YAML there is nothing to do, but exit with error
         return if $YAMLImplementation eq 'YAML';
 

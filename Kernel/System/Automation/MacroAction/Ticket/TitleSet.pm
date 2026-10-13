@@ -54,7 +54,7 @@ sub Describe {
         Required    => 1,
         Placeholder => {
             Richtext  => 0,
-            Translate => 0,
+            Translate => 1,
         },
     );
 

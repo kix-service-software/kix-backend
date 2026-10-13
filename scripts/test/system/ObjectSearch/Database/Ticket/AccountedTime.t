@@ -430,13 +430,18 @@ $Self->True(
     $TicketID1,
     'Created first ticket'
 );
-my $TicketAccountTime1 = $Kernel::OM->Get('Ticket')->TicketAccountTime(
-    TicketID  => $TicketID1,
-    TimeUnit  => '1',
-    UserID    => 1,
+my $TimeAccountingID1 = $Kernel::OM->Get('TimeAccounting')->TimeAccountingCreate(
+    TicketID           => $TicketID1,
+    StartTime          => $Kernel::OM->Get('Time')->CurrentTimestamp(),
+    TimeUnit           => '1',
+    UserID             => 1,
+    IsInvoiced         => 0,
+    ExecutingContactID => $Kernel::OM->Get('Contact')->ContactLookup(
+        UserID => 1
+    )
 );
 $Self->True(
-    $TicketAccountTime1,
+    $TimeAccountingID1,
     'Accounted time for first ticket'
 );
 # second ticket
@@ -457,13 +462,19 @@ $Self->True(
     $TicketID2,
     'Created second ticket'
 );
-my $TicketAccountTime2 = $Kernel::OM->Get('Ticket')->TicketAccountTime(
-    TicketID  => $TicketID2,
-    TimeUnit  => '2',
-    UserID    => 1,
+my $TimeAccountingID2 = $Kernel::OM->Get('TimeAccounting')->TimeAccountingCreate(
+    TicketID           => $TicketID2,
+    StartTime          => $Kernel::OM->Get('Time')->CurrentTimestamp(),
+    TimeUnit           => '2',
+    UserID             => 1,
+    IsInvoiced         => 0,
+    ExecutingContactID => $Kernel::OM->Get('Contact')->ContactLookup(
+        UserID => 1
+    )
 );
+
 $Self->True(
-    $TicketAccountTime2,
+    $TimeAccountingID2,
     'Accounted time for second ticket'
 );
 # third ticket
@@ -484,13 +495,18 @@ $Self->True(
     $TicketID3,
     'Created third ticket'
 );
-my $TicketAccountTime3 = $Kernel::OM->Get('Ticket')->TicketAccountTime(
-    TicketID  => $TicketID3,
-    TimeUnit  => '3',
-    UserID    => 1,
+my $TimeAccountingID3 = $Kernel::OM->Get('TimeAccounting')->TimeAccountingCreate(
+    TicketID           => $TicketID3,
+    StartTime          => $Kernel::OM->Get('Time')->CurrentTimestamp(),
+    TimeUnit           => '3',
+    UserID             => 1,
+    IsInvoiced         => 0,
+    ExecutingContactID => $Kernel::OM->Get('Contact')->ContactLookup(
+        UserID => 1
+    )
 );
 $Self->True(
-    $TicketAccountTime3,
+    $TimeAccountingID3,
     'Accounted time for third ticket'
 );
 

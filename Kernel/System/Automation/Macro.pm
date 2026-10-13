@@ -639,7 +639,8 @@ sub MacroExecute {
         if ( !$Param{$Needed} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "Need $Needed!"
+                Message  => "Need $Needed!",
+                Silent   => $Param{Silent}
             );
             return;
         }
@@ -698,7 +699,8 @@ sub MacroExecute {
     if ( !%Macro ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => "No such macro with ID $Param{ID}!"
+            Message  => "No such macro with ID $Param{ID}!",
+            Silent   => $Param{Silent}
         );
         return;
     }
@@ -757,6 +759,7 @@ sub MacroExecute {
         ObjectID  => $Param{ObjectID},
         ExecOrder => $Macro{ExecOrder},
         UserID    => $Param{UserID},
+        Silent    => $Param{Silent},
 
         # FIXME: add instance if job was triggerd by event with new instance (ExecuteJobsForEvent)
         AutomationInstance => $Self,

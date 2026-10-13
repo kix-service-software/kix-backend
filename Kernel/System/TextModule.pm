@@ -65,11 +65,14 @@ sub new {
         my @CustomModules = @{ $Kernel::OM->Get('Config')->Get('TextModule::CustomModules') };
         for my $CustMod (@CustomModules) {
             if ( !$Kernel::OM->Get('Main')->Require($CustMod) ) {
+                my $Error = $@;
+
                 $Kernel::OM->Get('Log')->Log(
                     Priority => 'error',
                     Message  => "Can't load TextModule custom module "
-                        . $CustMod . " ($@)!",
+                        . $CustMod . " ($Error)!",
                 );
+
                 next;
             }
 

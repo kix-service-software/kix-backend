@@ -1,0 +1,23 @@
+[req]
+distinguished_name = req_distinguished_name
+x509_extensions = v3_req
+prompt = no
+
+[req_distinguished_name]
+C = DE
+ST = Sachsen
+L = Chemnitz
+O = TestOrg
+OU = IT
+CN = test@example.com
+
+[v3_req]
+keyUsage = critical, digitalSignature, nonRepudiation, keyEncipherment
+extendedKeyUsage = emailProtection
+subjectAltName = @alt_names
+
+[alt_names]
+email.1 = test@example.com
+email.2 = test2@example.com
+email.3 = test3@example.com
+

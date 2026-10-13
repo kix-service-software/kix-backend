@@ -108,12 +108,11 @@ sub Print {
         )
     ) {
         if ( !$Param{$Needed} ) {
-            if ( !$Param{Silent} ) {
-                $Kernel::OM->Get('Log')->Log(
-                    Priority => 'error',
-                    Message  => "Needed $Needed!"
-                );
-            }
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Needed $Needed!",
+                Silent   => $Param{Silent}
+            );
             return;
         }
     }
@@ -154,6 +153,7 @@ sub Print {
             Allows               => $Param{Allows}  || q{},
             Ignores              => $Param{Ignores} || q{},
             UserID               => $Param{UserID},
+            Silent               => $Param{Silent}
         );
 
         # error messages are set in the Convert
@@ -164,7 +164,7 @@ sub Print {
 
     my %File;
     if ( $Compress ) {
-       
+
         %File = $Self->_Compress(
             Files => \@Files
         );

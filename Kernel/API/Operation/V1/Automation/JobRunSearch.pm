@@ -29,6 +29,16 @@ Kernel::API::Operation::Automation::JobRunSearch - API JobRun Search Operation b
 
 =cut
 
+sub Init {
+    my ( $Self, %Param ) = @_;
+
+    my $Result = $Self->SUPER::Init(%Param);
+
+    $Self->{HandleSortInCORE} = 1;
+
+    return $Result;
+}
+
 =item ParameterDefinition()
 
 define parameter preparation and check for this operation
@@ -83,20 +93,34 @@ perform JobRunSearch Operation. This will return a list of runs for the given Jo
 sub Run {
     my ( $Self, %Param ) = @_;
 
-    my @JobRunDataList;
+    $Self->{Search}->{JobRun}->{AND} //= [];
+    push(
+        @{ $Self->{Search}->{JobRun}->{AND} },
+        {
+            Field    => 'JobID',
+            Operator => 'EQ',
+            Value    => $Param{Data}->{JobID}
+        }
+    );
 
-    my %JobRunList = $Kernel::OM->Get('Kernel::System::Automation')->JobRunList(
-        JobID => $Param{Data}->{JobID},
+    my @JobRunList = $Kernel::OM->Get('ObjectSearch')->Search(
+        ObjectType => 'Automation_JobRun',
+        Result     => 'ARRAY',
+        Search     => $Self->{Search}->{JobRun},
+        Limit      => $Self->{SearchLimit}->{JobRun} || $Self->{SearchLimit}->{'__COMMON'},
+        Sort       => $Self->{Sort}->{JobRun}        || $Self->{DefaultSort}->{JobRun},
+        UserType   => $Self->{Authorization}->{UserType},
+        UserID     => $Self->{Authorization}->{UserID}
     );
 
     # get already prepared Run data from JobRunGet operation
-    if ( IsHashRefWithData(\%JobRunList) ) {
+    if ( IsArrayRefWithData(\@JobRunList) ) {
         my $GetResult = $Self->ExecOperation(
             OperationType            => 'V1::Automation::JobRunGet',
             SuppressPermissionErrors => 1,
             Data      => {
                 JobID => $Param{Data}->{JobID},
-                RunID => join(',', sort keys %JobRunList),
+                RunID => join(',', @JobRunList),
             }
         );
         if ( !IsHashRefWithData($GetResult) || !$GetResult->{Success} ) {

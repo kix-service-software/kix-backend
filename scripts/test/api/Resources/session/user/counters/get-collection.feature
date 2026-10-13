@@ -8,5 +8,5 @@
   Scenario: get the list of existing session user counters
     When I query the collection of session user counters
     Then the response code is 200
-#    Then the response content is
+
 

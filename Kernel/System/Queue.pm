@@ -98,7 +98,7 @@ sub new {
 
     # init of base permission handler
     $Self->BasePermissionHandlerInit(
-        Type => 'Base::Ticket'
+        Type => 'Base::Ticket',
     );
 
     return $Self;

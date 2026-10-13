@@ -550,7 +550,18 @@ sub ArticleWriteAttachment {
     if ( $Param{Disposition} ) {
         ( $Disposition, $FilenamePart ) = split ';', $Param{Disposition};
     }
-    $Disposition //= '';
+    elsif (
+        (
+            $Param{ContentID}
+            && $Param{ContentType} =~ m/image/i
+        )
+        || $Param{Filename} =~ m/^file-(1|2|1\.html)$/
+    ) {
+        $Disposition = 'inline';
+    }
+    else {
+        $Disposition = 'attachment';
+    }
 
     # write attachment to db
     return if !$DBObject->Do(
@@ -810,8 +821,8 @@ sub ArticleAttachment {
         SQL => '
             SELECT id, filename, content_type, content_size, content_id, content_alternative, disposition
             FROM article_attachment
-            WHERE id = ?',
-        Bind => [ \$Param{AttachmentID} ],
+            WHERE id = ? AND article_id = ?',
+        Bind => [ \$Param{AttachmentID}, \$Param{ArticleID} ],
     );
 
     my %Data;
@@ -861,6 +872,8 @@ sub ArticleAttachment {
             Disposition        => $Disposition,
         );
     }
+
+    return if ( !%Data );
 
     return %Data if ( $Param{NoContent} );
 

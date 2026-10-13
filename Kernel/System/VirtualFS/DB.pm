@@ -83,7 +83,7 @@ sub Read {
         }
     }
 
-    return if !$Content;
+    return if ( !defined( $Content ) );
 
     # uncompress (in case)
     if ( $Attributes->{Compress} ) {

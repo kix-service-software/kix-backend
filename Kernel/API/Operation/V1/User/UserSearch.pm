@@ -95,7 +95,10 @@ sub Run {
         }
     }
 
-    if ( $Param{Data} && $Param{Data}->{requiredPermission} && $Param{Data}->{requiredPermission}->{Object} eq 'Queue') {
+    if ( 
+        $Param{Data} && $Param{Data}->{requiredPermission} && $Param{Data}->{requiredPermission}->{Object} eq 'Queue'
+        && IsInteger($Param{Data}->{requiredPermission}->{ObjectID})
+    ) {
         $Self->AddCacheKeyExtension(
             Extension => ['requiredPermission']
         );

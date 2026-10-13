@@ -12,11 +12,6 @@ use utf8;
 
 use vars (qw($Self));
 
-my $AutomationObject = $Kernel::OM->Get('Automation');
-my $TicketObject     = $Kernel::OM->Get('Ticket');
-my $ConfigObject     = $Kernel::OM->Get('Config');
-my $MainObject       = $Kernel::OM->Get('Main');
-
 # get helper object
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
@@ -24,7 +19,7 @@ my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 $Helper->BeginWork();
 
 # no event handling for tickets
-$ConfigObject->Set(
+$Kernel::OM->Get('Config')->Set(
     Key => 'Ticket::EventModulePost',
 );
 
@@ -214,7 +209,7 @@ if ($TicketID_1) {
     );
 
     # load job type backend module
-    my $JobObject = $AutomationObject->_LoadJobTypeBackend(
+    my $JobObject = $Kernel::OM->Get('Automation')->_LoadJobTypeBackend(
         Name => 'Ticket',
     );
     $Self->True(
@@ -223,7 +218,7 @@ if ($TicketID_1) {
     );
 
     # run checks
-    foreach my $Test ( @TestData ) {
+    for my $Test ( @TestData ) {
         my @ObjectIDs = $JobObject->Run(
             Data   => $Test->{Data},
             Filter => $Test->{Filter},
@@ -320,7 +315,13 @@ if ($TicketID_1) {
         },
         {
             Test      => 'Type asc, "Title" filter',
-            Filter    =>[
+            Filter    => [
+                {
+                    OR => [
+                        { Field => 'Title', Operator => 'EQ', Value => $Data{Ticket_1_Title} },
+                        { Field => 'Title', Operator => 'EQ', Value => $Data{Ticket_2_Title} }
+                    ]
+                },
                 {
                     OR => [
                         { Field => 'Title', Operator => 'EQ', Value => $Data{Ticket_1_Title} },
@@ -335,8 +336,28 @@ if ($TicketID_1) {
             Expected  => [$TicketID_2, $TicketID_1]
         },
         {
+            Test      => 'Type asc, "Title" filter as two filter',
+            Filter    => [
+                {
+                    OR => [
+                        { Field => 'Title', Operator => 'EQ', Value => $Data{Ticket_1_Title} }
+                    ]
+                },
+                {
+                    OR => [
+                        { Field => 'Title', Operator => 'EQ', Value => $Data{Ticket_2_Title} }
+                    ]
+                }
+            ],
+            SortOrder => {
+                Field     => 'Type',
+                Direction => 'ascending'
+            },
+            Expected  => [$TicketID_2, $TicketID_1]
+        },
+        {
             Test      => 'Type desc, "Title" filter',
-            Filter    =>[
+            Filter    => [
                 {
                     OR => [
                         { Field => 'Title', Operator => 'EQ', Value => $Data{Ticket_1_Title} },
@@ -352,10 +373,20 @@ if ($TicketID_1) {
         },
         {
             Test      => 'Type desc, "TypeID" filter',
-            Filter    =>[
+            Filter    => [
                 {
                     AND => [
                         { Field => 'TypeID', Operator => 'IN', Value => [$Data{Ticket_2_TypeID}, $Data{Ticket_3_TypeID}] },
+                    ]
+                },
+                {
+                    AND => [
+                        { Field => 'TypeID', Operator => 'IN', Value => [$Data{Ticket_2_TypeID}] },
+                    ]
+                },
+                {
+                    AND => [
+                        { Field => 'TypeID', Operator => 'IN', Value => [$Data{Ticket_3_TypeID}] },
                     ]
                 }
             ],
@@ -367,7 +398,7 @@ if ($TicketID_1) {
         },
         {
             Test      => 'Type desc, "TypeID" filter',
-            Filter    =>[
+            Filter    => [
                 {
                     AND => [
                         { Field => 'TypeID', Operator => 'IN', Value => [$Data{Ticket_2_TypeID}, $Data{Ticket_3_TypeID}] },
@@ -383,7 +414,7 @@ if ($TicketID_1) {
     );
 
     # run checks
-    foreach my $Test ( @TestData ) {
+    for my $Test ( @TestData ) {
         my @ObjectIDs = $JobObject->Run(
             Filter    => $Test->{Filter},
             SortOrder => $Test->{SortOrder},
@@ -396,15 +427,223 @@ if ($TicketID_1) {
             $Test->{Test},
         );
     }
+
+    # check IsEventBased
+    @TestData = (
+        {
+            Test     => 'Without filter',
+            Data     => {
+                TicketID => $TicketID_1
+            },
+            Filter   => undef,
+            Expected => [$TicketID_1]
+        },
+        {
+            Test     => 'Matching OR filter',
+            Data     => {
+                TicketID => $TicketID_1
+            },
+            Filter   => [
+                {
+                    OR => [
+                        { Field => 'Title', Operator => 'EQ', Value => $Data{Ticket_1_Title} },
+                        { Field => 'Title', Operator => 'EQ', Value => $Data{Ticket_2_Title} }
+                    ]
+                }
+            ],
+            Expected => [$TicketID_1]
+        },
+        {
+            Test     => 'Not matching OR filter',
+            Data     => {
+                TicketID => $TicketID_1
+            },
+            Filter   => [
+                {
+                    OR => [
+                        { Field => 'Title', Operator => 'EQ', Value => $Data{Ticket_2_Title} },
+                        { Field => 'Title', Operator => 'EQ', Value => $Data{Ticket_3_Title} }
+                    ]
+                }
+            ],
+            Expected => []
+        },
+        {
+            Test     => 'Matching AND filter',
+            Data     => {
+                TicketID => $TicketID_1
+            },
+            Filter   => [
+                {
+                    AND => [
+                        { Field => 'Title', Operator => 'EQ', Value => $Data{Ticket_1_Title} },
+                        { Field => 'TypeID', Operator => 'IN', Value => [$Data{Ticket_1_TypeID}, $Data{Ticket_2_TypeID}] }
+                    ]
+                }
+            ],
+            Expected => [$TicketID_1]
+        },
+        {
+            Test     => 'Not matching AND filter',
+            Data     => {
+                TicketID => $TicketID_1
+            },
+            Filter   => [
+                {
+                    AND => [
+                        { Field => 'Title', Operator => 'EQ', Value => $Data{Ticket_2_Title} },
+                        { Field => 'TypeID', Operator => 'IN', Value => [$Data{Ticket_1_TypeID}, $Data{Ticket_2_TypeID}] }
+                    ]
+                }
+            ],
+            Expected => []
+        },
+        {
+            Test     => 'Matching AND and OR filter',
+            Data     => {
+                TicketID => $TicketID_1
+            },
+            Filter   => [
+                {
+                    OR => [
+                        { Field => 'Title', Operator => 'EQ', Value => $Data{Ticket_1_Title} },
+                        { Field => 'Title', Operator => 'EQ', Value => $Data{Ticket_2_Title} }
+                    ],
+                    AND => [
+                        { Field => 'TypeID', Operator => 'IN', Value => [$Data{Ticket_1_TypeID}, $Data{Ticket_2_TypeID}] }
+                    ]
+                }
+            ],
+            Expected => [$TicketID_1]
+        },
+        {
+            Test     => 'Matching AND and OR filters',
+            Data     => {
+                TicketID => $TicketID_1
+            },
+            Filter   => [
+                {
+                    OR => [
+                        { Field => 'Title', Operator => 'EQ', Value => $Data{Ticket_1_Title} }
+                    ],
+                    AND => [
+                        { Field => 'TypeID', Operator => 'IN', Value => [$Data{Ticket_1_TypeID}, $Data{Ticket_2_TypeID}] }
+                    ]
+                },
+                {
+                    OR => [
+                        { Field => 'Title', Operator => 'EQ', Value => $Data{Ticket_2_Title} }
+                    ],
+                    AND => [
+                        { Field => 'TypeID', Operator => 'IN', Value => [$Data{Ticket_1_TypeID}, $Data{Ticket_2_TypeID}] }
+                    ]
+                }
+            ],
+            Expected => [$TicketID_1]
+        },
+        {
+            Test     => 'Matching AND filter with DF',
+            Data     => {
+                TicketID => $TicketID_1
+            },
+            Filter   => [
+                {
+                    AND => [
+                        { Field => 'DynamicField_UnitTest', Operator => 'EQ', Value => $Data{Ticket_1_Title} },
+                        { Field => 'TypeID', Operator => 'IN', Value => [$Data{Ticket_1_TypeID}, $Data{Ticket_2_TypeID}] }
+                    ]
+                }
+            ],
+            Expected => [$TicketID_1]
+        },
+        {
+            Test     => 'Not matching AND filter with DF',
+            Data     => {
+                TicketID => $TicketID_1
+            },
+            Filter   => [
+                {
+                    AND => [
+                        { Field => 'DynamicField_UnitTest', Operator => 'EQ', Value => $Data{Ticket_2_Title} },
+                        { Field => 'TypeID', Operator => 'IN', Value => [$Data{Ticket_1_TypeID}, $Data{Ticket_2_TypeID}] }
+                    ]
+                }
+            ],
+            Expected => []
+        },
+        {
+            Test     => 'Matching AND filter with historic value filter',
+            Data     => {
+                TicketID => $TicketID_1
+            },
+            Filter   => [
+                {
+                    AND => [
+                        { Field => 'CreatedTypeID', Operator => 'EQ', Value => $Data{Ticket_1_TypeID} },
+                        { Field => 'TypeID', Operator => 'IN', Value => [$Data{Ticket_1_TypeID}, $Data{Ticket_2_TypeID}] }
+                    ]
+                }
+            ],
+            Expected => [$TicketID_1]
+        },
+        {
+            Test     => 'Not matching AND filter with historic value filte',
+            Data     => {
+                TicketID => $TicketID_1
+            },
+            Filter   => [
+                {
+                    AND => [
+                        { Field => 'CreatedTypeID', Operator => 'EQ', Value => $Data{Ticket_2_TypeID} },
+                        { Field => 'TypeID', Operator => 'IN', Value => [$Data{Ticket_1_TypeID}, $Data{Ticket_2_TypeID}] }
+                    ]
+                }
+            ],
+            Expected => []
+        },
+    );
+
+    # run checks
+    for my $Test ( @TestData ) {
+        my @ObjectIDs = $JobObject->Run(
+            Data         => $Test->{Data},
+            Filter       => $Test->{Filter},
+            IsEventBased => 1,
+            UserID       => 1
+        );
+
+        $Self->IsDeeply(
+            \@ObjectIDs,
+            $Test->{Expected},
+            'IsEventBased: ' . $Test->{Test},
+        );
+    }
 }
 
 # rollback transaction on database
 $Helper->Rollback();
 
 sub _CreateTickets {
+    my $TextDFID = $Kernel::OM->Get('DynamicField')->DynamicFieldAdd(
+        Name       => 'UnitTest',
+        Label      => 'UnitTest',
+        FieldType  => 'Text',
+        ObjectType => 'Ticket',
+        Config     => {},
+        ValidID    => 1,
+        UserID     => 1
+    );
+    $Self->True(
+        $TextDFID,
+        '_CreateTickets - create text dynamic field'
+    );
+    my $TextDynamicField = $Kernel::OM->Get('DynamicField')->DynamicFieldGet(
+        ID => $TextDFID,
+    );
+
     my @TicketIDs;
     for my $Index (1..3) {
-        my $TicketID = $TicketObject->TicketCreate(
+        my $TicketID = $Kernel::OM->Get('Ticket')->TicketCreate(
             Title   => $Data{"Ticket_".$Index."_Title"},
             QueueID => $Data{"Ticket_".$Index."_QueueID"},
             TypeID  => $Data{"Ticket_".$Index."_TypeID"},
@@ -414,6 +653,13 @@ sub _CreateTickets {
         );
         if ($TicketID) {
             push(@TicketIDs, $TicketID);
+
+            $Kernel::OM->Get('DynamicField::Backend')->ValueSet(
+                DynamicFieldConfig => $TextDynamicField,
+                ObjectID           => $TicketID,
+                Value              => [ $Data{ 'Ticket_' . $Index . '_Title' } ],
+                UserID             => 1,
+            );
         } else {
             $Self->True(
                 0,

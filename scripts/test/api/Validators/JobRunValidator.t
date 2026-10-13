@@ -31,7 +31,7 @@ my $NameRandom  = $Helper->GetRandomID();
 # add job
 my $JobID = $AutomationObject->JobAdd(
     Name    => 'job-'.$NameRandom,
-    Type    => 'Ticket',
+    Type    => 'Synchronisation',
     ValidID => 1,
     UserID  => 1,
 );

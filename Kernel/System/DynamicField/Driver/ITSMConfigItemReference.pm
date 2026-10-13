@@ -346,39 +346,46 @@ sub ShortDisplayValueRender {
 
 sub ExportConfigPrepare {
     my ( $Self, %Param ) = @_;
-    my $GeneralCatalogObject = $Kernel::OM->Get('GeneralCatalog');
 
-    if (
-        $Param{Config}->{DeploymentStates}
-        || $Param{Config}->{ITSMConfigItemClasses}
-    ) {
-        KEY:
-        for my $Key ( qw(DeploymentStates ITSMConfigItemClasses) ) {
-            next KEY if !$Param{Config}->{$Key};
-            my @Names;
+    my %Types = (
+        DeploymentStates => {
+            Object => 'DeploymentState',
+            Class  => 'ITSM::ConfigItem::DeploymentState',
+            Target => 'DeploymentStateNames'
+        },
+        ITSMConfigItemClasses => {
+            Object => 'ConfigItemClass',
+            Class  => 'ITSM::ConfigItem::Class',
+            Target => 'ITSMConfigItemClassNames'
+        }
+    );
 
-            ITEM:
-            for my $ItemID ( @{$Param{Config}->{$Key}} ) {
-                next ITEM if !$ItemID;
+    for my $Source ( keys %Types )  {
+        my $Object = $Types{$Source}->{Object};
+        my $Class  = $Types{$Source}->{Class};
+        my $Target = $Types{$Source}->{Target};
 
-                if ( $ItemID !~ m/^\d+$/smx ) {
-                    push(@Names, $ItemID);
-                    next ITEM;
-                }
-                my $ItemDataRef = $GeneralCatalogObject->ItemGet(
-                    ItemID => $ItemID
-                );
+        if ( IsArrayRefWithData($Param{Config}->{$Source}) ) {
+            my $List = $Kernel::OM->Get('GeneralCatalog')->ItemList(
+                Class => $Class,
+                Valid => 0,
+            );
 
-                next ITEM if !$ItemDataRef;
+            my $Result = $Self->_ExportConfigDataPrepare(
+                Source => $Param{Config}->{$Source},
+                Object => $Object,
+                List   => $List,
+                Silent => $Param{Silent}
+            );
 
-                push(@Names, $ItemDataRef->{Name});
-            }
+            return if !IsArrayRef($Result);
 
-            if ( scalar(@Names) ) {
-                $Param{Config}->{$Key} = \@Names;
-            } else {
-                delete $Param{Config}->{$Key};
-            }
+            delete $Param{Config}->{$Source};
+            $Param{Config}->{$Target} = $Result;
+        }
+        else {
+            delete $Param{Config}->{$Source};
+            $Param{Config}->{$Target} = [];
         }
     }
 
@@ -387,34 +394,51 @@ sub ExportConfigPrepare {
 
 sub ImportConfigPrepare {
     my ( $Self, %Param ) = @_;
-    my $GeneralCatalogObject = $Kernel::OM->Get('GeneralCatalog');
 
-    if (
-        $Param{Config}->{DeploymentStates}
-        || $Param{Config}->{ITSMConfigItemClasses}
-    ) {
-        KEY:
-        for my $Key ( qw(DeploymentStates ITSMConfigItemClasses) ) {
-            next KEY if !$Param{Config}->{$Key};
-            my @IDs;
+    my %Types = (
+        DeploymentStateNames => {
+            Object => 'DeploymentState',
+            Class  => 'ITSM::ConfigItem::DeploymentState',
+            Target => 'DeploymentStates'
+        },
+        ITSMConfigItemClassNames => {
+            Object => 'ConfigItemClass',
+            Class  => 'ITSM::ConfigItem::Class',
+            Target => 'ITSMConfigItemClasses'
+        }
+    );
 
-            ITEM:
-            for my $ItemName ( @{$Param{Config}->{$Key}} ) {
-                my $ItemDataRef = $GeneralCatalogObject->ItemGet(
-                    Class => 'ITSM::ConfigItem::' . ($Key eq 'DeploymentStates' ? 'DeploymentState' : 'Class'),
-                    Name  => $ItemName,
-                );
+    for my $Source ( keys %Types )  {
+        my $Object = $Types{$Source}->{Object};
+        my $Class  = $Types{$Source}->{Class};
+        my $Target = $Types{$Source}->{Target};
+        if (
+            IsArrayRefWithData($Param{Config}->{$Source})
+            || IsArrayRefWithData($Param{Config}->{$Target})
+        ) {
+            my $List = $Kernel::OM->Get('GeneralCatalog')->ItemList(
+                Class => $Class,
+                Valid => 0,
+            );
 
-                next ITEM if !$ItemDataRef;
+            my $Result = $Self->_ImportConfigDataPrepare(
+                Object => $Object,
+                Source => $Param{Config}->{$Source},
+                Target => $Param{Config}->{$Target},
+                List   => $List,
+                Silent => $Param{Silent}
+            );
 
-                push(@IDs, $ItemDataRef->{ItemID});
+            return if ( !IsHashRef($Result) );
+
+            if ( $Result->{Type} eq 'Source' ) {
+                delete $Param{Config}->{$Source};
             }
-
-            if ( scalar(@IDs) ) {
-                $Param{Config}->{$Key} = \@IDs;
-            } else {
-                delete $Param{Config}->{$Key};
-            }
+            $Param{Config}->{$Target} = $Result->{Values};
+        }
+        else {
+            delete $Param{Config}->{$Source};
+            $Param{Config}->{$Target} = [];
         }
     }
 

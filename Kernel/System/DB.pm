@@ -523,6 +523,9 @@ sub Do {
         return;
     }
 
+    # ignore comments
+    return 1 if $Param{SQL} =~ /^--/;
+
     my $StartTime;
     if ( $Self->{Debug} && $Self->{DebugMethods}->{Do} ) {
         $StartTime = Time::HiRes::time();
@@ -1096,17 +1099,31 @@ sub SQLProcessor {
     my @SQL;
     if ( $Param{Database} && ref $Param{Database} eq 'ARRAY' ) {
         my @Table;
+        my $Ignore = 0;
+
+        TAG:
         for my $Tag ( @{ $Param{Database} } ) {
 
             # create table
-            if ( $Tag->{Tag} eq 'Table' || $Tag->{Tag} eq 'TableCreate' ) {
+            if ( $Tag->{Tag} =~ /^Table(Create)?(?<IfNotExists>IfNotExists)?$/ ) {
                 if ( $Tag->{TagType} eq 'Start' ) {
                     $Self->_NameCheck($Tag);
+
+                    if ( $+{IfNotExists} ) {
+                        # check if table exists
+                        if ( $Self->_TableExistsCheck($Tag->{Name}) ) {
+                            # we need to push a comment here (and ignore it later in the process) just to show that there wasn't an error processing the XML into SQL
+                            push @SQL, "-- $Tag->{Tag}($Tag->{Name}) skipped, because table already exists";
+                            $Ignore = 1;    # ignore this and child tags
+                        }
+                    }
                 }
-                push @Table, $Tag;
+                push @Table, $Tag if !$Ignore;
+
                 if ( $Tag->{TagType} eq 'End' ) {
-                    push @SQL, $Self->{Backend}->TableCreate(@Table);
+                    push @SQL, $Self->{Backend}->TableCreate(@Table) if !$Ignore;
                     @Table = ();
+                    $Ignore = 0;        # reset
                 }
             }
 
@@ -1979,6 +1996,24 @@ sub _SpecialCharactersGet {
 
     return \%SpecialCharacter;
 }
+
+sub _TableExistsCheck {
+    my ( $Self, $Table ) = @_;
+
+    return if !$Table;
+
+    $Self->Connect() || die "Unable to connect to database!";
+
+    my $SchemaName = $Self->{'DB::Type'} eq 'postgresql' ? 'public' : undef;
+
+    # get tables
+    my %Tables = map {
+        my $Table = (split(/\./, $_))[1]; $Table =~ s/\`//g; $Table => 1
+    } $Self->{dbh}->tables(q{}, $SchemaName, $Table, 'TABLE');
+
+    return $Tables{$Table};
+}
+
 
 sub DESTROY {
     my $Self = shift;

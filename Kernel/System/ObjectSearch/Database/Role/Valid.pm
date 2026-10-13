@@ -86,7 +86,7 @@ sub AttributePrepare {
                 $TableAliasTLP .= $Count;
                 $TableAliasTL  .= $Count;
 
-                push( @SQLJoin, "LEFT OUTER JOIN translation_pattern $TableAliasTLP ON $TableAliasTLP.value = rv.name" );
+                push( @SQLJoin, "LEFT OUTER JOIN translation_pattern $TableAliasTLP ON $TableAliasTLP.value_md5 = MD5(rv.name)" );
                 push( @SQLJoin, "LEFT OUTER JOIN translation_language $TableAliasTL ON $TableAliasTL.pattern_id = $TableAliasTLP.id AND $TableAliasTL.language = '$Param{Language}'" );
 
                 $Param{Flags}->{JoinMap}->{TranslationRoleValid} = $Count;
@@ -107,7 +107,7 @@ sub AttributePrepare {
             ConditionDef => {}
         }
     );
-    
+
     my %Attribute = (
         Column => $AttributeDefinition{ $Param{Attribute} }->{Column},
         SQLDef => {
