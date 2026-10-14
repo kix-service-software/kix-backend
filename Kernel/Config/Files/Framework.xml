@@ -8575,8 +8575,9 @@ Notes:
         <SubGroup>Frontend::Manuals</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="de">https://docs.kixdesk.com/pro/de/self-service-portal.html</Item>
-                <Item Key="en">https://docs.kixdesk.com/pro/de/self-service-portal.html</Item>
+                <Item Key="de">https://docs.kixdesk.com/</Item>
+                <Item Key="en">https://docs.kixdesk.com/</Item>
+                <Item Key="fr">https://docs.kixdesk.com/</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -8586,8 +8587,9 @@ Notes:
         <SubGroup>Frontend::Manuals</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="de">https://docs.kixdesk.com/pro/de/anwendung.html</Item>
-                <Item Key="en">https://docs.kixdesk.com/pro/de/anwendung.html</Item>
+                <Item Key="de">https://docs.kixdesk.com/</Item>
+                <Item Key="en">https://docs.kixdesk.com/</Item>
+                <Item Key="fr">https://docs.kixdesk.com/</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -8597,8 +8599,9 @@ Notes:
         <SubGroup>Frontend::Manuals</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="de">https://docs.kixdesk.com/pro/de/administration.html</Item>
-                <Item Key="en">https://docs.kixdesk.com/pro/de/administration.html</Item>
+                <Item Key="de">https://docs.kixdesk.com/</Item>
+                <Item Key="en">https://docs.kixdesk.com/</Item>
+                <Item Key="fr">https://docs.kixdesk.com/</Item>
             </Hash>
         </Setting>
     </ConfigItem>
