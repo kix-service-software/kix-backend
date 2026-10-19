@@ -32,29 +32,31 @@ _UpdateTimeAccounting();
 sub _UpdateTimeAccounting {
     my ( $Self, %Param ) = @_;
 
-    my @TimeAccountingIDs = $Kernel::OM->Get('ObjectSearch')->Search(
-        ObjectType => 'TimeAccounting',
-        Result     => 'ARRAY',
-        UserID     => 1,
-        UserType   => 'Agent'
+    # create a new async task
+    my $TaskID = $Kernel::OM->Get('Scheduler')->TaskAdd(
+        Type                     => 'AsynchronousExecutor',
+        Name                     => 'build-2317.pl',
+        Attempts                 => 1,
+        MaximumParallelInstances => 1,
+        Data                     => {
+            Object   => 'Kernel::System::Installation::Update::2317',
+            Function => 'TimeAccountingUpdate',
+            Params   => {},
+        },
     );
 
-    if ( @TimeAccountingIDs ) {
-        for my $TimeAccountingID ( @TimeAccountingIDs ) {
-            my %TimeAccounting = $Kernel::OM->Get('TimeAccounting')->TimeAccountingGet(
-                TimeAccountingID => $TimeAccountingID
-            );
-
-            $Kernel::OM->Get('TimeAccounting')->TimeAccountingUpdate(
-                %TimeAccounting,
-                TimeAccountingID   => $TimeAccountingID,
-                ExecutingContactID => $Kernel::OM->Get('Contact')->ContactLookup( UserID => $TimeAccounting{CreateBy} ),
-                StartTime          => $TimeAccounting{CreateTime},
-                IsInvoiced         => 0,
-                UserID             => 1
-            );
-        }
+    if ( !$TaskID ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => "Could not create new AsynchronousExecutor task!",
+        );
+        return;
     }
+    
+    $Kernel::OM->Get('Log')->Log(
+        Priority => 'info',
+        Message  => "Started AsynchronousExecutor task to update ticket accounted times.",
+    );
 
     return 1;
 }

@@ -5123,6 +5123,9 @@ sub TicketAccountedTimeSet {
         TicketID => $Param{TicketID}
     );
 
+    # ensure integer value (time accounting uses decimal, ticket accounted time only integer)
+    $Result = int( $Result );
+
     return if !defined $Result;
 
     return if !$Kernel::OM->Get('DB')->Do(
