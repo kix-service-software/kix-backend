@@ -233,11 +233,11 @@ my @TestsCGE = (
             'Filepath'    => $Kernel::OM->Get('Config')->Get('Home') . '/var/ssl/certs/KIX_Cert_###ID###',
             'Fingerprint' => '18:0D:E0:E2:A1:AC:C9:46:92:5A:C7:A1:72:28:33:78:0E:68:4E:07',
             'Hash'        => '2930f735',
-            'Issuer'      => 'C =  DE, ST =  Saxony, L =  Example, O =  Example, OU =  Example, CN =  Example, emailAddress =  example@unittest.org',
+            'Issuer'      => 'C= DE, ST= Saxony, L= Example, O= Example, OU= Example, CN= Example, emailAddress= example@unittest.org',
             'Modulus'     => 'C1EB549A1D0AE1C1A7179A5E5C87AAC2482B448E6491CF335BB93A941EE5AA503F458557FE39C1AA6603FAD9C4BA8277042C9C260983E1820EDCA2379218BE946B09092B06B0DEBF91C13E47314443EE5267D3BF40B925009A4D246A5C003916BF2CF4ED350289EBBD63087638A5ED1A6D3B3A7B0DC5BF739ECB25FCFFF004BFB4FE0B4B5767C5FCEED8AFF8A28810AC30298F414AE70AA4B87A4ED5364B7BC6A82CFC880B356FC225C354ECB775F58E8E626FDA9CD79B09676F22F6025B1CB4BBAE818C3971020CD500F9B0AF4060DA6BA99D58EEAAC34442B4CF21A350DEA3D1394B45DB720AB3232A6CB3C17BA4D89440CDF9294C3BA60F2269C08DF0845B',
             'Serial'      => '5A01B5766B5C040B20CFF7E09E998A9B580BA0F4',
             'StartDate'   => '2024-04-25 08:40:48',
-            'Subject'     => 'C =  DE, ST =  Saxony, L =  Example, O =  Example, OU =  Example, CN =  Example, emailAddress =  example@unittest.org',
+            'Subject'     => 'C= DE, ST= Saxony, L= Example, O= Example, OU= Example, CN= Example, emailAddress= example@unittest.org',
             'Type'        => 'Cert'
         },
         Name     => 'Certificate: Get / Type .PEM | application/x-x509-ca-cert / Certificate'
@@ -261,11 +261,11 @@ my @TestsCGE = (
             'FilesizeRaw' => '1946',
             'Fingerprint' => '18:0D:E0:E2:A1:AC:C9:46:92:5A:C7:A1:72:28:33:78:0E:68:4E:07',
             'Hash'        => '2930f735',
-            'Issuer'      => 'C =  DE, ST =  Saxony, L =  Example, O =  Example, OU =  Example, CN =  Example, emailAddress =  example@unittest.org',
+            'Issuer'      => 'C= DE, ST= Saxony, L= Example, O= Example, OU= Example, CN= Example, emailAddress= example@unittest.org',
             'Modulus'     => 'C1EB549A1D0AE1C1A7179A5E5C87AAC2482B448E6491CF335BB93A941EE5AA503F458557FE39C1AA6603FAD9C4BA8277042C9C260983E1820EDCA2379218BE946B09092B06B0DEBF91C13E47314443EE5267D3BF40B925009A4D246A5C003916BF2CF4ED350289EBBD63087638A5ED1A6D3B3A7B0DC5BF739ECB25FCFFF004BFB4FE0B4B5767C5FCEED8AFF8A28810AC30298F414AE70AA4B87A4ED5364B7BC6A82CFC880B356FC225C354ECB775F58E8E626FDA9CD79B09676F22F6025B1CB4BBAE818C3971020CD500F9B0AF4060DA6BA99D58EEAAC34442B4CF21A350DEA3D1394B45DB720AB3232A6CB3C17BA4D89440CDF9294C3BA60F2269C08DF0845B',
             'Serial'      => '5A01B5766B5C040B20CFF7E09E998A9B580BA0F4',
             'StartDate'   => '2024-04-25 08:40:48',
-            'Subject'     => 'C =  DE, ST =  Saxony, L =  Example, O =  Example, OU =  Example, CN =  Example, emailAddress =  example@unittest.org',
+            'Subject'     => 'C= DE, ST= Saxony, L= Example, O= Example, OU= Example, CN= Example, emailAddress= example@unittest.org',
             'Type'        => 'Cert',
             'Content'     => <<'END'
 LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUQrVENDQXVHZ0F3SUJBZ0lVV2dHMWRtdGNC
@@ -336,11 +336,11 @@ END
             'Filepath'    => $Kernel::OM->Get('Config')->Get('Home') . '/var/ssl/private/KIX_Private_###ID###',
             'Fingerprint' => '18:0D:E0:E2:A1:AC:C9:46:92:5A:C7:A1:72:28:33:78:0E:68:4E:07',
             'Hash'        => '2930f735',
-            'Issuer'      => 'C =  DE, ST =  Saxony, L =  Example, O =  Example, OU =  Example, CN =  Example, emailAddress =  example@unittest.org',
+            'Issuer'      => 'C= DE, ST= Saxony, L= Example, O= Example, OU= Example, CN= Example, emailAddress= example@unittest.org',
             'Modulus'     => 'C1EB549A1D0AE1C1A7179A5E5C87AAC2482B448E6491CF335BB93A941EE5AA503F458557FE39C1AA6603FAD9C4BA8277042C9C260983E1820EDCA2379218BE946B09092B06B0DEBF91C13E47314443EE5267D3BF40B925009A4D246A5C003916BF2CF4ED350289EBBD63087638A5ED1A6D3B3A7B0DC5BF739ECB25FCFFF004BFB4FE0B4B5767C5FCEED8AFF8A28810AC30298F414AE70AA4B87A4ED5364B7BC6A82CFC880B356FC225C354ECB775F58E8E626FDA9CD79B09676F22F6025B1CB4BBAE818C3971020CD500F9B0AF4060DA6BA99D58EEAAC34442B4CF21A350DEA3D1394B45DB720AB3232A6CB3C17BA4D89440CDF9294C3BA60F2269C08DF0845B',
             'Serial'      => '5A01B5766B5C040B20CFF7E09E998A9B580BA0F4',
             'StartDate'   => '2024-04-25 08:40:48',
-            'Subject'     => 'C =  DE, ST =  Saxony, L =  Example, O =  Example, OU =  Example, CN =  Example, emailAddress =  example@unittest.org',
+            'Subject'     => 'C= DE, ST= Saxony, L= Example, O= Example, OU= Example, CN= Example, emailAddress= example@unittest.org',
             'Type'        => 'Private'
         },
         Name     => 'Certificate: Get / Type .PEM | application/x-x509-ca-cert / Private Key'
@@ -364,11 +364,11 @@ END
             'Filesize'    => '2.2 KBytes',
             'FilesizeRaw' => '2302',
             'Hash'        => '2930f735',
-            'Issuer'      => 'C =  DE, ST =  Saxony, L =  Example, O =  Example, OU =  Example, CN =  Example, emailAddress =  example@unittest.org',
+            'Issuer'      => 'C= DE, ST= Saxony, L= Example, O= Example, OU= Example, CN= Example, emailAddress= example@unittest.org',
             'Modulus'     => 'C1EB549A1D0AE1C1A7179A5E5C87AAC2482B448E6491CF335BB93A941EE5AA503F458557FE39C1AA6603FAD9C4BA8277042C9C260983E1820EDCA2379218BE946B09092B06B0DEBF91C13E47314443EE5267D3BF40B925009A4D246A5C003916BF2CF4ED350289EBBD63087638A5ED1A6D3B3A7B0DC5BF739ECB25FCFFF004BFB4FE0B4B5767C5FCEED8AFF8A28810AC30298F414AE70AA4B87A4ED5364B7BC6A82CFC880B356FC225C354ECB775F58E8E626FDA9CD79B09676F22F6025B1CB4BBAE818C3971020CD500F9B0AF4060DA6BA99D58EEAAC34442B4CF21A350DEA3D1394B45DB720AB3232A6CB3C17BA4D89440CDF9294C3BA60F2269C08DF0845B',
             'Serial'      => '5A01B5766B5C040B20CFF7E09E998A9B580BA0F4',
             'StartDate'   => '2024-04-25 08:40:48',
-            'Subject'     => 'C =  DE, ST =  Saxony, L =  Example, O =  Example, OU =  Example, CN =  Example, emailAddress =  example@unittest.org',
+            'Subject'     => 'C= DE, ST= Saxony, L= Example, O= Example, OU= Example, CN= Example, emailAddress= example@unittest.org',
             'Type'        => 'Private',
             'Content'     => <<'END'
 LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUV2QUlCQURBTkJna3Foa2lHOXcwQkFRRUZB
@@ -455,11 +455,11 @@ END
             'Filepath'    => $Kernel::OM->Get('Config')->Get('Home') . '/var/ssl/certs/KIX_Cert_###ID###',
             'Fingerprint' => 'CE:9A:76:C0:B4:8A:C4:B6:C7:3D:CF:F4:A9:A5:CC:60:3D:E9:7D:47',
             'Hash'        => 'a292bbe5',
-            'Issuer'      => 'C =  DE, L =  Example, O =  Example, CN =  Unit Test, emailAddress =  example@unittest.org',
+            'Issuer'      => 'C= DE, L= Example, O= Example, CN= Unit Test, emailAddress= example@unittest.org',
             'Modulus'     => 'C3914528F589E7AAC8F55DECD9E2AF9F2FAF0667E8B5E63522A80748E6A1F96E7BA5EEC024DEBDB94A70FC2679EB5ECE77B26F9CFBAC96C065753A008FA8D888116C3DFAAA43DE313356D83FD794031DB70F01BF3007F12185A763F0B55A10EAA306492B2504323AD1F7904263F775E5AE47750F7AA7A6F367614F7F6519F8E56438A0F279931CD1955DC4F6368CFED754CA3EE1295A0C8EFB64272042901445272D9E573027754B2FE8DA92B9C8948B53EBCDDE62BFF8FBCCEDBC46A3FC843B52DBCDEDE084913B6CA23FB95B90C9CE1427DF30DEAC6359FBE9EC501A9C2F368387D22DAACCD726DF3F66D9CA26C7BCBEBD643C066A566CD15A14EDED0EEFCF',
             'Serial'      => '02E3486D597C5309C1CAA42F83021DB43A6DDE9D',
             'StartDate'   => '2024-04-25 08:44:04',
-            'Subject'     => 'C =  DE, L =  Example, O =  Example, CN =  Unit Test, emailAddress =  example@unittest.org',
+            'Subject'     => 'C= DE, L= Example, O= Example, CN= Unit Test, emailAddress= example@unittest.org',
             'Type'        => 'Cert'
         },
         Name     => 'Certificate: Get / Type .CRT | application/pkix-cert / Certificate'
@@ -483,11 +483,11 @@ END
             'Filesize'    => '1.7 KBytes',
             'FilesizeRaw' => '1771',
             'Hash'        => 'a292bbe5',
-            'Issuer'      => 'C =  DE, L =  Example, O =  Example, CN =  Unit Test, emailAddress =  example@unittest.org',
+            'Issuer'      => 'C= DE, L= Example, O= Example, CN= Unit Test, emailAddress= example@unittest.org',
             'Modulus'     => 'C3914528F589E7AAC8F55DECD9E2AF9F2FAF0667E8B5E63522A80748E6A1F96E7BA5EEC024DEBDB94A70FC2679EB5ECE77B26F9CFBAC96C065753A008FA8D888116C3DFAAA43DE313356D83FD794031DB70F01BF3007F12185A763F0B55A10EAA306492B2504323AD1F7904263F775E5AE47750F7AA7A6F367614F7F6519F8E56438A0F279931CD1955DC4F6368CFED754CA3EE1295A0C8EFB64272042901445272D9E573027754B2FE8DA92B9C8948B53EBCDDE62BFF8FBCCEDBC46A3FC843B52DBCDEDE084913B6CA23FB95B90C9CE1427DF30DEAC6359FBE9EC501A9C2F368387D22DAACCD726DF3F66D9CA26C7BCBEBD643C066A566CD15A14EDED0EEFCF',
             'Serial'      => '02E3486D597C5309C1CAA42F83021DB43A6DDE9D',
             'StartDate'   => '2024-04-25 08:44:04',
-            'Subject'     => 'C =  DE, L =  Example, O =  Example, CN =  Unit Test, emailAddress =  example@unittest.org',
+            'Subject'     => 'C= DE, L= Example, O= Example, CN= Unit Test, emailAddress= example@unittest.org',
             'Type'        => 'Cert',
             'Content'     => <<'END'
 LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURtekNDQW9PZ0F3SUJBZ0lVQXVOSWJWbDhV
@@ -552,7 +552,7 @@ END
             'Filepath'    => $Kernel::OM->Get('Config')->Get('Home') . '/var/ssl/certs/KIX_Cert_###ID###',
             'Fingerprint' => 'da:39:a3:ee:5e:6b:4b:0d:32:55:bf:ef:95:60:18:90:af:d8:07:09',
             'Modulus'     => 'C3914528F589E7AAC8F55DECD9E2AF9F2FAF0667E8B5E63522A80748E6A1F96E7BA5EEC024DEBDB94A70FC2679EB5ECE77B26F9CFBAC96C065753A008FA8D888116C3DFAAA43DE313356D83FD794031DB70F01BF3007F12185A763F0B55A10EAA306492B2504323AD1F7904263F775E5AE47750F7AA7A6F367614F7F6519F8E56438A0F279931CD1955DC4F6368CFED754CA3EE1295A0C8EFB64272042901445272D9E573027754B2FE8DA92B9C8948B53EBCDDE62BFF8FBCCEDBC46A3FC843B52DBCDEDE084913B6CA23FB95B90C9CE1427DF30DEAC6359FBE9EC501A9C2F368387D22DAACCD726DF3F66D9CA26C7BCBEBD643C066A566CD15A14EDED0EEFCF',
-            'Subject'     => 'C =  DE, L =  Example, O =  Example, CN =  Unit Test, emailAddress =  example@unittest.org',
+            'Subject'     => 'C= DE, L= Example, O= Example, CN= Unit Test, emailAddress= example@unittest.org',
             'Type'        => 'Cert'
         },
         Name     => 'Certificate: Get / Type .CSR | application/pkcs10 / Certificate'
@@ -574,7 +574,7 @@ END
             'Filesize'    => '1.3 KBytes',
             'FilesizeRaw' => '1366',
             'Modulus'     => 'C3914528F589E7AAC8F55DECD9E2AF9F2FAF0667E8B5E63522A80748E6A1F96E7BA5EEC024DEBDB94A70FC2679EB5ECE77B26F9CFBAC96C065753A008FA8D888116C3DFAAA43DE313356D83FD794031DB70F01BF3007F12185A763F0B55A10EAA306492B2504323AD1F7904263F775E5AE47750F7AA7A6F367614F7F6519F8E56438A0F279931CD1955DC4F6368CFED754CA3EE1295A0C8EFB64272042901445272D9E573027754B2FE8DA92B9C8948B53EBCDDE62BFF8FBCCEDBC46A3FC843B52DBCDEDE084913B6CA23FB95B90C9CE1427DF30DEAC6359FBE9EC501A9C2F368387D22DAACCD726DF3F66D9CA26C7BCBEBD643C066A566CD15A14EDED0EEFCF',
-            'Subject'     => 'C =  DE, L =  Example, O =  Example, CN =  Unit Test, emailAddress =  example@unittest.org',
+            'Subject'     => 'C= DE, L= Example, O= Example, CN= Unit Test, emailAddress= example@unittest.org',
             'Type'        => 'Cert',
             'Content'     => <<'END'
 LS0tLS1CRUdJTiBDRVJUSUZJQ0FURSBSRVFVRVNULS0tLS0KTUlJQ3J6Q0NBWmNDQVFBd2FqRUxN
@@ -638,11 +638,11 @@ END
             'Filepath'    => $Kernel::OM->Get('Config')->Get('Home') . '/var/ssl/private/KIX_Private_###ID###',
             'Fingerprint' => 'CE:9A:76:C0:B4:8A:C4:B6:C7:3D:CF:F4:A9:A5:CC:60:3D:E9:7D:47',
             'Hash'        => 'a292bbe5',
-            'Issuer'      => 'C =  DE, L =  Example, O =  Example, CN =  Unit Test, emailAddress =  example@unittest.org',
+            'Issuer'      => 'C= DE, L= Example, O= Example, CN= Unit Test, emailAddress= example@unittest.org',
             'Modulus'     => 'C3914528F589E7AAC8F55DECD9E2AF9F2FAF0667E8B5E63522A80748E6A1F96E7BA5EEC024DEBDB94A70FC2679EB5ECE77B26F9CFBAC96C065753A008FA8D888116C3DFAAA43DE313356D83FD794031DB70F01BF3007F12185A763F0B55A10EAA306492B2504323AD1F7904263F775E5AE47750F7AA7A6F367614F7F6519F8E56438A0F279931CD1955DC4F6368CFED754CA3EE1295A0C8EFB64272042901445272D9E573027754B2FE8DA92B9C8948B53EBCDDE62BFF8FBCCEDBC46A3FC843B52DBCDEDE084913B6CA23FB95B90C9CE1427DF30DEAC6359FBE9EC501A9C2F368387D22DAACCD726DF3F66D9CA26C7BCBEBD643C066A566CD15A14EDED0EEFCF',
             'Serial'      => '02E3486D597C5309C1CAA42F83021DB43A6DDE9D',
             'StartDate'   => '2024-04-25 08:44:04',
-            'Subject'     => 'C =  DE, L =  Example, O =  Example, CN =  Unit Test, emailAddress =  example@unittest.org',
+            'Subject'     => 'C= DE, L= Example, O= Example, CN= Unit Test, emailAddress= example@unittest.org',
             'Type'        => 'Private'
         },
         Name     => 'Certificate: Get / Type .KEY | application/x-iwork-keynote-sffkey / Private Key'
@@ -667,11 +667,11 @@ END
             'FilesizeRaw' => '2367',
             'Fingerprint' => 'CE:9A:76:C0:B4:8A:C4:B6:C7:3D:CF:F4:A9:A5:CC:60:3D:E9:7D:47',
             'Hash'        => 'a292bbe5',
-            'Issuer'      => 'C =  DE, L =  Example, O =  Example, CN =  Unit Test, emailAddress =  example@unittest.org',
+            'Issuer'      => 'C= DE, L= Example, O= Example, CN= Unit Test, emailAddress= example@unittest.org',
             'Modulus'     => 'C3914528F589E7AAC8F55DECD9E2AF9F2FAF0667E8B5E63522A80748E6A1F96E7BA5EEC024DEBDB94A70FC2679EB5ECE77B26F9CFBAC96C065753A008FA8D888116C3DFAAA43DE313356D83FD794031DB70F01BF3007F12185A763F0B55A10EAA306492B2504323AD1F7904263F775E5AE47750F7AA7A6F367614F7F6519F8E56438A0F279931CD1955DC4F6368CFED754CA3EE1295A0C8EFB64272042901445272D9E573027754B2FE8DA92B9C8948B53EBCDDE62BFF8FBCCEDBC46A3FC843B52DBCDEDE084913B6CA23FB95B90C9CE1427DF30DEAC6359FBE9EC501A9C2F368387D22DAACCD726DF3F66D9CA26C7BCBEBD643C066A566CD15A14EDED0EEFCF',
             'Serial'      => '02E3486D597C5309C1CAA42F83021DB43A6DDE9D',
             'StartDate'   => '2024-04-25 08:44:04',
-            'Subject'     => 'C =  DE, L =  Example, O =  Example, CN =  Unit Test, emailAddress =  example@unittest.org',
+            'Subject'     => 'C= DE, L= Example, O= Example, CN= Unit Test, emailAddress= example@unittest.org',
             'Type'        => 'Private',
             'Content'     => <<'END'
 LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpQcm9jLVR5cGU6IDQsRU5DUllQVEVECkRF
@@ -753,8 +753,8 @@ END
             'CType'       => 'SMIME',
             'ContentType' => 'application/x-x509-ca-cert',
             'Email'       => [
-                'test2@example.com',
                 'test@example.com',
+                'test2@example.com',
                 'test3@example.com'
             ],
             'EndDate'     => '###EndDate###',
@@ -767,7 +767,7 @@ END
             'Modulus'     => '###Modulus###',
             'Serial'      => '###Serial###',
             'StartDate'   => '###StartDate###',
-            'Subject'     => 'C =  DE, ST =  Sachsen, L =  Chemnitz, O =  TestOrg, OU =  IT, CN =  test@example.com',
+            'Subject'     => 'C= DE, ST= Sachsen, L= Chemnitz, O= TestOrg, OU= IT, CN= test@example.com',
             'Type'        => 'Cert'
         },
         Name     => 'Certificate: Get / Type .CRT | application/x-x509-ca-cert / Certificate'
@@ -805,8 +805,8 @@ END
             'CType'       => 'SMIME',
             'ContentType' => 'application/x-iwork-keynote-sffkey',
             'Email'       => [
-                'test2@example.com',
                 'test@example.com',
+                'test2@example.com',
                 'test3@example.com'
             ],
             'EndDate'     => '###EndDate###',
@@ -819,7 +819,7 @@ END
             'Modulus'     => '###Modulus###',
             'Serial'      => '###Serial###',
             'StartDate'   => '###StartDate###',
-            'Subject'     => 'C =  DE, ST =  Sachsen, L =  Chemnitz, O =  TestOrg, OU =  IT, CN =  test@example.com',
+            'Subject'     => 'C= DE, ST= Sachsen, L= Chemnitz, O= TestOrg, OU= IT, CN= test@example.com',
             'Type'        => 'Private'
         },
         Name     => 'Certificate: Get / Type .KEY | application/x-iwork-keynote-sffkey / Private Key'
@@ -858,9 +858,15 @@ for my $Test ( @TestsCGE ) {
             Data => $Data
         );
         for my $Key ( keys %{$CertificateIDs[$Test->{Index}]} ) {
-            my $Pattern = "###$Key###";
-            my $Replace = $CertificateIDs[$Test->{Index}]->{$Key};
 
+            my $Pattern;
+            my $Replace = $CertificateIDs[$Test->{Index}]->{$Key};
+            if ( $Key eq 'ID' ) {
+                $Pattern = "(\"FileID\":)\"###$Key###\"";
+                $Tmp =~ s/$Pattern/$1$Replace/g;
+            }
+
+            $Pattern = "###$Key###";
             $Tmp =~ s/$Pattern/$Replace/g;
         }
 
@@ -893,9 +899,14 @@ for my $Test ( @TestsCGE ) {
                 Data => $Data
             );
             for my $Key ( keys %{$CertificateIDs[$Test->{Index}]} ) {
-                my $Pattern = "###$Key###";
+                my $Pattern;
                 my $Replace = $CertificateIDs[$Test->{Index}]->{$Key};
+                if ( $Key eq 'ID' ) {
+                    $Pattern = "(\"FileID\":)\"###$Key###\"";
+                    $Tmp =~ s/$Pattern/$1$Replace/g;
+                }
 
+                $Pattern = "###$Key###";
                 $Tmp =~ s/$Pattern/$Replace/g;
             }
 
