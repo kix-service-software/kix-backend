@@ -59,7 +59,7 @@ sub Describe {
         Required    => 0,
         Placeholder => {
             Richtext  => 0,
-            Translate => 0,
+            Translate => 1,
         },
     );
     $Self->AddOption(

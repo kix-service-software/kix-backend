@@ -41,25 +41,27 @@ if ( $Options{Help} ) {
 }
 
 my %RoleList = (
-    'Superuser'                     => 1,
-    'System Admin'                  => 2,
-    'Agent User'                    => 3,
-    'Ticket Reader'                 => 4,
-    'Ticket Agent'                  => 5,
-    'Webform Ticket Creator'        => 6,
-    'FAQ Reader'                    => 7,
-    'FAQ Editor'                    => 8,
-    'Asset Reader'                  => 9,
-    'Asset Maintainer'              => 10,
-    'Customer Reader'               => 11,
-    'Customer Manager'              => 12,
-    'Customer'                      => 13,
-    'Report User'                   => 14,
-    'Report Manager'                => 15,
-    'Ticket Agent (Servicedesk)'    => 16,
-    'Ticket Agent Base Permission'  => 17,
-    'Textmodule Admin'              => 18,
-    'FAQ Admin'                     => 19,
+    'Superuser'                        => 1,
+    'System Admin'                     => 2,
+    'Agent User'                       => 3,
+    'Ticket Reader'                    => 4,
+    'Ticket Agent'                     => 5,
+    'Webform Ticket Creator'           => 6,
+    'FAQ Reader'                       => 7,
+    'FAQ Editor'                       => 8,
+    'Asset Reader'                     => 9,
+    'Asset Maintainer'                 => 10,
+    'Customer Reader'                  => 11,
+    'Customer Manager'                 => 12,
+    'Customer'                         => 13,
+    'Report User'                      => 14,
+    'Report Manager'                   => 15,
+    'Ticket Agent (Servicedesk)'       => 16,
+    'Ticket Agent Base Permission'     => 17,
+    'Textmodule Admin'                 => 18,
+    'FAQ Admin'                        => 19,
+    'Asset Reader Base Permission'     => 20,
+    'Asset Maintainer Base Permission' => 21,
 );
 
 my %PermissionTypeList = (
@@ -67,6 +69,7 @@ my %PermissionTypeList = (
     'Object'       => 2,
     'Property'     => 3,
     'Base::Ticket' => 4,
+    'Base::Asset'  => 5,
 );
 
 # define permission bit values

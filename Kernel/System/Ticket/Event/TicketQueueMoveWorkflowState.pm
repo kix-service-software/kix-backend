@@ -107,7 +107,7 @@ sub Run {
 
         # check if given state is valid
         my $CurrentStateIsValid = 0;
-        for my $StateValid (%NextStates) {
+        for my $StateValid ( values( %NextStates ) ) {
             next if $NewState !~ m/^$StateValid$/i;
             $CurrentStateIsValid = 1;
         }

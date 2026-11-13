@@ -495,9 +495,10 @@ sub _CreateTicketDynamicField {
     my @Time = $Kernel::OM->Get('Time')->SystemTime2Date(
         SystemTime => $SystemTime
     );
-    my $DateTime = "$Time[3].$Time[4].$Time[5], $Time[2]:$Time[1]";
-    my $Date     = "$Time[3].$Time[4].$Time[5], 00:00";
-    my $CurrDate = "$Time[5]-$Time[4]-$Time[3] 00:00:00";
+    my $DateTime  = "$Time[3].$Time[4].$Time[5], $Time[2]:$Time[1]";
+    my $Date      = "$Time[3].$Time[4].$Time[5], 00:00";
+    my $DateShort = "$Time[3].$Time[4].$Time[5]";
+    my $CurrDate  = "$Time[5]-$Time[4]-$Time[3] 00:00:00";
 
     my $Version = $Kernel::OM->Get('ITSMConfigItem')->VersionGet(
         ConfigItemID => $Param{ConfigItemID},
@@ -663,6 +664,7 @@ END
             Value      => $CurrTime,
             Expection  => {
                 All         => $Date,
+                Short       => $DateShort,
                 ObjectValue => {
                     undef => [
                         $CurrDate

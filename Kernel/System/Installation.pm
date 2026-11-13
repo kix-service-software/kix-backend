@@ -839,24 +839,28 @@ __ROUTES__
         my @AdditionList = $Additions ? split(/,/, $Additions) : ();
 
     $Operations .= "    $Operation:
-        Description: ''
-        MappingInbound:
-            Type: Simple
-        MappingOutbound:
-            Type: Simple
-        Type: $Operation\n";
+      Description: ''
+      MappingInbound:
+        Type: Simple
+      MappingOutbound:
+        Type: Simple
+      Type: $Operation\n";
 
         if ($Additions) {
             foreach my $Addition (@AdditionList) {
-                $Operations .= "        $Addition\n";
+                $Operations .= "      $Addition\n";
             }
         }
 
         $Routes .= "        $Operation:
           RequestMethod:
-          - $Method
-          Route: $Route\n";
+            - $Method
+          Route: >-
+            $Route\n";
     }
+
+    # remove trailing newline
+    $Routes =~ s/\n$//;
 
     $Template =~ s/__OPERATIONS__/$Operations/g;
     $Template =~ s/__ROUTES__/$Routes/g;

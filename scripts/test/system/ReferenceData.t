@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/ 
+# Modified version of the work: Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -19,8 +19,11 @@ use Kernel::System::VariableCheck qw(:all);
 # get helper object
 my $Helper = $Kernel::OM->Get('UnitTest::Helper');
 
+# begin transaction on database
+$Helper->BeginWork();
+
 # use ReferenceData ISO list
-$Kernel::OM->Get('Config')->Set(
+$Helper->ConfigSettingChange(
     Key   => 'ReferenceData::OwnCountryList',
     Value => undef,
 );
@@ -36,8 +39,7 @@ $Self->True(
 );
 
 # let's assume these countries don't go anywhere
-my @CountryList = ( 'Netherlands', 'Germany', 'Switzerland', 'United States of America', 'Japan' );
-
+my @CountryList = ( 'Netherlands (Kingdom of the)', 'Germany', 'Switzerland', 'United States of America', 'Japan' );
 for my $Country (@CountryList) {
     $Self->True(
         $$CountryList{$Country},
@@ -46,7 +48,7 @@ for my $Country (@CountryList) {
 }
 
 # set configuration to small list
-$Kernel::OM->Get('Config')->Set(
+$Helper->ConfigSettingChange(
     Key   => 'ReferenceData::OwnCountryList',
     Value => {
         'FR' => 'France',
@@ -75,9 +77,10 @@ for my $Country (@CountryList) {
     );
 }
 
+# rollback transaction on database
+$Helper->Rollback();
+
 1;
-
-
 
 =back
 

@@ -1332,7 +1332,7 @@ my @SortTests = (
         Expected  => {
             'Join'    => [
                 'LEFT OUTER JOIN general_catalog cids ON cids.id = ci.cur_depl_state_id AND cids.general_catalog_class = \'ITSM::ConfigItem::DeploymentState\'',
-                'LEFT OUTER JOIN translation_pattern tlp0 ON tlp0.value = cids.name',
+                'LEFT OUTER JOIN translation_pattern tlp0 ON tlp0.value_md5 = MD5(cids.name)',
                 'LEFT OUTER JOIN translation_language tl0 ON tl0.pattern_id = tlp0.id AND tl0.language = \'en\''
             ],
             'OrderBy' => [

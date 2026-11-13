@@ -58,6 +58,7 @@ sub Log {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "Need $Needed!",
+                Silent   => $Param{Silent}
             );
             return;
         }
@@ -77,18 +78,17 @@ sub Log {
         SQL => 'INSERT INTO automation_log (job_id, run_id, macro_id, macro_action_id, object_id, priority, message, create_time, create_by) '
             . 'VALUES (?, ?, ?, ?, ?, ?, ?, current_timestamp, ?)',
         Bind => [
-            \$LogData{JobID}, \$LogData{RunID}, \$LogData{MacroID}, \$LogData{MacroActionID}, 
+            \$LogData{JobID}, \$LogData{RunID}, \$LogData{MacroID}, \$LogData{MacroActionID},
             \$ObjectIDString, \$Param{Priority}, \$Param{Message}, \$Param{UserID}
         ],
     );
 
     # log in system log
-    if ( !$Param{Silent} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => $Param{Priority},
-            Message  => sprintf("%s (Job: %s, RunID: %s, Macro: %s, MacroAction: %s)", $Param{Message}, $LogData{JobInfo}, $LogData{RunID} || '', $LogData{MacroInfo}, $LogData{MacroActionInfo}),
-        );
-    }
+    $Kernel::OM->Get('Log')->Log(
+        Priority => $Param{Priority},
+        Message  => sprintf("%s (Job: %s, RunID: %s, Macro: %s, MacroAction: %s)", $Param{Message}, $LogData{JobInfo}, $LogData{RunID} || '', $LogData{MacroInfo}, $LogData{MacroActionInfo}),
+        Silent   => $Param{Silent}
+    );
 
     return 1;
 }

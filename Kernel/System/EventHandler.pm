@@ -274,35 +274,58 @@ Kernel::System::EventHandler, like this:
 sub EventHandlerTransaction {
     my ( $Self, %Param ) = @_;
 
+    # Guard against re-entrant flush: if we are already processing the
+    # pipe, do not re-enter (would reset the flag mid-flush).
+    return 1 if $Self->{EventHandlerTransaction};
+
     my $Debug = $Kernel::OM->Get('Config')->Get('EventHandler::Debug');
 
     # remember, we are in destroy mode, do not execute new events
     $Self->{EventHandlerTransaction} = 1;
 
+    # Take ownership of the pipe BEFORE iterating, so that
+    # EventHandlerHasQueuedTransactions() reports "nothing pending" while the
+    # flush is running and no nested flush can be triggered.
+    my $PipedEvents = delete $Self->{EventHandlerPipe};
+
     # execute events on end of transaction
-    if ( $Self->{EventHandlerPipe} ) {
+    if ( IsArrayRefWithData($PipedEvents) ) {
 
         if ( $Debug ) {
-            $Self->_EventHandlerDebug(sprintf "EventHandlerTransaction: handling %i piped events", (scalar @{$Self->{EventHandlerPipe}}));
+            $Self->_EventHandlerDebug(sprintf "EventHandlerTransaction: handling %i piped events", (scalar @{$PipedEvents}));
         }
 
         my $StartTime;
         if ( $Debug ) {
             $StartTime = Time::HiRes::time();
         }
-        for my $Params ( @{ $Self->{EventHandlerPipe} } ) {
-            $Self->EventHandler(
-                %Param,
-                %{$Params},
-                Transaction => 1,
-            );
+        for my $Params ( @{ $PipedEvents } ) {
+            # Isolate handler failures: one broken event module must neither
+            # abort the remaining events nor leave the transaction flag set.
+            my $EventOk = eval {
+                $Self->EventHandler(
+                    %Param,
+                    %{$Params},
+                    Transaction => 1,
+                );
+                1;
+            };
+
+            if ( !$EventOk ) {
+                my $Error = $@ || 'unknown error';
+                chomp $Error;
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => "Event handler failed for event \""
+                        . ( $Params->{Event} // 'undef' )
+                        . "\": $Error",
+                );
+            }
         }
+
         if ( $Debug ) {
             $Self->_EventHandlerDebug(sprintf "EventHandlerTransaction took %i ms", (Time::HiRes::time() - $StartTime) * 1000);
         }
-
-        # delete event pipe
-        $Self->{EventHandlerPipe} = undef;
     }
 
     # reset transaction mode
@@ -320,7 +343,7 @@ C<EventHandlerTransaction> handles, when called.
 
 sub EventHandlerHasQueuedTransactions {
     my ( $Self, %Param ) = @_;
-
+    return 0 if $Self->{EventHandlerTransaction};
     return IsArrayRefWithData( $Self->{EventHandlerPipe} );
 }
 

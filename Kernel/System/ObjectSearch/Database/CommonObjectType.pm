@@ -172,12 +172,13 @@ sub GetSearchDef {
 
     # init sql def hash
     my %SQLDef = (
-        Select  => [],
-        From    => [],
-        Join    => [],
-        Where   => [],
-        Having  => [],
-        OrderBy => [],
+        Select     => [],
+        From       => [],
+        Join       => [],
+        Where      => [],
+        Having     => [],
+        OrderBy    => [],
+        IsRelative => 0
     );
 
     # generate SQL from attribute modules
@@ -355,6 +356,11 @@ sub GetSearchDef {
             # add to where statements
             push( @{ $SQLDef{Having} }, $StatementOR );
         }
+    }
+
+    # set "IsRelative" when given by param
+    if ( $Param{IsRelative} ) {
+        $SQLDef{IsRelative} = $Param{IsRelative};
     }
 
     # check requires

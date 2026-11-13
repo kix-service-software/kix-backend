@@ -604,6 +604,30 @@ sub PrepareData {
         }
     }
 
+    if ( defined( $Param{Data}->{DynamicFieldFilter} ) ) {
+        if ( IsStringWithData( $Param{Data}->{DynamicFieldFilter} ) ) {
+            my $Data = $Kernel::OM->Get('JSON')->Decode(
+                Data   => $Param{Data}->{DynamicFieldFilter},
+                Silent => 1
+            );
+
+            if ( !IsArrayRef( $Data ) ) {
+                return $Self->_Error(
+                    Code    => 'PrepareData.InvalidDynamicFieldFilter',
+                    Message => "DynamicFieldFilter is neither a JSON (type: array) nor array!",
+                );
+            }
+
+            $Param{Data}->{DynamicFieldFilter} = $Data;
+        }
+        elsif ( !IsArrayRef( $Param{Data}->{DynamicFieldFilter} ) ) {
+            return $Self->_Error(
+                Code    => 'PrepareData.InvalidDynamicFieldFilter',
+                Message => "DynamicFieldFilter is neither a JSON (type: array) nor array!",
+            );
+        }
+    }
+
     my %Data = %{ $Param{Data} };
 
     # store data for later use
@@ -4346,11 +4370,26 @@ sub _GetCustomerUserVisibleObjectIds {
         IsHashRefWithData($Self->{Authorization}) &&
         $Self->{Authorization}->{UserType} eq 'Customer'
     ) {
+        my $ContactSearchAttributes = $Kernel::OM->Get('Main')->GetAssignedSearchAttributes(
+            ObjectType         => 'Contact',
+            AssignedObjectType => $Param{ObjectType}
+        );
+        my $ContactDynamicFields = [];
+        if ( IsHashRefWithData( $ContactSearchAttributes ) ) {
+            for my $Attribute ( keys( %{ $ContactSearchAttributes } ) ) {
+                if ( $Attribute =~ m/^DynamicField_(.+)$/ ) {
+                    push( @{ $ContactDynamicFields }, $1 );
+                }
+            }
+        }
+        if ( !IsArrayRefWithData( $ContactDynamicFields ) ) {
+            $ContactDynamicFields = 0;
+        }
 
         # get contact data
         my %ContactData = $Kernel::OM->Get('Contact')->ContactGet(
             UserID        => $Self->{Authorization}->{UserID},
-            DynamicFields => 1
+            DynamicFields => $ContactDynamicFields
         );
 
         # get object relevant ids

@@ -223,7 +223,7 @@
                 <Item Key="Module">Kernel::API::Validator::PriorityValidator</Item>
                 <Item Key="Validates">Priority,PriorityID</Item>
                 <Item Key="ConsiderOperationRegEx"></Item>
-                <Item Key="IgnoreOperationRegEx">(PriorityGet|PriorityCreate|PriorityUpdate|NotificationCreate|NotificationUpdate)</Item>
+                <Item Key="IgnoreOperationRegEx">(PriorityGet|PriorityCreate|PriorityUpdate|NotificationCreate|NotificationUpdate|JobCreate|JobUpdate|JobGet|MacroCreate|MacroUpdate|MacroGet|MacroActionCreate|MacroActionUpdate|MacroActionGet)</Item>
             </Hash>
         </Setting>
     </ConfigItem>

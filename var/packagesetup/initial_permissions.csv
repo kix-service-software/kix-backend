@@ -145,6 +145,7 @@
 "FAQ Editor";"Resource";"/faq/*";;;;;
 "FAQ Editor";"Resource";"/faq/articles";"x";"x";"x";"x";
 "FAQ Editor";"Resource";"/links";"x";"x";"x";"x";
+"Asset Reader";"Base::Asset";"*";;"x";;;
 "Asset Reader";"Resource";"/system/cmdb";;"x";;;
 "Asset Reader";"Resource";"/system/cmdb/*";;;;;
 "Asset Reader";"Resource";"/system/cmdb/classes";;"x";;;
@@ -154,6 +155,17 @@
 "Asset Reader";"Resource";"/links";;"x";;;
 "Asset Reader";"Resource";"/system/htmltopdf";;"x";;;
 "Asset Reader";"Resource";"/system/htmltopdf/convert";;"x";;;
+"Asset Reader Base Permission";"Base::Asset";"*";;;;;
+"Asset Reader Base Permission";"Resource";"/system/cmdb";;"x";;;
+"Asset Reader Base Permission";"Resource";"/system/cmdb/*";;;;;
+"Asset Reader Base Permission";"Resource";"/system/cmdb/classes";;"x";;;
+"Asset Reader Base Permission";"Resource";"/cmdb";;"x";;;
+"Asset Reader Base Permission";"Resource";"/cmdb/*";;;;;
+"Asset Reader Base Permission";"Resource";"/cmdb/configitems";;"x";;;
+"Asset Reader Base Permission";"Resource";"/links";;"x";;;
+"Asset Reader Base Permission";"Resource";"/system/htmltopdf";;"x";;;
+"Asset Reader Base Permission";"Resource";"/system/htmltopdf/convert";;"x";;;
+"Asset Maintainer";"Base::Asset";"*";"x";"x";"x";"x";
 "Asset Maintainer";"Resource";"/system/cmdb";;"x";;;
 "Asset Maintainer";"Resource";"/system/cmdb/*";;;;;
 "Asset Maintainer";"Resource";"/system/cmdb/classes";;"x";;;
@@ -163,6 +175,16 @@
 "Asset Maintainer";"Resource";"/links";"x";"x";"x";"x";
 "Asset Maintainer";"Resource";"/system/htmltopdf";;"x";;;
 "Asset Maintainer";"Resource";"/system/htmltopdf/convert";;"x";;;
+"Asset Maintainer Base Permission";"Base::Asset";"*";;;;;
+"Asset Maintainer Base Permission";"Resource";"/system/cmdb";;"x";;;
+"Asset Maintainer Base Permission";"Resource";"/system/cmdb/*";;;;;
+"Asset Maintainer Base Permission";"Resource";"/system/cmdb/classes";;"x";;;
+"Asset Maintainer Base Permission";"Resource";"/cmdb";"x";"x";"x";"x";
+"Asset Maintainer Base Permission";"Resource";"/cmdb/*";;;;;
+"Asset Maintainer Base Permission";"Resource";"/cmdb/configitems";"x";"x";"x";"x";
+"Asset Maintainer Base Permission";"Resource";"/links";"x";"x";"x";"x";
+"Asset Maintainer Base Permission";"Resource";"/system/htmltopdf";;"x";;;
+"Asset Maintainer Base Permission";"Resource";"/system/htmltopdf/convert";;"x";;;
 "Customer Reader";"Resource";"/organisations";;"x";;;
 "Customer Reader";"Resource";"/contacts";;"x";;;
 "Customer Manager";"Resource";"/organisations";"x";"x";"x";"x";
@@ -241,6 +263,7 @@
 "Customer";"Resource";"/contacts";;"x";;;
 "Customer";"Object";"/contacts/*{Contact.OrganisationIDs !IN $CurrentUser.Contact.RelevantOrganisationID}";;;;;
 "Customer";"Resource";"/virtualfs";;"x";;;
+"Customer";"Base::Asset";"*";;"x";;;
 "Report User";"Resource";"/reporting";"x";"x";;;
 "Report User";"Resource";"/reporting/*";;;;;
 "Report User";"Resource";"/reporting/outputformats";;"x";;;
@@ -266,3 +289,4 @@
 "Textmodule Admin";"Resource";"/system/textmodules";"x";"x";"x";"x";
 "FAQ Admin";"Resource";"/system/faq";"x";"x";"x";"x";
 "FAQ Admin";"Resource";"/system/objecticons";"x";"x";"x";"x";
+

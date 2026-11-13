@@ -90,7 +90,8 @@ sub ObjectIconGet {
     if ( !$Param{ID} ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => 'Need ID!'
+            Message  => 'Need ID!',
+            Silent   => $Param{Silent}
         );
         return;
     }
@@ -133,6 +134,7 @@ sub ObjectIconGet {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "No ObjectIcon with ID $Param{ID} found!",
+            Silent   => $Param{Silent}
         );
         return;
     }
@@ -170,7 +172,11 @@ sub ObjectIconAdd {
     # check needed stuff
     for (qw(Object ObjectID ContentType Content UserID)) {
         if ( !defined( $Param{$_} ) ) {
-            $Kernel::OM->Get('Log')->Log( Priority => 'error', Message => "Need $_!" );
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!",
+                Silent   => $Param{Silent}
+            );
             return;
         }
     }
@@ -241,6 +247,7 @@ sub ObjectIconAdd {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "DB insert failed!",
+            Silent   => $Param{Silent}
         );
     }
 
@@ -268,7 +275,11 @@ sub ObjectIconUpdate {
     # check needed stuff
     for (qw(ID Object ObjectID ContentType Content UserID)) {
         if ( !defined( $Param{$_} ) ) {
-            $Kernel::OM->Get('Log')->Log( Priority => 'error', Message => "Need $_!" );
+            $Kernel::OM->Get('Log')->Log(
+                Priority => 'error',
+                Message  => "Need $_!",
+                Silent   => $Param{Silent}
+            );
             return;
         }
     }
@@ -277,7 +288,8 @@ sub ObjectIconUpdate {
 
     # check if icon exists
     my %Icon = $Self->ObjectIconGet(
-        ID => $Param{ID},
+        ID     => $Param{ID},
+        Silent => $Param{Silent}
     );
     return if !%Icon;
 
@@ -328,6 +340,7 @@ sub ObjectIconUpdate {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "DB update failed!",
+            Silent   => $Param{Silent}
         );
     }
 
@@ -418,7 +431,8 @@ sub ObjectIconDelete {
         if ( !$Param{$_} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "Need $_!"
+                Message  => "Need $_!",
+                Silent   => $Param{Silent}
             );
             return;
         }
@@ -426,7 +440,8 @@ sub ObjectIconDelete {
 
     # get old data before delete
     my %OldData = $Self->ObjectIconGet(
-        ID => $Param{ID},
+        ID     => $Param{ID},,
+        Silent => $Param{Silent}
     );
     return if !%OldData;
 
@@ -437,7 +452,7 @@ sub ObjectIconDelete {
         SQL  => 'DELETE FROM object_icon WHERE id = ?',
         Bind => [ \$Param{ID} ],
     );
-    
+
     my $Success = $Kernel::OM->Get('Main')->FileDelete(
         Directory       => $Self->{Config}->{Directory},
         Filename        => $Param{ID},

@@ -48,6 +48,7 @@ sub _CheckParams {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "_CheckParams: Need TicketID!",
+            Silent   => $Param{Silent},
         );
         return;
     }
@@ -62,6 +63,7 @@ sub _CheckParams {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
             Message  => "_CheckParams: No ticket found with ID '$Param{TicketID}'!",
+            Silent   => $Param{Silent},
         );
         return;
     }

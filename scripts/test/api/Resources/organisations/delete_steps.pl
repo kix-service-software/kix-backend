@@ -54,5 +54,22 @@ When qr/delete all this organisations$/, sub {
 
 };
 
+When qr/delete all of "(.*?)" in system$/, sub {
+    my $LC = lc($1).'s';
 
+    ( S->{Response}, S->{ResponseContent} ) = _Get(
+        Token => S->{Token},
+        URL   => S->{API_URL}.'/'.$LC,
+    );
+    my $Anzahl = @{S->{ResponseContent}->{$1}};
+    print STDERR "Anzahl:".Dumper($Anzahl);
+    if ($Anzahl) {
+        foreach my $Row ( @{S->{ResponseContent}->{$1}} ) {
+            ( S->{Response}, S->{ResponseContent} ) = _Delete(
+                Token => S->{Token},
+                URL   => S->{API_URL} . '/' . $LC . '/' . $Row->{ID},
+            );
+        }
+    }
+};
 	

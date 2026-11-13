@@ -40,6 +40,7 @@ for my $Method (
 $Helper->BeginWork();
 
 my $HomeDir = $Kernel::OM->Get('Config')->Get('Home');
+_GenerateCertByConf();
 my @Certificates = _ReadCertificates();
 my @Emails       = _ReadEmails();
 
@@ -225,18 +226,18 @@ my @TestsCGE = (
         Expected => {
             'CType'       => 'SMIME',
             'ContentType' => 'application/x-x509-ca-cert',
-            'Email'       => 'example@unittest.org',
+            'Email'       => ['example@unittest.org'],
             'EndDate'     => '2034-04-23 08:40:48',
             'FileID'      => '###ID###',
             'Filename'    => 'KIX_Cert_###ID###',
             'Filepath'    => $Kernel::OM->Get('Config')->Get('Home') . '/var/ssl/certs/KIX_Cert_###ID###',
             'Fingerprint' => '18:0D:E0:E2:A1:AC:C9:46:92:5A:C7:A1:72:28:33:78:0E:68:4E:07',
             'Hash'        => '2930f735',
-            'Issuer'      => 'C =  DE, ST =  Saxony, L =  Example, O =  Example, OU =  Example, CN =  Example, emailAddress =  example@unittest.org',
+            'Issuer'      => 'C= DE, ST= Saxony, L= Example, O= Example, OU= Example, CN= Example, emailAddress= example@unittest.org',
             'Modulus'     => 'C1EB549A1D0AE1C1A7179A5E5C87AAC2482B448E6491CF335BB93A941EE5AA503F458557FE39C1AA6603FAD9C4BA8277042C9C260983E1820EDCA2379218BE946B09092B06B0DEBF91C13E47314443EE5267D3BF40B925009A4D246A5C003916BF2CF4ED350289EBBD63087638A5ED1A6D3B3A7B0DC5BF739ECB25FCFFF004BFB4FE0B4B5767C5FCEED8AFF8A28810AC30298F414AE70AA4B87A4ED5364B7BC6A82CFC880B356FC225C354ECB775F58E8E626FDA9CD79B09676F22F6025B1CB4BBAE818C3971020CD500F9B0AF4060DA6BA99D58EEAAC34442B4CF21A350DEA3D1394B45DB720AB3232A6CB3C17BA4D89440CDF9294C3BA60F2269C08DF0845B',
             'Serial'      => '5A01B5766B5C040B20CFF7E09E998A9B580BA0F4',
             'StartDate'   => '2024-04-25 08:40:48',
-            'Subject'     => 'C =  DE, ST =  Saxony, L =  Example, O =  Example, OU =  Example, CN =  Example, emailAddress =  example@unittest.org',
+            'Subject'     => 'C= DE, ST= Saxony, L= Example, O= Example, OU= Example, CN= Example, emailAddress= example@unittest.org',
             'Type'        => 'Cert'
         },
         Name     => 'Certificate: Get / Type .PEM | application/x-x509-ca-cert / Certificate'
@@ -251,7 +252,7 @@ my @TestsCGE = (
         Expected => {
             'CType'       => 'SMIME',
             'ContentType' => 'application/x-x509-ca-cert',
-            'Email'       => 'example@unittest.org',
+            'Email'       => ['example@unittest.org'],
             'EndDate'     => '2034-04-23 08:40:48',
             'FileID'      => '###ID###',
             'Filename'    => 'KIX_Cert_###ID###',
@@ -260,11 +261,11 @@ my @TestsCGE = (
             'FilesizeRaw' => '1946',
             'Fingerprint' => '18:0D:E0:E2:A1:AC:C9:46:92:5A:C7:A1:72:28:33:78:0E:68:4E:07',
             'Hash'        => '2930f735',
-            'Issuer'      => 'C =  DE, ST =  Saxony, L =  Example, O =  Example, OU =  Example, CN =  Example, emailAddress =  example@unittest.org',
+            'Issuer'      => 'C= DE, ST= Saxony, L= Example, O= Example, OU= Example, CN= Example, emailAddress= example@unittest.org',
             'Modulus'     => 'C1EB549A1D0AE1C1A7179A5E5C87AAC2482B448E6491CF335BB93A941EE5AA503F458557FE39C1AA6603FAD9C4BA8277042C9C260983E1820EDCA2379218BE946B09092B06B0DEBF91C13E47314443EE5267D3BF40B925009A4D246A5C003916BF2CF4ED350289EBBD63087638A5ED1A6D3B3A7B0DC5BF739ECB25FCFFF004BFB4FE0B4B5767C5FCEED8AFF8A28810AC30298F414AE70AA4B87A4ED5364B7BC6A82CFC880B356FC225C354ECB775F58E8E626FDA9CD79B09676F22F6025B1CB4BBAE818C3971020CD500F9B0AF4060DA6BA99D58EEAAC34442B4CF21A350DEA3D1394B45DB720AB3232A6CB3C17BA4D89440CDF9294C3BA60F2269C08DF0845B',
             'Serial'      => '5A01B5766B5C040B20CFF7E09E998A9B580BA0F4',
             'StartDate'   => '2024-04-25 08:40:48',
-            'Subject'     => 'C =  DE, ST =  Saxony, L =  Example, O =  Example, OU =  Example, CN =  Example, emailAddress =  example@unittest.org',
+            'Subject'     => 'C= DE, ST= Saxony, L= Example, O= Example, OU= Example, CN= Example, emailAddress= example@unittest.org',
             'Type'        => 'Cert',
             'Content'     => <<'END'
 LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUQrVENDQXVHZ0F3SUJBZ0lVV2dHMWRtdGNC
@@ -328,18 +329,18 @@ END
         Expected => {
             'CType'       => 'SMIME',
             'ContentType' => 'application/x-x509-ca-cert',
-            'Email'       => 'example@unittest.org',
+            'Email'       => ['example@unittest.org'],
             'EndDate'     => '2034-04-23 08:40:48',
             'FileID'      => '###ID###',
             'Filename'    => 'KIX_Private_###ID###',
             'Filepath'    => $Kernel::OM->Get('Config')->Get('Home') . '/var/ssl/private/KIX_Private_###ID###',
             'Fingerprint' => '18:0D:E0:E2:A1:AC:C9:46:92:5A:C7:A1:72:28:33:78:0E:68:4E:07',
             'Hash'        => '2930f735',
-            'Issuer'      => 'C =  DE, ST =  Saxony, L =  Example, O =  Example, OU =  Example, CN =  Example, emailAddress =  example@unittest.org',
+            'Issuer'      => 'C= DE, ST= Saxony, L= Example, O= Example, OU= Example, CN= Example, emailAddress= example@unittest.org',
             'Modulus'     => 'C1EB549A1D0AE1C1A7179A5E5C87AAC2482B448E6491CF335BB93A941EE5AA503F458557FE39C1AA6603FAD9C4BA8277042C9C260983E1820EDCA2379218BE946B09092B06B0DEBF91C13E47314443EE5267D3BF40B925009A4D246A5C003916BF2CF4ED350289EBBD63087638A5ED1A6D3B3A7B0DC5BF739ECB25FCFFF004BFB4FE0B4B5767C5FCEED8AFF8A28810AC30298F414AE70AA4B87A4ED5364B7BC6A82CFC880B356FC225C354ECB775F58E8E626FDA9CD79B09676F22F6025B1CB4BBAE818C3971020CD500F9B0AF4060DA6BA99D58EEAAC34442B4CF21A350DEA3D1394B45DB720AB3232A6CB3C17BA4D89440CDF9294C3BA60F2269C08DF0845B',
             'Serial'      => '5A01B5766B5C040B20CFF7E09E998A9B580BA0F4',
             'StartDate'   => '2024-04-25 08:40:48',
-            'Subject'     => 'C =  DE, ST =  Saxony, L =  Example, O =  Example, OU =  Example, CN =  Example, emailAddress =  example@unittest.org',
+            'Subject'     => 'C= DE, ST= Saxony, L= Example, O= Example, OU= Example, CN= Example, emailAddress= example@unittest.org',
             'Type'        => 'Private'
         },
         Name     => 'Certificate: Get / Type .PEM | application/x-x509-ca-cert / Private Key'
@@ -354,7 +355,7 @@ END
         Expected => {
             'CType'       => 'SMIME',
             'ContentType' => 'application/x-x509-ca-cert',
-            'Email'       => 'example@unittest.org',
+            'Email'       => ['example@unittest.org'],
             'EndDate'     => '2034-04-23 08:40:48',
             'FileID'      => '###ID###',
             'Filename'    => 'KIX_Private_###ID###',
@@ -363,11 +364,11 @@ END
             'Filesize'    => '2.2 KBytes',
             'FilesizeRaw' => '2302',
             'Hash'        => '2930f735',
-            'Issuer'      => 'C =  DE, ST =  Saxony, L =  Example, O =  Example, OU =  Example, CN =  Example, emailAddress =  example@unittest.org',
+            'Issuer'      => 'C= DE, ST= Saxony, L= Example, O= Example, OU= Example, CN= Example, emailAddress= example@unittest.org',
             'Modulus'     => 'C1EB549A1D0AE1C1A7179A5E5C87AAC2482B448E6491CF335BB93A941EE5AA503F458557FE39C1AA6603FAD9C4BA8277042C9C260983E1820EDCA2379218BE946B09092B06B0DEBF91C13E47314443EE5267D3BF40B925009A4D246A5C003916BF2CF4ED350289EBBD63087638A5ED1A6D3B3A7B0DC5BF739ECB25FCFFF004BFB4FE0B4B5767C5FCEED8AFF8A28810AC30298F414AE70AA4B87A4ED5364B7BC6A82CFC880B356FC225C354ECB775F58E8E626FDA9CD79B09676F22F6025B1CB4BBAE818C3971020CD500F9B0AF4060DA6BA99D58EEAAC34442B4CF21A350DEA3D1394B45DB720AB3232A6CB3C17BA4D89440CDF9294C3BA60F2269C08DF0845B',
             'Serial'      => '5A01B5766B5C040B20CFF7E09E998A9B580BA0F4',
             'StartDate'   => '2024-04-25 08:40:48',
-            'Subject'     => 'C =  DE, ST =  Saxony, L =  Example, O =  Example, OU =  Example, CN =  Example, emailAddress =  example@unittest.org',
+            'Subject'     => 'C= DE, ST= Saxony, L= Example, O= Example, OU= Example, CN= Example, emailAddress= example@unittest.org',
             'Type'        => 'Private',
             'Content'     => <<'END'
 LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUV2QUlCQURBTkJna3Foa2lHOXcwQkFRRUZB
@@ -447,18 +448,18 @@ END
         Expected => {
             'CType'       => 'SMIME',
             'ContentType' => 'application/pkix-cert',
-            'Email'       => 'example@unittest.org',
+            'Email'       => ['example@unittest.org'],
             'EndDate'     => '2029-04-24 08:44:04',
             'FileID'      => '###ID###',
             'Filename'    => 'KIX_Cert_###ID###',
             'Filepath'    => $Kernel::OM->Get('Config')->Get('Home') . '/var/ssl/certs/KIX_Cert_###ID###',
             'Fingerprint' => 'CE:9A:76:C0:B4:8A:C4:B6:C7:3D:CF:F4:A9:A5:CC:60:3D:E9:7D:47',
             'Hash'        => 'a292bbe5',
-            'Issuer'      => 'C =  DE, L =  Example, O =  Example, CN =  Unit Test, emailAddress =  example@unittest.org',
+            'Issuer'      => 'C= DE, L= Example, O= Example, CN= Unit Test, emailAddress= example@unittest.org',
             'Modulus'     => 'C3914528F589E7AAC8F55DECD9E2AF9F2FAF0667E8B5E63522A80748E6A1F96E7BA5EEC024DEBDB94A70FC2679EB5ECE77B26F9CFBAC96C065753A008FA8D888116C3DFAAA43DE313356D83FD794031DB70F01BF3007F12185A763F0B55A10EAA306492B2504323AD1F7904263F775E5AE47750F7AA7A6F367614F7F6519F8E56438A0F279931CD1955DC4F6368CFED754CA3EE1295A0C8EFB64272042901445272D9E573027754B2FE8DA92B9C8948B53EBCDDE62BFF8FBCCEDBC46A3FC843B52DBCDEDE084913B6CA23FB95B90C9CE1427DF30DEAC6359FBE9EC501A9C2F368387D22DAACCD726DF3F66D9CA26C7BCBEBD643C066A566CD15A14EDED0EEFCF',
             'Serial'      => '02E3486D597C5309C1CAA42F83021DB43A6DDE9D',
             'StartDate'   => '2024-04-25 08:44:04',
-            'Subject'     => 'C =  DE, L =  Example, O =  Example, CN =  Unit Test, emailAddress =  example@unittest.org',
+            'Subject'     => 'C= DE, L= Example, O= Example, CN= Unit Test, emailAddress= example@unittest.org',
             'Type'        => 'Cert'
         },
         Name     => 'Certificate: Get / Type .CRT | application/pkix-cert / Certificate'
@@ -473,7 +474,7 @@ END
         Expected => {
             'CType'       => 'SMIME',
             'ContentType' => 'application/pkix-cert',
-            'Email'       => 'example@unittest.org',
+            'Email'       => ['example@unittest.org'],
             'EndDate'     => '2029-04-24 08:44:04',
             'FileID'      => '###ID###',
             'Filename'    => 'KIX_Cert_###ID###',
@@ -482,11 +483,11 @@ END
             'Filesize'    => '1.7 KBytes',
             'FilesizeRaw' => '1771',
             'Hash'        => 'a292bbe5',
-            'Issuer'      => 'C =  DE, L =  Example, O =  Example, CN =  Unit Test, emailAddress =  example@unittest.org',
+            'Issuer'      => 'C= DE, L= Example, O= Example, CN= Unit Test, emailAddress= example@unittest.org',
             'Modulus'     => 'C3914528F589E7AAC8F55DECD9E2AF9F2FAF0667E8B5E63522A80748E6A1F96E7BA5EEC024DEBDB94A70FC2679EB5ECE77B26F9CFBAC96C065753A008FA8D888116C3DFAAA43DE313356D83FD794031DB70F01BF3007F12185A763F0B55A10EAA306492B2504323AD1F7904263F775E5AE47750F7AA7A6F367614F7F6519F8E56438A0F279931CD1955DC4F6368CFED754CA3EE1295A0C8EFB64272042901445272D9E573027754B2FE8DA92B9C8948B53EBCDDE62BFF8FBCCEDBC46A3FC843B52DBCDEDE084913B6CA23FB95B90C9CE1427DF30DEAC6359FBE9EC501A9C2F368387D22DAACCD726DF3F66D9CA26C7BCBEBD643C066A566CD15A14EDED0EEFCF',
             'Serial'      => '02E3486D597C5309C1CAA42F83021DB43A6DDE9D',
             'StartDate'   => '2024-04-25 08:44:04',
-            'Subject'     => 'C =  DE, L =  Example, O =  Example, CN =  Unit Test, emailAddress =  example@unittest.org',
+            'Subject'     => 'C= DE, L= Example, O= Example, CN= Unit Test, emailAddress= example@unittest.org',
             'Type'        => 'Cert',
             'Content'     => <<'END'
 LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURtekNDQW9PZ0F3SUJBZ0lVQXVOSWJWbDhV
@@ -551,7 +552,7 @@ END
             'Filepath'    => $Kernel::OM->Get('Config')->Get('Home') . '/var/ssl/certs/KIX_Cert_###ID###',
             'Fingerprint' => 'da:39:a3:ee:5e:6b:4b:0d:32:55:bf:ef:95:60:18:90:af:d8:07:09',
             'Modulus'     => 'C3914528F589E7AAC8F55DECD9E2AF9F2FAF0667E8B5E63522A80748E6A1F96E7BA5EEC024DEBDB94A70FC2679EB5ECE77B26F9CFBAC96C065753A008FA8D888116C3DFAAA43DE313356D83FD794031DB70F01BF3007F12185A763F0B55A10EAA306492B2504323AD1F7904263F775E5AE47750F7AA7A6F367614F7F6519F8E56438A0F279931CD1955DC4F6368CFED754CA3EE1295A0C8EFB64272042901445272D9E573027754B2FE8DA92B9C8948B53EBCDDE62BFF8FBCCEDBC46A3FC843B52DBCDEDE084913B6CA23FB95B90C9CE1427DF30DEAC6359FBE9EC501A9C2F368387D22DAACCD726DF3F66D9CA26C7BCBEBD643C066A566CD15A14EDED0EEFCF',
-            'Subject'     => 'C =  DE, L =  Example, O =  Example, CN =  Unit Test, emailAddress =  example@unittest.org',
+            'Subject'     => 'C= DE, L= Example, O= Example, CN= Unit Test, emailAddress= example@unittest.org',
             'Type'        => 'Cert'
         },
         Name     => 'Certificate: Get / Type .CSR | application/pkcs10 / Certificate'
@@ -573,7 +574,7 @@ END
             'Filesize'    => '1.3 KBytes',
             'FilesizeRaw' => '1366',
             'Modulus'     => 'C3914528F589E7AAC8F55DECD9E2AF9F2FAF0667E8B5E63522A80748E6A1F96E7BA5EEC024DEBDB94A70FC2679EB5ECE77B26F9CFBAC96C065753A008FA8D888116C3DFAAA43DE313356D83FD794031DB70F01BF3007F12185A763F0B55A10EAA306492B2504323AD1F7904263F775E5AE47750F7AA7A6F367614F7F6519F8E56438A0F279931CD1955DC4F6368CFED754CA3EE1295A0C8EFB64272042901445272D9E573027754B2FE8DA92B9C8948B53EBCDDE62BFF8FBCCEDBC46A3FC843B52DBCDEDE084913B6CA23FB95B90C9CE1427DF30DEAC6359FBE9EC501A9C2F368387D22DAACCD726DF3F66D9CA26C7BCBEBD643C066A566CD15A14EDED0EEFCF',
-            'Subject'     => 'C =  DE, L =  Example, O =  Example, CN =  Unit Test, emailAddress =  example@unittest.org',
+            'Subject'     => 'C= DE, L= Example, O= Example, CN= Unit Test, emailAddress= example@unittest.org',
             'Type'        => 'Cert',
             'Content'     => <<'END'
 LS0tLS1CRUdJTiBDRVJUSUZJQ0FURSBSRVFVRVNULS0tLS0KTUlJQ3J6Q0NBWmNDQVFBd2FqRUxN
@@ -631,17 +632,17 @@ END
             'CType'       => 'SMIME',
             'ContentType' => 'application/x-iwork-keynote-sffkey',
             'EndDate'     => '2029-04-24 08:44:04',
-            'Email'       => 'example@unittest.org',
+            'Email'       => ['example@unittest.org'],
             'FileID'      => '###ID###',
             'Filename'    => 'KIX_Private_###ID###',
             'Filepath'    => $Kernel::OM->Get('Config')->Get('Home') . '/var/ssl/private/KIX_Private_###ID###',
             'Fingerprint' => 'CE:9A:76:C0:B4:8A:C4:B6:C7:3D:CF:F4:A9:A5:CC:60:3D:E9:7D:47',
             'Hash'        => 'a292bbe5',
-            'Issuer'      => 'C =  DE, L =  Example, O =  Example, CN =  Unit Test, emailAddress =  example@unittest.org',
+            'Issuer'      => 'C= DE, L= Example, O= Example, CN= Unit Test, emailAddress= example@unittest.org',
             'Modulus'     => 'C3914528F589E7AAC8F55DECD9E2AF9F2FAF0667E8B5E63522A80748E6A1F96E7BA5EEC024DEBDB94A70FC2679EB5ECE77B26F9CFBAC96C065753A008FA8D888116C3DFAAA43DE313356D83FD794031DB70F01BF3007F12185A763F0B55A10EAA306492B2504323AD1F7904263F775E5AE47750F7AA7A6F367614F7F6519F8E56438A0F279931CD1955DC4F6368CFED754CA3EE1295A0C8EFB64272042901445272D9E573027754B2FE8DA92B9C8948B53EBCDDE62BFF8FBCCEDBC46A3FC843B52DBCDEDE084913B6CA23FB95B90C9CE1427DF30DEAC6359FBE9EC501A9C2F368387D22DAACCD726DF3F66D9CA26C7BCBEBD643C066A566CD15A14EDED0EEFCF',
             'Serial'      => '02E3486D597C5309C1CAA42F83021DB43A6DDE9D',
             'StartDate'   => '2024-04-25 08:44:04',
-            'Subject'     => 'C =  DE, L =  Example, O =  Example, CN =  Unit Test, emailAddress =  example@unittest.org',
+            'Subject'     => 'C= DE, L= Example, O= Example, CN= Unit Test, emailAddress= example@unittest.org',
             'Type'        => 'Private'
         },
         Name     => 'Certificate: Get / Type .KEY | application/x-iwork-keynote-sffkey / Private Key'
@@ -658,7 +659,7 @@ END
             'CType'       => 'SMIME',
             'ContentType' => 'application/x-iwork-keynote-sffkey',
             'EndDate'     => '2029-04-24 08:44:04',
-            'Email'       => 'example@unittest.org',
+            'Email'       => ['example@unittest.org'],
             'FileID'      => '###ID###',
             'Filename'    => 'KIX_Private_###ID###',
             'Filepath'    => $Kernel::OM->Get('Config')->Get('Home') . '/var/ssl/private/KIX_Private_###ID###',
@@ -666,11 +667,11 @@ END
             'FilesizeRaw' => '2367',
             'Fingerprint' => 'CE:9A:76:C0:B4:8A:C4:B6:C7:3D:CF:F4:A9:A5:CC:60:3D:E9:7D:47',
             'Hash'        => 'a292bbe5',
-            'Issuer'      => 'C =  DE, L =  Example, O =  Example, CN =  Unit Test, emailAddress =  example@unittest.org',
+            'Issuer'      => 'C= DE, L= Example, O= Example, CN= Unit Test, emailAddress= example@unittest.org',
             'Modulus'     => 'C3914528F589E7AAC8F55DECD9E2AF9F2FAF0667E8B5E63522A80748E6A1F96E7BA5EEC024DEBDB94A70FC2679EB5ECE77B26F9CFBAC96C065753A008FA8D888116C3DFAAA43DE313356D83FD794031DB70F01BF3007F12185A763F0B55A10EAA306492B2504323AD1F7904263F775E5AE47750F7AA7A6F367614F7F6519F8E56438A0F279931CD1955DC4F6368CFED754CA3EE1295A0C8EFB64272042901445272D9E573027754B2FE8DA92B9C8948B53EBCDDE62BFF8FBCCEDBC46A3FC843B52DBCDEDE084913B6CA23FB95B90C9CE1427DF30DEAC6359FBE9EC501A9C2F368387D22DAACCD726DF3F66D9CA26C7BCBEBD643C066A566CD15A14EDED0EEFCF',
             'Serial'      => '02E3486D597C5309C1CAA42F83021DB43A6DDE9D',
             'StartDate'   => '2024-04-25 08:44:04',
-            'Subject'     => 'C =  DE, L =  Example, O =  Example, CN =  Unit Test, emailAddress =  example@unittest.org',
+            'Subject'     => 'C= DE, L= Example, O= Example, CN= Unit Test, emailAddress= example@unittest.org',
             'Type'        => 'Private',
             'Content'     => <<'END'
 LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpQcm9jLVR5cGU6IDQsRU5DUllQVEVECkRF
@@ -731,6 +732,121 @@ END
         Expected => 1,
         Name     => 'Certificate: Exists / Type .KEY | application/x-iwork-keynote-sffkey / Private Key'
     },
+    {
+        Function => 'CertificateCreate',
+        Data     => {
+            File   => $Certificates[5],
+            Type   => 'Cert',
+            CType  => 'SMIME',
+            UserID => 1
+        },
+        Expected => 1,
+        Name     => 'Certificate: Create / Type .CRT | application/x-x509-ca-cert / Certificate'
+    },
+    {
+        Function => 'CertificateGet',
+        Data     => {
+            ID => '###ID###'
+        },
+        Index    => 5,
+        Expected => {
+            'CType'       => 'SMIME',
+            'ContentType' => 'application/x-x509-ca-cert',
+            'Email'       => [
+                'test@example.com',
+                'test2@example.com',
+                'test3@example.com'
+            ],
+            'EndDate'     => '###EndDate###',
+            'FileID'      => '###ID###',
+            'Filename'    => 'KIX_Cert_###ID###',
+            'Filepath'    => $Kernel::OM->Get('Config')->Get('Home') . '/var/ssl/certs/KIX_Cert_###ID###',
+            'Fingerprint' => '###Fingerprint###',
+            'Hash'        => '###Hash###',
+            'Issuer'      => '###Issuer###',
+            'Modulus'     => '###Modulus###',
+            'Serial'      => '###Serial###',
+            'StartDate'   => '###StartDate###',
+            'Subject'     => 'C= DE, ST= Sachsen, L= Chemnitz, O= TestOrg, OU= IT, CN= test@example.com',
+            'Type'        => 'Cert'
+        },
+        Name     => 'Certificate: Get / Type .CRT | application/x-x509-ca-cert / Certificate'
+    },
+    {
+        Function => 'CertificateExists',
+        Data     => {
+            Filename => 'Certificate/SMIME/Cert/###Fingerprint###',
+            Silent   => 1
+        },
+        Index    => 5,
+        Expected => 1,
+        Name     => 'Certificate: Exists / Type .CRT | application/x-x509-ca-cert / Certificate'
+    },
+    {
+        Function => 'CertificateCreate',
+        Data     => {
+            File       => $Certificates[6],
+            Type       => 'Private',
+            Passphrase => 'start123',
+            CType      => 'SMIME',
+            UserID     => 1
+        },
+        Expected => 1,
+        Name     => 'Certificate: Create / Type .KEY | application/x-iwork-keynote-sffkey / Private Key '
+    },
+    {
+        Function => 'CertificateGet',
+        Data     => {
+            ID => '###ID###'
+        },
+
+        Index    => 6,
+        Expected => {
+            'CType'       => 'SMIME',
+            'ContentType' => 'application/x-iwork-keynote-sffkey',
+            'Email'       => [
+                'test@example.com',
+                'test2@example.com',
+                'test3@example.com'
+            ],
+            'EndDate'     => '###EndDate###',
+            'FileID'      => '###ID###',
+            'Filename'    => 'KIX_Private_###ID###',
+            'Filepath'    => $Kernel::OM->Get('Config')->Get('Home') . '/var/ssl/private/KIX_Private_###ID###',
+            'Fingerprint' => '###Fingerprint###',
+            'Hash'        => '###Hash###',
+            'Issuer'      => '###Issuer###',
+            'Modulus'     => '###Modulus###',
+            'Serial'      => '###Serial###',
+            'StartDate'   => '###StartDate###',
+            'Subject'     => 'C= DE, ST= Sachsen, L= Chemnitz, O= TestOrg, OU= IT, CN= test@example.com',
+            'Type'        => 'Private'
+        },
+        Name     => 'Certificate: Get / Type .KEY | application/x-iwork-keynote-sffkey / Private Key'
+    },
+    {
+        Function => 'CertificateExists',
+        Data     => {
+            Modulus         => '###Modulus###',
+            Type            => 'Private',
+            HasCertificate  => 1,
+            CType           => 'SMIME',
+            Silent          => 1
+        },
+        Index    => 6,
+        Expected => 1,
+        Name     => 'Certificate: Exists / Type .KEY | application/x-iwork-keynote-sffkey / Private Key / Exists Certificate'
+    },
+    {
+        Function => 'CertificateExists',
+        Data     => {
+            Filename => 'Certificate/SMIME/Private/###Fingerprint###',
+            Silent   => 1
+        },
+        Index    => 6,
+        Expected => 1,
+        Name     => 'Certificate: Exists / Type .KEY | application/x-iwork-keynote-sffkey / Private Key'
+    }
 );
 
 for my $Test ( @TestsCGE ) {
@@ -742,9 +858,15 @@ for my $Test ( @TestsCGE ) {
             Data => $Data
         );
         for my $Key ( keys %{$CertificateIDs[$Test->{Index}]} ) {
-            my $Pattern = "###$Key###";
-            my $Replace = $CertificateIDs[$Test->{Index}]->{$Key};
 
+            my $Pattern;
+            my $Replace = $CertificateIDs[$Test->{Index}]->{$Key};
+            if ( $Key eq 'ID' ) {
+                $Pattern = "(\"FileID\":)\"###$Key###\"";
+                $Tmp =~ s/$Pattern/$1$Replace/g;
+            }
+
+            $Pattern = "###$Key###";
             $Tmp =~ s/$Pattern/$Replace/g;
         }
 
@@ -763,6 +885,36 @@ for my $Test ( @TestsCGE ) {
     my $Result   = $Kernel::OM->Get('Certificate')->$Function(
         %{$Data->{Data}}
     );
+
+    if (
+        $Function eq 'CertificateGet'
+        && $Result
+    ) {
+        %{$CertificateIDs[$Data->{Index}]} = (
+            %{$CertificateIDs[$Data->{Index}]},
+            %{$Result}
+        );
+        if ( defined $Test->{Index} ) {
+            my $Tmp = $Kernel::OM->Get('JSON')->Encode(
+                Data => $Data
+            );
+            for my $Key ( keys %{$CertificateIDs[$Test->{Index}]} ) {
+                my $Pattern;
+                my $Replace = $CertificateIDs[$Test->{Index}]->{$Key};
+                if ( $Key eq 'ID' ) {
+                    $Pattern = "(\"FileID\":)\"###$Key###\"";
+                    $Tmp =~ s/$Pattern/$1$Replace/g;
+                }
+
+                $Pattern = "###$Key###";
+                $Tmp =~ s/$Pattern/$Replace/g;
+            }
+
+            $Data = $Kernel::OM->Get('JSON')->Decode(
+                Data => $Tmp
+            );
+        }
+    }
 
     if ( $Function eq 'CertificateGet' ) {
         $Self->IsDeeply(
@@ -795,16 +947,6 @@ for my $Test ( @TestsCGE ) {
             {
                 ID => $Result
             }
-        );
-    }
-
-    if (
-        $Function eq 'CertificateGet'
-        && $Result
-    ) {
-        %{$CertificateIDs[$Data->{Index}]} = (
-            %{$CertificateIDs[$Data->{Index}]},
-            %{$Result}
         );
     }
 
@@ -1261,6 +1403,46 @@ my @TestsVD = (
             "Certificate: Decrypt + Verify / $Emails[1]->{Filename} / decryption / decrypted",
             "Certificate: Decrypt + Verify / $Emails[1]->{Filename} / verification / verified"
         ]
+    },
+    {
+        Functions => [ 'Verify' ],
+        Data      => {
+            %{$Emails[2]},
+            Type   => 'Email'
+        },
+        Expected => [
+            [
+                {
+                    'Value' => 1,
+                    'Key'   => 'SMIMESigned'
+                },
+                {
+                    'Key'   => 'SMIMESignedError',
+                    'Value' => "OpenSSL: Verification failure\n".'; self-signed certificate'
+                }
+            ]
+        ],
+        Name     => [ "Certificate: Verify / $Emails[2]->{Filename} / verified" ]
+    },
+    {
+        Functions => [ 'Verify' ],
+        Data      => {
+            %{$Emails[3]},
+            Type   => 'Email'
+        },
+        Expected => [
+            [
+                {
+                    'Value' => 1,
+                    'Key'   => 'SMIMESigned'
+                },
+                {
+                    'Key'   => 'SMIMESignedError',
+                    'Value' => "OpenSSL: Verification failure\n".'; self-signed certificate'
+                }
+            ]
+        ],
+        Name     => [ "Certificate: Verify / $Emails[3]->{Filename} / verified" ]
     }
 );
 
@@ -1453,10 +1635,10 @@ sub _ExistsFilesInFS {
     $Self->IsDeeply(
         \%Counts,
         {
-            Cert    => 3,
-            Private => 2
+            Cert    => 4,
+            Private => 3
         },
-        'Certificate: Export / Check / Count: Certificates 3 | Private Key 2'
+        'Certificate: Export / Check / Count: Certificates 4 | Private Key 3'
     );
 
     return 1;
@@ -1494,6 +1676,16 @@ sub _ReadCertificates {
         {
             Filename    => 'Example.key',
             Filesize    => 1_751,
+            ContentType => 'application/x-iwork-keynote-sffkey',
+            Name        => 'Certificate: Read / Type .KEY | application/x-iwork-keynote-sffkey / Private Key'
+        },
+        {
+            Filename    => 'smime.crt',
+            ContentType => 'application/x-x509-ca-cert',
+            Name        => 'Certificate: Read / Type .CRT | application/x-x509-ca-cert / Certificate'
+        },
+        {
+            Filename    => 'smime.key',
             ContentType => 'application/x-iwork-keynote-sffkey',
             Name        => 'Certificate: Read / Type .KEY | application/x-iwork-keynote-sffkey / Private Key'
         }
@@ -1541,6 +1733,16 @@ sub _ReadEmails {
             Filesize    => 6_778,
             ContentType => 'application/vnd.previewsystems.box',
             Name        => 'Certificate: Read / UnitTest_Encrypted_Signed.box / Email'
+        },
+        {
+            Filename    => 'UnitTest_Signed_Test.box',
+            ContentType => 'application/vnd.previewsystems.box',
+            Name        => 'Certificate: Read / UnitTest_Encrypted_Signed_Test.box / Email'
+        },
+        {
+            Filename    => 'UnitTest_Signed_Test2.box',
+            ContentType => 'application/vnd.previewsystems.box',
+            Name        => 'Certificate: Read / UnitTest_Encrypted_Signed_Test2.box / Email'
         }
     );
 
@@ -1573,6 +1775,22 @@ sub _ReadEmails {
     }
 
     return @List;
+}
+
+# Test for KIX2018-15214
+sub _GenerateCertByConf {
+    my ( %Param ) = @_;
+
+    my $Cmd = $Kernel::OM->Get('Certificate')->{Cmd};
+
+    # create private key
+    my $Options = "genrsa -out $HomeDir/scripts/test/system/sample/Certificate/Certificates/smime.key 4096";
+    my $LogMessage = qx{$Cmd $Options 2>&1};
+
+    $Options = "req -x509 -new -nodes -key $HomeDir/scripts/test/system/sample/Certificate/Certificates/smime.key -sha256 -days 365 -out $HomeDir/scripts/test/system/sample/Certificate/Certificates/smime.crt -config $HomeDir/scripts/test/system/sample/Certificate/Certificates/smime.cnf";
+    $LogMessage = qx{$Cmd $Options 2>&1};
+
+    return;
 }
 
 # rollback transaction on database

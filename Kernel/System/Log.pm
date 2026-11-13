@@ -145,10 +145,17 @@ sub Log {
 
     my $Message = $Param{MSG} || $Param{Message} || '???';
 
+    # prepare message index
+    my $Index = 1;
+    if ( defined( $Self->{LogStack}->{ $PriorityNum }->[-1] ) ) {
+        $Index = $Self->{LogStack}->{ $PriorityNum }->[-1]->{Index} + 1;
+    }
+
     # add message to log stack
     push(
         @{ $Self->{LogStack}->{ $PriorityNum } },
         {
+            Index   => $Index,
             Code    => $Param{Code},
             Message => $Message
         }

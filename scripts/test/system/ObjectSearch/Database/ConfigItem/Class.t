@@ -535,7 +535,7 @@ my @SortTests = (
         Expected  => {
             'Join'    => [
                 'INNER JOIN general_catalog cic ON cic.id = ci.class_id AND cic.general_catalog_class = \'ITSM::ConfigItem::Class\'',
-                'LEFT OUTER JOIN translation_pattern tlp0 ON tlp0.value = cic.name',
+                'LEFT OUTER JOIN translation_pattern tlp0 ON tlp0.value_md5 = MD5(cic.name)',
                 'LEFT OUTER JOIN translation_language tl0 ON tl0.pattern_id = tlp0.id AND tl0.language = \'en\''
             ],
             'OrderBy' => [

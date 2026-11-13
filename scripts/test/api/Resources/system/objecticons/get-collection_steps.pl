@@ -39,6 +39,7 @@ When qr/I query the collection of objecticons$/, sub {
    ( S->{Response}, S->{ResponseContent} ) = _Get(
       Token => S->{Token},
       URL   => S->{API_URL}.'/system/objecticons',
+      Sort => 'ObjectIcon.Name:textual'
    );
 };
 

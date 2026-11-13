@@ -356,14 +356,16 @@ sub MacroActionUpdate {
 
     # get current data
     my %Data = $Self->MacroActionGet(
-        ID => $Param{ID},
+        ID     => $Param{ID},
+        Silent => $Param{Silent}
     );
 
     # validate parameters if given
     if ( $Param{Parameters} ) {
         # get macro data
         my %Macro = $Self->MacroGet(
-            ID => $Param{MacroID} || $Data{MacroID}
+            ID     => $Param{MacroID} || $Data{MacroID},
+            Silent => $Param{Silent}
         );
         if ( !%Macro ) {
             if ( !$Param{Silent} ) {
@@ -744,7 +746,8 @@ sub MacroActionExecute {
         if ( !$Param{$Needed} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "Need $Needed!"
+                Message  => "Need $Needed!",
+                Silent   => $Param{Silent}
             );
             return;
         }
@@ -755,13 +758,15 @@ sub MacroActionExecute {
 
     # get MacroAction data
     my %MacroAction = $Self->MacroActionGet(
-        ID => $Param{ID}
+        ID     => $Param{ID},
+        Silent => $Param{Silent}
     );
 
     if ( !%MacroAction ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => "No such macro action with ID $Param{ID}!"
+            Message  => "No such macro action with ID $Param{ID}!",
+            Silent   => $Param{Silent}
         );
         return;
     }
@@ -832,6 +837,7 @@ sub MacroActionExecute {
     # get macro action defintion
     my %Definition = $BackendObject->DefinitionGet();
 
+    my $MacroActionRunSuccess;
     do {
         # unset RepeatExecution of backend
         $BackendObject->UnsetRepeatExecution();
@@ -863,15 +869,16 @@ sub MacroActionExecute {
             }
 
             $Parameters{ $Option->{Name} } = $Self->_ReplaceValuePlaceholder(
-                Value     => $Parameters{ $Option->{Name} },
-                ValueType => $Option->{Placeholder}->{ValueType} || '',
-                Richtext  => $Option->{Placeholder}->{Richtext},
-                Translate => $Option->{Placeholder}->{Translate},
-                MacroType => $Macro{Type},
-                ObjectID  => $ObjectID,
-                UserID    => $Param{UserID},
-                Data      => IsHashRefWithData( $Param{AdditionalData} ) ? $Param{AdditionalData} : {},
-                ReplaceNotFound => $Option->{Placeholder}->{ReplaceNotFound}
+                Value           => $Parameters{ $Option->{Name} },
+                ValueType       => $Option->{Placeholder}->{ValueType} || '',
+                Richtext        => $Option->{Placeholder}->{Richtext},
+                Translate       => $Option->{Placeholder}->{Translate},
+                MacroType       => $Macro{Type},
+                ObjectID        => $ObjectID,
+                UserID          => $Param{UserID},
+                Data            => IsHashRefWithData( $Param{AdditionalData} ) ? $Param{AdditionalData} : {},
+                ReplaceNotFound => $Option->{Placeholder}->{ReplaceNotFound},
+                Silent          => $Param{Silent}
             );
         }
 
@@ -899,14 +906,14 @@ sub MacroActionExecute {
             );
         }
 
-        my $Success = $BackendObject->Run(
+        $MacroActionRunSuccess = $BackendObject->Run(
             %Param,
             MacroType => $Macro{Type},
             Config    => \%Parameters,
             ConfigRaw => \%{$MacroAction{Parameters} || {}},
         );
 
-        if ( !$Success ) {
+        if ( !$MacroActionRunSuccess ) {
             # get last error message from system log
             my $Message = $Kernel::OM->Get('Log')->GetLogEntry(
                 Type => 'error',
@@ -915,11 +922,10 @@ sub MacroActionExecute {
             $Self->LogError(
                 Message  => "Macro action \"$MacroAction{Type}\" returned execution error.",
                 UserID   => $Param{UserID},
+                Silent   => $Param{Silent}
             );
-
-            last;
         }
-    } while ( $BackendObject->RepeatExecution() );
+    } while ( $MacroActionRunSuccess && $BackendObject->RepeatExecution() );
 
     # remove MacroActionID from log reference
     delete $Self->{MacroActionID};
@@ -1387,6 +1393,7 @@ sub _ReplacePlaceholderString {
         ReplaceNotFound => $Param{ReplaceNotFound},
         ObjectType      => $Param{MacroType},
         ObjectID        => $Param{ObjectID},
+        Silent          => $Param{Silent},
     );
 
     return $Param{Value};

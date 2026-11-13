@@ -13,4 +13,4 @@
   Scenario: get an existing config
     When I get the config with Option "SendmailNotificationEnvelopeFrom::FallbackToEmailFrom"
     Then the response code is 200
-    And the attribute "SysConfigOption.Value" is "1"
+    And the attribute "SysConfigOption.AccessLevel" is "internal"

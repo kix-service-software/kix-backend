@@ -1085,7 +1085,7 @@
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="PostMaster::FollowUp::CheckReferences" Required="0" Valid="1">
-        <Description Translatable="1">Checks if the headers "In-Reply-To" or "References" of a follow-up message contain a Message-ID of an article visible in the self service portal on this ticket. If so, the email is visible in the self service portal.</Description>
+        <Description Translatable="1">Checks whether the most recent article referenced by the Message-IDs in the "In-Reply-To" or "References" headers of a follow-up message is visible in the Self Service Portal for this ticket. If so, the email is visible in the Self Service Portal.</Description>
         <Group>Framework</Group>
         <SubGroup>Core::PostMaster</SubGroup>
         <Setting>
@@ -2254,7 +2254,7 @@
         <Group>Framework</Group>
         <SubGroup>Core::Log</SubGroup>
         <Setting>
-            <Option SelectedID="monthly">
+            <Option SelectedID="daily">
                 <Item Key="never" Translatable="1">Never</Item>
                 <Item Key="hourly" Translatable="1">Hourly</Item>
                 <Item Key="daily" Translatable="1">Daily</Item>
@@ -2268,7 +2268,7 @@
         <Group>Framework</Group>
         <SubGroup>Core::Log</SubGroup>
         <Setting>
-            <String Regex="">0</String>
+            <String Regex="">100M</String>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="LogModule::LogFile::Keep" Required="1" Valid="1">
@@ -2276,7 +2276,7 @@
         <Group>Framework</Group>
         <SubGroup>Core::Log</SubGroup>
         <Setting>
-            <String Regex="">12</String>
+            <String Regex="">20</String>
         </Setting>
     </ConfigItem>
     <ConfigItem AccessLevel="internal" Name="MinimumLogLevel" Required="1" Valid="1">
@@ -8575,8 +8575,9 @@ Notes:
         <SubGroup>Frontend::Manuals</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="de">https://docs.kixdesk.com/pro/de/self-service-portal.html</Item>
-                <Item Key="en">https://docs.kixdesk.com/pro/de/self-service-portal.html</Item>
+                <Item Key="de">https://docs.kixdesk.com/</Item>
+                <Item Key="en">https://docs.kixdesk.com/</Item>
+                <Item Key="fr">https://docs.kixdesk.com/</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -8586,8 +8587,9 @@ Notes:
         <SubGroup>Frontend::Manuals</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="de">https://docs.kixdesk.com/pro/de/anwendung.html</Item>
-                <Item Key="en">https://docs.kixdesk.com/pro/de/anwendung.html</Item>
+                <Item Key="de">https://docs.kixdesk.com/</Item>
+                <Item Key="en">https://docs.kixdesk.com/</Item>
+                <Item Key="fr">https://docs.kixdesk.com/</Item>
             </Hash>
         </Setting>
     </ConfigItem>
@@ -8597,8 +8599,9 @@ Notes:
         <SubGroup>Frontend::Manuals</SubGroup>
         <Setting>
             <Hash>
-                <Item Key="de">https://docs.kixdesk.com/pro/de/administration.html</Item>
-                <Item Key="en">https://docs.kixdesk.com/pro/de/administration.html</Item>
+                <Item Key="de">https://docs.kixdesk.com/</Item>
+                <Item Key="en">https://docs.kixdesk.com/</Item>
+                <Item Key="fr">https://docs.kixdesk.com/</Item>
             </Hash>
         </Setting>
     </ConfigItem>

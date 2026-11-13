@@ -1,5 +1,5 @@
 # --
-# Modified version of the work: Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/ 
+# Modified version of the work: Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # based on the original work of:
 # Copyright (C) 2001-2017 OTRS AG, https://otrs.com/
 # --
@@ -202,11 +202,7 @@ sub TableCreate {
     my @Return       = ();
     for my $Tag (@Param) {
 
-        if (
-            ( $Tag->{Tag} eq 'Table' || $Tag->{Tag} eq 'TableCreate' )
-            && $Tag->{TagType} eq 'Start'
-            )
-        {
+        if ($Tag->{Tag} =~ /^Table(Create)?(IfNotExists)?$/ && $Tag->{TagType} eq 'Start' ) {
             if ( $ConfigObject->Get('Database::ShellOutput') ) {
                 $SQLStart .= $Self->{'DB::Comment'}
                     . "----------------------------------------------------------\n";
@@ -215,9 +211,16 @@ sub TableCreate {
                     . "----------------------------------------------------------\n";
             }
         }
-        if ( $Tag->{Tag} eq 'Table' || $Tag->{Tag} eq 'TableCreate' ) {
+        if ( $Tag->{Tag} =~ /^Table(Create)?(IfNotExists)?$/ ) {
+            my $IfNotExists = $2;
+
             if ( $Tag->{TagType} eq 'Start' ) {
-                $SQLStart .= "CREATE TABLE $Tag->{Name} (\n";
+                if ( $IfNotExists ) {
+                    $SQLStart .= "CREATE TABLE IF NOT EXISTS $Tag->{Name} (\n";
+                }
+                else {
+                    $SQLStart .= "CREATE TABLE $Tag->{Name} (\n";
+                }
                 $TableName = $Tag->{Name};
             }
             elsif ( $Tag->{TagType} eq 'End' ) {
@@ -462,6 +465,9 @@ sub TableAlter {
             my $Default = '';
             if ( $Tag->{Type} =~ /int/i ) {
                 $Default = defined $Tag->{Default} ? $Tag->{Default} : 0;
+            }
+            elsif ( $Tag->{Type} =~ /(date|time)/i ) {
+                $Default = defined $Tag->{Default} ? "'$Tag->{Default}'" : "'1970-01-01 00:00:00'";
             }
             else {
                 $Default = defined $Tag->{Default} ? "'$Tag->{Default}'" : "''";

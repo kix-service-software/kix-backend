@@ -1,5 +1,5 @@
 # --
-# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/ 
+# Copyright (C) 2006-2026 KIX Service Software GmbH, https://www.kixdesk.com/
 # --
 # This software comes with ABSOLUTELY NO WARRANTY. For details, see
 # the enclosed file LICENSE-GPL3 for license information (GPL3). If you
@@ -131,8 +131,11 @@ sub Run {
         );
     }
 
-    # restrict article sender types
-    if ( $Self->{Authorization}->{UserType} eq 'Customer' && $Article{ArticleSenderType} ne 'external') {
+    # restrict article customer visible
+    if (
+        $Self->{Authorization}->{UserType} eq 'Customer'
+        && !$Article{CustomerVisible}
+    ) {
         return $Self->_Error(
             Code => 'Object.NoPermission',
         );
@@ -140,6 +143,7 @@ sub Run {
 
     # get all attachments from article
     my %ArticleAttachments = $TicketObject->ArticleAttachmentIndex(
+        Article                    => \%Article,
         ArticleID                  => $Param{Data}->{ArticleID},
         UserID                     => $Self->{Authorization}->{UserID},,
         StripPlainBodyAsAttachment => 1,

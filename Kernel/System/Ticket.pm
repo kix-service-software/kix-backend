@@ -869,8 +869,10 @@ sub TicketDelete {
     }
 
     # delete accounted time
-    my $Success = $Self->TicketAccountedTimeDelete(
-        TicketID => $Param{TicketID}
+    my $Success = $Kernel::OM->Get('TimeAccounting')->TimeAccountingDelete(
+        TicketID => $Param{TicketID},
+        UserID   => $Param{UserID},
+
     );
 
     # trigger event
@@ -930,7 +932,8 @@ sub DeleteLinkedMergeTickets {
         if ( !$Param{$Needed} ) {
             $Kernel::OM->Get('Kernel::System::Log')->Log(
                 Priority => 'error',
-                Message  => "Need $Needed!"
+                Message  => "Need $Needed!",
+                Silent   => $Param{Silent}
             );
             return;
         }
@@ -1366,7 +1369,8 @@ sub TicketGet {
     if ( !$Param{TicketID} ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => 'Need TicketID!'
+            Message  => 'Need TicketID!',
+            Silent   => $Param{Silent}
         );
         return;
     }
@@ -1375,7 +1379,7 @@ sub TicketGet {
 
     # prepare cache key
     my $CacheKey = 'TicketGet::' . $Param{Extended} . '::';
-    if ( IsArrayRefWithData($Param{DynamicFields}) ) {
+    if ( IsArrayRef($Param{DynamicFields}) ) {
         $CacheKey .= join('::', @{$Param{DynamicFields}});
     }
     else {
@@ -1387,77 +1391,151 @@ sub TicketGet {
         TicketID => $Param{TicketID},
         Key      => $CacheKey,
     );
-    return %{$Cached} if ref $Cached eq 'HASH';
+    return %{ $Cached } if ( ref( $Cached ) eq 'HASH' );
 
     my %Ticket;
 
-    # get database object
-    my $DBObject = $Kernel::OM->Get('DB');
+    # check cache for basic ticket data if not already checked
+    if ( $CacheKey ne 'TicketGet::0::0' ) {
+        # check cache
+        my $Cached = $Self->_TicketCacheGet(
+            TicketID => $Param{TicketID},
+            Key      => 'TicketGet::0::0',
+        );
 
-    return if !$DBObject->Prepare(
-        SQL => '
-            SELECT st.id, st.queue_id, st.ticket_state_id, st.ticket_lock_id, st.ticket_priority_id,
-                st.create_time_unix, st.create_time, st.tn, st.organisation_id, st.contact_id,
-                st.user_id, st.responsible_user_id, st.until_time, st.change_time, st.title,
-                st.timeout, st.type_id, st.archive_flag,
-                st.create_by, st.change_by, accounted_time, attachment_count
-            FROM ticket st
-            WHERE st.id = ?',
-        Bind  => [ \$Param{TicketID} ],
-        Limit => 1,
-    );
-
-    while ( my @Row = $DBObject->FetchrowArray() ) {
-        $Ticket{TicketID}        = $Row[0];
-        $Ticket{QueueID}         = $Row[1];
-        $Ticket{StateID}         = $Row[2];
-        $Ticket{LockID}          = $Row[3];
-        $Ticket{PriorityID}      = $Row[4];
-        $Ticket{CreateTimeUnix}  = $Row[5];
-        $Ticket{TicketNumber}    = $Row[7];
-        $Ticket{OrganisationID}  = $Row[8];
-        $Ticket{ContactID}       = $Row[9];
-        $Ticket{OwnerID}         = $Row[10];
-        $Ticket{ResponsibleID}   = $Row[11] || 1;
-        $Ticket{PendingTimeUnix} = $Row[12];
-        $Ticket{Changed}         = $Row[13];
-        $Ticket{Title}           = $Row[14];
-        $Ticket{UnlockTimeout}   = $Row[15];
-        $Ticket{TypeID}          = $Row[16] || 1;
-        $Ticket{ArchiveFlag}     = $Row[17] ? 'y' : 'n';
-        $Ticket{CreateBy}        = $Row[18];
-        $Ticket{ChangeBy}        = $Row[19];
-        $Ticket{AccountedTime}   = $Row[20];
-        $Ticket{AttachmentCount} = $Row[21] || 0;
+        if ( ref( $Cached ) eq 'HASH' ) {
+            %Ticket = %{ $Cached };
+        }
     }
 
-    # check ticket
-    if ( !$Ticket{TicketID} ) {
-        if ( !$Param{Silent} ) {
+    # only fetch basic data from database, when not cached
+    if ( !%Ticket ) {
+        return if !$Kernel::OM->Get('DB')->Prepare(
+            SQL => '
+                SELECT st.id, st.queue_id, st.ticket_state_id, st.ticket_lock_id, st.ticket_priority_id,
+                    st.create_time_unix, st.create_time, st.tn, st.organisation_id, st.contact_id,
+                    st.user_id, st.responsible_user_id, st.until_time, st.change_time, st.title,
+                    st.timeout, st.type_id, st.archive_flag,
+                    st.create_by, st.change_by, accounted_time, attachment_count
+                FROM ticket st
+                WHERE st.id = ?',
+            Bind  => [ \$Param{TicketID} ],
+            Limit => 1,
+        );
+
+        while ( my @Row = $Kernel::OM->Get('DB')->FetchrowArray() ) {
+            $Ticket{TicketID}        = $Row[0];
+            $Ticket{QueueID}         = $Row[1];
+            $Ticket{StateID}         = $Row[2];
+            $Ticket{LockID}          = $Row[3];
+            $Ticket{PriorityID}      = $Row[4];
+            $Ticket{CreateTimeUnix}  = $Row[5];
+            $Ticket{TicketNumber}    = $Row[7];
+            $Ticket{OrganisationID}  = $Row[8];
+            $Ticket{ContactID}       = $Row[9];
+            $Ticket{OwnerID}         = $Row[10];
+            $Ticket{ResponsibleID}   = $Row[11] || 1;
+            $Ticket{PendingTimeUnix} = $Row[12];
+            $Ticket{Changed}         = $Row[13];
+            $Ticket{Title}           = $Row[14];
+            $Ticket{UnlockTimeout}   = $Row[15];
+            $Ticket{TypeID}          = $Row[16] || 1;
+            $Ticket{ArchiveFlag}     = $Row[17] ? 'y' : 'n';
+            $Ticket{CreateBy}        = $Row[18];
+            $Ticket{ChangeBy}        = $Row[19];
+            $Ticket{AccountedTime}   = $Row[20];
+            $Ticket{AttachmentCount} = $Row[21] || 0;
+        }
+
+        # check ticket
+        if ( !$Ticket{TicketID} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
                 Message  => "No such TicketID ($Param{TicketID})!",
+                Silent   => $Param{Silent}
+            );
+            return;
+        }
+
+        $Ticket{Created} = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
+            SystemTime => $Ticket{CreateTimeUnix},
+        );
+
+        if ($Ticket{PendingTimeUnix} > 0) {
+            $Ticket{PendingTime} = $Kernel::OM->Get('Time')->SystemTime2TimeStamp(
+                SystemTime => $Ticket{PendingTimeUnix},
             );
         }
-        return;
+        else {
+            $Ticket{PendingTime} = '';
+        }
+
+        $Ticket{Queue} = $Kernel::OM->Get('Queue')->QueueLookup(
+            QueueID => $Ticket{QueueID},
+        );
+
+        # fillup runtime values
+        $Ticket{Age} = $Kernel::OM->Get('Time')->SystemTime() - $Ticket{CreateTimeUnix};
+
+        $Ticket{Priority} = $Kernel::OM->Get('Priority')->PriorityLookup(
+            PriorityID => $Ticket{PriorityID},
+        );
+
+        # get owner
+        $Ticket{Owner} = $Kernel::OM->Get('User')->UserLookup(
+            UserID => $Ticket{OwnerID},
+        );
+
+        # get responsible
+        $Ticket{Responsible} = $Kernel::OM->Get('User')->UserLookup(
+            UserID => $Ticket{ResponsibleID},
+        );
+
+        # get lock
+        $Ticket{Lock} = $Kernel::OM->Get('Lock')->LockLookup(
+            LockID => $Ticket{LockID},
+        );
+
+        # get type
+        $Ticket{Type} = $Kernel::OM->Get('Type')->TypeLookup( TypeID => $Ticket{TypeID} );
+
+        # get state info
+        my %StateData = $Kernel::OM->Get('State')->StateGet(
+            ID => $Ticket{StateID}
+        );
+        $Ticket{StateType} = $StateData{TypeName};
+        $Ticket{State}     = $StateData{Name};
+
+        if ( !$Ticket{PendingTimeUnix} || lc $StateData{TypeName} eq 'pending' ) {
+            $Ticket{UntilTime} = 0;
+        }
+        else {
+            $Ticket{UntilTime} = $Ticket{PendingTimeUnix} - $Kernel::OM->Get('Time')->SystemTime();
+        }
+
+        # set cache for basic ticket data, if that is not the requested return data
+        if ( $CacheKey ne 'TicketGet::0::0' ) {
+            my %BasicTicket = %Ticket;
+
+            $Self->_TicketCacheSet(
+                TicketID => $Param{TicketID},
+                Key      => 'TicketGet::0::0',
+                Value    => \%BasicTicket,
+            );
+        }
     }
 
     # check if need to return DynamicFields
-    if ($Param{DynamicFields}) {
-
-        # get dynamic field objects
-        my $DynamicFieldObject        = $Kernel::OM->Get('DynamicField');
-        my $DynamicFieldBackendObject = $Kernel::OM->Get('DynamicField::Backend');
-
+    if ( $Param{DynamicFields} ) {
         my $FieldFilterRef = undef;
-        if ( IsArrayRefWithData($Param{DynamicFields}) ) {
+        if ( IsArrayRef($Param{DynamicFields}) ) {
             my %FieldFilter = map { $_ => 1 } @{$Param{DynamicFields}};
 
             $FieldFilterRef = \%FieldFilter;
         }
 
         # get all dynamic fields for the object type Ticket (with optional filter)
-        my $DynamicFieldList = $DynamicFieldObject->DynamicFieldListGet(
+        my $DynamicFieldList = $Kernel::OM->Get('DynamicField')->DynamicFieldListGet(
             ObjectType => 'Ticket',
             FieldFilter => $FieldFilterRef,
         );
@@ -1471,7 +1549,7 @@ sub TicketGet {
             next DYNAMICFIELD if !$DynamicFieldConfig->{Name};
 
             # get the current value for each dynamic field
-            my $Value = $DynamicFieldBackendObject->ValueGet(
+            my $Value = $Kernel::OM->Get('DynamicField::Backend')->ValueGet(
                 DynamicFieldConfig => $DynamicFieldConfig,
                 ObjectID           => $Ticket{TicketID},
             );
@@ -1479,68 +1557,6 @@ sub TicketGet {
             # set the dynamic field name and value into the ticket hash
             $Ticket{ 'DynamicField_' . $DynamicFieldConfig->{Name} } = $Value;
         }
-    }
-
-    # get time object
-    my $TimeObject = $Kernel::OM->Get('Time');
-
-    $Ticket{Created} = $TimeObject->SystemTime2TimeStamp(
-        SystemTime => $Ticket{CreateTimeUnix},
-    );
-
-    if ($Ticket{PendingTimeUnix} > 0) {
-        $Ticket{PendingTime} = $TimeObject->SystemTime2TimeStamp(
-            SystemTime => $Ticket{PendingTimeUnix},
-        );
-    } else {
-        $Ticket{PendingTime} = '';
-    }
-
-    $Ticket{Queue} = $Kernel::OM->Get('Queue')->QueueLookup(
-        QueueID => $Ticket{QueueID},
-    );
-
-    # fillup runtime values
-    $Ticket{Age} = $TimeObject->SystemTime() - $Ticket{CreateTimeUnix};
-
-    $Ticket{Priority} = $Kernel::OM->Get('Priority')->PriorityLookup(
-        PriorityID => $Ticket{PriorityID},
-    );
-
-    # get user object
-    my $UserObject = $Kernel::OM->Get('User');
-
-    # get owner
-    $Ticket{Owner} = $UserObject->UserLookup(
-        UserID => $Ticket{OwnerID},
-    );
-
-    # get responsible
-    $Ticket{Responsible} = $UserObject->UserLookup(
-        UserID => $Ticket{ResponsibleID},
-    );
-
-    # get lock
-    $Ticket{Lock} = $Kernel::OM->Get('Lock')->LockLookup(
-        LockID => $Ticket{LockID},
-    );
-
-    # get type
-    $Ticket{Type} = $Kernel::OM->Get('Type')->TypeLookup( TypeID => $Ticket{TypeID} );
-
-    # get state info
-    my %StateData = $Kernel::OM->Get('State')->StateGet(
-        ID => $Ticket{StateID}
-    );
-
-    $Ticket{StateType} = $StateData{TypeName};
-    $Ticket{State}     = $StateData{Name};
-
-    if ( !$Ticket{PendingTimeUnix} || lc $StateData{TypeName} eq 'pending' ) {
-        $Ticket{UntilTime} = 0;
-    }
-    else {
-        $Ticket{UntilTime} = $Ticket{PendingTimeUnix} - $TimeObject->SystemTime();
     }
 
     # do extended lookups
@@ -1617,19 +1633,19 @@ sub _TicketCacheClear {
         Type => $Self->{CacheType},
     );
 
-    # cleanup search cache
-    $Kernel::OM->Get('Cache')->CleanUp(
-        Type => "ObjectSearch_Ticket",
-    );
-    # cleanup search cache also for article
-    $Kernel::OM->Get('Cache')->CleanUp(
-        Type => "ObjectSearch_Article",
-    );
+    # cleanup additonal types
+    for my $Type (
+        qw(
+            ObjectSearch_Ticket ObjectSearch_Article
+            TicketIndex
+        )
+    ) {
+        $Kernel::OM->Get('Cache')->CleanUp(
+            Type => $Type
+        );
+    }
 
-    # cleanup index cache
-    $Kernel::OM->Get('Cache')->CleanUp(
-        Type => "TicketIndex",
-    );
+    $Kernel::OM->Get('TimeAccounting')->ClearCache();
 
     return 1;
 }
@@ -3304,18 +3320,18 @@ sub TicketArchiveFlagSet {
 
 to set a ticket state
 
-    my $Success = $TicketObject->TicketStateSet(
+    my $NewStateID = $TicketObject->TicketStateSet(
         State     => 'open',
         TicketID  => 123,
         ArticleID => 123, #optional, for history
         UserID    => 123,
     );
 
-    my $Success = $TicketObject->TicketStateSet(
+    my $NewStateID = $TicketObject->TicketStateSet(
         StateID  => 3,
         TicketID => 123,
         UserID   => 123,
-    );
+    ); 
 
 Optional attribute:
 SendNoNotification, disable or enable agent and customer notification for this
@@ -3332,9 +3348,6 @@ Events:
 
 sub TicketStateSet {
     my ( $Self, %Param ) = @_;
-
-    my %State;
-    my $ArticleID = $Param{ArticleID} || '';
 
     # check needed stuff
     for my $Needed (qw(TicketID UserID)) {
@@ -3354,83 +3367,73 @@ sub TicketStateSet {
         return;
     }
 
-    # get state object
-    my $StateObject = $Kernel::OM->Get('State');
-
-    # KIX4OTRS-capeIT
-    # get previous state if state placeholder is used
-    if ( $Param{State} && $Param{State} eq '_PREVIOUS_' ) {
-        $Param{State} = $Self->GetPreviousTicketState(
-            TicketID => $Param{TicketID},
-        );
-    }
-
     my %Ticket = $Self->TicketGet(
         TicketID      => $Param{TicketID},
         DynamicFields => 0,
     );
 
-    # use fallback if previous state could not be replaced
-    if ( defined( $Param{State} ) && ( $Param{State} eq '0' || $Param{State} eq '_PREVIOUS_' ) )
-    {
-        my $FallbackStates =
-            $Kernel::OM->Get('Config')->Get('TicketStateWorkflow::FallbackForPreviousState')
-            || 0;
-        my $FallbackStatesExtended
-            = $Kernel::OM->Get('Config')->Get('TicketStateWorkflowExtension::FallbackForPreviousState');
-        if ( defined $FallbackStatesExtended && ref $FallbackStatesExtended eq 'HASH' ) {
-            for my $Extension ( sort keys %{$FallbackStatesExtended} ) {
-                for my $Type ( keys %{ $FallbackStatesExtended->{$Extension} } ) {
-                    $FallbackStates->{$Type} = $FallbackStatesExtended->{$Extension}->{$Type};
-                }
+    # get previous state if state placeholder is used
+    if (
+        !$Param{StateID}
+        && $Param{State}
+        && $Param{State} eq '_PREVIOUS_'
+    ) {
+        $Param{State} = $Self->GetPreviousTicketState(
+            TicketID => $Param{TicketID},
+        ) || undef;
+
+        # use fallback if previous state could not be replaced
+        if ( !defined( $Param{State} ) ) {
+            my $FallbackStates = $Kernel::OM->Get('Config')->Get('TicketStateWorkflow::FallbackForPreviousState') || {};
+            if ( IsHashRef( $FallbackStates ) ) {
+                $Param{State} = $FallbackStates->{ $Ticket{Type} . ':::' . $Ticket{State} }
+                    || $FallbackStates->{ $Ticket{Type} }
+                    || undef;
+            }
+
+            if ( !defined( $Param{State} ) ) {
+                $Kernel::OM->Get('Log')->Log(
+                    Priority => 'error',
+                    Message  => 'Missing fallback for previous state!'
+                );
+                return;
             }
         }
-
-        if ( $FallbackStates && ref($FallbackStates) eq 'HASH' ) {
-            $Param{State} =
-                $FallbackStates->{ $Ticket{Type} . ':::' . $Ticket{State} }
-                || $FallbackStates->{ $Ticket{Type} }
-                || '_PREVIOUS_';
-        }
-    }
-
-    # EO KIX4OTRS-capeIT
-
-    # state id lookup
-    if ( !$Param{StateID} ) {
-        %State = $StateObject->StateGet( Name => $Param{State} );
     }
 
     # state lookup
-    if ( !$Param{State} ) {
-        %State = $StateObject->StateGet( ID => $Param{StateID} );
+    my %State;
+    # by id
+    if ( $Param{StateID} ) {
+        %State = $Kernel::OM->Get('State')->StateGet(
+            ID => $Param{StateID}
+        );
+    }
+    # by name
+    elsif ( $Param{State} ) {
+        %State = $Kernel::OM->Get('State')->StateGet(
+            Name => $Param{State}
+        );
     }
     if ( !%State ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'error',
-            Message  => 'Need StateID or State!'
+            Message  => 'Need valid StateID or State!'
         );
         return;
     }
 
     # check if update is needed
-    # KIX4OTRS-capeIT
-    # moved content upwards
-    # my %Ticket = $Self->TicketGet( TicketID => $Param{TicketID} );
-    # EO KIX4OTRS-capeIT
-
-    if ( $State{Name} eq $Ticket{State} ) {
-
+    if ( $State{ID} eq $Ticket{StateID} ) {
         # update is not needed
-        # KIX4OTRS-capeIT
-        # return 1;
         return $State{ID};
-
-        # EO KIX4OTRS-capeIT
     }
 
     # permission check
-    my %StateList = $Self->TicketStateList(%Param);
+    my %StateList = $Self->TicketStateList(
+        TicketID => $Param{TicketID},
+        UserID   => $Param{UserID}
+    );
     if ( !$StateList{ $State{ID} } ) {
         $Kernel::OM->Get('Log')->Log(
             Priority => 'notice',
@@ -3450,6 +3453,9 @@ sub TicketStateSet {
     $Self->_TicketCacheClear(
         TicketID => $Param{TicketID}
     );
+
+    # prepare ArticleID
+    my $ArticleID = $Param{ArticleID} || '';
 
     # add history
     $Self->HistoryAdd(
@@ -3479,11 +3485,7 @@ sub TicketStateSet {
         ObjectID  => $Param{TicketID}.'::'.$Ticket{StateID}.'::'.$State{ID},
     );
 
-    # KIX4OTRS-capeIT
-    # return 1;
     return $State{ID};
-
-    # EO KIX4OTRS-capeIT
 }
 
 =item TicketStateList()
@@ -3492,22 +3494,6 @@ to get the state list for a ticket (depends on workflow, if configured)
 
     my %States = $TicketObject->TicketStateList(
         TicketID => 123,
-        UserID   => 123,
-    );
-
-    my %States = $TicketObject->TicketStateList(
-        TicketID       => 123,
-        ContactID => 'customer_user_id_123',
-    );
-
-    my %States = $TicketObject->TicketStateList(
-        QueueID => 123,
-        UserID  => 123,
-    );
-
-    my %States = $TicketObject->TicketStateList(
-        TicketID => 123,
-        Type     => 'open',
         UserID   => 123,
     );
 
@@ -3524,63 +3510,27 @@ Returns:
 sub TicketStateList {
     my ( $Self, %Param ) = @_;
 
+
+    # check needed stuff
+    if ( !$Param{UserID} ) {
+        $Kernel::OM->Get('Log')->Log(
+            Priority => 'error',
+            Message  => 'Need UserID!'
+        );
+        return;
+    }
+
     my %States;
-
-    # check needed stuff
-    if ( !$Param{UserID} && !$Param{ContactID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Need UserID or ContactID!'
-        );
-        return;
-    }
-
-    # check needed stuff
-    if ( !$Param{QueueID} && !$Param{TicketID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Need QueueID, TicketID!'
-        );
-        return;
-    }
-
-    # get config object
-    my $ConfigObject = $Kernel::OM->Get('Config');
-
-    # get state object
-    my $StateObject = $Kernel::OM->Get('State');
-
     # get states by type
     if ( $Param{Type} ) {
-        %States = $StateObject->StateGetStatesByType(
+        %States = $Kernel::OM->Get('State')->StateGetStatesByType(
             Type   => $Param{Type},
             Result => 'HASH',
         );
     }
-    elsif ( $Param{Action} ) {
-
-        if (
-            ref $ConfigObject->Get("Ticket::Frontend::$Param{Action}")->{StateType} ne
-            'ARRAY'
-            )
-        {
-            $Kernel::OM->Get('Log')->Log(
-                Priority => 'error',
-                Message  => "Need config for Ticket::Frontend::$Param{Action}->StateType!"
-            );
-            return;
-        }
-
-        my @StateType = @{ $ConfigObject->Get("Ticket::Frontend::$Param{Action}")->{StateType} };
-        %States = $StateObject->StateGetStatesByType(
-            StateType => \@StateType,
-            Result    => 'HASH',
-        );
-    }
-
     # get whole states list
     else {
-        %States = $StateObject->StateList(
+        %States = $Kernel::OM->Get('State')->StateList(
             UserID => $Param{UserID},
         );
     }
@@ -5145,158 +5095,50 @@ sub HistoryDelete {
     return 1;
 }
 
-=item TicketAccountedTimeGet()
+=item TicketAccountedTimeSet ()
 
-returns the accounted time of a ticket.
+calculate the total accounted time of a ticket and sets to the ticket.
 
-    my $AccountedTime = $TicketObject->TicketAccountedTimeGet(TicketID => 1234);
+    my $TotalTime = $TicketObject->TicketAccountedTimeSet(
+        TicketID => 1234
+    );
 
 =cut
 
-sub TicketAccountedTimeGet {
+sub TicketAccountedTimeSet {
     my ( $Self, %Param ) = @_;
 
-    # check needed stuff
-    if ( !$Param{TicketID} ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => 'Need TicketID!'
-        );
-        return;
-    }
-
-    # get database object
-    my $DBObject = $Kernel::OM->Get('DB');
-
-    # db query
-    return if !$DBObject->Prepare(
-        SQL  => 'SELECT SUM(time_unit) FROM time_accounting WHERE ticket_id = ?',
-        Bind => [ \$Param{TicketID} ],
-    );
-
-    my $AccountedTime = 0;
-    while ( my @Row = $DBObject->FetchrowArray() ) {
-        if (@Row && $Row[0]) {
-            $Row[0] =~ s/,/./g;
-            $AccountedTime = $AccountedTime + int($Row[0]);
-        }
-    }
-
-    return $AccountedTime;
-}
-
-=item TicketAccountTime()
-
-account time to a ticket.
-
-    my $Success = $TicketObject->TicketAccountTime(
-        TicketID  => 1234,
-        ArticleID => 23542,      # optional
-        TimeUnit  => '4.5',
-        UserID    => 1,
-    );
-
-Events:
-    TicketAccountTime
-
-=cut
-
-sub TicketAccountTime {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for my $Needed (qw(TicketID TimeUnit UserID)) {
-        if ( !defined $Param{$Needed} ) {
+    for my $Needed ( qw(TicketID UserID) ) {
+        if ( !$Param{$Needed} ) {
             $Kernel::OM->Get('Log')->Log(
                 Priority => 'error',
-                Message  => "Need $Needed!"
+                Message  => "Need $Needed!",
+                Silent   => $Param{Silent}
             );
             return;
         }
     }
 
-    # check some wrong formats
-    $Param{TimeUnit} =~ s/,/\./g;
-    $Param{TimeUnit} =~ s/ //g;
-    $Param{TimeUnit} =~ s/^(-?\d{1,10}\.\d\d).+?$/$1/g;
-    chomp $Param{TimeUnit};
-
-    if ( !IsNumber($Param{TimeUnit}) ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "TimeUnit is not a number!"
-        );
-        return;
-    }
-
-    if (
-        $Param{TimeUnit} >= 86400 ||
-        $Param{TimeUnit} <= -86400
-    ) {
-        $Kernel::OM->Get('Log')->Log(
-            Priority => 'error',
-            Message  => "TimeUnit has to be between -86400 and 86400!"
-        );
-        return;
-    }
-
-    # get database object
-    my $DBObject = $Kernel::OM->Get('DB');
-
-    # db quote
-    $Param{TimeUnit} = $DBObject->Quote( $Param{TimeUnit}, 'Number' );
-
-    # db update
-    return if !$DBObject->Do(
-        SQL => "INSERT INTO time_accounting "
-            . " (ticket_id, article_id, time_unit, create_time, create_by, change_time, change_by) "
-            . " VALUES (?, ?, $Param{TimeUnit}, current_timestamp, ?, current_timestamp, ?)",
-        Bind => [
-            \$Param{TicketID}, \$Param{ArticleID}, \$Param{UserID}, \$Param{UserID},
-        ],
+    my $Result = $Kernel::OM->Get('TimeAccounting')->TimeAccountingTotal(
+        TicketID => $Param{TicketID}
     );
 
-    my $AccountedTime = $Self->TicketAccountedTimeGet( TicketID => $Param{TicketID} );
+    # ensure integer value (time accounting uses decimal, ticket accounted time only integer)
+    $Result = int( $Result );
 
-    # update ticket data
-    return if !$DBObject->Do(
+    return if !defined $Result;
+
+    return if !$Kernel::OM->Get('DB')->Do(
         SQL => 'UPDATE ticket SET change_time = current_timestamp, '
             . ' change_by = ?, accounted_time = ? WHERE id = ?',
-        Bind => [ \$Param{UserID}, \$AccountedTime, \$Param{TicketID} ],
+        Bind => [ \$Param{UserID}, \$Result, \$Param{TicketID} ],
     );
 
-    # clear ticket cache
     $Self->_TicketCacheClear(
         TicketID => $Param{TicketID}
     );
 
-    # add history
-    $Self->HistoryAdd(
-        TicketID     => $Param{TicketID},
-        ArticleID    => $Param{ArticleID},
-        CreateUserID => $Param{UserID},
-        HistoryType  => 'TimeAccounting',
-        Name         => "\%\%$Param{TimeUnit}\%\%$AccountedTime",
-    );
-
-    # trigger event
-    $Self->EventHandler(
-        Event => 'TicketAccountTime',
-        Data  => {
-            TicketID  => $Param{TicketID},
-            ArticleID => $Param{ArticleID},
-        },
-        UserID => $Param{UserID},
-    );
-
-    # push client callback event
-    $Kernel::OM->Get('ClientNotification')->NotifyClients(
-        Event     => 'UPDATE',
-        Namespace => 'Ticket',
-        ObjectID  => $Param{TicketID},
-    );
-
-    return 1;
+    return $Result;
 }
 
 =item TicketFlagSet()
@@ -5859,7 +5701,7 @@ sub TSWFCommonNextStates {
 
         my %States = $Kernel::OM->Get('Ticket')->TicketStateList(
             TicketID => $CurrTID,
-            UserID => $Param{UserID} || 1,
+            UserID   => $Param{UserID} || 1,
         );
 
         my @CurrNextStatesArr;
@@ -6230,26 +6072,22 @@ sub ArticleMove {
     );
 
     # update time accounting data
-    return 'AccountFailed' if !$Kernel::OM->Get('DB')->Do(
-        SQL => 'UPDATE time_accounting SET ticket_id = ?, '
-            . "change_time = current_timestamp, change_by = ? WHERE article_id = ?",
-        Bind => [ \$Param{TicketID}, \$Param{UserID}, \$Param{ArticleID} ],
+    return 'AccountFailed' if !$Kernel::OM->Get('TimeAccounting')->TimeAccountingMoveTo(
+        ArticleID   => $Param{ArticleID},
+        NewTicketID => $Param{TicketID},
+        UserID      => $Param{UserID}
     );
 
     # update accounted time of old ticket
-    my $OldAccountedTime = $Self->TicketAccountedTimeGet( TicketID => $TicketID );
-    return if !$Kernel::OM->Get('DB')->Do(
-        SQL => 'UPDATE ticket SET change_time = current_timestamp, '
-            . ' change_by = ?, accounted_time = ? WHERE id = ?',
-        Bind => [ \$Param{UserID}, \$OldAccountedTime, \$TicketID ],
+    return if !defined $Self->TicketAccountedTimeSet(
+        TicketID => $TicketID,
+        UserID   => $Param{UserID}
     );
 
     # update accounted time of new ticket
-    my $NewAccountedTime = $Self->TicketAccountedTimeGet( TicketID => $Param{TicketID} );
-    return if !$Kernel::OM->Get('DB')->Do(
-        SQL => 'UPDATE ticket SET change_time = current_timestamp, '
-            . ' change_by = ?, accounted_time = ? WHERE id = ?',
-        Bind => [ \$Param{UserID}, \$NewAccountedTime, \$Param{TicketID} ],
+    return if !defined $Self->TicketAccountedTimeSet(
+        TicketID => $Param{TicketID},
+        UserID   => $Param{UserID}
     );
 
     # clear ticket cache
@@ -6470,46 +6308,6 @@ sub ArticleCreateDateUpdate {
         Namespace => 'Ticket.Article',
         ObjectID  => $Param{TicketID}.'::'.$Param{ArticleID},
     );
-
-    return 1;
-}
-
-=item TicketAccountedTimeDelete()
-
-deletes the accounted time of a ticket.
-
-    my $Success = $TicketObject->TicketAccountedTimeDelete(
-        TicketID    => 1234,
-        ArticleID   => 1234     # optional
-    );
-
-=cut
-
-sub TicketAccountedTimeDelete {
-    my ( $Self, %Param ) = @_;
-
-    # check needed stuff
-    for my $Needed (qw(TicketID)) {
-        if ( !$Param{$Needed} ) {
-            $Kernel::OM->Get('Log')
-                ->Log( Priority => 'error', Message => "Need $Needed!" );
-            return;
-        }
-    }
-
-    # db query
-    if ( $Param{ArticleID} ) {
-        return if !$Kernel::OM->Get('DB')->Prepare(
-            SQL => 'DELETE FROM time_accounting WHERE ticket_id = ? AND article_id = ?',
-            Bind => [ \$Param{TicketID}, \$Param{ArticleID} ],
-        );
-    }
-    else {
-        return if !$Kernel::OM->Get('DB')->Prepare(
-            SQL  => 'DELETE FROM time_accounting WHERE ticket_id = ?',
-            Bind => [ \$Param{TicketID} ],
-        );
-    }
 
     return 1;
 }

@@ -54,4 +54,22 @@ When qr/delete all this faq articles$/, sub {
 
 };
 
+#=========== delete all items ===================================================================
 
+When qr/delete all of "(.*?)"$/, sub {
+    my $LC = lc($1).'s';
+    ( S->{Response}, S->{ResponseContent} ) = _Get(
+        Token => S->{Token},
+        URL   => S->{API_URL}.'/faq/articles',#.$LC
+    );
+
+    my $ARRAYAnzahl = @{S->{ResponseContent}->{$1}};
+    if ( $ARRAYAnzahl ) {
+        foreach my $Row ( @{S->{ResponseContent}->{FAQArticle}} ) {
+            ( S->{Response}, S->{ResponseContent} ) = _Delete(
+                Token => S->{Token},
+                URL   => S->{API_URL} . '/faq/articles/' . $Row->{ID} || 1,
+            );
+        };
+    }
+};

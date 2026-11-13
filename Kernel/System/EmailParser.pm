@@ -103,6 +103,12 @@ sub new {
             @Email = @{$Param{Email}}
         }
 
+        # create Mail::Internet object for original email
+        my $OriginalMail = $Kernel::OM->Get('Storable')->Clone(
+            Data => \@Email
+        );
+        $Self->{OriginalEmail} = Mail::Internet->new( $OriginalMail );
+
         if ( !$Param{NoDecrypt} ) {
             # decrypt email if needed
             my $DecryptedRef = $Kernel::OM->Get('Certificate')->Decrypt(
@@ -176,6 +182,20 @@ sub GetPlainEmail {
     my $Self = shift;
 
     return $Self->{Email}->as_string();
+}
+
+=item GetOriginalPlainEmail()
+
+To get the original email as a string back (plain email).
+
+    my $Email = $ParserObject->GetOriginalPlainEmail();
+
+=cut
+
+sub GetOriginalPlainEmail {
+    my $Self = shift;
+
+    return $Self->{OriginalEmail}->as_string();
 }
 
 =item GetParam()

@@ -313,7 +313,7 @@ sub _GetArticleData {
             ID => $QueueInfo{SystemAddressID},
         );
 
-        $ArticleData{To} = $ArticleData{To} . ' <' . $QueueSystemeMailAddress{Name} . '>';
+        $ArticleData{To} = '"' . $ArticleData{To} . '" <' . $QueueSystemeMailAddress{Name} . '>';
     }
 
     if ( $Param{Data}->{include}->{Plain} ) {
