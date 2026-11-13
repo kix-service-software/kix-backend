@@ -888,7 +888,8 @@ sub ConfigSettingChange {
     die "Need 'Key'" if !defined $Key;
 
     my %OptionData = $Kernel::OM->Get('SysConfig')->OptionGet(
-        Name => $Key,
+        Name   => $Key,
+        Silent => $Param{Silent}
     );
     if ( %OptionData ) {
         my $ValidID = 1;
